@@ -49,6 +49,17 @@ GraphCreatorGUIHandler.prototype.show = function(graphID, markedPoints){
     }
   }
 
+  var removeEdge = function(vertex1, vertex2, fromName, toName){
+    if (!graph.removeEdge(vertex1, vertex2)){
+      terminal.printError(Text.EDGE_DOES_NOT_EXIST);
+    }else{
+      terminal.printInfo(Text.EDGE_REMOVED.replace(Text.PARAM1, fromName).replace(Text.PARAM2, toName));
+      debugHelper.deactivate();
+      debugHelper = new Kompute.DebugHelper(world, THREE, scene);
+      debugHelper.visualiseGraph(graph);
+    }
+  }
+
   var onExit = function(isDone){
     terminal.clear();
     terminal.enable();
@@ -82,6 +93,18 @@ GraphCreatorGUIHandler.prototype.show = function(graphID, markedPoints){
         addEdge(vertex2, vertex1, this["To"], this["From"]);
       }
     },
+    "Remove edge": function(){
+      terminal.clear();
+
+      var vertex1 = verticesByMarkedPointName[this["From"]];
+      var vertex2 = verticesByMarkedPointName[this["To"]];
+
+      removeEdge(vertex1, vertex2, this["From"], this["To"]);
+
+      if (this["Direction"] == "Two ways"){
+        removeEdge(vertex2, vertex1, this["To"], this["From"]);
+      }
+    },
     "Done": function(){
 
       var edgeCount = 0;
@@ -105,6 +128,7 @@ GraphCreatorGUIHandler.prototype.show = function(graphID, markedPoints){
   guiHandler.datGuiGraphCreation.add(config, "To", markedPointNames).listen();
   guiHandler.datGuiGraphCreation.add(config, "Direction", ["One way", "Two ways"]).listen();
   guiHandler.datGuiGraphCreation.add(config, "Create edge").listen();
+  guiHandler.datGuiGraphCreation.add(config, "Remove edge").listen();
   guiHandler.datGuiGraphCreation.add(config, "Done").listen();
   guiHandler.datGuiGraphCreation.add(config, "Cancel").listen();
 }
