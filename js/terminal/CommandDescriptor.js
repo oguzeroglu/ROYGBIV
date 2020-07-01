@@ -249,7 +249,8 @@ var CommandDescriptor = function(){
       2, //insertJumpDescriptorToPath
       4, //constructGraph
       1, //destroyGraph
-      0 //printGraphs
+      0, //printGraphs
+      2 //newGraph
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -501,7 +502,8 @@ var CommandDescriptor = function(){
     "insertJumpDescriptorToPath jumpDescriptorID pathID",
     "constructGraph id offsetX offsetY offsetZ",
     "destroyGraph id",
-    "printGraphs"
+    "printGraphs",
+    "newGraph id point[0],point[1],....point[n]"
   ];
 
   this.commands = [
@@ -753,7 +755,8 @@ var CommandDescriptor = function(){
     "insertJumpDescriptorToPath",
     "constructGraph",
     "destroyGraph",
-    "printGraphs"
+    "printGraphs",
+    "newGraph"
   ];
 
   this.commandInfo = [
@@ -1005,7 +1008,8 @@ var CommandDescriptor = function(){
     "insertJumpDescriptorToPath: Inserts a jump descriptor to a path.",
     "constructGraph: Automatically constructs a graph from selected grids.",
     "destroyGraph: Destroys a graph of given id.",
-    "printGraphs: Prints created graphs."
+    "printGraphs: Prints created graphs.",
+    "newGraph: Opens graph creation GUI to manually create a graph from given vertices."
   ];
 
   this.keyboardInfo = [
@@ -1888,6 +1892,12 @@ var CommandDescriptor = function(){
   this.destroyGraph = new Object();
   this.destroyGraph.types = [];
   this.destroyGraph.types.push(this.GRAPH_ID); //id
+
+  // newGraph
+  this.newGraph = new Object();
+  this.newGraph.types = [];
+  this.newGraph.types.push(this.UNKNOWN_INDICATOR); //id
+  this.newGraph.types.push(this.ANY_MARKED_POINT); //point[0],point[1],....,point[n]
 };
 
 CommandDescriptor.prototype.test = function(){

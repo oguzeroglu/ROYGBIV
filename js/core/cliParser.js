@@ -5964,8 +5964,8 @@ function parse(input){
             }
           }
 
-          if (waypoints.length == 0){
-            terminal.printError(Text.MUST_SPECIFY_AT_LEAST_ONE_POINT);
+          if (waypoints.length < 2){
+            terminal.printError(Text.MUST_SPECIFY_AT_LEAST_TWO_POINTS);
             return true;
           }
 
@@ -6221,6 +6221,46 @@ function parse(input){
           if (count == 0){
             terminal.printError(Text.NO_GRAPHS_IN_THIS_SCENE);
           }
+          return true;
+        break;
+        case 249: //newGraph
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+
+          if (steeringHandler.usedGraphIDs[id]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          var pointNames = splitted[2].split(",");
+
+          var usedPoints = [];
+
+          for (var i = 0; i < pointNames.length; i ++){
+            var markedPoint = markedPoints[pointNames[i]];
+            if (!markedPoint){
+              terminal.printError(Text.POINT_X_DOES_NOT_EXIST.replace(Text.PARAM1, i));
+              return true;
+            }
+
+            if (markedPoint.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.POINT_X_NOT_IN_ACTIVE_SCENE.replace(Text.PARAM1, i));
+              return true;
+            }
+
+            usedPoints.push(markedPoint);
+          }
+
+          if (usedPoints.length < 2){
+            terminal.printError(Text.MUST_SPECIFY_AT_LEAST_TWO_POINTS);
+            return true;
+          }
+
+          graphCreatorGUIHandler.show(id, usedPoints);
           return true;
         break;
       }

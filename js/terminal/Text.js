@@ -445,6 +445,7 @@ var Text = function(){
   this.NO_LIGHTNINGS_FOUND = "No lightnings found.";
   this.NO_SUCH_TEXTURE_PACK = "No such texture pack.";
   this.MUST_SPECIFY_AT_LEAST_ONE_POINT = "Must specify at least one marked point.";
+  this.MUST_SPECIFY_AT_LEAST_TWO_POINTS = "Must specify at least two marked points.";
   this.POINT_X_DOES_NOT_EXIST = "Point#@@1 does not exist.";
   this.POINT_X_NOT_IN_ACTIVE_SCENE = "Point#@@1 is not inside the active scene.";
   this.NO_SUCH_TEXT = "No such text.";
