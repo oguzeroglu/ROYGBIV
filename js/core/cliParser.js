@@ -6241,18 +6241,28 @@ function parse(input){
           var usedPoints = [];
 
           for (var i = 0; i < pointNames.length; i ++){
-            var markedPoint = markedPoints[pointNames[i]];
-            if (!markedPoint){
-              terminal.printError(Text.POINT_X_DOES_NOT_EXIST.replace(Text.PARAM1, i));
-              return true;
-            }
+            if (pointNames[i].indexOf("*") >= 0){
+              var nameSplitted = pointNames[i].split("*");
+              for (var ptName in sceneHandler.getMarkedPoints()){
+                if (ptName.toLowerCase().startsWith(nameSplitted[0].toLowerCase())){
+                  usedPoints.push(markedPoints[ptName]);
+                }
+              }
+            }else{
+              var markedPoint = markedPoints[pointNames[i]];
 
-            if (markedPoint.registeredSceneName != sceneHandler.getActiveSceneName()){
-              terminal.printError(Text.POINT_X_NOT_IN_ACTIVE_SCENE.replace(Text.PARAM1, i));
-              return true;
-            }
+              if (!markedPoint){
+                terminal.printError(Text.POINT_X_DOES_NOT_EXIST.replace(Text.PARAM1, i));
+                return true;
+              }
 
-            usedPoints.push(markedPoint);
+              if (markedPoint.registeredSceneName != sceneHandler.getActiveSceneName()){
+                terminal.printError(Text.POINT_X_NOT_IN_ACTIVE_SCENE.replace(Text.PARAM1, i));
+                return true;
+              }
+
+              usedPoints.push(markedPoint);
+            }
           }
 
           if (usedPoints.length < 2){
