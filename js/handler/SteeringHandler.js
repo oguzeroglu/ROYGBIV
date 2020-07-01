@@ -170,6 +170,15 @@ SteeringHandler.prototype.export = function(){
   return exportObject;
 }
 
+SteeringHandler.prototype.onBeforeSceneChange = function(){
+  var graphs = this.graphsBySceneName[sceneHandler.getActiveSceneName()];
+  if (graphs){
+    for (var id in graphs){
+      this.world.removeGraph(graphs[id]);
+    }
+  }
+}
+
 SteeringHandler.prototype.onAfterSceneChange = function(){
   this.resetWorld();
 }
@@ -234,6 +243,13 @@ SteeringHandler.prototype.resetWorld = function(){
   if (obstacles){
     for (var id in obstacles){
       this.world.insertEntity(obstacles[id]);
+    }
+  }
+
+  var graphs = this.graphsBySceneName[sceneHandler.getActiveSceneName()];
+  if (graphs){
+    for (var id in graphs){
+      this.world.insertGraph(graphs[id]);
     }
   }
 }
