@@ -6239,6 +6239,7 @@ function parse(input){
           var pointNames = splitted[2].split(",");
 
           var usedPoints = [];
+          var vertices = [];
 
           for (var i = 0; i < pointNames.length; i ++){
             if (pointNames[i].indexOf("*") >= 0){
@@ -6263,14 +6264,20 @@ function parse(input){
 
               usedPoints.push(markedPoint);
             }
+
+            for (var i2 = 0; i2 < usedPoints.length; i2 ++){
+              if (vertices.indexOf(usedPoints[i2]) < 0){
+                vertices.push(usedPoints[i2]);
+              }
+            }
           }
 
-          if (usedPoints.length < 2){
+          if (vertices.length < 2){
             terminal.printError(Text.MUST_SPECIFY_AT_LEAST_TWO_POINTS);
             return true;
           }
 
-          graphCreatorGUIHandler.show(id, usedPoints);
+          graphCreatorGUIHandler.show(id, vertices);
           return true;
         break;
       }
