@@ -6191,6 +6191,38 @@ function parse(input){
           }
           return true;
         break;
+        case 248: //printGraphs
+          var count = 0;
+          var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          terminal.printHeader(Text.GRAPHS_IN_THIS_SCENE);
+          for (var id in graphs){
+            count ++;
+            var graph = graphs[id];
+
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, id), true);
+            terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "vertices"), true);
+            graph.forEachVertex(function(x, y, z){
+              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, "("+ x +", " + y + ", " + z + ")"), true);
+            });
+            terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "edges"), true);
+            var totalEdgeCount = 0;
+            var edgeCount = 0;
+            graph.forEachEdge(function(edge){
+              totalEdgeCount ++;
+            });
+            graph.forEachEdge(function(edge){
+              edgeCount ++;
+              var opt = edgeCount != totalEdgeCount;
+              var edgeTextFrom = "(" + edge.fromVertex.x + ", " + edge.fromVertex.y + ", " + edge.fromVertex.z +")";
+              var edgeTextTo = "(" + edge.toVertex.x + ", " + edge.toVertex.y + ", " + edge.toVertex.z +")";
+              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, edgeTextFrom + " --> " + edgeTextTo), opt);
+            });
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_GRAPHS_IN_THIS_SCENE);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

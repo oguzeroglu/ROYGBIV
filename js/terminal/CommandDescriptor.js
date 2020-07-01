@@ -248,7 +248,8 @@ var CommandDescriptor = function(){
       0, //printPaths
       2, //insertJumpDescriptorToPath
       4, //constructGraph
-      1 //destroyGraph
+      1, //destroyGraph
+      0 //printGraphs
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -499,7 +500,8 @@ var CommandDescriptor = function(){
     "printPaths",
     "insertJumpDescriptorToPath jumpDescriptorID pathID",
     "constructGraph id offsetX offsetY offsetZ",
-    "destroyGraph id"
+    "destroyGraph id",
+    "printGraphs"
   ];
 
   this.commands = [
@@ -750,7 +752,8 @@ var CommandDescriptor = function(){
     "printPaths",
     "insertJumpDescriptorToPath",
     "constructGraph",
-    "destroyGraph"
+    "destroyGraph",
+    "printGraphs"
   ];
 
   this.commandInfo = [
@@ -1001,7 +1004,8 @@ var CommandDescriptor = function(){
     "printPaths: Prints created paths.",
     "insertJumpDescriptorToPath: Inserts a jump descriptor to a path.",
     "constructGraph: Automatically constructs a graph from selected grids.",
-    "destroyGraph: Destroys a graph of given id."
+    "destroyGraph: Destroys a graph of given id.",
+    "printGraphs: Prints created graphs."
   ];
 
   this.keyboardInfo = [
