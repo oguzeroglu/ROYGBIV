@@ -526,6 +526,18 @@ SteeringHandler.prototype.insertJumpDescriptorToPath = function(jumpDescriptorID
   return true;
 }
 
+SteeringHandler.prototype.registerGraph = function(id, graph){
+  this.usedGraphIDs[id] = graph;
+  
+  var graphs = this.graphsBySceneName[sceneHandler.getActiveSceneName()];
+  if (!graphs){
+    graphs = {};
+    this.graphsBySceneName[sceneHandler.getActiveSceneName()] = graphs;
+  }
+
+  graphs[id] = graph;
+}
+
 SteeringHandler.prototype.constructGraph = function(id, grids, offsetX, offsetY, offsetZ){
   if (this.usedGraphIDs[id]){
     return false;

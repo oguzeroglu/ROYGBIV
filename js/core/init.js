@@ -82,6 +82,7 @@ window.onload = function() {
     lightningCreatorGUIHandler = new LightningCreatorGUIHandler();
     virtualKeyboardCreatorGUIHandler = new VirtualKeyboardCreatorGUIHandler();
     lightsGUIHandler = new LightsGUIHandler();
+    graphCreatorGUIHandler = new GraphCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

@@ -346,6 +346,7 @@ var animationCreatorGUIHandler;
 var lightningCreatorGUIHandler;
 var virtualKeyboardCreatorGUIHandler;
 var lightsGUIHandler;
+var graphCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
