@@ -6358,6 +6358,59 @@ function parse(input){
 
           return true;
         break;
+        case 251: //mergeGraphs
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var graphID = splitted[1];
+          if (steeringHandler.usedGraphIDs[graphID]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          var splittedGraphIDs = splitted[2].split(",");
+          var ary = [];
+          var graphsAry = [];
+          for (var i = 0; i < splittedGraphIDs.length; i ++){
+            if (splittedGraphIDs[i].indexOf("*") >= 0){
+              var idSplitted = splittedGraphIDs[i].split("*");
+              for (var gid in steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()]){
+                if (gid.toLowerCase().startsWith(idSplitted[0].toLowerCase())){
+                  ary.push(gid);
+                }
+              }
+            }else{
+              if (!steeringHandler.usedGraphIDs[splittedGraphIDs[i]]){
+                terminal.printError(Text.GRAPH_X_DOES_NOT_EXIST.replace(Text.PARAM1, i));
+                return true;
+              }
+              var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+              if (!graphs[splittedGraphIDs[i]]){
+                terminal.printError(Text.GRAPH_X_NOT_IN_ACTIVE_SCENE.replace(Text.PARAM1, i));
+                return true;
+              }
+
+              ary.push(splittedGraphIDs[i]);
+            }
+
+            for (var i2 = 0; i2 < ary.length; i2 ++){
+              if (graphsAry.indexOf(ary[i2]) < 0){
+                graphsAry.push(ary[i2]);
+              }
+            }
+          }
+
+          if (graphsAry.length < 2){
+            terminal.printError(Text.MUST_MERGE_AT_LEAST_2_GRAPHS);
+            return true;
+          }
+
+          steeringHandler.mergeGraphs(graphID, graphsAry);
+          terminal.printInfo(Text.GRAPHS_MERGED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

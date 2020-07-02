@@ -878,6 +878,22 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Graphs]: ";
 			break;
+			case commandDescriptor.ANY_GRAPH_ID:
+				var splittedEntry = curEntry.split(",");
+				for (var graphID in steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()]){
+					var found = false;
+					for (var i = 0; i<splittedEntry.length; i++){
+						if (splittedEntry[i] == graphID){
+							found = true;
+						}
+					}
+					if (!found){
+						possibilities.push(graphID);
+					}
+				}
+				replaceCommand = false;
+				helpString = "[Graphs]: ";
+			break;
 		}
 
 		//  **********************************************************

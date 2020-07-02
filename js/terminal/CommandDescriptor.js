@@ -251,7 +251,8 @@ var CommandDescriptor = function(){
       1, //destroyGraph
       0, //printGraphs
       2, //newGraph
-      2 //insertJumpDescriptorToGraph
+      2, //insertJumpDescriptorToGraph
+      2 //mergeGraphs
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -505,7 +506,8 @@ var CommandDescriptor = function(){
     "destroyGraph id",
     "printGraphs",
     "newGraph id point[0],point[1],....point[n]",
-    "insertJumpDescriptorToGraph jumpDescriptorID graphID"
+    "insertJumpDescriptorToGraph jumpDescriptorID graphID",
+    "mergeGraphs mergedGraphID id[0],id[1],.....id[n]"
   ];
 
   this.commands = [
@@ -759,7 +761,8 @@ var CommandDescriptor = function(){
     "destroyGraph",
     "printGraphs",
     "newGraph",
-    "insertJumpDescriptorToGraph"
+    "insertJumpDescriptorToGraph",
+    "mergeGraphs"
   ];
 
   this.commandInfo = [
@@ -1013,7 +1016,8 @@ var CommandDescriptor = function(){
     "destroyGraph: Destroys a graph of given id.",
     "printGraphs: Prints created graphs.",
     "newGraph: Opens graph creation GUI to manually create a graph from given vertices.",
-    "insertJumpDescriptorToGraph: Inserts a jump descriptor to a graph."
+    "insertJumpDescriptorToGraph: Inserts a jump descriptor to a graph.",
+    "mergeGraphs: Creates a new graph by merging given graphs."
   ];
 
   this.keyboardInfo = [
@@ -1163,6 +1167,7 @@ var CommandDescriptor = function(){
   this.ANY_MARKED_POINT            =   49;
   this.PATH_ID                     =   50;
   this.GRAPH_ID                    =   51;
+  this.ANY_GRAPH_ID                =   52;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1908,6 +1913,12 @@ var CommandDescriptor = function(){
   this.insertJumpDescriptorToGraph.types = [];
   this.insertJumpDescriptorToGraph.types.push(this.JUMP_DESCRIPTOR_ID); //jumpDescriptorID
   this.insertJumpDescriptorToGraph.types.push(this.GRAPH_ID); //graphID
+
+  // mergeGraphs
+  this.mergeGraphs = new Object();
+  this.mergeGraphs.types = [];
+  this.mergeGraphs.types.push(this.UNKNOWN_INDICATOR); //mergedGraphID
+  this.mergeGraphs.types.push(this.ANY_GRAPH_ID); //id[0],id[1],.....id[n]
 };
 
 CommandDescriptor.prototype.test = function(){
