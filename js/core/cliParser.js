@@ -6286,6 +6286,58 @@ function parse(input){
           graphCreatorGUIHandler.show(id, vertices);
           return true;
         break;
+        case 250: //insertJumpDescriptorToGraph
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var jdID = splitted[1];
+          var graphID = splitted[2];
+
+          if (!steeringHandler.usedJumpDescriptorIDs[jdID]){
+            terminal.printError(Text.NO_SUCH_JUMPDESCRIPTOR);
+            return true;
+          }
+
+          if (!steeringHandler.usedGraphIDs[graphID]){
+            terminal.printError(Text.NO_SUCH_GRAPH);
+            return true;
+          }
+
+          var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+          if (!jumpDescriptors[jdID]){
+            terminal.printError(Text.JUMPDESCRIPTOR_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+
+          if (!graphs[graphID]){
+            terminal.printError(Text.GRAPH_NOT_INSIDE_ACTIVE_SCENE);
+            return true;
+          }
+
+          for (var gid in steeringHandler.graphsByJumpDescriptors[jdID]){
+            if (gid == graphID){
+              terminal.printError(Text.JUMPDESCRIPTOR_ALREADY_INSERTED_TO_THE_GRAPH);
+              return true;
+            }
+          }
+
+          if (steeringHandler.insertJumpDescriptorToGraph(jdID, graphID)){
+            terminal.printInfo(Text.JUMPDESCRIPTOR_INSERTED_INTO_THE_GRAPH);
+          }else{
+            terminal.printError(Text.JUMPDESCRIPTOR_IS_NOT_ON_THE_GRAPH);
+          }
+
+          if (steeringHandler.debugHelper){
+            steeringHandler.switchDebugMode();
+            steeringHandler.switchDebugMode();
+          }
+
+          return true;
+        break;
       }
       return true;
     }catch(err){
