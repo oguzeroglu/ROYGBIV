@@ -640,6 +640,41 @@ SteeringHandler.prototype.removeGraph = function(id){
   }
 }
 
+SteeringHandler.prototype.mergeGraphs = function(id, graphIDs){
+  var mergedGraph = new Kompute.Graph();
+
+  for (var i = 0; i < graphIDs.length; i ++){
+    var graph = this.usedGraphIDs[graphIDs[i]];
+    graph.forEachVertex(function(x, y, z){
+      mergedGraph.addVertex(new Kompute.Vector3D(x, y, z));
+    });
+
+    graph.forEachEdge(function(edge){
+      mergedGraph.addEdge(edge.fromVertex, edge.toVertex);
+    });
+  }
+
+  this.registerGraph(id, mergedGraph);
+
+  for (var i = 0; i < graphIDs.length; i ++){
+    for (var jdID in this.graphsByJumpDescriptors){
+      var graphs = this.graphsByJumpDescriptors[jdID];
+      for (var gid in graphs){
+        if (gid == graphIDs[i]){
+          this.insertJumpDescriptorToGraph(jdID, id);
+        }
+      }
+    }
+
+    this.removeGraph(graphIDs[i]);
+  }
+
+  if (this.debugHelper){
+    this.switchDebugMode();
+    this.switchDebugMode();
+  }
+}
+
 SteeringHandler.prototype.update = function(){
   this.updateBuffer.forEach(this.issueUpdate);
   this.updateBuffer.clear();
