@@ -11,6 +11,7 @@ SteeringHandler.prototype.import = function(exportObj){
   var jumpDescriptorInfo = exportObj.jumpDescriptorInfo;
   var pathInfo = exportObj.pathInfo;
   var pathsByJumpDescriptors = exportObj.pathsByJumpDescriptors;
+  var graphsByJumpDescriptors = exportObj.graphsByJumpDescriptors;
   var graphInfo = exportObj.graphInfo;
 
   for (var sceneName in obstacleInfo){
@@ -84,6 +85,13 @@ SteeringHandler.prototype.import = function(exportObj){
       this.usedGraphIDs[id] = graph;
     }
   }
+
+  for (var jdID in graphsByJumpDescriptors){
+    var graphs = graphsByJumpDescriptors[jdID];
+    for (var graphID in graphs){
+      this.insertJumpDescriptorToGraph(jdID, graphID);
+    }
+  }
 }
 
 SteeringHandler.prototype.export = function(){
@@ -92,6 +100,7 @@ SteeringHandler.prototype.export = function(){
     jumpDescriptorInfo: {},
     pathInfo: {},
     pathsByJumpDescriptors: {},
+    graphsByJumpDescriptors: {},
     graphInfo: {}
   };
 
@@ -144,6 +153,14 @@ SteeringHandler.prototype.export = function(){
     var paths = this.pathsByJumpDescriptors[jdID];
     for (var pathID in paths){
       exportObject.pathsByJumpDescriptors[jdID][pathID] = true;
+    }
+  }
+
+  for (var jdID in this.graphsByJumpDescriptors){
+    exportObject.graphsByJumpDescriptors[jdID] = {};
+    var graphs = this.graphsByJumpDescriptors[jdID];
+    for (var graphID in graphs){
+      exportObject.graphsByJumpDescriptors[jdID][graphID] = true;
     }
   }
 
