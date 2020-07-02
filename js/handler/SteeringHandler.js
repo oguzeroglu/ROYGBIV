@@ -220,6 +220,7 @@ SteeringHandler.prototype.reset = function(){
   this.usedPathIDs = {};
 
   this.pathsByJumpDescriptors = {};
+  this.graphsByJumpDescriptors = {};
 
   this.usedGraphIDs = {};
   this.graphsBySceneName = {};
@@ -526,9 +527,27 @@ SteeringHandler.prototype.insertJumpDescriptorToPath = function(jumpDescriptorID
   return true;
 }
 
+SteeringHandler.prototype.insertJumpDescriptorToGraph = function(jumpDescriptorID, graphID){
+  var jumpDescriptor = this.usedJumpDescriptorIDs[jumpDescriptorID];
+  var graph = this.usedGraphIDs[graphID];
+
+  var result = graph.addJumpDescriptor(jumpDescriptor);
+
+  if (!result){
+    return false;
+  }
+
+  if (!this.graphsByJumpDescriptors[jumpDescriptorID]){
+    this.graphsByJumpDescriptors[jumpDescriptorID] = {};
+  }
+
+  this.graphsByJumpDescriptors[jumpDescriptorID][graphID] = graph;
+  return true;
+}
+
 SteeringHandler.prototype.registerGraph = function(id, graph){
   this.usedGraphIDs[id] = graph;
-  
+
   var graphs = this.graphsBySceneName[sceneHandler.getActiveSceneName()];
   if (!graphs){
     graphs = {};
@@ -597,6 +616,10 @@ SteeringHandler.prototype.removeGraph = function(id){
   if (this.debugHelper){
     this.switchDebugMode();
     this.switchDebugMode();
+  }
+
+  for (var jdID in this.graphsByJumpDescriptors){
+    delete this.graphsByJumpDescriptors[jdID][id];
   }
 }
 

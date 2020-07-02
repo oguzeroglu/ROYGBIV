@@ -5870,6 +5870,12 @@ function parse(input){
               return true;
             }
           }
+          if (steeringHandler.graphsByJumpDescriptors[id]){
+            if (Object.keys(steeringHandler.graphsByJumpDescriptors[id]).length > 0){
+              terminal.printError(Text.JUMP_DESCRIPTOR_INSERTED_TO_A_GRAPH);
+              return true;
+            }
+          }
 
           steeringHandler.removeJumpDescriptor(id);
 

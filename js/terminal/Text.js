@@ -361,6 +361,7 @@ var Text = function(){
   this.WALL_COLLECTION_CREATED = "Wall collection created.";
   this.JUMPDESCRIPTOR_ALREADY_INSERTED_TO_THE_PATH = "Jump descriptor is already inserted into the path.";
   this.JUMP_DESCRIPTOR_INSERTED_TO_A_PATH = "Jump descriptor is inserted to a path. Cannot delete.";
+  this.JUMP_DESCRIPTOR_INSERTED_TO_A_GRAPH = "Jump descriptor is inserted to a graph. Cannot delete.";
   this.LIGHTNING_DESTROYED = "Lightning destroyed.";
   this.WALL_COLLECTIONS = "Wall collections";
   this.TREE_WALL_COLLECTIONS = "|____@@1: OUTLINE COLOR -> @@2";
