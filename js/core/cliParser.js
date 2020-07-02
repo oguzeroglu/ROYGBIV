@@ -6218,11 +6218,31 @@ function parse(input){
             });
             graph.forEachEdge(function(edge){
               edgeCount ++;
-              var opt = edgeCount != totalEdgeCount;
               var edgeTextFrom = "(" + edge.fromVertex.x + ", " + edge.fromVertex.y + ", " + edge.fromVertex.z +")";
               var edgeTextTo = "(" + edge.toVertex.x + ", " + edge.toVertex.y + ", " + edge.toVertex.z +")";
-              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, edgeTextFrom + " --> " + edgeTextTo), opt);
+              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, edgeTextFrom + " --> " + edgeTextTo), true);
             });
+
+            var insertedJDs = {};
+            for (var jdID in steeringHandler.graphsByJumpDescriptors){
+              for (var gid in steeringHandler.graphsByJumpDescriptors[jdID]){
+                if (gid == id){
+                  insertedJDs[jdID] = true;
+                }
+              }
+            }
+
+            var insertedJDsCount = Object.keys(insertedJDs).length;
+            if (insertedJDsCount > 0){
+              terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "Inserted jump descriptors"), true);
+              var ct = 0;
+              for (var jdID in insertedJDs){
+                ct ++;
+                terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, jdID), ct != insertedJDsCount);
+              }
+            }else{
+              terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "Inserted jump descriptors").replace(Text.PARAM2, "none"), false);
+            }
           }
           if (count == 0){
             terminal.printError(Text.NO_GRAPHS_IN_THIS_SCENE);
