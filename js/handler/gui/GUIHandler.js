@@ -677,6 +677,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
 
       guiHandler.objectManipulationParameters["AI entity"] = true;
       guiHandler.disableController(guiHandler.omAIEntityController);
+      guiHandler.disableController(guiHandler.omFPSWeaponController);
     }else{
       guiHandler.objectManipulationParameters["Steerable"] = false;
       guiHandler.objectManipulationParameters["Steering mode"] = "Track position";
@@ -699,6 +700,14 @@ GUIHandler.prototype.afterObjectSelection = function(){
       guiHandler.disableController(guiHandler.omMaxSpeedController);
       guiHandler.disableController(guiHandler.omJumpSpeedController);
       guiHandler.disableController(guiHandler.omLookSpeedController);
+    }
+
+    if (obj.usedAsAIEntity){
+      guiHandler.disableController(guiHandler.omFPSWeaponController);
+    }
+
+    if (obj.isFPSWeapon){
+      guiHandler.disableController(guiHandler.omAIEntityController);
     }
 
     guiHandler.objectManipulationParameters["Motion blur"] = !(typeof obj.objectTrailConfigurations == UNDEFINED);
@@ -1393,7 +1402,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
   }).listen();
   guiHandler.omFPSWeaponController = generalFolder.add(guiHandler.objectManipulationParameters, "FPS Weapon").onChange(function(val){
-    if (!!selectionHandler.getSelectedObject().steerableInfo){
+    if (!!selectionHandler.getSelectedObject().steerableInfo || selectionHandler.getSelectedObject().usedAsAIEntity){
       guiHandler.objectManipulationParameters["FPS Weapon"] = false;
       return;
     }
@@ -1404,6 +1413,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.disableController(guiHandler.omIntersectableController);
       guiHandler.disableController(guiHandler.omMassController);
       guiHandler.disableController(guiHandler.omSteerableController);
+      guiHandler.disableController(guiHandler.omAIEntityController);
       guiHandler.objectManipulationParameters["Has mass"] = false;
       guiHandler.objectManipulationParameters["Changeable"] = true;
       guiHandler.objectManipulationParameters["Intersectable"] = false;
@@ -1412,6 +1422,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.enableController(guiHandler.omHasMassController);
       guiHandler.enableController(guiHandler.omChangeableController);
       guiHandler.enableController(guiHandler.omIntersectableController);
+      guiHandler.enableController(guiHandler.omAIEntityController);
       if (selectionHandler.getSelectedObject().isChangeable){
         guiHandler.enableController(guiHandler.omSteerableController);
       }
@@ -1587,6 +1598,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.objectManipulationParameters["AI entity"] = true;
       return;
     }
+    if (selectionHandler.getSelectedObject().isFPSWeapon){
+      guiHandler.objectManipulationParameters["AI entity"] = false;
+      return;
+    }
     terminal.clear();
     if (val){
       var result = selectionHandler.getSelectedObject().useAsAIEntity();
@@ -1595,8 +1610,13 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
         guiHandler.objectManipulationParameters["AI entity"] = false;
         return;
       }
+
+      guiHandler.disableController(guiHandler.omFPSWeaponController);
+
       terminal.printInfo(Text.OBJECT_WILL_BE_USED_AS_AI_ENTITY);
     }else{
+
+      guiHandler.enableController(guiHandler.omFPSWeaponController);
       selectionHandler.getSelectedObject().unUseAsAIEntity();
       terminal.printInfo(Text.OBJECT_WONT_BE_USED_AS_AI_ENTITY);
     }
