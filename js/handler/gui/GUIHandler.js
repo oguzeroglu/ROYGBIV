@@ -1326,7 +1326,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   // GENERAL
   guiHandler.omChangeableController = generalFolder.add(guiHandler.objectManipulationParameters, "Changeable").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
-    if (obj.isFPSWeapon){
+    if (obj.isFPSWeapon || !!obj.steerableInfo){
       guiHandler.objectManipulationParameters["Changeable"] = true;
       return;
     }
@@ -1645,6 +1645,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.enableController(guiHandler.omMaxSpeedController);
       guiHandler.enableController(guiHandler.omJumpSpeedController);
       guiHandler.enableController(guiHandler.omLookSpeedController);
+      guiHandler.disableController(guiHandler.omChangeableController);
 
       terminal.printInfo(Text.OBJECT_IS_SET_AS_A_STEERABLE);
     }else{
@@ -1656,6 +1657,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.disableController(guiHandler.omMaxSpeedController);
       guiHandler.disableController(guiHandler.omJumpSpeedController);
       guiHandler.disableController(guiHandler.omLookSpeedController);
+      guiHandler.enableController(guiHandler.omChangeableController);
 
       obj.unmakeSteerable();
 
