@@ -1340,6 +1340,8 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
 
     if (val){
       guiHandler.enableController(guiHandler.omSteerableController);
+    }else{
+      guiHandler.disableController(guiHandler.omSteerableController);
     }
   }).listen();
   guiHandler.omIntersectableController = generalFolder.add(guiHandler.objectManipulationParameters, "Intersectable").onChange(function(val){
@@ -1590,6 +1592,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
 
     terminal.clear();
+
+    if (val && steeringHandler.usedEntityIDs[obj.name] && !obj.usedAsAIEntity){
+      terminal.printError(Text.AI_ENTITY_WITH_SAME_NAME_EXISTS);
+      guiHandler.objectManipulationParameters["Steerable"] = false;
+      return;
+    }
 
     if (val){
 
