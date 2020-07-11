@@ -699,6 +699,12 @@ SteeringHandler.prototype.createSteerableFromObject = function(object){
   var steerable = new Kompute.Steerable(steerableID, steerableCenterPosition, steerableSize);
   this.world.insertEntity(steerable);
 
+  steerable.setJumpBehavior(new Kompute.JumpBehavior());
+
+  steerable.maxSpeed = object.steerableInfo.maxSpeed;
+  steerable.maxAcceleration = object.steerableInfo.maxAcceleration;
+  steerable.jumpSpeed = object.steerableInfo.jumpSpeed;
+
   if (this.debugHelper){
     this.switchDebugMode();
     this.switchDebugMode();

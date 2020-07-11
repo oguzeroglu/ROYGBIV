@@ -75,8 +75,14 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
-AddedObject.prototype.makeSteerable = function(mode){
-  this.steerableInfo = {mode: mode, behaviorsByID: {}};
+AddedObject.prototype.makeSteerable = function(mode, maxSpeed, maxAcceleration, jumpSpeed){
+  this.steerableInfo = {
+    mode: mode,
+    maxSpeed: maxSpeed,
+    maxAcceleration: maxAcceleration,
+    jumpSpeed: jumpSpeed
+    behaviorsByID: {}
+  };
   this.steerable = steeringHandler.createSteerableFromObject(this);
 }
 
