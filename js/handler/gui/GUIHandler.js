@@ -692,6 +692,15 @@ GUIHandler.prototype.afterObjectSelection = function(){
       guiHandler.disableController(guiHandler.omLookSpeedController);
     }
 
+    if (obj.isFPSWeapon){
+      guiHandler.disableController(guiHandler.omSteerableController);
+      guiHandler.disableController(guiHandler.omSteeringModeController);
+      guiHandler.disableController(guiHandler.omMaxAccelerationController);
+      guiHandler.disableController(guiHandler.omMaxSpeedController);
+      guiHandler.disableController(guiHandler.omJumpSpeedController);
+      guiHandler.disableController(guiHandler.omLookSpeedController);
+    }
+
     guiHandler.objectManipulationParameters["Motion blur"] = !(typeof obj.objectTrailConfigurations == UNDEFINED);
     if (obj.objectTrailConfigurations){
       guiHandler.objectManipulationParameters["mb alpha"] = obj.objectTrailConfigurations.alpha;
@@ -1384,12 +1393,17 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
   }).listen();
   guiHandler.omFPSWeaponController = generalFolder.add(guiHandler.objectManipulationParameters, "FPS Weapon").onChange(function(val){
+    if (!!selectionHandler.getSelectedObject().steerableInfo){
+      guiHandler.objectManipulationParameters["FPS Weapon"] = false;
+      return;
+    }
     if (val){
       selectionHandler.getSelectedObject().useAsFPSWeapon();
       guiHandler.disableController(guiHandler.omHasMassController);
       guiHandler.disableController(guiHandler.omChangeableController);
       guiHandler.disableController(guiHandler.omIntersectableController);
       guiHandler.disableController(guiHandler.omMassController);
+      guiHandler.disableController(guiHandler.omSteerableController);
       guiHandler.objectManipulationParameters["Has mass"] = false;
       guiHandler.objectManipulationParameters["Changeable"] = true;
       guiHandler.objectManipulationParameters["Intersectable"] = false;
@@ -1398,6 +1412,9 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.enableController(guiHandler.omHasMassController);
       guiHandler.enableController(guiHandler.omChangeableController);
       guiHandler.enableController(guiHandler.omIntersectableController);
+      if (selectionHandler.getSelectedObject().isChangeable){
+        guiHandler.enableController(guiHandler.omSteerableController);
+      }
       if (!selectionHandler.getSelectedObject().noMass){
         guiHandler.enableController(guiHandler.omMassController);
       }
@@ -1586,7 +1603,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
   guiHandler.omSteerableController = aiFolder.add(guiHandler.objectManipulationParameters, "Steerable").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
-    if (!obj.isChangeable){
+    if (!obj.isChangeable || obj.isFPSWeapon){
       guiHandler.objectManipulationParameters["Steerable"] = false;
       return;
     }
@@ -1646,6 +1663,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.enableController(guiHandler.omJumpSpeedController);
       guiHandler.enableController(guiHandler.omLookSpeedController);
       guiHandler.disableController(guiHandler.omChangeableController);
+      guiHandler.disableController(guiHandler.omFPSWeaponController);
 
       terminal.printInfo(Text.OBJECT_IS_SET_AS_A_STEERABLE);
     }else{
@@ -1658,6 +1676,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.disableController(guiHandler.omJumpSpeedController);
       guiHandler.disableController(guiHandler.omLookSpeedController);
       guiHandler.enableController(guiHandler.omChangeableController);
+      guiHandler.enableController(guiHandler.omFPSWeaponController);
 
       obj.unmakeSteerable();
 
