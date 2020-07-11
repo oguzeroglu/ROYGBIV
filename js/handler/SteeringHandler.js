@@ -270,6 +270,13 @@ SteeringHandler.prototype.resetWorld = function(){
     }
   }
 
+  var steerables = this.steerablesBySceneName[sceneHandler.getActiveSceneName()];
+  if (steerables){
+    for (var id in steerables){
+      this.world.insertEntity(steerables[id]);
+    }
+  }
+
   var graphs = this.graphsBySceneName[sceneHandler.getActiveSceneName()];
   if (graphs){
     for (var id in graphs){
