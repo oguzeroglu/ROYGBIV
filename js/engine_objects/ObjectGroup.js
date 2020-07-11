@@ -38,6 +38,28 @@ var ObjectGroup = function(name, group){
   this.matrixCache = new THREE.Matrix4();
 }
 
+ObjectGroup.prototype.makeSteerable = function(mode, maxSpeed, maxAcceleration, jumpSpeed, lookSpeed){
+  this.steerableInfo = {
+    mode: mode,
+    maxSpeed: maxSpeed,
+    maxAcceleration: maxAcceleration,
+    jumpSpeed: jumpSpeed,
+    lookSpeed: lookSpeed,
+    behaviorsByID: {}
+  };
+  this.steerable = steeringHandler.createSteerableFromObject(this);
+}
+
+ObjectGroup.prototype.unmakeSteerable = function(){
+  delete this.steerableInfo;
+  delete this.steerable;
+  steeringHandler.removeSteerable(this);
+}
+
+ObjectGroup.prototype.addSteeringBehavior = function(id, behavior){
+  this.steerableInfo.behaviorsByID[id] = behavior;
+}
+
 ObjectGroup.prototype.unUseAsAIEntity = function(){
   steeringHandler.unUseObjectGroupAsAIEntity(this);
   this.usedAsAIEntity = false;

@@ -678,6 +678,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
       guiHandler.objectManipulationParameters["AI entity"] = true;
       guiHandler.disableController(guiHandler.omAIEntityController);
       guiHandler.disableController(guiHandler.omFPSWeaponController);
+      guiHandler.disableController(guiHandler.omChangeableController);
     }else{
       guiHandler.objectManipulationParameters["Steerable"] = false;
       guiHandler.objectManipulationParameters["Steering mode"] = "Track position";
