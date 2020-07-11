@@ -344,12 +344,17 @@ SteeringHandler.prototype.removeObstacle = function(id){
 
   this.world.removeEntity(entity);
 
-  delete this.obstaclesBySceneName[sceneHandler.getActiveSceneName()][id];
+  if (entity instanceof Kompute.Steerable){
+    delete this.steerablesBySceneName[sceneHandler.getActiveSceneName()][id];
+  }else{
+    delete this.obstaclesBySceneName[sceneHandler.getActiveSceneName()][id];
+  }
+
   delete this.usedEntityIDs[id];
 }
 
 SteeringHandler.prototype.updateObject = function(obj){
-  if (!obj.usedAsAIEntity){
+  if (!obj.usedAsAIEntity && !obj.steerableInfo){
     return;
   }
 
@@ -418,13 +423,13 @@ SteeringHandler.prototype.issueUpdate = function(obj){
     return;
   }
 
-  var obstacles = this.obstaclesBySceneName[sceneName];
+  var entities = this.obstaclesBySceneName[sceneName] || this.steerablesBySceneName[sceneName];
 
-  if (!obstacles){
+  if (!entities){
     return;
   }
 
-  var entity = obstacles[obj.name];
+  var entity = entities[obj.name];
 
   if (obj.isAddedObject){
 

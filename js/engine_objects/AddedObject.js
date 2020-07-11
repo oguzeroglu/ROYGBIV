@@ -80,7 +80,7 @@ AddedObject.prototype.makeSteerable = function(mode, maxSpeed, maxAcceleration, 
     mode: mode,
     maxSpeed: maxSpeed,
     maxAcceleration: maxAcceleration,
-    jumpSpeed: jumpSpeed
+    jumpSpeed: jumpSpeed,
     behaviorsByID: {}
   };
   this.steerable = steeringHandler.createSteerableFromObject(this);
