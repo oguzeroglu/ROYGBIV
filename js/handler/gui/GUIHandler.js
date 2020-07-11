@@ -1264,6 +1264,11 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.disableController(guiHandler.omPhysicsSimplifiedController);
     }else{
       guiHandler.enableController(guiHandler.omPhysicsSimplifiedController);
+      if (obj.steerableInfo && obj.steerableInfo.mode == steeringHandler.steeringModes.TRACK_VELOCITY){
+        obj.steerableInfo.mode = steeringHandler.steeringModes.TRACK_POSITION;
+        terminal.printInfo(Text.SWITCHED_TO_TRACK_POSITION);
+        selectionHandler.resetCurrentSelection();
+      }
     }
   });
   guiHandler.omPhysicsSimplifiedController = physicsFolder.add(guiHandler.objectManipulationParameters, "Phy. simpl.").onChange(function(val){
@@ -1315,6 +1320,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     if (obj.isFPSWeapon){
       guiHandler.objectManipulationParameters["Has mass"] = false;
+      return;
+    }
+    if (obj.steerableInfo && obj.steerableInfo.mode == steeringHandler.steeringModes.TRACK_VELOCITY){
+      guiHandler.objectManipulationParameters["Has mass"] = true;
       return;
     }
     terminal.clear();
@@ -1636,9 +1645,9 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       return;
     }
 
-    if (val){
+    var steeringMode = guiHandler.objectManipulationParameters["Steering mode"];
 
-      var steeringMode = guiHandler.objectManipulationParameters["Steering mode"];
+    if (val){
 
       if (steeringMode == steeringHandler.steeringModes.TRACK_VELOCITY && !obj.isDynamicObject){
         terminal.printError(Text.VELOCITY_TRACKING_STEERING_MODE_DYNAMIC);
@@ -1685,6 +1694,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.disableController(guiHandler.omChangeableController);
       guiHandler.disableController(guiHandler.omFPSWeaponController);
 
+      if (steeringMode == steeringHandler.steeringModes.TRACK_VELOCITY){
+        guiHandler.disableController(guiHandler.omHasMassController);
+      }
+
       terminal.printInfo(Text.OBJECT_IS_SET_AS_A_STEERABLE);
     }else{
 
@@ -1700,6 +1713,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
 
       obj.unmakeSteerable();
 
+      if (steeringMode == steeringHandler.steeringModes.TRACK_VELOCITY){
+        guiHandler.enableController(guiHandler.omHasMassController);
+      }
+
       terminal.printInfo(Text.OBJECT_WONT_BE_USED_AS_STEERABLE);
     }
   }).listen();
@@ -1712,6 +1729,11 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       return;
     }
     selectionHandler.getSelectedObject().steerableInfo.mode = val;
+    if (val == steeringHandler.steeringModes.TRACK_VELOCITY){
+      guiHandler.disableController(guiHandler.omHasMassController);
+    }else{
+      guiHandler.enableController(guiHandler.omHasMassController);
+    }
   }).listen();
   guiHandler.omMaxAccelerationController = aiFolder.add(guiHandler.objectManipulationParameters, "Max acceleration").onFinishChange(function(val){
     terminal.clear();
