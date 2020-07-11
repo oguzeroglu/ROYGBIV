@@ -75,6 +75,21 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedObject.prototype.makeSteerable = function(mode){
+  this.steerableInfo = {mode: mode, behaviorsByID: {}};
+  this.steerable = steeringHandler.createSteerableFromObject(this);
+}
+
+AddedObject.prototype.unmakeSteerable = function(){
+  delete this.steerableInfo;
+  delete this.steerable;
+  steeringHandler.removeSteerable(this);
+}
+
+AddedObject.prototype.addSteeringBehavior = function(id, behavior){
+  this.steerableInfo.behaviorsByID[id] = behavior;
+}
+
 AddedObject.prototype.unUseAsAIEntity = function(){
   steeringHandler.unUseAddedObjectAsAIEntity(this);
   this.usedAsAIEntity = false;

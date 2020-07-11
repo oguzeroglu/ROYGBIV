@@ -4,6 +4,11 @@ var SteeringHandler = function(){
   this.vectorPool = new Kompute.VectorPool(10);
 
   this.issueUpdate = this.issueUpdate.bind(this);
+
+  this.steeringModes = {
+    ALIGN_POSITION: 'ALIGN_POSITION',
+    ALIGN_VELOCITY: 'ALIGN_VELOCITY'
+  };
 }
 
 SteeringHandler.prototype.import = function(exportObj){
@@ -228,6 +233,7 @@ SteeringHandler.prototype.reset = function(){
   }
 
   this.obstaclesBySceneName = {};
+  this.steerablesBySceneName = {};
   this.usedEntityIDs = {};
 
   this.jumpDescriptorsBySceneName = {};
@@ -668,6 +674,49 @@ SteeringHandler.prototype.mergeGraphs = function(id, graphIDs){
 
     this.removeGraph(graphIDs[i]);
   }
+
+  if (this.debugHelper){
+    this.switchDebugMode();
+    this.switchDebugMode();
+  }
+}
+
+SteeringHandler.prototype.createSteerableFromObject = function(object){
+  var totalBox = new THREE.Box3();
+  for (var i = 0; i < object.boundingBoxes.length; i ++){
+    var bb = object.boundingBoxes[i];
+    totalBox.expandByPoint(bb.min);
+    totalBox.expandByPoint(bb.max);
+  }
+
+  var steerableID = object.name;
+  var centerPos = totalBox.getCenter(new THREE.Vector3());
+  var size = totalBox.getSize(new THREE.Vector3());
+
+  var steerableCenterPosition = new Kompute.Vector3D(centerPos.x, centerPos.y, centerPos.z);
+  var steerableSize = new Kompute.Vector3D(size.x, size.y, size.z);
+
+  var steerable = new Kompute.Steerable(steerableID, steerableCenterPosition, steerableSize);
+  this.world.insertEntity(steerable);
+
+  if (this.debugHelper){
+    this.switchDebugMode();
+    this.switchDebugMode();
+  }
+
+  var steerables = this.steerablesBySceneName[object.registeredSceneName] || {};
+  steerables[steerableID] = steerable;
+
+  this.steerablesBySceneName[object.registeredSceneName] = steerables;
+
+  this.usedEntityIDs[steerableID] = steerable;
+}
+
+SteeringHandler.prototype.removeSteerable = function(object){
+  this.world.removeEntity(this.usedEntityIDs[object.name]);
+
+  delete this.steerablesBySceneName[object.registeredSceneName][object.name];
+  delete this.usedEntityIDs[object.name];
 
   if (this.debugHelper){
     this.switchDebugMode();
