@@ -709,6 +709,7 @@ SteeringHandler.prototype.createSteerableFromObject = function(object){
   steerable.maxSpeed = object.steerableInfo.maxSpeed;
   steerable.maxAcceleration = object.steerableInfo.maxAcceleration;
   steerable.jumpSpeed = object.steerableInfo.jumpSpeed;
+  steerable.lookSpeed = object.steerableInfo.lookSpeed;
 
   if (this.debugHelper){
     this.switchDebugMode();
