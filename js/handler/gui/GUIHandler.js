@@ -35,7 +35,13 @@ var GUIHandler = function(){
     "Motion blur": false,
     "mb alpha": 1.0,
     "mb time": OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT,
-    "AI entity": false
+    "AI entity": false,
+    "Steerable": false,
+    "Steering mode": "Track position",
+    "Max acceleration": "100",
+    "Max speed": "100",
+    "Jump speed": "500",
+    "Look speed": 0.1
   };
   this.textManipulationParameters = {
     "Text": "textName",
@@ -657,6 +663,35 @@ GUIHandler.prototype.afterObjectSelection = function(){
 
     guiHandler.objectManipulationParameters["AI entity"] = obj.usedAsAIEntity || false;
 
+    if (!obj.isChangeable){
+      guiHandler.disableController(guiHandler.omSteerableController);
+    }
+
+    if (obj.steerableInfo){
+      guiHandler.objectManipulationParameters["Steerable"] = true;
+      guiHandler.objectManipulationParameters["Steering mode"] = obj.steerableInfo.mode;
+      guiHandler.objectManipulationParameters["Max acceleration"] = "" + obj.steerableInfo.maxAcceleration;
+      guiHandler.objectManipulationParameters["Max speed"] = "" + obj.steerableInfo.maxSpeed;
+      guiHandler.objectManipulationParameters["Jump speed"] = "" + obj.steerableInfo.jumpSpeed;
+      guiHandler.objectManipulationParameters["Look speed"] = obj.steerableInfo.lookSpeed;
+
+      guiHandler.objectManipulationParameters["AI entity"] = true;
+      guiHandler.disableController(guiHandler.omAIEntityController);
+    }else{
+      guiHandler.objectManipulationParameters["Steerable"] = false;
+      guiHandler.objectManipulationParameters["Steering mode"] = "Track position";
+      guiHandler.objectManipulationParameters["Max acceleration"] = "100";
+      guiHandler.objectManipulationParameters["Max speed"] = "100";
+      guiHandler.objectManipulationParameters["Jump speed"] = "500";
+      guiHandler.objectManipulationParameters["Look speed"] = 0.1;
+
+      guiHandler.disableController(guiHandler.omSteeringModeController);
+      guiHandler.disableController(guiHandler.omMaxAccelerationController);
+      guiHandler.disableController(guiHandler.omMaxSpeedController);
+      guiHandler.disableController(guiHandler.omJumpSpeedController);
+      guiHandler.disableController(guiHandler.omLookSpeedController);
+    }
+
     guiHandler.objectManipulationParameters["Motion blur"] = !(typeof obj.objectTrailConfigurations == UNDEFINED);
     if (obj.objectTrailConfigurations){
       guiHandler.objectManipulationParameters["mb alpha"] = obj.objectTrailConfigurations.alpha;
@@ -838,6 +873,12 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omObjectTrailAlphaController);
   guiHandler.enableController(guiHandler.omObjectTrailTimeController);
   guiHandler.enableController(guiHandler.omAIEntityController);
+  guiHandler.enableController(guiHandler.omSteerableController);
+  guiHandler.enableController(guiHandler.omSteeringModeController);
+  guiHandler.enableController(guiHandler.omMaxAccelerationController);
+  guiHandler.enableController(guiHandler.omMaxSpeedController);
+  guiHandler.enableController(guiHandler.omJumpSpeedController);
+  guiHandler.enableController(guiHandler.omLookSpeedController);
 }
 
 GUIHandler.prototype.show = function(guiType){
@@ -1296,6 +1337,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }else{
       terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "unchangeable"));
     }
+
+    if (val){
+      guiHandler.enableController(guiHandler.omSteerableController);
+    }
   }).listen();
   guiHandler.omIntersectableController = generalFolder.add(guiHandler.objectManipulationParameters, "Intersectable").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
@@ -1519,6 +1564,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
 
   // AI
   guiHandler.omAIEntityController = aiFolder.add(guiHandler.objectManipulationParameters, "AI entity").onChange(function(val){
+    if (!!selectionHandler.getSelectedObject().steerableInfo){
+      guiHandler.objectManipulationParameters["AI entity"] = true;
+      return;
+    }
     terminal.clear();
     if (val){
       var result = selectionHandler.getSelectedObject().useAsAIEntity();
@@ -1532,6 +1581,122 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       selectionHandler.getSelectedObject().unUseAsAIEntity();
       terminal.printInfo(Text.OBJECT_WONT_BE_USED_AS_AI_ENTITY);
     }
+  }).listen();
+  guiHandler.omSteerableController = aiFolder.add(guiHandler.objectManipulationParameters, "Steerable").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    if (!obj.isChangeable){
+      guiHandler.objectManipulationParameters["Steerable"] = false;
+      return;
+    }
+
+    terminal.clear();
+
+    if (val){
+
+      var steeringMode = guiHandler.objectManipulationParameters["Steering mode"];
+
+      if (steeringMode == steeringHandler.steeringModes.TRACK_VELOCITY && !obj.isDynamicObject){
+        terminal.printError(Text.VELOCITY_TRACKING_STEERING_MODE_DYNAMIC);
+        guiHandler.objectManipulationParameters["Steerable"] = false;
+        return;
+      }
+
+      var maxSpeed = parseFloat(guiHandler.objectManipulationParameters["Max speed"]);
+      var maxAcceleration = parseFloat(guiHandler.objectManipulationParameters["Max acceleration"]);
+      var jumpSpeed = parseFloat(guiHandler.objectManipulationParameters["Jump speed"]);
+      var lookSpeed = guiHandler.objectManipulationParameters["Look speed"];
+
+      if (isNaN(maxSpeed)){
+        terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "Max speed"));
+        guiHandler.objectManipulationParameters["Steerable"] = false;
+        return;
+      }
+
+      if (isNaN(maxAcceleration)){
+        terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "Max acceleration"));
+        guiHandler.objectManipulationParameters["Steerable"] = false;
+        return;
+      }
+
+      if (isNaN(jumpSpeed)){
+        terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "Jump speed"));
+        guiHandler.objectManipulationParameters["Steerable"] = false;
+        return;
+      }
+
+      if (obj.usedAsAIEntity){
+        obj.unUseAsAIEntity();
+      }
+
+      obj.makeSteerable(steeringMode, maxSpeed, maxAcceleration, jumpSpeed, lookSpeed);
+
+      guiHandler.objectManipulationParameters["AI entity"] = true;
+      guiHandler.disableController(guiHandler.omAIEntityController);
+      guiHandler.enableController(guiHandler.omSteeringModeController);
+      guiHandler.enableController(guiHandler.omMaxAccelerationController);
+      guiHandler.enableController(guiHandler.omMaxSpeedController);
+      guiHandler.enableController(guiHandler.omJumpSpeedController);
+      guiHandler.enableController(guiHandler.omLookSpeedController);
+
+      terminal.printInfo(Text.OBJECT_IS_SET_AS_A_STEERABLE);
+    }else{
+
+      guiHandler.objectManipulationParameters["AI entity"] = false;
+      guiHandler.enableController(guiHandler.omAIEntityController);
+      guiHandler.disableController(guiHandler.omSteeringModeController);
+      guiHandler.disableController(guiHandler.omMaxAccelerationController);
+      guiHandler.disableController(guiHandler.omMaxSpeedController);
+      guiHandler.disableController(guiHandler.omJumpSpeedController);
+      guiHandler.disableController(guiHandler.omLookSpeedController);
+
+      obj.unmakeSteerable();
+
+      terminal.printInfo(Text.OBJECT_WONT_BE_USED_AS_STEERABLE);
+    }
+  }).listen();
+  guiHandler.omSteeringModeController = aiFolder.add(guiHandler.objectManipulationParameters, "Steering mode", [steeringHandler.steeringModes.TRACK_POSITION, steeringHandler.steeringModes.TRACK_VELOCITY]).onChange(function(val){
+    if (val == steeringHandler.steeringModes.TRACK_VELOCITY && !selectionHandler.getSelectedObject().isDynamicObject){
+      guiHandler.objectManipulationParameters["Steering mode"] = steeringHandler.steeringModes.TRACK_POSITION;
+      terminal.clear();
+      terminal.printError(Text.VELOCITY_TRACKING_STEERING_MODE_DYNAMIC);
+      selectionHandler.resetCurrentSelection();
+      return;
+    }
+    selectionHandler.getSelectedObject().steerableInfo.mode = val;
+  }).listen();
+  guiHandler.omMaxAccelerationController = aiFolder.add(guiHandler.objectManipulationParameters, "Max acceleration").onFinishChange(function(val){
+    terminal.clear();
+    var parsedVal = parseFloat(val);
+    if (isNaN(parsedVal)){
+      terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "Max acceleration"));
+      return;
+    }
+    selectionHandler.getSelectedObject().steerableInfo.maxAcceleration = parsedVal;
+    terminal.printInfo(Text.IS_SET.replace(Text.PARAM1, "Max acceleration"));
+  }).listen();
+  guiHandler.omMaxSpeedController = aiFolder.add(guiHandler.objectManipulationParameters, "Max speed").onFinishChange(function(val){
+    terminal.clear();
+    var parsedVal = parseFloat(val);
+    if (isNaN(parsedVal)){
+      terminal.clear();
+      terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "Max speed"));
+      return;
+    }
+    selectionHandler.getSelectedObject().steerableInfo.maxSpeed = parsedVal;
+    terminal.printInfo(Text.IS_SET.replace(Text.PARAM1, "Max speed"));
+  }).listen();
+  guiHandler.omJumpSpeedController = aiFolder.add(guiHandler.objectManipulationParameters, "Jump speed").onFinishChange(function(val){
+    terminal.clear();
+    var parsedVal = parseFloat(val);
+    if (isNaN(parsedVal)){
+      terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "Jump speed"));
+      return;
+    }
+    selectionHandler.getSelectedObject().steerableInfo.jumpSpeed = parsedVal;
+    terminal.printInfo(Text.IS_SET.replace(Text.PARAM1, "Jump speed"));
+  }).listen();
+  guiHandler.omLookSpeedController = aiFolder.add(guiHandler.objectManipulationParameters, "Look speed").min(0.01).max(1).step(0.01).onChange(function(val){
+    selectionHandler.getSelectedObject().steerableInfo.lookSpeed = val;
   }).listen();
 
   // MOTION BLUR

@@ -6,8 +6,8 @@ var SteeringHandler = function(){
   this.issueUpdate = this.issueUpdate.bind(this);
 
   this.steeringModes = {
-    ALIGN_POSITION: 'ALIGN_POSITION',
-    ALIGN_VELOCITY: 'ALIGN_VELOCITY'
+    TRACK_POSITION: 'Track position',
+    TRACK_VELOCITY: 'Track velocity'
   };
 }
 
