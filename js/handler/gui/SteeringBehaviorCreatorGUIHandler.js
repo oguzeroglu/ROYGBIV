@@ -144,5 +144,68 @@ SteeringBehaviorCreatorGUIHandler.prototype.createBehavior = function(name, type
 }
 
 SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavior){
+  var params = behavior.parameters;
 
+  var commonFolderFunc = function(params){
+    var folder = guiHandler.datGuiSteeringBehaviorCreation.addFolder(params.name);
+    var controller = folder.add(params, "type");
+    guiHandler.disableController(controller);
+  };
+
+  switch (params.type){
+    case steeringHandler.steeringBehaviorTypes.ALIGN:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.ARRIVE:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.AVOID:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.BLENDED:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.COHESIION:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.EVADE:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.FLEE:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.HIDE:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.LOOK_WHERE_YOU_ARE_GOING:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.PATH_FOLLOWING:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.PRIORITY:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.PURSUE:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.RANDOM_PATH:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.RANDOM_WAYPOINT:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.SEEK:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.SEPARATION:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.WANDER_TWO:
+      commonFolderFunc(params);
+    return;
+    case steeringHandler.steeringBehaviorTypes.WANDER_THREE:
+      commonFolderFunc(params);
+    return;
+  }
 }
