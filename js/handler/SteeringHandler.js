@@ -6,8 +6,29 @@ var SteeringHandler = function(){
   this.issueUpdate = this.issueUpdate.bind(this);
 
   this.steeringModes = {
-    TRACK_POSITION: 'Track position',
-    TRACK_VELOCITY: 'Track velocity'
+    TRACK_POSITION: "Track position",
+    TRACK_VELOCITY: "Track velocity"
+  };
+
+  this.steeringBehaviorTypes = {
+    ALIGN: "AlignBehavior",
+    ARRIVE: "ArriveBehavior",
+    AVOID: "AvoidBehavior",
+    BLENDED: "BlendedSteeringBehavior",
+    COHESIION: "CohesionBehavior",
+    EVADE: "EvadeBehavior",
+    FLEE: "FleeBehavior",
+    HIDE: "HideBehavior",
+    LOOK_WHERE_YOU_ARE_GOING: "LookWhereYouAreGoingBehavior",
+    PATH_FOLLOWING: "PathFollowingBehavior",
+    PRIORITY: "PrioritySteeringBehavior",
+    PURSUE: "PursueSteeringBehavior",
+    RANDOM_PATH: "RandomPathBehavior",
+    RANDOM_WAYPOINT: "RandomWaypointBehavior",
+    SEEK: "SeekBehavior",
+    SEPARATION: "SeparationBehavior",
+    WANDER_TWO: "Wander2DBehavior",
+    WANDER_THREE: "Wander3DBehavior"
   };
 }
 
