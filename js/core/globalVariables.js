@@ -347,6 +347,7 @@ var lightningCreatorGUIHandler;
 var virtualKeyboardCreatorGUIHandler;
 var lightsGUIHandler;
 var graphCreatorGUIHandler;
+var steeringBehaviorCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;

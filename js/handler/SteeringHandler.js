@@ -269,6 +269,9 @@ SteeringHandler.prototype.reset = function(){
   this.usedGraphIDs = {};
   this.graphsBySceneName = {};
 
+  this.behaviorsBySceneName = {};
+  this.usedBehaviorIDs = {};
+
   this.updateBuffer = new Map();
 
   this.resetWorld();
@@ -767,4 +770,11 @@ SteeringHandler.prototype.removeSteerable = function(object){
 SteeringHandler.prototype.update = function(){
   this.updateBuffer.forEach(this.issueUpdate);
   this.updateBuffer.clear();
+}
+
+SteeringHandler.prototype.addBehavior = function(id, behavior){
+  this.usedBehaviorIDs[id] = behavior;
+  var behaviors = this.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+  behaviors[id] = behavior;
+  this.behaviorsBySceneName[sceneHandler.getActiveSceneName()] = behaviors;
 }

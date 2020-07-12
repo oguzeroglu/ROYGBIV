@@ -83,6 +83,7 @@ window.onload = function() {
     virtualKeyboardCreatorGUIHandler = new VirtualKeyboardCreatorGUIHandler();
     lightsGUIHandler = new LightsGUIHandler();
     graphCreatorGUIHandler = new GraphCreatorGUIHandler();
+    steeringBehaviorCreatorGUIHandler = new SteeringBehaviorCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
