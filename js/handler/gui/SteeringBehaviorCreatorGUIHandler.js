@@ -150,6 +150,13 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
     var folder = guiHandler.datGuiSteeringBehaviorCreation.addFolder(params.name);
     var controller = folder.add(params, "type");
     guiHandler.disableController(controller);
+    folder.add({"Delete": function(){
+      steeringHandler.removeBehavior(behavior.parameters.name);
+      guiHandler.datGuiSteeringBehaviorCreation.removeFolder(folder);
+      terminal.clear();
+      terminal.printInfo(Text.BEHAVIOR_REMOVED);
+    }}, "Delete");
+    return folder;
   };
 
   switch (params.type){
@@ -157,10 +164,52 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
       commonFolderFunc(params);
     return;
     case steeringHandler.steeringBehaviorTypes.ARRIVE:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {satisfactionRadius: "" + params.satisfactionRadius, slowDownRadius: "" + params.slowDownRadius};
+      folder.add(confs, "satisfactionRadius").onFinishChange(function(val){
+        terminal.clear();
+        var parsed = parseFloat(val);
+        if (isNaN(parsed)){
+          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "satisfactionRadius"));
+          return;
+        }
+        behavior.parameters.satisfactionRadius = parsed;
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
+      folder.add(confs, "slowDownRadius").onFinishChange(function(val){
+        terminal.clear();
+        var parsed = parseFloat(val);
+        if (isNaN(parsed)){
+          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "slowDownRadius"));
+          return;
+        }
+        behavior.parameters.slowDownRadius = parsed;
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
     return;
     case steeringHandler.steeringBehaviorTypes.AVOID:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {maxSeeAhead: "" + params.maxSeeAhead, maxAvoidForce: "" + params.maxAvoidForce};
+      folder.add(confs, "maxSeeAhead").onFinishChange(function(val){
+        terminal.clear();
+        var parsed = parseFloat(val);
+        if (isNaN(parsed)){
+          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxSeeAhead"));
+          return;
+        }
+        behavior.parameters.maxSeeAhead = parsed;
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
+      folder.add(confs, "maxAvoidForce").onFinishChange(function(val){
+        terminal.clear();
+        var parsed = parseFloat(val);
+        if (isNaN(parsed)){
+          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxAvoidForce"));
+          return;
+        }
+        behavior.parameters.maxAvoidForce = parsed;
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
     return;
     case steeringHandler.steeringBehaviorTypes.BLENDED:
       commonFolderFunc(params);

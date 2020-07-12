@@ -778,3 +778,8 @@ SteeringHandler.prototype.addBehavior = function(id, behavior){
   behaviors[id] = behavior;
   this.behaviorsBySceneName[sceneHandler.getActiveSceneName()] = behaviors;
 }
+
+SteeringHandler.prototype.removeBehavior = function(id){
+  delete this.usedBehaviorIDs[id];
+  delete this.behaviorsBySceneName[sceneHandler.getActiveSceneName()][id];
+}
