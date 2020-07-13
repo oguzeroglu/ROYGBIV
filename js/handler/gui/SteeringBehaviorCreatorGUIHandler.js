@@ -218,13 +218,70 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
       commonFolderFunc(params);
     return;
     case steeringHandler.steeringBehaviorTypes.EVADE:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {maxPredictionTime: "" + params.maxPredictionTime};
+      folder.add(confs, "maxPredictionTime").onFinishChange(function(val){
+        terminal.clear();
+        var parsed = parseFloat(val);
+        if (isNaN(parsed)){
+          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxPredictionTime"));
+          return;
+        }
+        behavior.parameters.maxPredictionTime = parsed;
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
     return;
     case steeringHandler.steeringBehaviorTypes.FLEE:
       commonFolderFunc(params);
     return;
     case steeringHandler.steeringBehaviorTypes.HIDE:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {
+        arriveSatisfactionRadius: "" + params.arriveSatisfactionRadius,
+        arriveSlowDownRadius: "" + params.arriveSlowDownRadius,
+        hideDistance: "" + params.hideDistance,
+        threatDistance: "" + params.threatDistance
+      };
+      folder.add(confs, "arriveSatisfactionRadius").onFinishChange(function(val){
+        terminal.clear();
+        var parsed = parseFloat(val);
+        if (isNaN(parsed)){
+          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "arriveSatisfactionRadius"));
+          return;
+        }
+        behavior.parameters.arriveSatisfactionRadius = parsed;
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
+      folder.add(confs, "arriveSlowDownRadius").onFinishChange(function(val){
+        terminal.clear();
+        var parsed = parseFloat(val);
+        if (isNaN(parsed)){
+          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "arriveSlowDownRadius"));
+          return;
+        }
+        behavior.parameters.arriveSlowDownRadius = parsed;
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
+      folder.add(confs, "hideDistance").onFinishChange(function(val){
+        terminal.clear();
+        var parsed = parseFloat(val);
+        if (isNaN(parsed)){
+          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "hideDistance"));
+          return;
+        }
+        behavior.parameters.hideDistance = parsed;
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
+      folder.add(confs, "threatDistance").onFinishChange(function(val){
+        terminal.clear();
+        var parsed = parseFloat(val);
+        if (isNaN(parsed)){
+          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "threatDistance"));
+          return;
+        }
+        behavior.parameters.threatDistance = parsed;
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
     return;
     case steeringHandler.steeringBehaviorTypes.LOOK_WHERE_YOU_ARE_GOING:
       commonFolderFunc(params);
