@@ -176,7 +176,32 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
       this.addNumericalController(folder, confs, "maxAvoidForce", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.BLENDED:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {"Behavior name": "", "Add": function(){
+        var name = this["Behavior name"];
+        terminal.clear();
+        var existingBehaviors = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+        if (!existingBehaviors[name]){
+          terminal.printError(Text.NO_SUCH_BEHAVIOR);
+          return;
+        }
+        for (var i = 0; i < params.list.length; i ++){
+          var curBehavior = params.list[i].behavior;
+          if (curBehavior.parameters.name == name){
+            terminal.printError(Text.BEHAVIOR_ALREADY_ADDED);
+            return;
+          }
+        }
+        var newInfo = { behavior: existingBehaviors[name], weight: 1 };
+        params.list.push(newInfo);
+        steeringBehaviorCreatorGUIHandler.addBlendedBehaviorFolder(folder, newInfo, behavior);
+        terminal.printInfo(Text.BEHAVIOR_ADDED);
+      }};
+      folder.add(confs, "Behavior name");
+      folder.add(confs, "Add");
+      for (var i = 0; i < params.list.length; i ++){
+        this.addBlendedBehaviorFolder(folder, params.list[i], behavior);
+      }
     return;
     case steeringHandler.steeringBehaviorTypes.COHESIION:
       commonFolderFunc(params);
@@ -296,7 +321,27 @@ SteeringBehaviorCreatorGUIHandler.prototype.addNumericalController = function(pa
       terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, confName));
       return;
     }
-    behavior.parameters[confName] = parsed;
+    if (behavior instanceof PreconfiguredSteeringBehavior){
+      behavior.parameters[confName] = parsed;
+    }else{
+      behavior(parsed);
+    }
     terminal.printInfo(Text.BEHAVIOR_UPDATED);
   });
+}
+
+SteeringBehaviorCreatorGUIHandler.prototype.addBlendedBehaviorFolder = function(parentContainer, info, behavior){
+  var folder = parentContainer.addFolder(info.behavior.parameters.name);
+  var confs = {weight: "" + info.weight};
+  this.addNumericalController(folder, confs, "weight", function(val){
+    info.weight = val;
+  });
+  folder.add({
+    "Remove": function(){
+      parentContainer.removeFolder(folder);
+      behavior.parameters.list.splice(behavior.parameters.list.indexOf(info), 1);
+      terminal.clear();
+      terminal.printInfo(Text.BEHAVIOR_REMOVED);
+    }
+  }, "Remove");
 }
