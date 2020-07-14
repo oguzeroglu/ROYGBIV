@@ -166,50 +166,14 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
     case steeringHandler.steeringBehaviorTypes.ARRIVE:
       var folder = commonFolderFunc(params);
       var confs = {satisfactionRadius: "" + params.satisfactionRadius, slowDownRadius: "" + params.slowDownRadius};
-      folder.add(confs, "satisfactionRadius").onFinishChange(function(val){
-        terminal.clear();
-        var parsed = parseFloat(val);
-        if (isNaN(parsed)){
-          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "satisfactionRadius"));
-          return;
-        }
-        behavior.parameters.satisfactionRadius = parsed;
-        terminal.printInfo(Text.BEHAVIOR_UPDATED);
-      });
-      folder.add(confs, "slowDownRadius").onFinishChange(function(val){
-        terminal.clear();
-        var parsed = parseFloat(val);
-        if (isNaN(parsed)){
-          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "slowDownRadius"));
-          return;
-        }
-        behavior.parameters.slowDownRadius = parsed;
-        terminal.printInfo(Text.BEHAVIOR_UPDATED);
-      });
+      this.addNumericalController(folder, confs, "satisfactionRadius", behavior);
+      this.addNumericalController(folder, confs, "slowDownRadius", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.AVOID:
       var folder = commonFolderFunc(params);
       var confs = {maxSeeAhead: "" + params.maxSeeAhead, maxAvoidForce: "" + params.maxAvoidForce};
-      folder.add(confs, "maxSeeAhead").onFinishChange(function(val){
-        terminal.clear();
-        var parsed = parseFloat(val);
-        if (isNaN(parsed)){
-          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxSeeAhead"));
-          return;
-        }
-        behavior.parameters.maxSeeAhead = parsed;
-        terminal.printInfo(Text.BEHAVIOR_UPDATED);
-      });
-      folder.add(confs, "maxAvoidForce").onFinishChange(function(val){
-        terminal.clear();
-        var parsed = parseFloat(val);
-        if (isNaN(parsed)){
-          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxAvoidForce"));
-          return;
-        }
-        behavior.parameters.maxAvoidForce = parsed;
-        terminal.printInfo(Text.BEHAVIOR_UPDATED);
-      });
+      this.addNumericalController(folder, confs, "maxSeeAhead", behavior);
+      this.addNumericalController(folder, confs, "maxAvoidForce", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.BLENDED:
       commonFolderFunc(params);
@@ -220,16 +184,7 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
     case steeringHandler.steeringBehaviorTypes.EVADE:
       var folder = commonFolderFunc(params);
       var confs = {maxPredictionTime: "" + params.maxPredictionTime};
-      folder.add(confs, "maxPredictionTime").onFinishChange(function(val){
-        terminal.clear();
-        var parsed = parseFloat(val);
-        if (isNaN(parsed)){
-          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxPredictionTime"));
-          return;
-        }
-        behavior.parameters.maxPredictionTime = parsed;
-        terminal.printInfo(Text.BEHAVIOR_UPDATED);
-      });
+      this.addNumericalController(folder, confs, "maxPredictionTime", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.FLEE:
       commonFolderFunc(params);
@@ -242,76 +197,106 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
         hideDistance: "" + params.hideDistance,
         threatDistance: "" + params.threatDistance
       };
-      folder.add(confs, "arriveSatisfactionRadius").onFinishChange(function(val){
-        terminal.clear();
-        var parsed = parseFloat(val);
-        if (isNaN(parsed)){
-          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "arriveSatisfactionRadius"));
-          return;
-        }
-        behavior.parameters.arriveSatisfactionRadius = parsed;
-        terminal.printInfo(Text.BEHAVIOR_UPDATED);
-      });
-      folder.add(confs, "arriveSlowDownRadius").onFinishChange(function(val){
-        terminal.clear();
-        var parsed = parseFloat(val);
-        if (isNaN(parsed)){
-          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "arriveSlowDownRadius"));
-          return;
-        }
-        behavior.parameters.arriveSlowDownRadius = parsed;
-        terminal.printInfo(Text.BEHAVIOR_UPDATED);
-      });
-      folder.add(confs, "hideDistance").onFinishChange(function(val){
-        terminal.clear();
-        var parsed = parseFloat(val);
-        if (isNaN(parsed)){
-          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "hideDistance"));
-          return;
-        }
-        behavior.parameters.hideDistance = parsed;
-        terminal.printInfo(Text.BEHAVIOR_UPDATED);
-      });
-      folder.add(confs, "threatDistance").onFinishChange(function(val){
-        terminal.clear();
-        var parsed = parseFloat(val);
-        if (isNaN(parsed)){
-          terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "threatDistance"));
-          return;
-        }
-        behavior.parameters.threatDistance = parsed;
-        terminal.printInfo(Text.BEHAVIOR_UPDATED);
-      });
+      this.addNumericalController(folder, confs, "arriveSatisfactionRadius", behavior);
+      this.addNumericalController(folder, confs, "arriveSlowDownRadius", behavior);
+      this.addNumericalController(folder, confs, "hideDistance", behavior);
+      this.addNumericalController(folder, confs, "threatDistance", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.LOOK_WHERE_YOU_ARE_GOING:
       commonFolderFunc(params);
     return;
     case steeringHandler.steeringBehaviorTypes.PATH_FOLLOWING:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {pathID: params.pathID, satisfactionRadius: "" + params.satisfactionRadius};
+      var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()];
+      var pathIDs = Object.keys(paths);
+      folder.add(confs, "pathID", pathIDs).onChange(function(val){
+        behavior.parameters.pathID = val;
+        terminal.clear();
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
+      this.addNumericalController(folder, confs, "satisfactionRadius", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.PRIORITY:
       commonFolderFunc(params);
     return;
     case steeringHandler.steeringBehaviorTypes.PURSUE:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {maxPredictionTime: "" + params.maxPredictionTime};
+      this.addNumericalController(folder, confs, "maxPredictionTime", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.RANDOM_PATH:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {graphID: params.graphID, satisfactionRadius: "" + params.satisfactionRadius};
+      var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()];
+      var graphIDs = Object.keys(graphs);
+      folder.add(confs, "graphID", graphIDs).onChange(function(val){
+        behavior.parameters.graphID = val;
+        terminal.clear();
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
+      this.addNumericalController(folder, confs, "satisfactionRadius", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.RANDOM_WAYPOINT:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {pathID: params.pathID, satisfactionRadius: "" + params.satisfactionRadius};
+      var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()];
+      var pathIDs = Object.keys(paths);
+      folder.add(confs, "pathID", pathIDs).onChange(function(val){
+        behavior.parameters.pathID = val;
+        terminal.clear();
+        terminal.printInfo(Text.BEHAVIOR_UPDATED);
+      });
+      this.addNumericalController(folder, confs, "satisfactionRadius", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.SEEK:
       commonFolderFunc(params);
     return;
     case steeringHandler.steeringBehaviorTypes.SEPARATION:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {strength: "" + params.strength};
+      this.addNumericalController(folder, confs, "strength", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.WANDER_TWO:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {
+        angleChange: "" + params.angleChange,
+        normalX: "" + params.normalX,
+        normalY: "" + params.normalY,
+        normalZ: "" + params.normalZ,
+        wanderCircleDistance: "" + params.wanderCircleDistance,
+        wanderCircleRadius: "" + params.wanderCircleRadius
+      };
+      this.addNumericalController(folder, confs, "angleChange", behavior);
+      this.addNumericalController(folder, confs, "normalX", behavior);
+      this.addNumericalController(folder, confs, "normalY", behavior);
+      this.addNumericalController(folder, confs, "normalZ", behavior);
+      this.addNumericalController(folder, confs, "wanderCircleDistance", behavior);
+      this.addNumericalController(folder, confs, "wanderCircleRadius", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.WANDER_THREE:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {
+        angleChange: "" + params.angleChange,
+        wanderSphereDistance: "" + params.wanderSphereDistance,
+        wanderSphereRadius: "" + params.wanderSphereRadius
+      };
+      this.addNumericalController(folder, confs, "angleChange", behavior);
+      this.addNumericalController(folder, confs, "wanderSphereDistance", behavior);
+      this.addNumericalController(folder, confs, "wanderSphereRadius", behavior);
     return;
   }
+}
+
+SteeringBehaviorCreatorGUIHandler.prototype.addNumericalController = function(parentContainer, confs, confName, behavior){
+  parentContainer.add(confs, confName).onFinishChange(function(val){
+    terminal.clear();
+    var parsed = parseFloat(val);
+    if (isNaN(parsed)){
+      terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, confName));
+      return;
+    }
+    behavior.parameters[confName] = parsed;
+    terminal.printInfo(Text.BEHAVIOR_UPDATED);
+  });
 }
