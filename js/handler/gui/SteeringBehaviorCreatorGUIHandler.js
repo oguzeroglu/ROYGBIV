@@ -34,7 +34,10 @@ var SteeringBehaviorCreatorGUIHandler = function(){
       terminal.printInfo(Text.STEERING_BEHAVIOR_CREATED);
     },
     "Close": function(){
-
+      terminal.clear();
+      terminal.enable();
+      guiHandler.hide(guiHandler.guiTypes.STEERING_BEHAVIOR_CREATION);
+      terminal.printInfo(Text.GUI_CLOSED);
     }
   };
 }
