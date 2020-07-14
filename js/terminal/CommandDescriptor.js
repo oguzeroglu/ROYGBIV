@@ -252,7 +252,8 @@ var CommandDescriptor = function(){
       0, //printGraphs
       2, //newGraph
       2, //insertJumpDescriptorToGraph
-      2 //mergeGraphs
+      2, //mergeGraphs
+      0 //steeringBehaviors
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -507,7 +508,8 @@ var CommandDescriptor = function(){
     "printGraphs",
     "newGraph id point[0],point[1],....point[n]",
     "insertJumpDescriptorToGraph jumpDescriptorID graphID",
-    "mergeGraphs mergedGraphID id[0],id[1],.....id[n]"
+    "mergeGraphs mergedGraphID id[0],id[1],.....id[n]",
+    "steeringBehaviors"
   ];
 
   this.commands = [
@@ -762,7 +764,8 @@ var CommandDescriptor = function(){
     "printGraphs",
     "newGraph",
     "insertJumpDescriptorToGraph",
-    "mergeGraphs"
+    "mergeGraphs",
+    "steeringBehaviors"
   ];
 
   this.commandInfo = [
@@ -1017,7 +1020,8 @@ var CommandDescriptor = function(){
     "printGraphs: Prints created graphs.",
     "newGraph: Opens graph creation GUI to manually create a graph from given vertices.",
     "insertJumpDescriptorToGraph: Inserts a jump descriptor to a graph.",
-    "mergeGraphs: Creates a new graph by merging given graphs."
+    "mergeGraphs: Creates a new graph by merging given graphs.",
+    "steeringBehaviors: Shows the steering behavior configuration GUI."
   ];
 
   this.keyboardInfo = [

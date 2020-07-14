@@ -6411,6 +6411,14 @@ function parse(input){
           terminal.printInfo(Text.GRAPHS_MERGED);
           return true;
         break;
+        case 252: //steeringBehaviors
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          steeringBehaviorCreatorGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){
