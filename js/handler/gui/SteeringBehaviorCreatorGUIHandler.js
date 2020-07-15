@@ -184,7 +184,7 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
         var name = this["Behavior name"];
         terminal.clear();
         var existingBehaviors = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
-        if (!existingBehaviors[name]){
+        if (!existingBehaviors[name] || name == behavior.parameters.name){
           terminal.printError(Text.NO_SUCH_BEHAVIOR);
           return;
         }
@@ -246,7 +246,35 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
       this.addNumericalController(folder, confs, "satisfactionRadius", behavior);
     return;
     case steeringHandler.steeringBehaviorTypes.PRIORITY:
-      commonFolderFunc(params);
+      var folder = commonFolderFunc(params);
+      var confs = {"Behavior name": "", threshold: "" + params.threshold, "Add": function(){
+        var name = this["Behavior name"];
+        terminal.clear();
+        var existingBehaviors = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+        if (!existingBehaviors[name] || name == behavior.parameters.name){
+          terminal.printError(Text.NO_SUCH_BEHAVIOR);
+          return;
+        }
+        for (var i = 0; i < params.list.length; i ++){
+          var curBehavior = params.list[i];
+          if (curBehavior.parameters.name == name){
+            terminal.printError(Text.BEHAVIOR_ALREADY_ADDED);
+            return;
+          }
+        }
+        var newFolder = folder.addFolder(name);
+        params.list.push(existingBehaviors[name]);
+        newFolder.add({"Remove": function(){
+          folder.removeFolder(newFolder);
+          params.list.splice(params.list.indexOf(existingBehaviors[name]), 1);
+          terminal.clear();
+          terminal.printInfo(Text.BEHAVIOR_REMOVED);
+        }}, "Remove");
+        terminal.printInfo(Text.BEHAVIOR_ADDED);
+      }};
+      this.addNumericalController(folder, confs, "threshold", behavior);
+      folder.add(confs, "Behavior name");
+      folder.add(confs, "Add");
     return;
     case steeringHandler.steeringBehaviorTypes.PURSUE:
       var folder = commonFolderFunc(params);
