@@ -701,6 +701,7 @@ var Text = function(){
   this.CANNOT_SET_MASS_FOR_SIMPLIFIED_OBJECTS = "Cannot set mass for objects with simplified physics.";
   this.ALREADY_FOR_MOBILE = "Application is already @@1 for mobile devices.";
   this.ENABLED = "enabled";
+  this.BEHAVIOR_USED_IN_COMBINED_STEERING_BEHAVIOR = "Behavior used in a combined steering behavior. Cannot delete.";
   this.PROTOCOL_DEFINITION_FILE_DOES_NOT_EXIST = "Protocol definition file does not exist: @@1";
   this.PROTOCOL_DEFINITION_FILE_SET = "Protocol definition file set.";
   this.PROTOCOL_DEFINITION_FILE_RESET = "Protocol definition file reset.";

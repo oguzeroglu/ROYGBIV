@@ -154,6 +154,29 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
     var controller = folder.add(params, "type");
     guiHandler.disableController(controller);
     folder.add({"Delete": function(){
+      var allBehaviors = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var behaviorName in allBehaviors){
+        var curBehavior = allBehaviors[behaviorName];
+        if (curBehavior.parameters.type == steeringHandler.steeringBehaviorTypes.BLENDED){
+          var list = curBehavior.parameters.list;
+          for (var i = 0; i < list.length; i ++){
+            if (list[i].behavior.parameters.name == behavior.parameters.name){
+              terminal.clear();
+              terminal.printError(Text.BEHAVIOR_USED_IN_COMBINED_STEERING_BEHAVIOR);
+              return;
+            }
+          }
+        }else if (curBehavior.parameters.type == steeringHandler.steeringBehaviorTypes.PRIORITY){
+          var list = curBehavior.parameters.list;
+          for (var i = 0; i < list.length; i ++){
+            if (list[i].parameters.name == behavior.parameters.name){
+              terminal.clear();
+              terminal.printError(Text.BEHAVIOR_USED_IN_COMBINED_STEERING_BEHAVIOR);
+              return;
+            }
+          }
+        }
+      }
       steeringHandler.removeBehavior(behavior.parameters.name);
       guiHandler.datGuiSteeringBehaviorCreation.removeFolder(folder);
       terminal.clear();
