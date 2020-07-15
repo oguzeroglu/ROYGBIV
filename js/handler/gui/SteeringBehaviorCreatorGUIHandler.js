@@ -154,6 +154,22 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
     var controller = folder.add(params, "type");
     guiHandler.disableController(controller);
     folder.add({"Delete": function(){
+      for (var objName in sceneHandler.getAddedObjects()){
+        var obj = addedObjects[objName];
+        if (obj.steerableInfo && obj.steerableInfo.behaviorsByID[behavior.parameters.name]){
+          terminal.clear();
+          terminal.printError(Text.BEHAVIOR_ASSIGNED_TO_OBJECT.replace(Text.PARAM1, objName));
+          return;
+        }
+      }
+      for (var objName in sceneHandler.getObjectGroups()){
+        var obj = objectGroups[objName];
+        if (obj.steerableInfo && obj.steerableInfo.behaviorsByID[behavior.parameters.name]){
+          terminal.clear();
+          terminal.printError(Text.BEHAVIOR_ASSIGNED_TO_OBJECT.replace(Text.PARAM1, objName));
+          return;
+        }
+      }
       var allBehaviors = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
       for (var behaviorName in allBehaviors){
         var curBehavior = allBehaviors[behaviorName];

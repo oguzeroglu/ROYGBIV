@@ -216,6 +216,7 @@ var Text = function(){
   this.NO_PARTICLE_SYSTEM_POOLS_CREATED = "No particle system pools created.";
   this.NO_MUZZLE_FLASHES_CREATED = "No muzzleflashes created.";
   this.SHADER_PRECISION_ADJUSTED = "Shader precision adjusted.";
+  this.BEHAVIOR_ASSIGNED_TO_OBJECT = "Behavior assigned to object [@@1]. Unassign before deleting.";
   this.COMMAND_EXECUTED_FOR_X_OBJECTS = "Command executed for @@1 objects.";
   this.TEXTURE_PACK_MAPPED_TO_X_OBJECTS = "Command executed for @@1 objects.";
   this.TEXTURE_PACK_ALREADY_USED = "Texture pack already mapped, cannot be edited.";
