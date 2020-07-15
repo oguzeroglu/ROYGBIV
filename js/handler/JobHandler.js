@@ -119,6 +119,10 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyPathCommand();
     }else if (this.splitted[0] == "destroygraph"){
       this.handleDestroyGraphCommand();
+    }else if (this.splitted[0] == "assignsteeringbehavior"){
+      this.handleAssignSteeringBehaviorCommand();
+    }else if (this.splitted[0] == "unassignsteeringbehavior"){
+      this.handleUnassignSteeringBehaviorCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -127,8 +131,58 @@ JobHandler.prototype.handle = function(previewModeCommand){
     console.error(err);
   }
   // because async
-  if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
+  if (this.splitted[0] != "autoconfigurearea"){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleUnassignSteeringBehaviorCommand = function(){
+  var namePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  for (var objName in sceneHandler.getAddedObjects()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("unassignSteeringBehavior " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  for (var objName in sceneHandler.getObjectGroups()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("unassignSteeringBehavior " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBJECT_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleAssignSteeringBehaviorCommand = function(){
+  var namePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  for (var objName in sceneHandler.getAddedObjects()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("assignSteeringBehavior " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  for (var objName in sceneHandler.getObjectGroups()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("assignSteeringBehavior " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBJECT_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
 }
 

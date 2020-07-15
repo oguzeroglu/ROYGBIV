@@ -6425,6 +6425,11 @@ function parse(input){
             return true;
           }
 
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
 
           if (!obj){
@@ -6457,12 +6462,19 @@ function parse(input){
 
           obj.steerableInfo.behaviorsByID[splitted[2]] = behavior;
           selectionHandler.resetCurrentSelection();
-          terminal.printInfo(Text.BEHAVIOR_ASSIGNED_TO_THE_OBJECT);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.BEHAVIOR_ASSIGNED_TO_THE_OBJECT);
+          }
           return true;
         break;
         case 254: //unassignSteeringBehavior
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
 
@@ -6498,7 +6510,9 @@ function parse(input){
 
           delete obj.steerableInfo.behaviorsByID[splitted[2]];
           selectionHandler.resetCurrentSelection();
-          terminal.printInfo(Text.BEHAVIOR_UNASSIGNED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.BEHAVIOR_UNASSIGNED);
+          }
           return true;
         break;
       }
