@@ -253,7 +253,8 @@ var CommandDescriptor = function(){
       2, //newGraph
       2, //insertJumpDescriptorToGraph
       2, //mergeGraphs
-      0 //steeringBehaviors
+      0, //steeringBehaviors
+      2 //assignSteeringBehavior
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -509,7 +510,8 @@ var CommandDescriptor = function(){
     "newGraph id point[0],point[1],....point[n]",
     "insertJumpDescriptorToGraph jumpDescriptorID graphID",
     "mergeGraphs mergedGraphID id[0],id[1],.....id[n]",
-    "steeringBehaviors"
+    "steeringBehaviors",
+    "assignSteeringBehavior objectName steeringBehaviorName"
   ];
 
   this.commands = [
@@ -765,7 +767,8 @@ var CommandDescriptor = function(){
     "newGraph",
     "insertJumpDescriptorToGraph",
     "mergeGraphs",
-    "steeringBehaviors"
+    "steeringBehaviors",
+    "assignSteeringBehavior"
   ];
 
   this.commandInfo = [
@@ -1021,7 +1024,8 @@ var CommandDescriptor = function(){
     "newGraph: Opens graph creation GUI to manually create a graph from given vertices.",
     "insertJumpDescriptorToGraph: Inserts a jump descriptor to a graph.",
     "mergeGraphs: Creates a new graph by merging given graphs.",
-    "steeringBehaviors: Shows the steering behavior configuration GUI."
+    "steeringBehaviors: Shows the steering behavior configuration GUI.",
+    "assignSteeringBehavior: Assigns a steering behavior to an object."
   ];
 
   this.keyboardInfo = [
@@ -1172,6 +1176,7 @@ var CommandDescriptor = function(){
   this.PATH_ID                     =   50;
   this.GRAPH_ID                    =   51;
   this.ANY_GRAPH_ID                =   52;
+  this.STEERING_BEHAVIOR_NAME      =   53;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1923,6 +1928,12 @@ var CommandDescriptor = function(){
   this.mergeGraphs.types = [];
   this.mergeGraphs.types.push(this.UNKNOWN_INDICATOR); //mergedGraphID
   this.mergeGraphs.types.push(this.ANY_GRAPH_ID); //id[0],id[1],.....id[n]
+
+  // assignSteeringBehavior
+  this.assignSteeringBehavior = new Object();
+  this.assignSteeringBehavior.types = [];
+  this.assignSteeringBehavior.types.push(this.OBJECT_NAME); //objectName
+  this.assignSteeringBehavior.types.push(this.STEERING_BEHAVIOR_NAME); //steeringBehaviorName
 };
 
 CommandDescriptor.prototype.test = function(){

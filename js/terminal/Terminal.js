@@ -894,6 +894,15 @@ Terminal.prototype.autocomplete = function(command){
 				replaceCommand = false;
 				helpString = "[Graphs]: ";
 			break;
+			case commandDescriptor.STEERING_BEHAVIOR_NAME:
+				var behaviors = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+				for (var name in behaviors){
+					if (name.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(name);
+					}
+				}
+				helpString = "[Steering behaviors]: ";
+			break;
 		}
 
 		//  **********************************************************
