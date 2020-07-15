@@ -33,7 +33,7 @@ var SteeringBehaviorCreatorGUIHandler = function(){
       steeringBehaviorCreatorGUIHandler.addBehaviorFolder(behavior);
       terminal.printInfo(Text.STEERING_BEHAVIOR_CREATED);
     },
-    "Close": function(){
+    "Done": function(){
       terminal.clear();
       terminal.enable();
       guiHandler.hide(guiHandler.guiTypes.STEERING_BEHAVIOR_CREATION);
@@ -55,7 +55,7 @@ SteeringBehaviorCreatorGUIHandler.prototype.show = function(){
   guiHandler.datGuiSteeringBehaviorCreation.add(this.defaultControls, "Type", this.types);
   guiHandler.datGuiSteeringBehaviorCreation.add(this.defaultControls, "Name");
   guiHandler.datGuiSteeringBehaviorCreation.add(this.defaultControls, "Create");
-  guiHandler.datGuiSteeringBehaviorCreation.add(this.defaultControls, "Close");
+  guiHandler.datGuiSteeringBehaviorCreation.add(this.defaultControls, "Done");
 
   var existingBehaviors = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()];
   for (var behaviorID in existingBehaviors){
