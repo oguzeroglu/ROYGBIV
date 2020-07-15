@@ -254,7 +254,8 @@ var CommandDescriptor = function(){
       2, //insertJumpDescriptorToGraph
       2, //mergeGraphs
       0, //steeringBehaviors
-      2 //assignSteeringBehavior
+      2, //assignSteeringBehavior
+      2 //unassignSteeringBehavior
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -511,7 +512,8 @@ var CommandDescriptor = function(){
     "insertJumpDescriptorToGraph jumpDescriptorID graphID",
     "mergeGraphs mergedGraphID id[0],id[1],.....id[n]",
     "steeringBehaviors",
-    "assignSteeringBehavior objectName steeringBehaviorName"
+    "assignSteeringBehavior objectName steeringBehaviorName",
+    "unassignSteeringBehavior objectName steeringBehaviorName"
   ];
 
   this.commands = [
@@ -768,7 +770,8 @@ var CommandDescriptor = function(){
     "insertJumpDescriptorToGraph",
     "mergeGraphs",
     "steeringBehaviors",
-    "assignSteeringBehavior"
+    "assignSteeringBehavior",
+    "unassignSteeringBehavior"
   ];
 
   this.commandInfo = [
@@ -1025,7 +1028,8 @@ var CommandDescriptor = function(){
     "insertJumpDescriptorToGraph: Inserts a jump descriptor to a graph.",
     "mergeGraphs: Creates a new graph by merging given graphs.",
     "steeringBehaviors: Shows the steering behavior configuration GUI.",
-    "assignSteeringBehavior: Assigns a steering behavior to an object."
+    "assignSteeringBehavior: Assigns a steering behavior to an object.",
+    "unassignSteeringBehavior: Unassigns a steering behavior from an object."
   ];
 
   this.keyboardInfo = [
@@ -1934,6 +1938,12 @@ var CommandDescriptor = function(){
   this.assignSteeringBehavior.types = [];
   this.assignSteeringBehavior.types.push(this.OBJECT_NAME); //objectName
   this.assignSteeringBehavior.types.push(this.STEERING_BEHAVIOR_NAME); //steeringBehaviorName
+
+  // unassignSteeringBehavior
+  this.unassignSteeringBehavior = new Object();
+  this.unassignSteeringBehavior.types = [];
+  this.unassignSteeringBehavior.types.push(this.OBJECT_NAME); //objectName
+  this.unassignSteeringBehavior.types.push(this.STEERING_BEHAVIOR_NAME); //steeringBehaviorName
 };
 
 CommandDescriptor.prototype.test = function(){

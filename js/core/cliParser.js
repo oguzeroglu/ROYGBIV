@@ -6460,6 +6460,46 @@ function parse(input){
           terminal.printInfo(Text.BEHAVIOR_ASSIGNED_TO_THE_OBJECT);
           return true;
         break;
+        case 254: //unassignSteeringBehavior
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+
+          if (!obj.steerableInfo){
+            terminal.printError(Text.OBJECT_IS_NOT_A_STEERABLE);
+            return true;
+          }
+
+          var allBehaviorsInScene = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var behavior = allBehaviorsInScene[splitted[2]];
+
+          if (!behavior){
+            terminal.printError(Text.NO_SUCH_BEHAVIOR);
+            return true;
+          }
+
+          if (!obj.steerableInfo.behaviorsByID[splitted[2]]){
+            terminal.printError(Text.BEHAVIOR_IS_NOT_ASSIGNED_TO_THIS_OBJECT);
+            return true;
+          }
+
+          delete obj.steerableInfo.behaviorsByID[splitted[2]];
+          terminal.printInfo(Text.BEHAVIOR_UNASSIGNED);
+          return true;
+        break;
       }
       return true;
     }catch(err){
