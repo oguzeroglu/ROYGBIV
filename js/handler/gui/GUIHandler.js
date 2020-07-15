@@ -1783,6 +1783,21 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     selectionHandler.getSelectedObject().steerableInfo.lookSpeed = val;
   }).listen();
 
+  if (!!selectionHandler.getSelectedObject().steerableInfo){
+    var behaviorCount = Object.keys(selectionHandler.getSelectedObject().steerableInfo.behaviorsByID).length;
+    if (behaviorCount > 0){
+      var behaviorsFolder = aiFolder.addFolder("Behaviors");
+      for (var behaviorName in selectionHandler.getSelectedObject().steerableInfo.behaviorsByID){
+        var behavior = selectionHandler.getSelectedObject().steerableInfo.behaviorsByID[behaviorName];
+        var behaviorFolder = behaviorsFolder.addFolder(behavior.parameters.name);
+        behaviorFolder.add({"Unassign": function(){
+          terminal.clear();
+          parseCommand("unassignSteeringBehavior " + selectionHandler.getSelectedObject().name + " " + this.name);
+        }.bind({name: behavior.parameters.name})}, "Unassign");
+      }
+    }
+  }
+
   // MOTION BLUR
   guiHandler.omHasObjectTrailController = motionBlurFolder.add(guiHandler.objectManipulationParameters, "Motion blur").onChange(function(val){
     if (val){

@@ -6497,6 +6497,7 @@ function parse(input){
           }
 
           delete obj.steerableInfo.behaviorsByID[splitted[2]];
+          selectionHandler.resetCurrentSelection();
           terminal.printInfo(Text.BEHAVIOR_UNASSIGNED);
           return true;
         break;
