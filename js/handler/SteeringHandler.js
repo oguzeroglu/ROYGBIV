@@ -22,7 +22,7 @@ var SteeringHandler = function(){
     LOOK_WHERE_YOU_ARE_GOING: "LookWhereYouAreGoingBehavior",
     PATH_FOLLOWING: "PathFollowingBehavior",
     PRIORITY: "PrioritySteeringBehavior",
-    PURSUE: "PursueSteeringBehavior",
+    PURSUE: "PursueBehavior",
     RANDOM_PATH: "RandomPathBehavior",
     RANDOM_WAYPOINT: "RandomWaypointBehavior",
     SEEK: "SeekBehavior",

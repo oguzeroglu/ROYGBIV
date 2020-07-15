@@ -182,6 +182,9 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
       terminal.clear();
       terminal.printInfo(Text.BEHAVIOR_REMOVED);
     }}, "Delete");
+    folder.add({"Documentation": function(){
+      window.open("https://github.com/oguzeroglu/Kompute/wiki/" + behavior.parameters.type, '_blank').focus();
+    }}, "Documentation");
     return folder;
   };
 
