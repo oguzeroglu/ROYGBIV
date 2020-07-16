@@ -3883,6 +3883,7 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   preConditions.checkIfChangeable(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.trackObjectPosition, sourceObject);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.trackObjectPosition, targetObject);
+  preConditions.checkIfNotFPSWeapon(ROYGBIV.trackObjectPosition, sourceObject);
   sourceObject.trackObjectPosition(targetObject);
 }
 

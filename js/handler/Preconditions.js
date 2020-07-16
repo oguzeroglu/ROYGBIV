@@ -702,6 +702,12 @@ Preconditions.prototype.checkIfAddedObjectObjectGroupAddedTextSprite = function(
   }
 }
 
+Preconditions.prototype.checkIfNotFPSWeapon = function(callerFunc, obj){
+  if (obj.isFPSWeapon){
+    this.throw(callerFunc, "FPS weapon objects do not support this API.");
+  }
+}
+
 Preconditions.prototype.checkIfFPSWeaponOnlyIfExists = function(callerFunc, parameterName, obj){
   if (!(typeof obj == UNDEFINED)){
     if (!obj.isFPSWeapon){
