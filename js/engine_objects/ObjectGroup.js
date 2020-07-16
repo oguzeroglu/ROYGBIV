@@ -2105,6 +2105,12 @@ ObjectGroup.prototype.glue = function(simplifiedChildrenPhysicsBodies){
   var hasAnyPhysicsShape = false;
   for (var objectName in group){
     var addedObject = group[objectName];
+    if (addedObject.usedAsAIEntity){
+      addedObject.unUseAsAIEntity();
+    }
+    if (addedObject.steerableInfo){
+      addedObject.unmakeSteerable();
+    }
     addedObject.setAttachedProperties();
     if (addedObject.isFPSWeapon){
       addedObject.resetFPSWeaponProperties();
@@ -2239,6 +2245,15 @@ ObjectGroup.prototype.destroyParts = function(){
 }
 
 ObjectGroup.prototype.detach = function(childrenNoPhysicsContribution){
+
+  if (this.usedAsAIEntity){
+    this.unUseAsAIEntity();
+  }
+
+  if (this.steerableInfo){
+    this.unmakeSteerable();
+  }
+
   this.graphicsGroup.position.copy(this.mesh.position);
   this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
   this.graphicsGroup.updateMatrixWorld();

@@ -410,11 +410,11 @@ SteeringHandler.prototype.updateObject = function(obj){
 }
 
 SteeringHandler.prototype.hide = function(obj){
-  if (!obj.usedAsAIEntity){
+  if (!obj.usedAsAIEntity && !obj.steerableInfo){
     return;
   }
 
-  if (obj.isObjectGroup){
+  if (!obj.steerableInfo && obj.isObjectGroup){
     for (var childName in obj.group){
       this.hide(obj.group[childName]);
     }
@@ -426,18 +426,18 @@ SteeringHandler.prototype.hide = function(obj){
     sceneName = objectGroups[obj.parentObjectName].registeredSceneName;
   }
 
-  var obstacles = this.obstaclesBySceneName[sceneName];
-  var entity = obstacles[obj.name];
+  var entities = obj.steerableInfo? this.steerablesBySceneName[sceneName]: this.obstaclesBySceneName[sceneName];
+  var entity = entities[obj.name];
 
   this.world.hideEntity(entity);
 }
 
 SteeringHandler.prototype.show = function(obj){
-  if (!obj.usedAsAIEntity){
+  if (!obj.usedAsAIEntity && !obj.steerableInfo){
     return;
   }
 
-  if (obj.isObjectGroup){
+  if (!obj.steerableInfo && obj.isObjectGroup){
     for (var childName in obj.group){
       this.show(obj.group[childName]);
     }
@@ -449,8 +449,8 @@ SteeringHandler.prototype.show = function(obj){
     sceneName = objectGroups[obj.parentObjectName].registeredSceneName;
   }
 
-  var obstacles = this.obstaclesBySceneName[sceneName];
-  var entity = obstacles[obj.name];
+  var entities = obj.steerableInfo? this.steerablesBySceneName[sceneName]: this.obstaclesBySceneName[sceneName];
+  var entity = entities[obj.name];
 
   this.world.showEntity(entity);
   if (typeof obj.parentObjectName === UNDEFINED){
@@ -471,7 +471,7 @@ SteeringHandler.prototype.issueUpdate = function(obj){
     return;
   }
 
-  var entities = this.obstaclesBySceneName[sceneName] || this.steerablesBySceneName[sceneName];
+  var entities = obj.steerableInfo? this.steerablesBySceneName[sceneName]: this.obstaclesBySceneName[sceneName];
 
   if (!entities){
     return;
@@ -498,8 +498,23 @@ SteeringHandler.prototype.issueUpdate = function(obj){
   }else if (obj.isObjectGroup){
     obj.mesh.updateMatrixWorld(true);
     obj.updateBoundingBoxes();
-    for (var childname in obj.group){
-      this.issueUpdate(obj.group[childname]);
+
+    if (obj.steerableInfo){
+      REUSABLE_BOX3.makeEmpty();
+      for (var i = 0; i < obj.boundingBoxes.length; i ++){
+        var bb = obj.boundingBoxes[i];
+        REUSABLE_BOX3.expandByPoint(bb.min);
+        REUSABLE_BOX3.expandByPoint(bb.max);
+      }
+      var center = REUSABLE_BOX3.getCenter(REUSABLE_VECTOR);
+      var size = REUSABLE_BOX3.getSize(REUSABLE_VECTOR_2);
+      var centerKomputeVector = this.vectorPool.get().set(center.x, center.y, center.z);
+      var sizeKomputeVector = this.vectorPool.get().set(size.x, size.y, size.z);
+      entity.setPositionAndSize(centerKomputeVector, sizeKomputeVector);
+    }else{
+      for (var childname in obj.group){
+        this.issueUpdate(obj.group[childname]);
+      }
     }
   }
 }
