@@ -39,6 +39,7 @@ SteeringHandler.prototype.import = function(exportObj){
   var pathsByJumpDescriptors = exportObj.pathsByJumpDescriptors;
   var graphsByJumpDescriptors = exportObj.graphsByJumpDescriptors;
   var graphInfo = exportObj.graphInfo;
+  var steeringBehaviorInfo = exportObj.steeringBehaviorInfo;
 
   for (var sceneName in obstacleInfo){
     for (var id in obstacleInfo[sceneName]){
@@ -118,6 +119,13 @@ SteeringHandler.prototype.import = function(exportObj){
       this.insertJumpDescriptorToGraph(jdID, graphID);
     }
   }
+
+  for (var sceneName in steeringBehaviorInfo){
+    this.behaviorsBySceneName[sceneName] = {};
+    for (var behaviorName in steeringBehaviorInfo[sceneName]){
+      this.behaviorsBySceneName[sceneName][behaviorName] = new PreconfiguredSteeringBehavior(steeringBehaviorInfo[sceneName][behaviorName]);
+    }
+  }
 }
 
 SteeringHandler.prototype.export = function(){
@@ -127,7 +135,8 @@ SteeringHandler.prototype.export = function(){
     pathInfo: {},
     pathsByJumpDescriptors: {},
     graphsByJumpDescriptors: {},
-    graphInfo: {}
+    graphInfo: {},
+    steeringBehaviorInfo: {}
   };
 
   for (var sceneName in this.obstaclesBySceneName){
@@ -207,6 +216,13 @@ SteeringHandler.prototype.export = function(){
       });
 
       exportObject.graphInfo[sceneName][id] = obj;
+    }
+  }
+
+  for (var sceneName in this.behaviorsBySceneName){
+    exportObject.steeringBehaviorInfo[sceneName] = {};
+    for (var behaviorName in this.behaviorsBySceneName[sceneName]){
+      exportObject.steeringBehaviorInfo[sceneName][behaviorName] = this.behaviorsBySceneName[sceneName][behaviorName].export();
     }
   }
 
