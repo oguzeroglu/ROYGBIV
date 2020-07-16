@@ -124,6 +124,7 @@ SteeringHandler.prototype.import = function(exportObj){
     this.behaviorsBySceneName[sceneName] = {};
     for (var behaviorName in steeringBehaviorInfo[sceneName]){
       this.behaviorsBySceneName[sceneName][behaviorName] = new PreconfiguredSteeringBehavior(steeringBehaviorInfo[sceneName][behaviorName]);
+      this.usedBehaviorIDs[behaviorName] = this.behaviorsBySceneName[sceneName][behaviorName];
     }
   }
 }
@@ -735,6 +736,9 @@ SteeringHandler.prototype.mergeGraphs = function(id, graphIDs){
 
 SteeringHandler.prototype.createSteerableFromObject = function(object){
   var totalBox = new THREE.Box3();
+  if (!object.boundingBoxes){
+    object.generateBoundingBoxes();
+  }
   for (var i = 0; i < object.boundingBoxes.length; i ++){
     var bb = object.boundingBoxes[i];
     totalBox.expandByPoint(bb.min);

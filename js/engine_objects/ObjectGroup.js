@@ -2787,6 +2787,21 @@ ObjectGroup.prototype.export = function(){
 
   exportObj.affectedByLight = this.affectedByLight;
   exportObj.usedAsAIEntity = this.usedAsAIEntity;
+
+  if (this.steerableInfo){
+    exportObj.steerableInfo = {
+      mode: this.steerableInfo.mode,
+      maxSpeed: this.steerableInfo.maxSpeed,
+      maxAcceleration: this.steerableInfo.maxAcceleration,
+      jumpSpeed: this.steerableInfo.jumpSpeed,
+      lookSpeed: this.steerableInfo.lookSpeed,
+      behaviorIDs: []
+    };
+    for (var behaviorID in this.steerableInfo.behaviorsByID){
+      exportObj.steerableInfo.behaviorIDs.push(behaviorID);
+    }
+  }
+
   return exportObj;
 }
 

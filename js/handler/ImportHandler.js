@@ -4,6 +4,28 @@ var ImportHandler = function(){
 
 ImportHandler.prototype.importSteeringHandler = function(obj){
   steeringHandler.import(obj.steeringHandler);
+
+  for (var objName in obj.addedObjects){
+    var steerableInfo = obj.addedObjects[objName].steerableInfo;
+    if (steerableInfo){
+      var addedObject = addedObjects[objName];
+      addedObject.makeSteerable(steerableInfo.mode, steerableInfo.maxSpeed, steerableInfo.maxAcceleration, steerableInfo.jumpSpeed, steerableInfo.lookSpeed);
+      for (var i = 0; i < steerableInfo.behaviorIDs.length; i ++){
+        addedObject.steerableInfo.behaviorsByID[steerableInfo.behaviorIDs[i]] = steeringHandler.usedBehaviorIDs[steerableInfo.behaviorIDs[i]];
+      }
+    }
+  }
+
+  for (var objName in obj.objectGroups){
+    var steerableInfo = obj.objectGroups[objName].steerableInfo;
+    if (steerableInfo){
+      var objectGroup = objectGroups[objName];
+      objectGroup.makeSteerable(steerableInfo.mode, steerableInfo.maxSpeed, steerableInfo.maxAcceleration, steerableInfo.jumpSpeed, steerableInfo.lookSpeed);
+      for (var i = 0; i < steerableInfo.behaviorIDs.length; i ++){
+        objectGroup.steerableInfo.behaviorsByID[steerableInfo.behaviorIDs[i]] = steeringHandler.usedBehaviorIDs[steerableInfo.behaviorIDs[i]];
+      }
+    }
+  }
 }
 
 ImportHandler.prototype.importScenes = function(obj){

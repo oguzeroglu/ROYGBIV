@@ -916,6 +916,21 @@ AddedObject.prototype.export = function(){
   exportObject.affectedByLight = this.affectedByLight;
   exportObject.customDisplacementTextureMatrixInfo  = this.customDisplacementTextureMatrixInfo;
   exportObject.usedAsAIEntity = this.usedAsAIEntity;
+
+  if (this.steerableInfo){
+    exportObject.steerableInfo = {
+      mode: this.steerableInfo.mode,
+      maxSpeed: this.steerableInfo.maxSpeed,
+      maxAcceleration: this.steerableInfo.maxAcceleration,
+      jumpSpeed: this.steerableInfo.jumpSpeed,
+      lookSpeed: this.steerableInfo.lookSpeed,
+      behaviorIDs: []
+    };
+    for (var behaviorID in this.steerableInfo.behaviorsByID){
+      exportObject.steerableInfo.behaviorIDs.push(behaviorID);
+    }
+  }
+
   return exportObject;
 }
 
