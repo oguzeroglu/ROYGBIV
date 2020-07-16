@@ -702,6 +702,12 @@ Preconditions.prototype.checkIfAddedObjectObjectGroupAddedTextSprite = function(
   }
 }
 
+Preconditions.prototype.checkIfNotSteerable = function(callerFunc, obj){
+  if (obj.steerableInfo){
+    this.throw(callerFunc, "Steerable objects do not support this API.");
+  }
+}
+
 Preconditions.prototype.checkIfNotFPSWeapon = function(callerFunc, obj){
   if (obj.isFPSWeapon){
     this.throw(callerFunc, "FPS weapon objects do not support this API.");
