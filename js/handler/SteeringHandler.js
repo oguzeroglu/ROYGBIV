@@ -32,6 +32,24 @@ var SteeringHandler = function(){
   };
 }
 
+SteeringHandler.prototype.setBehavior = function(object, behaviorName){
+  var constructedBehavior = object.constructedSteeringBehaviors[behaviorName];
+  var steerable = object.steerable;
+  steerable.setBehavior(constructedBehavior);
+  this.activeSteerablesMap.set(object.name, object);
+}
+
+SteeringHandler.prototype.stopSteerable = function(object){
+  this.activeSteerablesMap.delete(object.name);
+  if (object.steerableInfo.mode == this.steeringModes.TRACK_VELOCITY){
+    object.resetVelocity();
+  }
+}
+
+SteeringHandler.prototype.onModeSwitch = function(){
+  this.activeSteerablesMap = new Map();
+}
+
 SteeringHandler.prototype.import = function(exportObj){
   var obstacleInfo = exportObj.obstacleInfo;
   var jumpDescriptorInfo = exportObj.jumpDescriptorInfo;
@@ -241,6 +259,9 @@ SteeringHandler.prototype.onBeforeSceneChange = function(){
 
 SteeringHandler.prototype.onAfterSceneChange = function(){
   this.resetWorld();
+  if (mode == 1){
+    this.activeSteerablesMap = new Map();
+  }
 }
 
 SteeringHandler.prototype.switchDebugMode = function(){
@@ -519,6 +540,20 @@ SteeringHandler.prototype.issueUpdate = function(obj){
   }
 }
 
+SteeringHandler.prototype.issueSteerableUpdate = function(object){
+  var steerable = object.steerable;
+  steerable.update();
+
+  var mode = object.steerableInfo.mode;
+  if (mode == steeringHandler.steeringModes.TRACK_POSITION){
+    var pos = steerable.position;
+    object.setPosition(pos.x, pos.y, pos.z);
+  }else{
+    var velocity = steerable.velocity;
+    object.setVelocity(velocity);
+  }
+}
+
 SteeringHandler.prototype.addJumpDescriptor = function(id, takeoffMarkedPoint, landingMarkedPoint, runupSatisfactionRadius, takeoffPositionSatisfactionRadius, takeoffVelocitySatisfactionRadius){
   if (this.usedJumpDescriptorIDs[id]){
     return false;
@@ -788,6 +823,8 @@ SteeringHandler.prototype.createSteerableFromObject = function(object){
   this.steerablesBySceneName[object.registeredSceneName] = steerables;
 
   this.usedEntityIDs[steerableID] = steerable;
+
+  return steerable;
 }
 
 SteeringHandler.prototype.removeSteerable = function(object){
@@ -805,6 +842,10 @@ SteeringHandler.prototype.removeSteerable = function(object){
 SteeringHandler.prototype.update = function(){
   this.updateBuffer.forEach(this.issueUpdate);
   this.updateBuffer.clear();
+
+  if (mode == 1){
+    this.activeSteerablesMap.forEach(this.issueSteerableUpdate);
+  }
 }
 
 SteeringHandler.prototype.addBehavior = function(id, behavior){

@@ -81,6 +81,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   if (oldIsPaused){
     render();
   }
+  steeringHandler.onModeSwitch();
 }
 
 ModeSwitcher.prototype.switchFromDesignToPreview = function(){
