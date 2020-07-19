@@ -159,6 +159,13 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (object.objectTrailConfigurations){
       new ObjectTrail({object: object, alpha: object.objectTrailConfigurations.alpha, maxTimeInSeconds: object.objectTrailConfigurations.time});
     }
+    if (object.steerableInfo){
+      object.constructedSteeringBehaviors = {};
+      for (var behaviorID in object.steerableInfo.behaviorsByID){
+        var constructedBehavior = object.steerableInfo.behaviorsByID[behaviorID].getBehavior();
+        object.constructedSteeringBehaviors[behaviorID] = constructedBehavior;
+      }
+    }
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -178,6 +185,13 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
     if (object.objectTrailConfigurations){
       new ObjectTrail({object: object, alpha: object.objectTrailConfigurations.alpha, maxTimeInSeconds: object.objectTrailConfigurations.time});
+    }
+    if (object.steerableInfo){
+      object.constructedSteeringBehaviors = {};
+      for (var behaviorID in object.steerableInfo.behaviorsByID){
+        var constructedBehavior = object.steerableInfo.behaviorsByID[behaviorID].getBehavior();
+        object.constructedSteeringBehaviors[behaviorID] = constructedBehavior;
+      }
     }
   }
   autoInstancingHandler.handle();
@@ -460,6 +474,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.initOpacitySet = false;
     }
     steeringHandler.updateObject(object);
+    delete object.constructedSteeringBehaviors;
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -498,6 +513,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       delete object.originalMass;
     }
     steeringHandler.updateObject(object);
+    delete object.constructedSteeringBehaviors;
   }
   fogHandler.onFromPreviewToDesign();
   renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
