@@ -317,6 +317,9 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
       this.addNumericalController(folder, confs, "threshold", behavior);
       folder.add(confs, "Behavior name");
       folder.add(confs, "Add");
+      for (var i = 0; i < params.list.length; i ++){
+        this.addPriorityBehaviorFolder(folder, params.list[i], behavior);
+      }
     return;
     case steeringHandler.steeringBehaviorTypes.PURSUE:
       var folder = commonFolderFunc(params);
@@ -401,6 +404,18 @@ SteeringBehaviorCreatorGUIHandler.prototype.addNumericalController = function(pa
     }
     terminal.printInfo(Text.BEHAVIOR_UPDATED);
   });
+}
+
+SteeringBehaviorCreatorGUIHandler.prototype.addPriorityBehaviorFolder = function(parentContainer, info, behavior){
+  var folder = parentContainer.addFolder(info.parameters.name);
+  folder.add({
+    "Remove": function(){
+      parentContainer.removeFolder(folder);
+      behavior.parameters.list.splice(behavior.parameters.list.indexOf(info), 1);
+      terminal.clear();
+      terminal.printInfo(Text.BEHAVIOR_REMOVED);
+    }
+  }, "Remove");
 }
 
 SteeringBehaviorCreatorGUIHandler.prototype.addBlendedBehaviorFolder = function(parentContainer, info, behavior){
