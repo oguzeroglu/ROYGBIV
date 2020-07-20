@@ -81,10 +81,10 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   if (oldIsPaused){
     render();
   }
-  steeringHandler.onModeSwitch();
 }
 
 ModeSwitcher.prototype.switchFromDesignToPreview = function(){
+  steeringHandler.onModeSwitch();
   TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
@@ -163,7 +163,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (object.steerableInfo){
       object.constructedSteeringBehaviors = {};
       for (var behaviorID in object.steerableInfo.behaviorsByID){
-        var constructedBehavior = object.steerableInfo.behaviorsByID[behaviorID].getBehavior();
+        var constructedBehavior = object.steerableInfo.behaviorsByID[behaviorID].getBehavior(object);
         object.constructedSteeringBehaviors[behaviorID] = constructedBehavior;
       }
     }
@@ -190,7 +190,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (object.steerableInfo){
       object.constructedSteeringBehaviors = {};
       for (var behaviorID in object.steerableInfo.behaviorsByID){
-        var constructedBehavior = object.steerableInfo.behaviorsByID[behaviorID].getBehavior();
+        var constructedBehavior = object.steerableInfo.behaviorsByID[behaviorID].getBehavior(object);
         object.constructedSteeringBehaviors[behaviorID] = constructedBehavior;
       }
     }
@@ -280,6 +280,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   if (inputText){
     inputText.deactivateInputMode();
   }
+
+  steeringHandler.onModeSwitch();
 
   mode = 0;
   autoInstancingHandler.reset();

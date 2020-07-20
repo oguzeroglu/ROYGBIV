@@ -48,6 +48,7 @@ SteeringHandler.prototype.stopSteerable = function(object){
 
 SteeringHandler.prototype.onModeSwitch = function(){
   this.activeSteerablesMap = new Map();
+  this.clonedGraphsBySceneName = new Object();
 }
 
 SteeringHandler.prototype.import = function(exportObj){
@@ -255,6 +256,15 @@ SteeringHandler.prototype.onBeforeSceneChange = function(){
       this.world.removeGraph(graphs[id]);
     }
   }
+
+  if (mode == 1){
+    var clonedGraphs = this.clonedGraphsBySceneName[sceneHandler.getActiveSceneName()];
+    if (clonedGraphs){
+      for (var i = 0; i < clonedGraphs.length; i++){
+        this.world.removeGraph(clonedGraphs[i]);
+      }
+    }
+  }
 }
 
 SteeringHandler.prototype.onAfterSceneChange = function(){
@@ -343,6 +353,15 @@ SteeringHandler.prototype.resetWorld = function(){
   if (graphs){
     for (var id in graphs){
       this.world.insertGraph(graphs[id]);
+    }
+  }
+
+  if (mode == 1){
+    var clonedGraphs = this.clonedGraphsBySceneName[sceneHandler.getActiveSceneName()];
+    if (clonedGraphs){
+      for (var i = 0; i < clonedGraphs.length; i++){
+        this.world.insertGraph(clonedGraphs[i]);
+      }
     }
   }
 }

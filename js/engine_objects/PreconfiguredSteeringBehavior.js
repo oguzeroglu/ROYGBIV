@@ -6,7 +6,7 @@ PreconfiguredSteeringBehavior.prototype.export = function(){
   return JSON.parse(JSON.stringify(this.parameters));
 }
 
-PreconfiguredSteeringBehavior.prototype.getBehavior = function(){
+PreconfiguredSteeringBehavior.prototype.getBehavior = function(object){
   var params = this.parameters;
 
   switch (params.type){
@@ -17,7 +17,7 @@ PreconfiguredSteeringBehavior.prototype.getBehavior = function(){
       var list = [];
       for (var i = 0; i < params.list.length; i ++){
         var curListItem = params.list[i];
-        list.push({behavior: curListItem.behavior.getBehavior(), weight: curListItem.weight});
+        list.push({behavior: curListItem.behavior.getBehavior(object), weight: curListItem.weight});
       }
     return new Kompute.BlendedSteeringBehavior(list);
     case steeringHandler.steeringBehaviorTypes.COHESIION: return new Kompute.CohesionBehavior();
@@ -36,12 +36,15 @@ PreconfiguredSteeringBehavior.prototype.getBehavior = function(){
     case steeringHandler.steeringBehaviorTypes.PRIORITY:
       var list = [];
       for (var i = 0; i < params.list.length; i ++){
-        list.push(params.list[i].getBehavior());
+        list.push(params.list[i].getBehavior(object));
       }
     return new Kompute.PrioritySteeringBehavior({list: list, threshold: params.threshold});
     case steeringHandler.steeringBehaviorTypes.PURSUE: return new Kompute.PursueBehavior({maxPredictionTime: params.maxPredictionTime});
     case steeringHandler.steeringBehaviorTypes.RANDOM_PATH:
       var graph = steeringHandler.usedGraphIDs[params.graphID].clone();
+      var clonedGraphs = steeringHandler.clonedGraphsBySceneName[object.registeredSceneName] || [];
+      clonedGraphs.push(graph);
+      steeringHandler.clonedGraphsBySceneName[object.registeredSceneName] = clonedGraphs;
     return new Kompute.RandomPathBehavior({graph: graph, satisfactionRadius: params.satisfactionRadius});
     case steeringHandler.steeringBehaviorTypes.RANDOM_WAYPOINT:
       var path = steeringHandler.usedPathIDs[params.pathID].clone();
