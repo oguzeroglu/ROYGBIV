@@ -1756,6 +1756,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       return;
     }
     selectionHandler.getSelectedObject().steerableInfo.maxAcceleration = parsedVal;
+    selectionHandler.getSelectedObject().steerable.maxAcceleration = parsedVal;
     terminal.printInfo(Text.IS_SET.replace(Text.PARAM1, "Max acceleration"));
   }).listen();
   guiHandler.omMaxSpeedController = aiFolder.add(guiHandler.objectManipulationParameters, "Max speed").onFinishChange(function(val){
@@ -1767,6 +1768,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       return;
     }
     selectionHandler.getSelectedObject().steerableInfo.maxSpeed = parsedVal;
+    selectionHandler.getSelectedObject().steerable.maxSpeed = parsedVal;
     terminal.printInfo(Text.IS_SET.replace(Text.PARAM1, "Max speed"));
   }).listen();
   guiHandler.omJumpSpeedController = aiFolder.add(guiHandler.objectManipulationParameters, "Jump speed").onFinishChange(function(val){
@@ -1777,6 +1779,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       return;
     }
     selectionHandler.getSelectedObject().steerableInfo.jumpSpeed = parsedVal;
+    selectionHandler.getSelectedObject().steerable.jumpSpeed = parsedVal;
     terminal.printInfo(Text.IS_SET.replace(Text.PARAM1, "Jump speed"));
   }).listen();
   guiHandler.omLookSpeedController = aiFolder.add(guiHandler.objectManipulationParameters, "Look speed").min(0.01).max(1).step(0.01).onChange(function(val){
