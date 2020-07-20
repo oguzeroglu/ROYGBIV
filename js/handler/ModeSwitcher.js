@@ -476,6 +476,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
     }
+    if (object.steerable){
+      object.steerable.velocity.set(0, 0, 0);
+    }
     steeringHandler.updateObject(object);
     delete object.constructedSteeringBehaviors;
   }
@@ -514,6 +517,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
         sceneHandler.onDynamicObjectDeletion(object);
       }
       delete object.originalMass;
+    }
+    if (object.steerable){
+      object.steerable.velocity.set(0, 0, 0);
     }
     steeringHandler.updateObject(object);
     delete object.constructedSteeringBehaviors;
