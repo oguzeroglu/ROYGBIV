@@ -1,9 +1,23 @@
 var PreconfiguredSteeringBehavior = function(parameters){
-  this.parameters = JSON.parse(JSON.stringify(parameters));
+  this.parameters = parameters;
 }
 
 PreconfiguredSteeringBehavior.prototype.export = function(){
-  return JSON.parse(JSON.stringify(this.parameters));
+  var exported = JSON.parse(JSON.stringify(this.parameters));
+
+  var params = this.parameters;
+
+  if (params.type == steeringHandler.steeringBehaviorTypes.BLENDED){
+    for (var i = 0; i < params.list.length; i++){
+      exported.list[i].behavior = params.list[i].behavior.export();
+    }
+  }else if (params.type == steeringHandler.steeringBehaviorTypes.PRIORITY){
+    for (var i = 0; i < params.list.length; i++){
+      exported.list[i] = params.list[i].export();
+    }
+  }
+
+  return exported;
 }
 
 PreconfiguredSteeringBehavior.prototype.getBehavior = function(object){

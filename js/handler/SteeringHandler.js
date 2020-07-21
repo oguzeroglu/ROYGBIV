@@ -139,11 +139,39 @@ SteeringHandler.prototype.import = function(exportObj){
     }
   }
 
+  var importLaterList = new Object();
+
   for (var sceneName in steeringBehaviorInfo){
     this.behaviorsBySceneName[sceneName] = {};
     for (var behaviorName in steeringBehaviorInfo[sceneName]){
-      this.behaviorsBySceneName[sceneName][behaviorName] = new PreconfiguredSteeringBehavior(steeringBehaviorInfo[sceneName][behaviorName]);
-      this.usedBehaviorIDs[behaviorName] = this.behaviorsBySceneName[sceneName][behaviorName];
+      var curExport = steeringBehaviorInfo[sceneName][behaviorName];
+      if (curExport.type == this.steeringBehaviorTypes.BLENDED || curExport.type == this.steeringBehaviorTypes.PRIORITY){
+        var curImportLaters = importLaterList[sceneName] || [];
+        curImportLaters.push(curExport);
+        importLaterList[sceneName] = curImportLaters;
+        continue;
+      }
+      var behavior = new PreconfiguredSteeringBehavior(curExport);
+      this.behaviorsBySceneName[sceneName][behaviorName] = behavior;
+      this.usedBehaviorIDs[behaviorName] = behavior;
+    }
+  }
+
+  for (var sceneName in importLaterList){
+    for (var i = 0; i < importLaterList[sceneName].length; i ++){
+      var curExport = importLaterList[sceneName][i];
+      if (curExport.type == this.steeringBehaviorTypes.BLENDED){
+        for (var i2 = 0; i2 < curExport.list.length; i2 ++){
+          curExport.list[i2].behavior = this.usedBehaviorIDs[curExport.list[i2].behavior.name];
+        }
+      }else{
+        for (var i2 = 0; i2 < curExport.list.length; i2 ++){
+          curExport.list[i2] = this.usedBehaviorIDs[curExport.list[i2].name];
+        }
+      }
+      var behavior = new PreconfiguredSteeringBehavior(curExport);
+      this.behaviorsBySceneName[sceneName][curExport.name] = behavior;
+      this.usedBehaviorIDs[curExport.name] = behavior;
     }
   }
 }
