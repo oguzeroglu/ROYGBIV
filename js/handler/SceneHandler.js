@@ -269,7 +269,6 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     document.exitPointerLock();
   }
 
-  steeringHandler.onBeforeSceneChange();
   lightHandler.onBeforeSceneChange();
   if (projectLoaded){
     this.scenes[this.getActiveSceneName()].saveLights();

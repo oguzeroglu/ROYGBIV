@@ -277,24 +277,6 @@ SteeringHandler.prototype.export = function(){
   return exportObject;
 }
 
-SteeringHandler.prototype.onBeforeSceneChange = function(){
-  var graphs = this.graphsBySceneName[sceneHandler.getActiveSceneName()];
-  if (graphs){
-    for (var id in graphs){
-      this.world.removeGraph(graphs[id]);
-    }
-  }
-
-  if (mode == 1){
-    var clonedGraphs = this.clonedGraphsBySceneName[sceneHandler.getActiveSceneName()];
-    if (clonedGraphs){
-      for (var i = 0; i < clonedGraphs.length; i++){
-        this.world.removeGraph(clonedGraphs[i]);
-      }
-    }
-  }
-}
-
 SteeringHandler.prototype.onAfterSceneChange = function(){
   this.resetWorld();
   if (mode == 1){
@@ -385,7 +367,11 @@ SteeringHandler.prototype.resetWorld = function(){
   var graphs = this.graphsBySceneName[sceneHandler.getActiveSceneName()];
   if (graphs){
     for (var id in graphs){
-      this.world.insertGraph(graphs[id]);
+      var graph = graphs[id];
+      if (graph.world){
+        graph.world.removeGraph(graph);
+      }
+      this.world.insertGraph(graph);
     }
   }
 
@@ -393,7 +379,23 @@ SteeringHandler.prototype.resetWorld = function(){
     var clonedGraphs = this.clonedGraphsBySceneName[sceneHandler.getActiveSceneName()];
     if (clonedGraphs){
       for (var i = 0; i < clonedGraphs.length; i++){
-        this.world.insertGraph(clonedGraphs[i]);
+        var graph = clonedGraphs[i];
+        if (graph.world){
+          graph.world.removeGraph(graph);
+        }
+        this.world.insertGraph(graph);
+      }
+    }
+
+    var aStars = this.astarsBySceneName[sceneHandler.getActiveSceneName()];
+    if (aStars){
+      for (var astarID in aStars){
+        var aStar = aStars[astarID];
+        var graph = aStar.graph;
+        if (graph.world){
+          graph.world.removeGraph(graph);
+        }
+        this.world.insertGraph(graph);
       }
     }
   }
