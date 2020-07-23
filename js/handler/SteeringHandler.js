@@ -342,8 +342,13 @@ SteeringHandler.prototype.reset = function(){
   this.pathsByJumpDescriptors = {};
   this.graphsByJumpDescriptors = {};
 
+  this.graphIDsByAStars = {};
+
   this.usedGraphIDs = {};
   this.graphsBySceneName = {};
+
+  this.usedAStarIDs = {};
+  this.astarsBySceneName = {};
 
   this.behaviorsBySceneName = {};
   this.usedBehaviorIDs = {};
@@ -634,6 +639,26 @@ SteeringHandler.prototype.removeJumpDescriptor = function(id){
 
   delete this.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()][id];
   delete this.usedJumpDescriptorIDs[id];
+}
+
+SteeringHandler.prototype.addAStar = function(id, graphID){
+  var usedGraph = this.usedGraphIDs[graphID].clone();
+
+  var aStar = new Kompute.AStar(usedGraph);
+
+  this.usedAStarIDs[id] = aStar;
+
+  var astars = this.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
+  astars[id] = aStar;
+  this.astarsBySceneName[sceneHandler.getActiveSceneName()] = astars;
+
+  this.graphIDsByAStars[id] = graphID;
+}
+
+SteeringHandler.prototype.removeAStar = function(id){
+  delete this.usedAStarIDs[id];
+  delete this.astarsBySceneName[sceneHandler.getActiveSceneName()][id];
+  delete this.graphIDsByAStars[id];
 }
 
 SteeringHandler.prototype.addPath = function(id, markedPoints, loop, rewind){
