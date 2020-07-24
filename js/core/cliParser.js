@@ -6515,6 +6515,30 @@ function parse(input){
           }
           return true;
         break;
+        case 255: //newAStar
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var aStarID = splitted[1];
+          var graphID = splitted[2];
+
+          if (steeringHandler.usedAStarIDs[aStarID]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          if (!graphs[graphID]){
+            terminal.printError(Text.NO_SUCH_GRAPH_IN_CURRENT_SCENE);
+            return true;
+          }
+
+          steeringHandler.addAStar(aStarID, graphID);
+          terminal.printInfo(Text.ASTAR_CREATED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

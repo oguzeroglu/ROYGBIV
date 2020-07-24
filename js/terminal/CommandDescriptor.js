@@ -255,7 +255,8 @@ var CommandDescriptor = function(){
       2, //mergeGraphs
       0, //steeringBehaviors
       2, //assignSteeringBehavior
-      2 //unassignSteeringBehavior
+      2, //unassignSteeringBehavior
+      2 //newAStar
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -513,7 +514,8 @@ var CommandDescriptor = function(){
     "mergeGraphs mergedGraphID id[0],id[1],.....id[n]",
     "steeringBehaviors",
     "assignSteeringBehavior objectName steeringBehaviorName",
-    "unassignSteeringBehavior objectName steeringBehaviorName"
+    "unassignSteeringBehavior objectName steeringBehaviorName",
+    "newAStar astarID graphID"
   ];
 
   this.commands = [
@@ -771,7 +773,8 @@ var CommandDescriptor = function(){
     "mergeGraphs",
     "steeringBehaviors",
     "assignSteeringBehavior",
-    "unassignSteeringBehavior"
+    "unassignSteeringBehavior",
+    "newAStar"
   ];
 
   this.commandInfo = [
@@ -1029,7 +1032,8 @@ var CommandDescriptor = function(){
     "mergeGraphs: Creates a new graph by merging given graphs.",
     "steeringBehaviors: Shows the steering behavior configuration GUI.",
     "assignSteeringBehavior: Assigns a steering behavior to an object.",
-    "unassignSteeringBehavior: Unassigns a steering behavior from an object."
+    "unassignSteeringBehavior: Unassigns a steering behavior from an object.",
+    "newAStar: Creates a new AStar object from given graph."
   ];
 
   this.keyboardInfo = [
@@ -1944,6 +1948,12 @@ var CommandDescriptor = function(){
   this.unassignSteeringBehavior.types = [];
   this.unassignSteeringBehavior.types.push(this.OBJECT_NAME); //objectName
   this.unassignSteeringBehavior.types.push(this.STEERING_BEHAVIOR_NAME); //steeringBehaviorName
+
+  // newAStar
+  this.newAStar = new Object();
+  this.newAStar.types = [];
+  this.newAStar.types.push(this.UNKNOWN_INDICATOR); //astarID
+  this.newAStar.types.push(this.GRAPH_ID); //graphID
 };
 
 CommandDescriptor.prototype.test = function(){
