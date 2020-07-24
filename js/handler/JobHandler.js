@@ -123,6 +123,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleAssignSteeringBehaviorCommand();
     }else if (this.splitted[0] == "unassignsteeringbehavior"){
       this.handleUnassignSteeringBehaviorCommand();
+    }else if (this.splitted[0] == "destroyastar"){
+      this.handleDestroyAStarCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -133,6 +135,26 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoconfigurearea"){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyAStarCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  var aStars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  for (var id in aStars){
+    if (id.toLowerCase().startsWith(idPrefix.toLowerCase())){
+      parseCommand("destroyAStar " + id);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_ASTARS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_ASTARS.replace(Text.PARAM1, ctr));
   }
 }
 

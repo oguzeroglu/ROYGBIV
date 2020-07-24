@@ -6545,6 +6545,11 @@ function parse(input){
             return true;
           }
 
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           var astars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
           if (!astars[splitted[1]]){
             terminal.printError(Text.NO_SUCH_ASTAR_IN_CURRENT_SCENE);
@@ -6552,7 +6557,10 @@ function parse(input){
           }
 
           steeringHandler.removeAStar(splitted[1]);
-          terminal.printInfo(Text.ASTAR_DESTROYED);
+
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.ASTAR_DESTROYED);
+          }
           return true;
         break;
         case 257: //printAStars
