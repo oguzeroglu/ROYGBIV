@@ -5931,7 +5931,7 @@ function parse(input){
           var loop = splitted[3];
           var rewind = splitted[4];
 
-          if (steeringHandler.usedPathIDs[id]){
+          if (steeringHandler.usedPathIDs[id] || steeringHandler.usedAStarIDs[id]){
             terminal.printError(Text.ID_MUST_BE_UNIQUE);
             return true;
           }
@@ -6524,7 +6524,7 @@ function parse(input){
           var aStarID = splitted[1];
           var graphID = splitted[2];
 
-          if (steeringHandler.usedAStarIDs[aStarID]){
+          if (steeringHandler.usedAStarIDs[aStarID] || steeringHandler.usedPathIDs[aStarID]){
             terminal.printError(Text.ID_MUST_BE_UNIQUE);
             return true;
           }
