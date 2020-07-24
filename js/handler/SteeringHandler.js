@@ -58,6 +58,7 @@ SteeringHandler.prototype.import = function(exportObj){
   var pathsByJumpDescriptors = exportObj.pathsByJumpDescriptors;
   var graphsByJumpDescriptors = exportObj.graphsByJumpDescriptors;
   var graphInfo = exportObj.graphInfo;
+  var aStarInfo = exportObj.aStarInfo;
   var steeringBehaviorInfo = exportObj.steeringBehaviorInfo;
 
   for (var sceneName in obstacleInfo){
@@ -174,6 +175,13 @@ SteeringHandler.prototype.import = function(exportObj){
       this.usedBehaviorIDs[curExport.name] = behavior;
     }
   }
+
+  for (var sceneName in aStarInfo){
+    var aStars = aStarInfo[sceneName];
+    for (var id in aStars){
+      this.addAStar(id, aStars[id], sceneName);
+    }
+  }
 }
 
 SteeringHandler.prototype.export = function(){
@@ -184,6 +192,7 @@ SteeringHandler.prototype.export = function(){
     pathsByJumpDescriptors: {},
     graphsByJumpDescriptors: {},
     graphInfo: {},
+    aStarInfo: {},
     steeringBehaviorInfo: {}
   };
 
@@ -271,6 +280,13 @@ SteeringHandler.prototype.export = function(){
     exportObject.steeringBehaviorInfo[sceneName] = {};
     for (var behaviorName in this.behaviorsBySceneName[sceneName]){
       exportObject.steeringBehaviorInfo[sceneName][behaviorName] = this.behaviorsBySceneName[sceneName][behaviorName].export();
+    }
+  }
+
+  for (var sceneName in this.astarsBySceneName){
+    exportObject.aStarInfo[sceneName] = {};
+    for (var aStarID in this.astarsBySceneName[sceneName]){
+      exportObject.aStarInfo[sceneName][aStarID] = this.graphIDsByAStars[aStarID];
     }
   }
 
@@ -643,16 +659,16 @@ SteeringHandler.prototype.removeJumpDescriptor = function(id){
   delete this.usedJumpDescriptorIDs[id];
 }
 
-SteeringHandler.prototype.addAStar = function(id, graphID){
+SteeringHandler.prototype.addAStar = function(id, graphID, overrideSceneName){
   var usedGraph = this.usedGraphIDs[graphID].clone();
 
   var aStar = new Kompute.AStar(usedGraph);
 
   this.usedAStarIDs[id] = aStar;
 
-  var astars = this.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var astars = this.astarsBySceneName[overrideSceneName || sceneHandler.getActiveSceneName()] || {};
   astars[id] = aStar;
-  this.astarsBySceneName[sceneHandler.getActiveSceneName()] = astars;
+  this.astarsBySceneName[overrideSceneName || sceneHandler.getActiveSceneName()] = astars;
 
   this.graphIDsByAStars[id] = graphID;
 }
