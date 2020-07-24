@@ -6555,6 +6555,22 @@ function parse(input){
           terminal.printInfo(Text.ASTAR_DESTROYED);
           return true;
         break;
+        case 257: //printAStars
+          var count = 0;
+          var astars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var totalCount = Object.keys(astars).length;
+          terminal.printHeader(Text.ASTARS_IN_THIS_SCENE);
+          for (var id in astars){
+            count ++;
+            var astar = astars[id];
+            var graphID = steeringHandler.graphIDsByAStars[id];
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, id).replace(Text.PARAM2, graphID), count != totalCount);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_ASTARS_IN_THIS_SCENE);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

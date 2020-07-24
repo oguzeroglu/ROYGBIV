@@ -257,7 +257,8 @@ var CommandDescriptor = function(){
       2, //assignSteeringBehavior
       2, //unassignSteeringBehavior
       2, //newAStar
-      1 //destroyAStar
+      1, //destroyAStar
+      0 //printAStars
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -517,7 +518,8 @@ var CommandDescriptor = function(){
     "assignSteeringBehavior objectName steeringBehaviorName",
     "unassignSteeringBehavior objectName steeringBehaviorName",
     "newAStar astarID graphID",
-    "destroyAStar id"
+    "destroyAStar id",
+    "printAStars"
   ];
 
   this.commands = [
@@ -777,7 +779,8 @@ var CommandDescriptor = function(){
     "assignSteeringBehavior",
     "unassignSteeringBehavior",
     "newAStar",
-    "destroyAStar"
+    "destroyAStar",
+    "printAStars"
   ];
 
   this.commandInfo = [
@@ -1037,7 +1040,8 @@ var CommandDescriptor = function(){
     "assignSteeringBehavior: Assigns a steering behavior to an object.",
     "unassignSteeringBehavior: Unassigns a steering behavior from an object.",
     "newAStar: Creates a new AStar object from given graph.",
-    "destroyAStar: Destroys an AStar of given id."
+    "destroyAStar: Destroys an AStar of given id.",
+    "printAStars: Prints a list of created AStar objects."
   ];
 
   this.keyboardInfo = [
