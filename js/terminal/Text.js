@@ -547,6 +547,7 @@ var Text = function(){
   this.PROJECT_FAILED_TO_LOAD = "Project failed to load: @@1";
   this.NOTHING_TO_UNDO = "Nothing to undo.";
   this.OK = "Ok.";
+  this.GRAPH_USED_IN_ASTAR = "Graph used in AStar [@@1] cannot destroy.";
   this.NOTHING_TO_REDO = "Nothing to redo.";
   this.OBJECT_SELECTED = "@@1 selected.";
   this.MASS_MUST_BE_A_POSITIVE_NUMBER = "Mass must be a positive number.";

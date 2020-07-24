@@ -6191,6 +6191,13 @@ function parse(input){
             return true;
           }
 
+          for (var asid in steeringHandler.graphIDsByAStars){
+            if (steeringHandler.graphIDsByAStars[asid] == id){
+              terminal.printError(Text.GRAPH_USED_IN_ASTAR.replace(Text.PARAM1, asid));
+              return true;
+            }
+          }
+
           steeringHandler.removeGraph(id);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.GRAPH_DESTROYED);
