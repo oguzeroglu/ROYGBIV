@@ -203,6 +203,7 @@ var Text = function(){
   this.NO_GRAPHS_FOUND = "No graphs found.";
   this.ASTAR_CREATED = "AStar created.";
   this.ASTAR_DESTROYED = "AStar destroyed.";
+  this.NO_SUCH_ASTAR_IN_CURRENT_SCENE = "No such AStar in current scene";
   this.COMMAND_EXECUTED_FOR_X_GRAPHS = "Command executed for @@1 graphs.";
   this.OBJECT_HAS_NO_MASS = "Object does not have a mass.";
   this.OBJECT_CANNOT_SET_MASS = "This object does not have a physics body as none of its children has a physics body.";

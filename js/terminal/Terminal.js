@@ -903,6 +903,17 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Steering behaviors]: ";
 			break;
+			case commandDescriptor.ASTAR_ID:
+				var astars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()];
+				if (astars){
+					for (var id in astars){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}
+					}
+				}
+				helpString = "[AStars]: ";
+			break;
 		}
 
 		//  **********************************************************

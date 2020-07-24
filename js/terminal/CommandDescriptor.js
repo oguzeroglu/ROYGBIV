@@ -256,7 +256,8 @@ var CommandDescriptor = function(){
       0, //steeringBehaviors
       2, //assignSteeringBehavior
       2, //unassignSteeringBehavior
-      2 //newAStar
+      2, //newAStar
+      1 //destroyAStar
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -515,7 +516,8 @@ var CommandDescriptor = function(){
     "steeringBehaviors",
     "assignSteeringBehavior objectName steeringBehaviorName",
     "unassignSteeringBehavior objectName steeringBehaviorName",
-    "newAStar astarID graphID"
+    "newAStar astarID graphID",
+    "destroyAStar id"
   ];
 
   this.commands = [
@@ -774,7 +776,8 @@ var CommandDescriptor = function(){
     "steeringBehaviors",
     "assignSteeringBehavior",
     "unassignSteeringBehavior",
-    "newAStar"
+    "newAStar",
+    "destroyAStar"
   ];
 
   this.commandInfo = [
@@ -1033,7 +1036,8 @@ var CommandDescriptor = function(){
     "steeringBehaviors: Shows the steering behavior configuration GUI.",
     "assignSteeringBehavior: Assigns a steering behavior to an object.",
     "unassignSteeringBehavior: Unassigns a steering behavior from an object.",
-    "newAStar: Creates a new AStar object from given graph."
+    "newAStar: Creates a new AStar object from given graph.",
+    "destroyAStar: Destroys an AStar of given id."
   ];
 
   this.keyboardInfo = [
@@ -1185,6 +1189,7 @@ var CommandDescriptor = function(){
   this.GRAPH_ID                    =   51;
   this.ANY_GRAPH_ID                =   52;
   this.STEERING_BEHAVIOR_NAME      =   53;
+  this.ASTAR_ID                    =   54;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1954,6 +1959,11 @@ var CommandDescriptor = function(){
   this.newAStar.types = [];
   this.newAStar.types.push(this.UNKNOWN_INDICATOR); //astarID
   this.newAStar.types.push(this.GRAPH_ID); //graphID
+
+  // destroyAStar
+  this.destroyAStar = new Object();
+  this.destroyAStar.types = [];
+  this.destroyAStar.types.push(this.ASTAR_ID); //id
 };
 
 CommandDescriptor.prototype.test = function(){

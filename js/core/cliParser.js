@@ -6539,6 +6539,22 @@ function parse(input){
           terminal.printInfo(Text.ASTAR_CREATED);
           return true;
         break;
+        case 256: //destroyAStar
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var astars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          if (!astars[splitted[1]]){
+            terminal.printError(Text.NO_SUCH_ASTAR_IN_CURRENT_SCENE);
+            return true;
+          }
+
+          steeringHandler.removeAStar(splitted[1]);
+          terminal.printInfo(Text.ASTAR_DESTROYED);
+          return true;
+        break;
       }
       return true;
     }catch(err){
