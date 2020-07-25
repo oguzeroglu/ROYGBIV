@@ -45,7 +45,14 @@ PreconfiguredSteeringBehavior.prototype.getBehavior = function(object){
     });
     case steeringHandler.steeringBehaviorTypes.LOOK_WHERE_YOU_ARE_GOING: return new Kompute.LookWhereYouAreGoingBehavior();
     case steeringHandler.steeringBehaviorTypes.PATH_FOLLOWING:
-      var path = steeringHandler.usedPathIDs[params.pathID].clone();
+      var path;
+      var komputePath = steeringHandler.usedPathIDs[params.pathID];
+      if (!komputePath){
+        komputePath = steeringHandler.usedAStarIDs[params.pathID].path;
+        path = komputePath;
+      }else{
+        path = komputePath.clone();
+      }
     return new Kompute.PathFollowingBehavior({path: path, satisfactionRadius: params.satisfactionRadius});
     case steeringHandler.steeringBehaviorTypes.PRIORITY:
       var list = [];

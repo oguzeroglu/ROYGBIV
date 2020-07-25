@@ -95,6 +95,10 @@ SteeringBehaviorCreatorGUIHandler.prototype.createBehavior = function(name, type
     case steeringHandler.steeringBehaviorTypes.PATH_FOLLOWING:
       var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()] || {};
       var pathIDs = Object.keys(paths);
+      var aStars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var asid in aStars){
+        pathIDs.push(asid);
+      }
       if (pathIDs.length == 0){
         return Text.NO_PATHS_IN_THIS_SCENE;
       }
@@ -278,8 +282,12 @@ SteeringBehaviorCreatorGUIHandler.prototype.addBehaviorFolder = function(behavio
     case steeringHandler.steeringBehaviorTypes.PATH_FOLLOWING:
       var folder = commonFolderFunc(params);
       var confs = {pathID: params.pathID, satisfactionRadius: "" + params.satisfactionRadius};
-      var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()];
+      var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()] || {};
       var pathIDs = Object.keys(paths);
+      var astars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var asid in astars){
+        pathIDs.push(asid);
+      }
       folder.add(confs, "pathID", pathIDs).onChange(function(val){
         behavior.parameters.pathID = val;
         terminal.clear();
