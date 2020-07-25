@@ -6563,6 +6563,17 @@ function parse(input){
             return true;
           }
 
+          var behaviors = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          for (var bid in behaviors){
+            var behavior = behaviors[bid];
+            if (behavior.parameters.type == steeringHandler.steeringBehaviorTypes.PATH_FOLLOWING){
+              if (behavior.parameters.pathID == splitted[1]){
+                terminal.printError(Text.ASTAR_USED_IN_BEHAVIOR.replace(Text.PARAM1, bid));
+                return true;
+              }
+            }
+          }
+
           steeringHandler.removeAStar(splitted[1]);
 
           if (!jobHandlerWorking){

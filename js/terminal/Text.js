@@ -508,6 +508,7 @@ var Text = function(){
   this.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PARTICLES = "Cannot create muzzleflash from a particle system with collidable particles.";
   this.SKYBOXES = "Skyboxes";
   this.PIVOT_SET = "Pivot set.";
+  this.ASTAR_USED_IN_BEHAVIOR = "AStar used in PathFollowingBehavior [@@1]. Cannot destroy.";
   this.NO_SKYBOXES_CREATED = "No skyboxes created.";
   this.NO_SUCH_SKYBOX = "No such skybox.";
   this.SKYBOX_NOT_USABLE = "Skybox not usable. Use the command printSkyboxInfo for the details.";
