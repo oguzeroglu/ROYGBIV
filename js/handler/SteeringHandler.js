@@ -318,6 +318,38 @@ SteeringHandler.prototype.switchDebugMode = function(){
     this.debugHelper.visualiseGraph(this.graphsBySceneName[sceneHandler.getActiveSceneName()][id]);
   }
 
+  if (mode == 1){
+    var aStars = this.astarsBySceneName[sceneHandler.getActiveSceneName()];
+    if (aStars){
+      for (var asid in aStars){
+        this.debugHelper.visualiseAStar(aStars[asid]);
+      }
+    }
+
+    for (var objName in sceneHandler.getAddedObjects()){
+      var obj = addedObjects[objName];
+      if (obj.steerableInfo){
+        for (var bid in obj.constructedSteeringBehaviors){
+          var behavior = obj.constructedSteeringBehaviors[bid];
+          if (behavior instanceof Kompute.RandomPathBehavior){
+            this.debugHelper.visualiseAStar(behavior.aStar);
+          }
+        }
+      }
+    }
+    for (var objName in sceneHandler.getObjectGroups()){
+      var obj = objectGroups[objName];
+      if (obj.steerableInfo){
+        for (var bid in obj.constructedSteeringBehaviors){
+          var behavior = obj.constructedSteeringBehaviors[bid];
+          if (behavior instanceof Kompute.RandomPathBehavior){
+            this.debugHelper.visualiseAStar(behavior.aStar);
+          }
+        }
+      }
+    }
+  }
+
   return true;
 }
 
