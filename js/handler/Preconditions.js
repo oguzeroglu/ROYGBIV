@@ -267,6 +267,7 @@ var Preconditions = function(){
   this.newPosX = "newPosX";
   this.newPosY = "newPosY";
   this.newPosZ = "newPosZ";
+  this.behaviorName = "behaviorName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -275,6 +276,18 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfObjectHasBehavior = function(callerFunc, object, behaviorName){
+  if (!object.steerableInfo.behaviorsByID[behaviorName]){
+    this.throw(callerFunc, "Object does not have such steering behavior assigned.");
+  }
+}
+
+Preconditions.prototype.checkIfSteerable = function(callerFunc, object){
+  if (!object.steerableInfo){
+    this.throw(callerFunc, "Object is not a steerable.");
+  }
 }
 
 Preconditions.prototype.checkIfLightInActiveScene = function(callerFunc, light){

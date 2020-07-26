@@ -22,6 +22,7 @@
 //  * Virtual keyboard functions
 //  * Script related functions
 //  * Networking functions
+//  * AI functions
 var Roygbiv = function(){
   this.functionNames = [
     "getObject",
@@ -273,7 +274,8 @@ var Roygbiv = function(){
     "updateLightColor",
     "updateLightDirection",
     "updateLightPosition",
-    "attachPointLightToObject"
+    "attachPointLightToObject",
+    "setSteeringBehavior"
   ];
 
   this.globals = new Object();
@@ -3540,6 +3542,24 @@ Roygbiv.prototype.onLatencyUpdated = function(callbackFunction){
   preConditions.checkIfDefined(ROYGBIV.onLatencyUpdated, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onLatencyUpdated, preConditions.callbackFunction, callbackFunction);
   Rhubarb.onLatencyUpdated(callbackFunction);
+}
+
+// AI FUNCTIONS ****************************************************************
+
+// Sets the steering behavior of given object.
+Roygbiv.prototype.setSteeringBehavior = function(object, behaviorName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSteeringBehavior, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setSteeringBehavior, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteeringBehavior, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteeringBehavior, object);
+  preConditions.checkIfString(ROYGBIV.setSteeringBehavior, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfSteerable(ROYGBIV.setSteeringBehavior, object);
+  preConditions.checkIfObjectHasBehavior(ROYGBIV.setSteeringBehavior, object, behaviorName);
+  
+  steeringHandler.setBehavior(object, behaviorName);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************
