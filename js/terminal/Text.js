@@ -1159,4 +1159,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_UPDATELIGHTPOSITION = "Updates the position of a dynamic light.";
   this.ROYGBIV_SCRIPTING_API_ATTACHPOINTLIGHTTOOBJECT = "Places a point light into the position of given object each frame.";
   this.ROYGBIV_SCRIPTING_API_SETSTEERINGBEHAVIOR = "Sets the steering behavior of given object.";
+  this.ROYGBIV_SCRIPTING_API_STOPSTEERABLE = "Stops a steerable.";
 }

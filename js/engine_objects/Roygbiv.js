@@ -275,7 +275,8 @@ var Roygbiv = function(){
     "updateLightDirection",
     "updateLightPosition",
     "attachPointLightToObject",
-    "setSteeringBehavior"
+    "setSteeringBehavior",
+    "stopSteerable"
   ];
 
   this.globals = new Object();
@@ -3558,8 +3559,21 @@ Roygbiv.prototype.setSteeringBehavior = function(object, behaviorName){
   preConditions.checkIfString(ROYGBIV.setSteeringBehavior, preConditions.behaviorName, behaviorName);
   preConditions.checkIfSteerable(ROYGBIV.setSteeringBehavior, object);
   preConditions.checkIfObjectHasBehavior(ROYGBIV.setSteeringBehavior, object, behaviorName);
-  
+
   steeringHandler.setBehavior(object, behaviorName);
+}
+
+// Stops a steerable.
+Roygbiv.prototype.stopSteerable = function(object){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSteeringBehavior, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteeringBehavior, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteeringBehavior, object);
+  preConditions.checkIfSteerable(ROYGBIV.setSteeringBehavior, object);
+
+  steeringHandler.stopSteerable(object);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************
