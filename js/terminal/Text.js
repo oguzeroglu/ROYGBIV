@@ -1165,4 +1165,5 @@ var Text = function(){
                                                           "    * Flee\n" +
                                                           "    * Arrive";
   this.ROYGBIV_SCRIPTING_API_SETSTEERABLELOOKTARGET = "Makes a steerable look at given target position.";
+  this.ROYGBIV_SCRIPTING_API_GETASTAR = "Returns an AStar object or 0 if AStar does not exist.";
 }

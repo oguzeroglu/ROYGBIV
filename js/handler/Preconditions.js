@@ -268,6 +268,7 @@ var Preconditions = function(){
   this.newPosY = "newPosY";
   this.newPosZ = "newPosZ";
   this.behaviorName = "behaviorName";
+  this.aStarName = "aStarName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -276,6 +277,13 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfAStarInActiveScene = function(callerFunc, aStarName){
+  var allAStarsInScene = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()];
+  if (!(allAStarsInScene && allAStarsInScene[aStarName])){
+    this.throw(callerFunc, "AStar not in active scene.");
+  }
 }
 
 Preconditions.prototype.checkIfSteerableIsBeingUpdated = function(callerFunc, object){

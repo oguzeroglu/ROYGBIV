@@ -278,7 +278,8 @@ var Roygbiv = function(){
     "setSteeringBehavior",
     "stopSteerable",
     "setSteerableTargetPosition",
-    "setSteerableLookTarget"
+    "setSteerableLookTarget",
+    "getAStar"
   ];
 
   this.globals = new Object();
@@ -726,6 +727,20 @@ Roygbiv.prototype.getDynamicLight = function(dynamicLightName){
   }
   preConditions.checkIfDefined(ROYGBIV.getDynamicLight, preConditions.dynamicLightName, dynamicLightName);
   return lightHandler.dynamicLights[dynamicLightName] || 0;
+}
+
+// Returns an AStar object or 0 if AStar does not exist.
+Roygbiv.prototype.getAStar = function(aStarName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getAStar, preConditions.aStarName, aStarName);
+  var aStar = steeringHandler.usedAStarIDs[aStarName];
+  if (aStar){
+    preConditions.checkIfAStarInActiveScene(ROYGBIV.getAStar, aStarName);
+    return aStar;
+  }
+  return 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
