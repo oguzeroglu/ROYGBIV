@@ -138,6 +138,7 @@ var Preconditions = function(){
   this.offsetY = "offsetY";
   this.offsetZ = "offsetZ";
   this.fromVector = "fromVector";
+  this.toVector = "toVector";
   this.directionVector = "directionVector";
   this.targetResultObject = "targetResultObject";
   this.vector1 = "vector1";
@@ -269,6 +270,7 @@ var Preconditions = function(){
   this.newPosZ = "newPosZ";
   this.behaviorName = "behaviorName";
   this.aStarName = "aStarName";
+  this.aStar = "aStar";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -277,6 +279,12 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfAStar = function(callerFunc, aStar){
+  if (!aStar instanceof Kompute.AStar){
+    this.throw(callerFunc, "Object is not an AStar.");
+  }
 }
 
 Preconditions.prototype.checkIfAStarInActiveScene = function(callerFunc, aStarName){

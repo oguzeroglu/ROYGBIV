@@ -991,3 +991,23 @@ SteeringHandler.prototype.setLookTarget = function(object, targetVector){
   var komputeVector = this.vectorPool.get().set(targetVector.x, targetVector.y, targetVector.z);
   object.steerable.setLookTarget(komputeVector);
 }
+
+SteeringHandler.prototype.calculateShortestPath = function(aStar, fromVector, toVector){
+  var graph = aStar.graph;
+
+  var komputeFromVector = this.vectorPool.get().set(fromVector.x, fromVector.y, fromVector.z);
+  var komputeToVector = this.vectorPool.get().set(toVector.x, toVector.y, toVector.z);
+
+  var closestFrom = graph.findClosestVertexToPoint(komputeFromVector);
+  var closestTo = graph.findClosestVertexToPoint(komputeToVector);
+
+  if (closestFrom){
+    komputeFromVector = this.vectorPool.get().set(closestFrom.x, closestFrom.y, closestFrom.z);
+  }
+
+  if (closestTo){
+    komputeToVector = this.vectorPool.get().set(closestTo.x, closestTo.y, closestTo.z);
+  }
+
+  aStar.findShortestPath(komputeFromVector, komputeToVector);
+}

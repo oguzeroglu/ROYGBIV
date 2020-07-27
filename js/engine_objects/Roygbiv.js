@@ -279,7 +279,8 @@ var Roygbiv = function(){
     "stopSteerable",
     "setSteerableTargetPosition",
     "setSteerableLookTarget",
-    "getAStar"
+    "getAStar",
+    "findShortestPath"
   ];
 
   this.globals = new Object();
@@ -3626,6 +3627,27 @@ Roygbiv.prototype.setSteerableLookTarget = function(object, targetVector){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableLookTarget, preConditions.targetVector, targetVector);
 
   steeringHandler.setLookTarget(object, targetVector);
+}
+
+// Calculates the shortest path between given points. This API returns nothing
+// as it automatically pipes the resulting path to the PathFollowingBehavior, if
+// the behavior is constructed with given AStar object. So use this API together
+// with the PathFollowingBehavior. If there's no nearby graph vertex of given
+// vectors, this API does not calculate any path. In that case increasing the world
+// bin size might help.
+Roygbiv.prototype.findShortestPath = function(aStar, fromVector, toVector){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.findShortestPath, preConditions.aStar, aStar);
+  preConditions.checkIfDefined(ROYGBIV.findShortestPath, preConditions.fromVector, fromVector);
+  preConditions.checkIfDefined(ROYGBIV.findShortestPath, preConditions.toVector, toVector);
+  preConditions.checkIfAStar(ROYGBIV.findShortestPath, aStar);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.findShortestPath, preConditions.fromVector, fromVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.findShortestPath, preConditions.toVector, toVector);
+
+  steeringHandler.calculateShortestPath(aStar, fromVector, toVector);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************
