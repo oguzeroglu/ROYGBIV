@@ -277,7 +277,8 @@ var Roygbiv = function(){
     "attachPointLightToObject",
     "setSteeringBehavior",
     "stopSteerable",
-    "setSteerableTargetPosition"
+    "setSteerableTargetPosition",
+    "setSteerableLookTarget"
   ];
 
   this.globals = new Object();
@@ -3594,6 +3595,21 @@ Roygbiv.prototype.setSteerableTargetPosition = function(object, positionVector){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.positionVector, positionVector);
 
   steeringHandler.setTargetPosition(object, positionVector);
+}
+
+// Makes a steerable look at given target position.
+Roygbiv.prototype.setSteerableLookTarget = function(object, targetVector){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.targetVector, targetVector);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteerableTargetPosition, object);
+  preConditions.checkIfSteerable(ROYGBIV.setSteerableTargetPosition, object);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.targetVector, targetVector);
+
+  steeringHandler.setLookTarget(object, targetVector);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

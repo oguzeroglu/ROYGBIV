@@ -1164,4 +1164,5 @@ var Text = function(){
                                                           "    * Seek\n" +
                                                           "    * Flee\n" +
                                                           "    * Arrive";
+  this.ROYGBIV_SCRIPTING_API_SETSTEERABLELOOKTARGET = "Makes a steerable look at given target position.";
 }

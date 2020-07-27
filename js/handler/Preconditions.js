@@ -5,7 +5,6 @@ var Preconditions = function(){
   this.targetVector = "targetVector";
   this.axis = "axis";
   this.markedPointName = "markedPointName";
-  this.targetVector = "targetVector";
   this.positionVector = "positionVector";
   this.particleSystem = "particleSystem";
   this.time = "time";
