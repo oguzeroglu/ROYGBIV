@@ -3602,12 +3602,13 @@ Roygbiv.prototype.setSteerableLookTarget = function(object, targetVector){
   if (mode == 0){
     return;
   }
-  preConditions.checkIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
-  preConditions.checkIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.targetVector, targetVector);
-  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
-  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteerableTargetPosition, object);
-  preConditions.checkIfSteerable(ROYGBIV.setSteerableTargetPosition, object);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.targetVector, targetVector);
+  preConditions.checkIfDefined(ROYGBIV.setSteerableLookTarget, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setSteerableLookTarget, preConditions.targetVector, targetVector);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteerableLookTarget, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteerableLookTarget, object);
+  preConditions.checkIfSteerable(ROYGBIV.setSteerableLookTarget, object);
+  preConditions.checkIfSteerableIsBeingUpdated(ROYGBIV.setSteerableLookTarget, object);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableLookTarget, preConditions.targetVector, targetVector);
 
   steeringHandler.setLookTarget(object, targetVector);
 }

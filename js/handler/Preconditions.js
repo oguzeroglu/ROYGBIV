@@ -278,6 +278,12 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
 }
 
+Preconditions.prototype.checkIfSteerableIsBeingUpdated = function(callerFunc, object){
+  if (!steeringHandler.activeSteerablesMap.get(object.name)){
+    this.throw(callerFunc, "Object has no active steering behavior.");
+  }
+}
+
 Preconditions.prototype.checkIfObjectHasBehavior = function(callerFunc, object, behaviorName){
   if (!object.steerableInfo.behaviorsByID[behaviorName]){
     this.throw(callerFunc, "Object does not have such steering behavior assigned.");
