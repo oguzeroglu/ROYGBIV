@@ -1167,4 +1167,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETSTEERABLELOOKTARGET = "Makes a steerable look at given target position.";
   this.ROYGBIV_SCRIPTING_API_GETASTAR = "Returns an AStar object or 0 if AStar does not exist.";
   this.ROYGBIV_SCRIPTING_API_FINDSHORTESTPATH = "Calculates the shortest path between given points. This API returns nothing as it automatically pipes\nthe resulting path to the PathFollowingBehavior, if the behavior is constructed with given AStar object.\nSo use this API together with the PathFollowingBehavior.\nIf there's no nearby graph vertex of given vectors, this API does not calculate any path. In that case,\nincreasing the world bin size might help.";
+  this.ROYGBIV_SCRIPTING_API_HIDEFROM = "Makes a steerable represented as hidingObject hide from another steerable represented as targetObject.\nThis API should be used with HideBehavior.";
 }

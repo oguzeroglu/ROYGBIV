@@ -280,7 +280,8 @@ var Roygbiv = function(){
     "setSteerableTargetPosition",
     "setSteerableLookTarget",
     "getAStar",
-    "findShortestPath"
+    "findShortestPath",
+    "hideFrom"
   ];
 
   this.globals = new Object();
@@ -3648,6 +3649,25 @@ Roygbiv.prototype.findShortestPath = function(aStar, fromVector, toVector){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.findShortestPath, preConditions.toVector, toVector);
 
   steeringHandler.calculateShortestPath(aStar, fromVector, toVector);
+}
+
+// Makes a steerable represented as hidingObject hide from another steerable
+// represented as targetObject. This API should be used with HideBehavior.
+Roygbiv.prototype.hideFrom = function(hidingObject, targetObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.hideFrom, preConditions.hidingObject, hidingObject);
+  preConditions.checkIfDefined(ROYGBIV.hideFrom, preConditions.targetObject, targetObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.hideFrom, preConditions.hidingObject, hidingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.hideFrom, preConditions.targetObject, targetObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.hideFrom, hidingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.hideFrom, targetObject);
+  preConditions.checkIfSteerable(ROYGBIV.hideFrom, hidingObject);
+  preConditions.checkIfSteerable(ROYGBIV.hideFrom, targetObject);
+
+  steeringHandler.makeSteerableHideFromSteerable(hidingObject, targetObject);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

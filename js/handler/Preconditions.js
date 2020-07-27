@@ -271,6 +271,7 @@ var Preconditions = function(){
   this.behaviorName = "behaviorName";
   this.aStarName = "aStarName";
   this.aStar = "aStar";
+  this.hidingObject = "hidingObject";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
