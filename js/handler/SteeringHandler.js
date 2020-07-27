@@ -1015,3 +1015,7 @@ SteeringHandler.prototype.calculateShortestPath = function(aStar, fromVector, to
 SteeringHandler.prototype.makeSteerableHideFromSteerable = function(hidingObject, targetObject){
   hidingObject.steerable.setHideTargetEntity(targetObject.steerable);
 }
+
+SteeringHandler.prototype.makeSteerableStopHiding = function(hidingObject){
+  hidingObject.steerable.setHideTargetEntity(null);
+}

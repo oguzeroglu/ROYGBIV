@@ -281,7 +281,8 @@ var Roygbiv = function(){
     "setSteerableLookTarget",
     "getAStar",
     "findShortestPath",
-    "hideFrom"
+    "hideFrom",
+    "stopHiding"
   ];
 
   this.globals = new Object();
@@ -3668,6 +3669,21 @@ Roygbiv.prototype.hideFrom = function(hidingObject, targetObject){
   preConditions.checkIfSteerable(ROYGBIV.hideFrom, targetObject);
 
   steeringHandler.makeSteerableHideFromSteerable(hidingObject, targetObject);
+}
+
+// Makes a steerable stop hiding from other entities. It makes sense to use this
+// API with HideBehavior, after using hideFrom API.
+Roygbiv.prototype.stopHiding = function(hidingObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.stopHiding, preConditions.hidingObject, hidingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopHiding, preConditions.hidingObject, hidingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopHiding, hidingObject);
+  preConditions.checkIfSteerable(ROYGBIV.stopHiding, hidingObject);
+
+  steeringHandler.makeSteerableStopHiding(hidingObject);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************
