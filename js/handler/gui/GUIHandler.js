@@ -1784,6 +1784,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
   guiHandler.omLookSpeedController = aiFolder.add(guiHandler.objectManipulationParameters, "Look speed").min(0.01).max(1).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().steerableInfo.lookSpeed = val;
+    selectionHandler.getSelectedObject().steerable.lookSpeed = val;
   }).listen();
 
   if (!!selectionHandler.getSelectedObject().steerableInfo){
