@@ -1160,4 +1160,8 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ATTACHPOINTLIGHTTOOBJECT = "Places a point light into the position of given object each frame.";
   this.ROYGBIV_SCRIPTING_API_SETSTEERINGBEHAVIOR = "Sets the steering behavior of given object.";
   this.ROYGBIV_SCRIPTING_API_STOPSTEERABLE = "Stops a steerable.";
+  this.ROYGBIV_SCRIPTING_API_SETSTEERABLETARGETPOSITION = "Sets a target position of a steerable. Target position is consumed by these steering behaviors:\n" +
+                                                          "    * Seek\n" +
+                                                          "    * Flee\n" +
+                                                          "    * Arrive";
 }

@@ -981,3 +981,8 @@ SteeringHandler.prototype.removeBehavior = function(id){
   delete this.usedBehaviorIDs[id];
   delete this.behaviorsBySceneName[sceneHandler.getActiveSceneName()][id];
 }
+
+SteeringHandler.prototype.setTargetPosition = function(object, position){
+  var komputeVector = this.vectorPool.get().set(position.x, position.y, position.z);
+  object.steerable.setTargetPosition(komputeVector);
+}

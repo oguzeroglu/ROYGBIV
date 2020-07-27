@@ -276,7 +276,8 @@ var Roygbiv = function(){
     "updateLightPosition",
     "attachPointLightToObject",
     "setSteeringBehavior",
-    "stopSteerable"
+    "stopSteerable",
+    "setSteerableTargetPosition"
   ];
 
   this.globals = new Object();
@@ -3574,6 +3575,25 @@ Roygbiv.prototype.stopSteerable = function(object){
   preConditions.checkIfSteerable(ROYGBIV.setSteeringBehavior, object);
 
   steeringHandler.stopSteerable(object);
+}
+
+// Sets a target position of a steerable. Target position is consumed by these
+// steering behaviors:
+// * Seek
+// * Flee
+// * Arrive
+Roygbiv.prototype.setSteerableTargetPosition = function(object, positionVector){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.positionVector, positionVector);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteerableTargetPosition, object);
+  preConditions.checkIfSteerable(ROYGBIV.setSteerableTargetPosition, object);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.positionVector, positionVector);
+
+  steeringHandler.setTargetPosition(object, positionVector);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************
