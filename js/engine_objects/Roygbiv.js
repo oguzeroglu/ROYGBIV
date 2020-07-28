@@ -287,7 +287,8 @@ var Roygbiv = function(){
     "pursue",
     "evade",
     "stopPursuing",
-    "stopEvading"
+    "stopEvading",
+    "getJumpDescriptor"
   ];
 
   this.globals = new Object();
@@ -747,6 +748,20 @@ Roygbiv.prototype.getAStar = function(aStarName){
   if (aStar){
     preConditions.checkIfAStarInActiveScene(ROYGBIV.getAStar, aStarName);
     return aStar;
+  }
+  return 0;
+}
+
+// Returns a JumpDescriptor object or 0 if JumpDescriptor does not exist.
+Roygbiv.prototype.getJumpDescriptor = function(jdName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getJumpDescriptor, preConditions.jdName, jdName);
+  var jumpDescriptor = steeringHandler.usedJumpDescriptorIDs[jdName];
+  if (jumpDescriptor){
+    preConditions.checkIfJumpDescriptorInActiveScene(ROYGBIV.getJumpDescriptor, jdName);
+    return jumpDescriptor;
   }
   return 0;
 }

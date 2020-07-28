@@ -1174,4 +1174,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_EVADE = "Makes a steerable represented by evadingObject evade another steerable represented by targetObject.\nThis API should be used with EvadeBehavior.";
   this.ROYGBIV_SCRIPTING_API_STOPPURSUING = "Makes a steerable stop pursuing other steerables. It makes sense to use this API with PursueBehavior,\nafter using pursue API.";
   this.ROYGBIV_SCRIPTING_API_STOPEVADING = "Makes a steerable stop evading other steerables. It makes sense to use this API with EvadeBehavior,\nafter using evade API.";
+  this.ROYGBIV_SCRIPTING_API_GETJUMPDESCRIPTOR = "Returns a JumpDescriptor object or 0 if JumpDescriptor does not exist.";
 }

@@ -274,6 +274,7 @@ var Preconditions = function(){
   this.hidingObject = "hidingObject";
   this.pursuingObject = "pursuingObject";
   this.evadingObject = "evadingObject";
+  this.jdName = "jdName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -287,6 +288,13 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
 Preconditions.prototype.checkIfAStar = function(callerFunc, aStar){
   if (!aStar instanceof Kompute.AStar){
     this.throw(callerFunc, "Object is not an AStar.");
+  }
+}
+
+Preconditions.prototype.checkIfJumpDescriptorInActiveScene = function(callerFunc, jdName){
+  var allJumpDescriptorsInScene = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()];
+  if (!(allJumpDescriptorsInScene && allJumpDescriptorsInScene[jdName])){
+    this.throw(callerFunc, "JumpDescriptor not in active scene.");
   }
 }
 
