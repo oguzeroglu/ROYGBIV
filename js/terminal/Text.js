@@ -1169,4 +1169,8 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_FINDSHORTESTPATH = "Calculates the shortest path between given points. This API returns nothing as it automatically pipes\nthe resulting path to the PathFollowingBehavior, if the behavior is constructed with given AStar object.\nSo use this API together with the PathFollowingBehavior.\nIf there's no nearby graph vertex of given vectors, this API does not calculate any path. In that case,\nincreasing the world bin size might help.";
   this.ROYGBIV_SCRIPTING_API_HIDEFROM = "Makes a steerable represented as hidingObject hide from another steerable represented as targetObject.\nThis API should be used with HideBehavior.";
   this.ROYGBIV_SCRIPTING_API_STOPHIDING = "Makes a steerable stop hiding from other entities. It makes sense to use this API with HideBehavior,\nafter using hideFrom API.";
+  this.ROYGBIV_SCRIPTING_API_PURSUE = "Makes a steerable represented by pursuingObject chase another steerable represented by targetObject.\nThis API should be used with PursueBehavior.";
+  this.ROYGBIV_SCRIPTING_API_EVADE = "Makes a steerable represented by evadingObject evade another steerable represented by targetObject.\nThis API should be used with EvadeBehavior.";
+  this.ROYGBIV_SCRIPTING_API_STOPPURSUING = "Makes a steerable stop pursuing other steerables. It makes sense to use this API with PursueBehavior,\nafter using pursue API.";
+  this.ROYGBIV_SCRIPTING_API_STOPEVADING = "Makes a steerable stop evading other steerables. It makes sense to use this API with EvadeBehavior,\nafter using evade API.";
 }

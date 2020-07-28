@@ -282,7 +282,11 @@ var Roygbiv = function(){
     "getAStar",
     "findShortestPath",
     "hideFrom",
-    "stopHiding"
+    "stopHiding",
+    "pursue",
+    "evade",
+    "stopPursuing",
+    "stopEvading"
   ];
 
   this.globals = new Object();
@@ -3684,6 +3688,74 @@ Roygbiv.prototype.stopHiding = function(hidingObject){
   preConditions.checkIfSteerable(ROYGBIV.stopHiding, hidingObject);
 
   steeringHandler.makeSteerableStopHiding(hidingObject);
+}
+
+// Makes a steerable represented by pursuingObject chase another steerable
+// represented by targetObject. This API should be used with PursueBehavior.
+Roygbiv.prototype.pursue = function(pursuingObject, targetObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.pursue, preConditions.pursuingObject, pursuingObject);
+  preConditions.checkIfDefined(ROYGBIV.pursue, preConditions.targetObject, targetObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.pursue, preConditions.pursuingObject, pursuingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.pursue, preConditions.targetObject, targetObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.pursue, pursuingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.pursue, targetObject);
+  preConditions.checkIfSteerable(ROYGBIV.pursue, pursuingObject);
+  preConditions.checkIfSteerable(ROYGBIV.pursue, targetObject);
+
+  steeringHandler.setTargetSteerable(pursuingObject, targetObject);
+}
+
+// Makes a steerable represented by evadingObject evade another steerable
+// represented by targetObject. This API should be used with EvadeBehavior.
+Roygbiv.prototype.evade = function(evadingObject, targetObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.evade, preConditions.evadingObject, evadingObject);
+  preConditions.checkIfDefined(ROYGBIV.evade, preConditions.targetObject, targetObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.evade, preConditions.evadingObject, evadingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.evade, preConditions.targetObject, targetObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.evade, evadingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.evade, targetObject);
+  preConditions.checkIfSteerable(ROYGBIV.evade, evadingObject);
+  preConditions.checkIfSteerable(ROYGBIV.evade, targetObject);
+
+  steeringHandler.setTargetSteerable(evadingObject, targetObject);
+}
+
+// Makes a steerable stop pursuing other steerables. It makes sense to use this API
+// with PursueBehavior, after using pursue API.
+Roygbiv.prototype.stopPursuing = function(pursuingObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.stopPursuing, preConditions.pursuingObject, pursuingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopPursuing, preConditions.pursuingObject, pursuingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopPursuing, pursuingObject);
+  preConditions.checkIfSteerable(ROYGBIV.stopPursuing, pursuingObject);
+
+  steeringHandler.unsetTargetSteerable(pursuingObject);
+}
+
+// Makes a steerable stop evading other steerables. It makes sense to use this API
+// with EvadeBehavior, after using evade API.
+Roygbiv.prototype.stopEvading = function(evadingObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.stopEvading, preConditions.evadingObject, evadingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopEvading, preConditions.evadingObject, evadingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopEvading, evadingObject);
+  preConditions.checkIfSteerable(ROYGBIV.stopEvading, evadingObject);
+
+  steeringHandler.unsetTargetSteerable(evadingObject);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

@@ -1017,5 +1017,13 @@ SteeringHandler.prototype.makeSteerableHideFromSteerable = function(hidingObject
 }
 
 SteeringHandler.prototype.makeSteerableStopHiding = function(hidingObject){
-  hidingObject.steerable.setHideTargetEntity(null);
+  hidingObject.steerable.unsetHideTargetEntity();
+}
+
+SteeringHandler.prototype.setTargetSteerable = function(sourceObject, targetObject){
+  sourceObject.steerable.setTargetEntity(targetObject.steerable);
+}
+
+SteeringHandler.prototype.unsetTargetSteerable = function(object){
+  object.steerable.unsetTargetEntity();
 }
