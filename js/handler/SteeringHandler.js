@@ -987,6 +987,10 @@ SteeringHandler.prototype.setTargetPosition = function(object, position){
   object.steerable.setTargetPosition(komputeVector);
 }
 
+SteeringHandler.prototype.unsetTargetPosition = function(object){
+  object.steerable.unsetTargetPosition();
+}
+
 SteeringHandler.prototype.setLookTarget = function(object, targetVector){
   var komputeVector = this.vectorPool.get().set(targetVector.x, targetVector.y, targetVector.z);
   object.steerable.setLookTarget(komputeVector);

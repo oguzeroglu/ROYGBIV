@@ -278,6 +278,7 @@ var Roygbiv = function(){
     "setSteeringBehavior",
     "stopSteerable",
     "setSteerableTargetPosition",
+    "unsetSteerableTargetPosition",
     "setSteerableLookTarget",
     "getAStar",
     "findShortestPath",
@@ -3617,6 +3618,19 @@ Roygbiv.prototype.setSteerableTargetPosition = function(object, positionVector){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.positionVector, positionVector);
 
   steeringHandler.setTargetPosition(object, positionVector);
+}
+
+// Unsets a target position of a steerable set via setSteerableTargetPosition API.
+Roygbiv.prototype.unsetSteerableTargetPosition = function(object){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteerableTargetPosition, object);
+  preConditions.checkIfSteerable(ROYGBIV.setSteerableTargetPosition, object);
+
+  steeringHandler.unsetTargetPosition(object);
 }
 
 // Makes a steerable look at given target position.
