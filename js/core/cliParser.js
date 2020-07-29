@@ -6449,6 +6449,14 @@ function parse(input){
           }
           return true;
         break;
+        case 258: //jumpDescriptors
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          jumpDescriptorCreatorGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){

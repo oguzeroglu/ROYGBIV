@@ -258,7 +258,8 @@ var CommandDescriptor = function(){
       2, //unassignSteeringBehavior
       2, //newAStar
       1, //destroyAStar
-      0 //printAStars
+      0, //printAStars
+      0 //jumpDescriptors
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -519,7 +520,8 @@ var CommandDescriptor = function(){
     "unassignSteeringBehavior objectName steeringBehaviorName",
     "newAStar astarID graphID",
     "destroyAStar id",
-    "printAStars"
+    "printAStars",
+    "jumpDescriptors"
   ];
 
   this.commands = [
@@ -780,7 +782,8 @@ var CommandDescriptor = function(){
     "unassignSteeringBehavior",
     "newAStar",
     "destroyAStar",
-    "printAStars"
+    "printAStars",
+    "jumpDescriptors"
   ];
 
   this.commandInfo = [
@@ -1041,7 +1044,8 @@ var CommandDescriptor = function(){
     "unassignSteeringBehavior: Unassigns a steering behavior from an object.",
     "newAStar: Creates a new AStar object from given graph.",
     "destroyAStar: Destroys an AStar of given id.",
-    "printAStars: Prints a list of created AStar objects."
+    "printAStars: Prints a list of created AStar objects.",
+    "jumpDescriptors: Shows the jump descriptor configuration GUI."
   ];
 
   this.keyboardInfo = [
