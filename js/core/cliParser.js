@@ -5885,40 +5885,7 @@ function parse(input){
           return true;
         break;
         case 241: //printJumpDescriptors
-          var count = 0;
-          var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()] || {};
-          terminal.printHeader(Text.JUMPDESCRIPTORS_IN_THIS_SCENE);
-          for (var id in jumpDescriptors){
-            count ++;
-            var jd = jumpDescriptors[id];
-            var takeoffPosition = jd.takeoffPosition;
-            var landingPosition = jd.landingPosition;
-
-            terminal.printInfo(Text.TREE.replace(Text.PARAM1, id), true);
-            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "takeoffPosiiton").replace(Text.PARAM2, "(" + takeoffPosition.x + ", " + takeoffPosition.y + ", " + takeoffPosition.z + ")"), true);
-            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "landingPosition").replace(Text.PARAM2, "(" + landingPosition.x + ", " + landingPosition.y + ", " + landingPosition.z + ")"), true);
-            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "runupSatisfactionRadius").replace(Text.PARAM2, jd.runupSatisfactionRadius), true);
-            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "takeoffPositionSatisfactionRadius").replace(Text.PARAM2, jd.takeoffPositionSatisfactionRadius), true);
-            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "takeoffVelocitySatisfactionRadius").replace(Text.PARAM2, jd.takeoffVelocitySatisfactionRadius), true);
-
-            var paths = steeringHandler.pathsByJumpDescriptors[id];
-            var isInserted = paths && Object.keys(paths).length > 0;
-            if (isInserted){
-              var pc = 0;
-              var tpc = Object.keys(paths).length;
-              terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "Path insertions"), true);
-              for (var pathID in paths){
-                pc ++;
-                terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, pathID), !(pc == tpc));
-              }
-            }else{
-              terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "Path insertions").replace(Text.PARAM2, "none"), false);
-            }
-          }
-          if (count == 0){
-            terminal.printError(Text.NO_JUMPDESCRIPTORS_IN_THIS_SCENE);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 242: //newPath
           if (mode != 0){

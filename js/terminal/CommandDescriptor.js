@@ -1123,7 +1123,8 @@ var CommandDescriptor = function(){
     146, //skyboxConfigurations -> Deprecated due to architectural changes in Skybox creation process.
     147, //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
     239, //newJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
-    240 //destroyJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
+    240, //destroyJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
+    241 //printJumpDescriptors -> Deprecated due to architectural changes in JumpDescriptor creation process.
   ];
 
   if (this.commandInfo.length != this.commands.length){
