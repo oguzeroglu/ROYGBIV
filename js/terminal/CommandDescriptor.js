@@ -1121,7 +1121,9 @@ var CommandDescriptor = function(){
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
     128, //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
     146, //skyboxConfigurations -> Deprecated due to architectural changes in Skybox creation process.
-    147 //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
+    147, //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
+    239, //newJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
+    240 //destroyJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
   ];
 
   if (this.commandInfo.length != this.commands.length){
@@ -1880,21 +1882,6 @@ var CommandDescriptor = function(){
   this.aiEntity.types = [];
   this.aiEntity.types.push(this.OBJECT_NAME); //objectName
   this.aiEntity.types.push(this.STATE_ON_OFF); //on/off
-
-  // newJumpDescriptor
-  this.newJumpDescriptor = new Object();
-  this.newJumpDescriptor.types = [];
-  this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //id
-  this.newJumpDescriptor.types.push(this.MARKED_POINT_NAME); //takeoffPoint
-  this.newJumpDescriptor.types.push(this.MARKED_POINT_NAME); //landingPoint
-  this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //runupSatisfactionRadius
-  this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //takeoffPositionSatisfactionRadius
-  this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //takeoffVelocitySatisfactionRadius
-
-  // destroyJumpDescriptor
-  this.destroyJumpDescriptor = new Object();
-  this.destroyJumpDescriptor.types = [];
-  this.destroyJumpDescriptor.types.push(this.JUMP_DESCRIPTOR_ID); //id
 
   // newPath
   this.newPath = new Object();
