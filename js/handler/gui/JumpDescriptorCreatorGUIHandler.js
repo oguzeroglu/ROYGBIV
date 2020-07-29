@@ -83,6 +83,31 @@ JumpDescriptorCreatorGUIHandler.prototype.addJumpDescriptorFolder = function(id,
   }
 
   folder.add(params, "Destroy");
+
+  var steerables = steeringHandler.steerablesBySceneName[sceneHandler.getActiveSceneName()];
+
+  if (steerables){
+    var eqTestFolder = folder.addFolder("Equation Test");
+
+    var allSteerableIDs = Object.keys(steerables);
+
+    var eqTestParams = {
+      "Steerable": allSteerableIDs[0],
+      "Test": function(){
+        terminal.clear();
+        var steerable = steeringHandler.steerablesBySceneName[sceneHandler.getActiveSceneName()][this["Steerable"]];
+        var result = jumpDescriptor.solveQuadraticEquation(steerable);
+        if (result.isAchievable){
+          terminal.printInfo(Text.JUMP_IS_ACHIEVABLE_FOR_STEERABLE.replace(Text.PARAM1, this["Steerable"]));
+        }else{
+          terminal.printError(Text.JUMP_IS_UNACHIEVABLE_FOR_STEERABLE.replace(Text.PARAM1, this["Steerable"]));
+        }
+      }
+    }
+
+    eqTestFolder.add(eqTestParams, "Steerable", allSteerableIDs);
+    eqTestFolder.add(eqTestParams, "Test");
+  }
 }
 
 JumpDescriptorCreatorGUIHandler.prototype.addNumericalController = function(params, propName, folder, jumpDescriptor){
