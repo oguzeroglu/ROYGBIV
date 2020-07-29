@@ -27,6 +27,11 @@ var JumpDescriptorCreatorGUIHandler = function(){
       jumpDescriptorCreatorGUIHandler.addJumpDescriptorFolder(id, steeringHandler.addJumpDescriptor(id, pt1, pt2, 100, 100, 100));
 
       terminal.printInfo(Text.JUMP_DESCRIPTOR_CREATED);
+
+      if (steeringHandler.debugHelper){
+        steeringHandler.switchDebugMode();
+        steeringHandler.switchDebugMode();
+      }
     },
     "Done": function(){
       terminal.clear();
@@ -70,6 +75,11 @@ JumpDescriptorCreatorGUIHandler.prototype.addJumpDescriptorFolder = function(id,
 
       guiHandler.datGuiJumpDescriptorCreation.removeFolder(folder);
       terminal.printInfo(Text.JUMPDESCRIPTOR_DESTROYED);
+
+      if (steeringHandler.debugHelper){
+        steeringHandler.switchDebugMode();
+        steeringHandler.switchDebugMode();
+      }
     }
   };
 

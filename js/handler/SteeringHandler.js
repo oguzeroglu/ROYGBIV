@@ -318,6 +318,10 @@ SteeringHandler.prototype.switchDebugMode = function(){
     this.debugHelper.visualiseGraph(this.graphsBySceneName[sceneHandler.getActiveSceneName()][id]);
   }
 
+  for (var id in this.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()]){
+    this.debugHelper.visualiseJumpDescriptor(this.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()][id]);
+  }
+
   if (mode == 1){
     var aStars = this.astarsBySceneName[sceneHandler.getActiveSceneName()];
     if (aStars){
