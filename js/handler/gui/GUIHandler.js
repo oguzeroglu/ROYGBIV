@@ -152,14 +152,15 @@ var GUIHandler = function(){
     TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5,
     WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
     CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17,
-    CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22
+    CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
+    JUMP_DESCRIPTOR_CREATION: 23
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
     this.guiTypes.TEXTURE_PACK, this.guiTypes.SKYBOX_CREATION, this.guiTypes.FOG, this.guiTypes.FONT,
     this.guiTypes.CROSSHAIR_CREATION, this.guiTypes.SCRIPTS, this.guiTypes.ANIMATION_CREATION,
     this.guiTypes.LIGHTNING, this.guiTypes.VIRTUAL_KEYBOARD_CREATION, this.guiTypes.GRAPH_CREATOR,
-    this.guiTypes.STEERING_BEHAVIOR_CREATION
+    this.guiTypes.STEERING_BEHAVIOR_CREATION, this.guiTypes.JUMP_DESCRIPTOR_CREATION
   ];
 }
 
@@ -233,6 +234,11 @@ GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
       break;
       case this.guiTypes.STEERING_BEHAVIOR_CREATION:
         if (this.datGuiSteeringBehaviorCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.JUMP_DESCRIPTOR_CREATION:
+        if (this.datGuiJumpDescriptorCreation){
           return true;
         }
       break;
@@ -1114,6 +1120,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiSteeringBehaviorCreation){
         this.destroyGUI(this.datGuiSteeringBehaviorCreation);
         this.datGuiSteeringBehaviorCreation = 0;
+      }
+    return;
+    case this.guiTypes.JUMP_DESCRIPTOR_CREATION:
+      if (this.datGuiJumpDescriptorCreation){
+        this.destroyGUI(this.datGuiJumpDescriptorCreation);
+        this.datGuiJumpDescriptorCreation = 0;        
       }
     return;
   }

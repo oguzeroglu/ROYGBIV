@@ -349,6 +349,7 @@ var virtualKeyboardCreatorGUIHandler;
 var lightsGUIHandler;
 var graphCreatorGUIHandler;
 var steeringBehaviorCreatorGUIHandler;
+var jumpDescriptorCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;

@@ -679,7 +679,7 @@ SteeringHandler.prototype.addJumpDescriptor = function(id, takeoffMarkedPoint, l
   }
 
   jumpDescriptors[id] = jumpDescriptor;
-  return true;
+  return jumpDescriptor;
 }
 
 SteeringHandler.prototype.removeJumpDescriptor = function(id){
