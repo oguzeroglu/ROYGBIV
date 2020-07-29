@@ -1,6 +1,8 @@
 var JumpDescriptorCreatorGUIHandler = function(){
   this.defaultControls = {
     "Name": "",
+    "Takeoff point": "",
+    "Landing point": "",
     "Create": function(){
       var id = this["Name"];
 
@@ -21,8 +23,8 @@ var JumpDescriptorCreatorGUIHandler = function(){
         return;
       }
 
-      var pt1 = markedPoints[jumpDescriptorCreatorGUIHandler.markedPointNames[0]];
-      var pt2 = markedPoints[jumpDescriptorCreatorGUIHandler.markedPointNames[1]];
+      var pt1 = markedPoints[this["Takeoff point"]];
+      var pt2 = markedPoints[this["Landing point"]];
 
       jumpDescriptorCreatorGUIHandler.addJumpDescriptorFolder(id, steeringHandler.addJumpDescriptor(id, pt1, pt2, 100, 100, 100));
 
@@ -147,6 +149,9 @@ JumpDescriptorCreatorGUIHandler.prototype.show = function(){
     this.markedPointNames.push(mpName);
   }
 
+  this.defaultControls["Takeoff point"] = this.markedPointNames.length >= 1? this.markedPointNames[0]: "";
+  this.defaultControls["Landing point"] = this.markedPointNames.length >= 2? this.markedPointNames[1]: "";
+
   terminal.disable();
   terminal.clear();
   terminal.printInfo(Text.USE_GUI_TO_CREATE_JUMP_DESCRIPTORS);
@@ -157,6 +162,8 @@ JumpDescriptorCreatorGUIHandler.prototype.show = function(){
   guiHandler.datGuiJumpDescriptorCreation = new dat.GUI({hideable: false});
 
   guiHandler.datGuiJumpDescriptorCreation.add(this.defaultControls, "Name");
+  guiHandler.datGuiJumpDescriptorCreation.add(this.defaultControls, "Takeoff point", this.markedPointNames);
+  guiHandler.datGuiJumpDescriptorCreation.add(this.defaultControls, "Landing point", this.markedPointNames);
   guiHandler.datGuiJumpDescriptorCreation.add(this.defaultControls, "Create");
   guiHandler.datGuiJumpDescriptorCreation.add(this.defaultControls, "Done");
 
