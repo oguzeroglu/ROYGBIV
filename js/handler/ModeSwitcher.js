@@ -477,6 +477,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.initOpacitySet = false;
     }
     if (object.steerable){
+      object.steerable.cancelJump();
       object.steerable.velocity.set(0, 0, 0);
       object.steerable.unsetTargetPosition();
       object.steerable.unsetTargetEntity();
@@ -522,6 +523,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       delete object.originalMass;
     }
     if (object.steerable){
+      object.steerable.cancelJump();
       object.steerable.velocity.set(0, 0, 0);
       object.steerable.unsetTargetPosition();
       object.steerable.unsetTargetEntity();
