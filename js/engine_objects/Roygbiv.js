@@ -288,7 +288,8 @@ var Roygbiv = function(){
     "evade",
     "stopPursuing",
     "stopEvading",
-    "getJumpDescriptor"
+    "getJumpDescriptor",
+    "jump"
   ];
 
   this.globals = new Object();
@@ -3785,6 +3786,33 @@ Roygbiv.prototype.stopEvading = function(evadingObject){
   preConditions.checkIfSteerable(ROYGBIV.stopEvading, evadingObject);
 
   steeringHandler.unsetTargetSteerable(evadingObject);
+}
+
+// Makes a steerable manually jump. toRunupBehaviorName parameter represents the
+// steering behavior used until the steerable reaches to the runup point.
+// completeCallback function is executed when the jump is completed. When a
+// jump is completed, a steering behavior needs to be set to the steerable in order
+// to continue the movement. Note that this API returns false if the jump described
+// by the jumpDescriptor is not achievable by given steerable, true otherwise.
+Roygbiv.prototype.jump = function(object, jumpDescriptor, toRunupBehaviorName, completeCallback){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.jump, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.jump, preConditions.jumpDescriptor, jumpDescriptor);
+  preConditions.checkIfDefined(ROYGBIV.jump, preConditions.toRunupBehaviorName, toRunupBehaviorName);
+  preConditions.checkIfDefined(ROYGBIV.jump, preConditions.completeCallback, completeCallback);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.jump, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.jump, object);
+  preConditions.checkIfSteerable(ROYGBIV.jump, object);
+  preConditions.checkIfJumpDescriptor(ROYGBIV.jump, jumpDescriptor);
+  preConditions.checkIfJumpDescriptorInActiveScene(ROYGBIV.jump, jumpDescriptor.roygbivName);
+  preConditions.checkIfString(ROYGBIV.jump, preConditions.toRunupBehaviorName, toRunupBehaviorName);
+  preConditions.checkIfObjectHasBehavior(ROYGBIV.jump, object, toRunupBehaviorName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.jump, preConditions.completeCallback, completeCallback);
+
+  return steeringHandler.jump(object, jumpDescriptor, toRunupBehaviorName, completeCallback);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

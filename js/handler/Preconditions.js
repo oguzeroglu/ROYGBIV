@@ -275,6 +275,10 @@ var Preconditions = function(){
   this.pursuingObject = "pursuingObject";
   this.evadingObject = "evadingObject";
   this.jdName = "jdName";
+  this.steerable = "steerable";
+  this.jumpDescriptor = "jumpDescriptor";
+  this.toRunupBehaviorName = "toRunupBehaviorName";
+  this.completeCallback = "completeCallback";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -283,6 +287,12 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfJumpDescriptor = function(callerFunc, jumpDescriptor){
+  if (!(jumpDescriptor instanceof Kompute.JumpDescriptor)){
+    this.throw(callerFunc, "Object is not a JumpDescriptor");
+  }
 }
 
 Preconditions.prototype.checkIfAStar = function(callerFunc, aStar){

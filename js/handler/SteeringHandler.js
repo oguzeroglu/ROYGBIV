@@ -88,6 +88,7 @@ SteeringHandler.prototype.import = function(exportObj){
       });
       this.jumpDescriptorsBySceneName[sceneName][id] = jumpDescriptor;
       this.usedJumpDescriptorIDs[id] = jumpDescriptor;
+      jumpDescriptor.roygbivName = id;
     }
   }
 
@@ -675,6 +676,8 @@ SteeringHandler.prototype.addJumpDescriptor = function(id, takeoffMarkedPoint, l
     takeoffVelocitySatisfactionRadius: takeoffVelocitySatisfactionRadius
   });
 
+  jumpDescriptor.roygbivName = id;
+
   this.usedJumpDescriptorIDs[id] = jumpDescriptor;
   var jumpDescriptors = this.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()];
   if (!jumpDescriptors){
@@ -1034,4 +1037,15 @@ SteeringHandler.prototype.setTargetSteerable = function(sourceObject, targetObje
 
 SteeringHandler.prototype.unsetTargetSteerable = function(object){
   object.steerable.unsetTargetEntity();
+}
+
+SteeringHandler.prototype.jump = function(object, jumpDescriptor, toRunupBehaviorName, completeCallback){
+  var toRunupBehavior = object.constructedSteeringBehaviors[toRunupBehaviorName];
+  var steerable = object.steerable;
+
+  this.setBehavior(object, toRunupBehaviorName);
+
+  steerable.jumpCompletionCallback = completeCallback;
+
+  return steerable.jump(toRunupBehavior, jumpDescriptor);
 }

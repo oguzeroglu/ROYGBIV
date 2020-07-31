@@ -1180,4 +1180,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_STOPPURSUING = "Makes a steerable stop pursuing other steerables. It makes sense to use this API with PursueBehavior,\nafter using pursue API.";
   this.ROYGBIV_SCRIPTING_API_STOPEVADING = "Makes a steerable stop evading other steerables. It makes sense to use this API with EvadeBehavior,\nafter using evade API.";
   this.ROYGBIV_SCRIPTING_API_GETJUMPDESCRIPTOR = "Returns a JumpDescriptor object or 0 if JumpDescriptor does not exist.";
+  this.ROYGBIV_SCRIPTING_API_JUMP = "Makes a steerable manually jump. toRunupBehaviorName parameter represents the steering behavior used until the steerable reaches\nto the runup point. completeCallback function is executed when the jump is completed. When a jump is completed, a steering behavior\nneeds to be set to the steerable in order to continue the movement. Note that this API returns false if the jump\ndescribed by the jumpDescriptor is not achievable by given steerable, true otherwise.";
 }
