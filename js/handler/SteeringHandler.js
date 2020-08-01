@@ -1041,3 +1041,9 @@ SteeringHandler.prototype.jump = function(object, jumpDescriptor, toTakeoffBehav
 
   return steerable.jump(toRunupBehavior, jumpDescriptor);
 }
+
+SteeringHandler.prototype.setPathFinishListener = function(object, behaviorName, callbackFunction){
+  var behavior = object.constructedSteeringBehaviors[behaviorName];
+
+  var callbackID = behavior.path.addFinishCallback(callbackFunction);
+}

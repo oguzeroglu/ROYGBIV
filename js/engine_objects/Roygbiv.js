@@ -289,7 +289,8 @@ var Roygbiv = function(){
     "stopPursuing",
     "stopEvading",
     "getJumpDescriptor",
-    "jump"
+    "jump",
+    "setPathFinishListener"
   ];
 
   this.globals = new Object();
@@ -2504,6 +2505,28 @@ Roygbiv.prototype.removeLocationHashChangeListener = function(){
     return;
   }
   hashChangeCallbackFunction = noop;
+}
+
+// Sets a path finish listener for PathFollowingBehavior of given steerable object.
+// The callbackFunction is executed when the path of given PathFollowingBehavior
+// is consumed.
+Roygbiv.prototype.setPathFinishListener = function(object, behaviorName, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.setPathFinishListener, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setPathFinishListener, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfDefined(ROYGBIV.setPathFinishListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setPathFinishListener, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setPathFinishListener, object);
+  preConditions.checkIfSteerable(ROYGBIV.setPathFinishListener, object);
+  preConditions.checkIfString(ROYGBIV.setPathFinishListener, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setPathFinishListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectHasBehavior(ROYGBIV.setPathFinishListener, object, behaviorName);
+  preConditions.checkIfPathFollowingBehavior(ROYGBIV.setPathFinishListener, object, behaviorName);
+
+  steeringHandler.setPathFinishListener(object, behaviorName, callbackFunction);
 }
 
 // TEXT FUNCTIONS **************************************************************

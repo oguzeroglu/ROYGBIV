@@ -329,6 +329,13 @@ Preconditions.prototype.checkIfSteerableIsBeingUpdated = function(callerFunc, ob
   }
 }
 
+Preconditions.prototype.checkIfPathFollowingBehavior = function(callerFunc, object, behaviorName){
+  var constructedBehavior = object.constructedSteeringBehaviors[behaviorName];
+  if (!(constructedBehavior instanceof Kompute.PathFollowingBehavior)){
+    this.throw(callerFunc, "Behavior is not a PathFollowingBehavior.");
+  }
+}
+
 Preconditions.prototype.checkIfObjectHasBehavior = function(callerFunc, object, behaviorName){
   if (!object.steerableInfo.behaviorsByID[behaviorName]){
     this.throw(callerFunc, "Object does not have such steering behavior assigned.");
