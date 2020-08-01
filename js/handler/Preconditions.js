@@ -289,6 +289,14 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
 }
 
+Preconditions.prototype.checkIfObjectIsJumping = function(callerFunc, object){
+  var steerable = object.steerable;
+
+  if (steerable.isJumpInitiated || steerable.isJumpReady || steerable.isJumpTakenOff){
+    this.throw(callerFunc, "Object is in the middle of a jump. Cannot use this API.");
+  }
+}
+
 Preconditions.prototype.checkIfJumpDescriptor = function(callerFunc, jumpDescriptor){
   if (!(jumpDescriptor instanceof Kompute.JumpDescriptor)){
     this.throw(callerFunc, "Object is not a JumpDescriptor");

@@ -3811,6 +3811,7 @@ Roygbiv.prototype.jump = function(object, jumpDescriptor, toRunupBehaviorName, c
   preConditions.checkIfString(ROYGBIV.jump, preConditions.toRunupBehaviorName, toRunupBehaviorName);
   preConditions.checkIfObjectHasBehavior(ROYGBIV.jump, object, toRunupBehaviorName);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.jump, preConditions.completeCallback, completeCallback);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.jump, object);
 
   return steeringHandler.jump(object, jumpDescriptor, toRunupBehaviorName, completeCallback);
 }
