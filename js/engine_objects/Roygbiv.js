@@ -3632,6 +3632,7 @@ Roygbiv.prototype.setSteerableTargetPosition = function(object, positionVector){
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteerableTargetPosition, object);
   preConditions.checkIfSteerable(ROYGBIV.setSteerableTargetPosition, object);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.positionVector, positionVector);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.setSteerableTargetPosition, object);
 
   steeringHandler.setTargetPosition(object, positionVector);
 }
@@ -3641,10 +3642,11 @@ Roygbiv.prototype.unsetSteerableTargetPosition = function(object){
   if (mode == 0){
     return;
   }
-  preConditions.checkIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
-  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
-  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteerableTargetPosition, object);
-  preConditions.checkIfSteerable(ROYGBIV.setSteerableTargetPosition, object);
+  preConditions.checkIfDefined(ROYGBIV.unsetSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.unsetSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.unsetSteerableTargetPosition, object);
+  preConditions.checkIfSteerable(ROYGBIV.unsetSteerableTargetPosition, object);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.unsetSteerableTargetPosition, object);
 
   steeringHandler.unsetTargetPosition(object);
 }
@@ -3701,6 +3703,7 @@ Roygbiv.prototype.hideFrom = function(hidingObject, targetObject){
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.hideFrom, targetObject);
   preConditions.checkIfSteerable(ROYGBIV.hideFrom, hidingObject);
   preConditions.checkIfSteerable(ROYGBIV.hideFrom, targetObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.hideFrom, hidingObject);
 
   steeringHandler.makeSteerableHideFromSteerable(hidingObject, targetObject);
 }
@@ -3716,6 +3719,7 @@ Roygbiv.prototype.stopHiding = function(hidingObject){
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopHiding, preConditions.hidingObject, hidingObject);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopHiding, hidingObject);
   preConditions.checkIfSteerable(ROYGBIV.stopHiding, hidingObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.stopHiding, hidingObject);
 
   steeringHandler.makeSteerableStopHiding(hidingObject);
 }
@@ -3735,6 +3739,7 @@ Roygbiv.prototype.pursue = function(pursuingObject, targetObject){
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.pursue, targetObject);
   preConditions.checkIfSteerable(ROYGBIV.pursue, pursuingObject);
   preConditions.checkIfSteerable(ROYGBIV.pursue, targetObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.pursue, pursuingObject);
 
   steeringHandler.setTargetSteerable(pursuingObject, targetObject);
 }
@@ -3754,6 +3759,7 @@ Roygbiv.prototype.evade = function(evadingObject, targetObject){
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.evade, targetObject);
   preConditions.checkIfSteerable(ROYGBIV.evade, evadingObject);
   preConditions.checkIfSteerable(ROYGBIV.evade, targetObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.evade, evadingObject);
 
   steeringHandler.setTargetSteerable(evadingObject, targetObject);
 }
@@ -3769,6 +3775,7 @@ Roygbiv.prototype.stopPursuing = function(pursuingObject){
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopPursuing, preConditions.pursuingObject, pursuingObject);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopPursuing, pursuingObject);
   preConditions.checkIfSteerable(ROYGBIV.stopPursuing, pursuingObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.stopPursuing, pursuingObject);
 
   steeringHandler.unsetTargetSteerable(pursuingObject);
 }
@@ -3784,6 +3791,7 @@ Roygbiv.prototype.stopEvading = function(evadingObject){
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopEvading, preConditions.evadingObject, evadingObject);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopEvading, evadingObject);
   preConditions.checkIfSteerable(ROYGBIV.stopEvading, evadingObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.stopEvading, evadingObject);
 
   steeringHandler.unsetTargetSteerable(evadingObject);
 }
