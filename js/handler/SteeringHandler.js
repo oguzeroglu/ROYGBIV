@@ -1031,11 +1031,11 @@ SteeringHandler.prototype.unsetTargetSteerable = function(object){
   object.steerable.unsetTargetEntity();
 }
 
-SteeringHandler.prototype.jump = function(object, jumpDescriptor, toRunupBehaviorName, completeCallback){
-  var toRunupBehavior = object.constructedSteeringBehaviors[toRunupBehaviorName];
+SteeringHandler.prototype.jump = function(object, jumpDescriptor, toTakeoffBehaviorName, completeCallback){
+  var toRunupBehavior = object.constructedSteeringBehaviors[toTakeoffBehaviorName];
   var steerable = object.steerable;
 
-  this.setBehavior(object, toRunupBehaviorName);
+  this.setBehavior(object, toTakeoffBehaviorName);
 
   steerable.jumpCompletionCallback = completeCallback;
 

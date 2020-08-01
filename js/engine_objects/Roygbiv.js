@@ -3796,32 +3796,32 @@ Roygbiv.prototype.stopEvading = function(evadingObject){
   steeringHandler.unsetTargetSteerable(evadingObject);
 }
 
-// Makes a steerable manually jump. toRunupBehaviorName parameter represents the
-// steering behavior used until the steerable reaches to the runup point.
+// Makes a steerable manually jump. toTakeoffBehaviorName parameter represents the
+// steering behavior used until the steerable reaches to the takeoff point.
 // completeCallback function is executed when the jump is completed. When a
 // jump is completed, a steering behavior needs to be set to the steerable in order
 // to continue the movement. Note that this API returns false if the jump described
 // by the jumpDescriptor is not achievable by given steerable, true otherwise.
-Roygbiv.prototype.jump = function(object, jumpDescriptor, toRunupBehaviorName, completeCallback){
+Roygbiv.prototype.jump = function(object, jumpDescriptor, toTakeoffBehaviorName, completeCallback){
   if (mode == 0){
     return;
   }
 
   preConditions.checkIfDefined(ROYGBIV.jump, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.jump, preConditions.jumpDescriptor, jumpDescriptor);
-  preConditions.checkIfDefined(ROYGBIV.jump, preConditions.toRunupBehaviorName, toRunupBehaviorName);
+  preConditions.checkIfDefined(ROYGBIV.jump, preConditions.toTakeoffBehaviorName, toTakeoffBehaviorName);
   preConditions.checkIfDefined(ROYGBIV.jump, preConditions.completeCallback, completeCallback);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.jump, preConditions.object, object);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.jump, object);
   preConditions.checkIfSteerable(ROYGBIV.jump, object);
   preConditions.checkIfJumpDescriptor(ROYGBIV.jump, jumpDescriptor);
   preConditions.checkIfJumpDescriptorInActiveScene(ROYGBIV.jump, jumpDescriptor.roygbivName);
-  preConditions.checkIfString(ROYGBIV.jump, preConditions.toRunupBehaviorName, toRunupBehaviorName);
-  preConditions.checkIfObjectHasBehavior(ROYGBIV.jump, object, toRunupBehaviorName);
+  preConditions.checkIfString(ROYGBIV.jump, preConditions.toTakeoffBehaviorName, toTakeoffBehaviorName);
+  preConditions.checkIfObjectHasBehavior(ROYGBIV.jump, object, toTakeoffBehaviorName);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.jump, preConditions.completeCallback, completeCallback);
   preConditions.checkIfObjectIsJumping(ROYGBIV.jump, object);
 
-  return steeringHandler.jump(object, jumpDescriptor, toRunupBehaviorName, completeCallback);
+  return steeringHandler.jump(object, jumpDescriptor, toTakeoffBehaviorName, completeCallback);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

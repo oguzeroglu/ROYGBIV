@@ -277,7 +277,7 @@ var Preconditions = function(){
   this.jdName = "jdName";
   this.steerable = "steerable";
   this.jumpDescriptor = "jumpDescriptor";
-  this.toRunupBehaviorName = "toRunupBehaviorName";
+  this.toTakeoffBehaviorName = "toTakeoffBehaviorName";
   this.completeCallback = "completeCallback";
 }
 
