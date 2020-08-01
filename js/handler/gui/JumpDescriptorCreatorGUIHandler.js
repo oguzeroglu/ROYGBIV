@@ -26,7 +26,7 @@ var JumpDescriptorCreatorGUIHandler = function(){
       var pt1 = markedPoints[this["Takeoff point"]];
       var pt2 = markedPoints[this["Landing point"]];
 
-      jumpDescriptorCreatorGUIHandler.addJumpDescriptorFolder(id, steeringHandler.addJumpDescriptor(id, pt1, pt2, 100, 100, 100));
+      jumpDescriptorCreatorGUIHandler.addJumpDescriptorFolder(id, steeringHandler.addJumpDescriptor(id, pt1, pt2, 100));
 
       terminal.printInfo(Text.JUMP_DESCRIPTOR_CREATED);
 
@@ -53,9 +53,7 @@ JumpDescriptorCreatorGUIHandler.prototype.addJumpDescriptorFolder = function(id,
   var params = {
     takeoffPosition: takeoffPosition.x + "," + takeoffPosition.y + "," + takeoffPosition.z,
     landingPosition: landingPosition.x + "," + landingPosition.y + "," + landingPosition.z,
-    runupSatisfactionRadius: "" + jumpDescriptor.runupSatisfactionRadius,
     takeoffPositionSatisfactionRadius: "" + jumpDescriptor.takeoffPositionSatisfactionRadius,
-    takeoffVelocitySatisfactionRadius: "" + jumpDescriptor.takeoffVelocitySatisfactionRadius,
     "Destroy": function(){
       terminal.clear();
 
@@ -88,7 +86,7 @@ JumpDescriptorCreatorGUIHandler.prototype.addJumpDescriptorFolder = function(id,
   guiHandler.disableController(folder.add(params, "takeoffPosition"));
   guiHandler.disableController(folder.add(params, "landingPosition"));
 
-  var props = ["runupSatisfactionRadius", "takeoffPositionSatisfactionRadius", "takeoffVelocitySatisfactionRadius"];
+  var props = ["takeoffPositionSatisfactionRadius"];
 
   for (var i = 0; i < props.length; i ++){
     this.addNumericalController(params, props[i], folder, jumpDescriptor);

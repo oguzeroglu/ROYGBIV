@@ -76,15 +76,11 @@ SteeringHandler.prototype.import = function(exportObj){
       var curExport = jumpDescriptorInfo[sceneName][id];
       var takeoffPosition = curExport.takeoffPosition;
       var landingPosition = curExport.landingPosition;
-      var runupSatisfactionRadius = curExport.runupSatisfactionRadius;
       var takeoffPositionSatisfactionRadius = curExport.takeoffPositionSatisfactionRadius;
-      var takeoffVelocitySatisfactionRadius = curExport.takeoffVelocitySatisfactionRadius;
       var jumpDescriptor = new Kompute.JumpDescriptor({
         takeoffPosition: new Kompute.Vector3D(takeoffPosition.x, takeoffPosition.y, takeoffPosition.z),
         landingPosition: new Kompute.Vector3D(landingPosition.x, landingPosition.y, landingPosition.z),
-        runupSatisfactionRadius: runupSatisfactionRadius,
-        takeoffPositionSatisfactionRadius: takeoffPositionSatisfactionRadius,
-        takeoffVelocitySatisfactionRadius: takeoffVelocitySatisfactionRadius
+        takeoffPositionSatisfactionRadius: takeoffPositionSatisfactionRadius
       });
       this.jumpDescriptorsBySceneName[sceneName][id] = jumpDescriptor;
       this.usedJumpDescriptorIDs[id] = jumpDescriptor;
@@ -217,9 +213,7 @@ SteeringHandler.prototype.export = function(){
       exportObject.jumpDescriptorInfo[sceneName][id] = {
         takeoffPosition: {x: jd.takeoffPosition.x, y: jd.takeoffPosition.y, z: jd.takeoffPosition.z},
         landingPosition: {x: jd.landingPosition.x, y: jd.landingPosition.y, z: jd.landingPosition.z},
-        runupSatisfactionRadius: jd.runupSatisfactionRadius,
-        takeoffPositionSatisfactionRadius: jd.takeoffPositionSatisfactionRadius,
-        takeoffVelocitySatisfactionRadius: jd.takeoffVelocitySatisfactionRadius
+        takeoffPositionSatisfactionRadius: jd.takeoffPositionSatisfactionRadius
       };
     }
   }
@@ -661,7 +655,7 @@ SteeringHandler.prototype.issueSteerableUpdate = function(object){
   }
 }
 
-SteeringHandler.prototype.addJumpDescriptor = function(id, takeoffMarkedPoint, landingMarkedPoint, runupSatisfactionRadius, takeoffPositionSatisfactionRadius, takeoffVelocitySatisfactionRadius){
+SteeringHandler.prototype.addJumpDescriptor = function(id, takeoffMarkedPoint, landingMarkedPoint, takeoffPositionSatisfactionRadius){
   if (this.usedJumpDescriptorIDs[id]){
     return false;
   }
@@ -671,9 +665,7 @@ SteeringHandler.prototype.addJumpDescriptor = function(id, takeoffMarkedPoint, l
   var jumpDescriptor = new Kompute.JumpDescriptor({
     takeoffPosition: takeoffVector,
     landingPosition: landingVector,
-    runupSatisfactionRadius: runupSatisfactionRadius,
-    takeoffPositionSatisfactionRadius: takeoffPositionSatisfactionRadius,
-    takeoffVelocitySatisfactionRadius: takeoffVelocitySatisfactionRadius
+    takeoffPositionSatisfactionRadius: takeoffPositionSatisfactionRadius
   });
 
   jumpDescriptor.roygbivName = id;
