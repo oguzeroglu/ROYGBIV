@@ -49,6 +49,15 @@ SteeringHandler.prototype.stopSteerable = function(object){
 SteeringHandler.prototype.onModeSwitch = function(){
   this.activeSteerablesMap = new Map();
   this.clonedGraphsBySceneName = new Object();
+
+  for (var id in this.usedAStarIDs){
+    var aStar = this.usedAStarIDs[id];
+
+    aStar.path.length = 0;
+    if (aStar.onPathConstructed){
+      aStar.onPathConstructed();
+    }
+  }
 }
 
 SteeringHandler.prototype.import = function(exportObj){
