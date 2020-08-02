@@ -291,7 +291,8 @@ var Roygbiv = function(){
     "getJumpDescriptor",
     "jump",
     "setPathFinishListener",
-    "removePathFinishListener"
+    "removePathFinishListener",
+    "setObjectMouseMoveListener"
   ];
 
   this.globals = new Object();
@@ -2546,6 +2547,23 @@ Roygbiv.prototype.removePathFinishListener = function(object, behaviorName){
   preConditions.checkIfPathFollowingBehavior(ROYGBIV.removePathFinishListener, object, behaviorName);
 
   steeringHandler.removePathFinishListener(object, behaviorName);
+}
+
+// Sets a mouse move listener for given object. The callbackFunction is executed
+// with x, y, z parameters every frame the mouse is on given object.
+Roygbiv.prototype.setObjectMouseMoveListener = function(object, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setObjectMouseMoveListener, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setObjectMouseMoveListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectMouseMoveListener, preConditions.object, object);
+  preConditions.checkIfTrue(ROYGBIV.setObjectMouseMoveListener, "object marked as unintersectable, cannot be selected.", (!object.isIntersectable));
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectMouseMoveListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectMouseMoveListener, object);
+
+  object.mouseMoveCallbackFunction = callbackFunction;
+  objectsWithMouseMoveListeners.set(object.name, object);
 }
 
 // TEXT FUNCTIONS **************************************************************

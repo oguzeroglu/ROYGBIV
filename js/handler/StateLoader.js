@@ -300,6 +300,7 @@ StateLoader.prototype.resetProject = function(){
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
   objectsWithOnClickListeners = new Map();
   objectsWithMouseOverListeners = new Map();
+  objectsWithMouseMoveListeners = new Map();
   objectsWithMouseOutListeners = new Map();
   postProcessiongConfigurationsVisibility = new Object();
   currentMouseOverObjectName = 0;

@@ -523,6 +523,11 @@ function onRaycasterMouseMoveIntersection(){
         object.onMouseMoveIntersection(intersectionObject);
       }
     }
+
+    if (object && object.mouseMoveCallbackFunction){
+      object.mouseMoveCallbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+    }
+
     var isDifferent = currentMouseOverObjectName != object.name;
     if (object.mouseOverCallbackFunction && isDifferent){
       if (object.registeredSceneName == sceneHandler.getActiveSceneName()){

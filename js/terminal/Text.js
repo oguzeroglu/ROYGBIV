@@ -1183,4 +1183,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_JUMP = "Makes a steerable manually jump. toTakeoffBehaviorName parameter represents the steering behavior used until the steerable reaches\nto the takeoff point. completeCallback function is executed when the jump is completed. When a jump is completed, a steering behavior\nneeds to be set to the steerable in order to continue the movement. Note that this API returns false if the jump\ndescribed by the jumpDescriptor is not achievable by given steerable, true otherwise.";
   this.ROYGBIV_SCRIPTING_API_SETPATHFINISHLISTENER = "Sets a path finish listener for PathFollowingBehavior of given steerable object. The callbackFunction is executed\nwhen the path of given PathFollowingBehavior is consumed.";
   this.ROYGBIV_SCRIPTING_API_REMOVEPATHFINISHLISTENER = "Removes a path finish listener for PathFollowingBehavior of given steerable object.";
+  this.ROYGBIV_SCRIPTING_API_SETOBJECTMOUSEMOVELISTENER = "Sets a mouse move listener for given object. The callbackFunction is executed with x, y, z parameters every frame\nthe mouse is on given object.";
 }

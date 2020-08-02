@@ -326,6 +326,7 @@ var fpsHandler;
 var objectsWithOnClickListeners = new Map();
 var objectsWithMouseOverListeners = new Map();
 var objectsWithMouseOutListeners = new Map();
+var objectsWithMouseMoveListeners = new Map();
 var currentMouseOverObjectName;
 var renderer;
 var bloom;

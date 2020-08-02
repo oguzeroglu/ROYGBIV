@@ -68,6 +68,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   trackingObjects = new Object();
   objectsWithOnClickListeners = new Map();
   objectsWithMouseOverListeners = new Map();
+  objectsWithMouseMoveListeners = new Map();
   objectsWithMouseOutListeners = new Map();
   currentMouseOverObjectName = 0;
   draggingSprite = false;
