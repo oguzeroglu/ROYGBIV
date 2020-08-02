@@ -290,7 +290,8 @@ var Roygbiv = function(){
     "stopEvading",
     "getJumpDescriptor",
     "jump",
-    "setPathFinishListener"
+    "setPathFinishListener",
+    "removePathFinishListener"
   ];
 
   this.globals = new Object();
@@ -2527,6 +2528,24 @@ Roygbiv.prototype.setPathFinishListener = function(object, behaviorName, callbac
   preConditions.checkIfPathFollowingBehavior(ROYGBIV.setPathFinishListener, object, behaviorName);
 
   steeringHandler.setPathFinishListener(object, behaviorName, callbackFunction);
+}
+
+// Removes a path finish listener for PathFollowingBehavior of given steerable object.
+Roygbiv.prototype.removePathFinishListener = function(object, behaviorName){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removePathFinishListener, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.removePathFinishListener, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removePathFinishListener, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removePathFinishListener, object);
+  preConditions.checkIfSteerable(ROYGBIV.removePathFinishListener, object);
+  preConditions.checkIfString(ROYGBIV.removePathFinishListener, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfObjectHasBehavior(ROYGBIV.removePathFinishListener, object, behaviorName);
+  preConditions.checkIfPathFollowingBehavior(ROYGBIV.removePathFinishListener, object, behaviorName);
+
+  steeringHandler.removePathFinishListener(object, behaviorName);
 }
 
 // TEXT FUNCTIONS **************************************************************

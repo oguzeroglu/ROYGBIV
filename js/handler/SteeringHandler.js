@@ -1062,3 +1062,11 @@ SteeringHandler.prototype.setPathFinishListener = function(object, behaviorName,
   var callbackID = behavior.path.addFinishCallback(callbackFunction);
   object.pathFinishListenerIDsBySteerableName[behaviorName] = callbackID;
 }
+
+SteeringHandler.prototype.removePathFinishListener = function(object, behaviorName){
+  if (object.pathFinishListenerIDsBySteerableName[behaviorName]){
+    var behavior = object.constructedSteeringBehaviors[behaviorName];
+    behavior.path.removeFinishCallback(object.pathFinishListenerIDsBySteerableName[behaviorName]);
+    delete object.pathFinishListenerIDsBySteerableName[behaviorName];
+  }
+}
