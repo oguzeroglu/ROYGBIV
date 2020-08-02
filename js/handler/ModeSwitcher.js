@@ -166,6 +166,8 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
         var constructedBehavior = object.steerableInfo.behaviorsByID[behaviorID].getBehavior(object);
         object.constructedSteeringBehaviors[behaviorID] = constructedBehavior;
       }
+
+      object.pathFinishListenerIDsBySteerableName = {};
     }
   }
   for (var objectName in addedObjects){
@@ -193,6 +195,8 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
         var constructedBehavior = object.steerableInfo.behaviorsByID[behaviorID].getBehavior(object);
         object.constructedSteeringBehaviors[behaviorID] = constructedBehavior;
       }
+
+      object.pathFinishListenerIDsBySteerableName = {};
     }
   }
   autoInstancingHandler.handle();
@@ -477,6 +481,16 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.initOpacitySet = false;
     }
     if (object.steerable){
+
+      for (var behaviorName in object.pathFinishListenerIDsBySteerableName){
+        var behavior = object.constructedSteeringBehaviors[behaviorName];
+        var listenerID = object.pathFinishListenerIDsBySteerableName[behaviorName];
+
+        behavior.path.removeFinishCallback(listenerID);
+      }
+
+      delete object.pathFinishListenerIDsBySteerableName;
+
       object.steerable.cancelJump();
       object.steerable.jumpCompletionCallback = null;
       object.steerable.velocity.set(0, 0, 0);
@@ -524,6 +538,16 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       delete object.originalMass;
     }
     if (object.steerable){
+
+      for (var behaviorName in object.pathFinishListenerIDsBySteerableName){
+        var behavior = object.constructedSteeringBehaviors[behaviorName];
+        var listenerID = object.pathFinishListenerIDsBySteerableName[behaviorName];
+
+        behavior.path.removeFinishCallback(listenerID);
+      }
+
+      delete object.pathFinishListenerIDsBySteerableName;
+
       object.steerable.cancelJump();
       object.steerable.jumpCompletionCallback = null;
       object.steerable.velocity.set(0, 0, 0);
