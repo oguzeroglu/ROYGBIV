@@ -1140,7 +1140,7 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(prevParams)
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "lifetime").min(0).max(100).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(magicCircleParameters, "angleStep").min(0).max(100).step(0.1).onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "angleStep").min(0).max(2*Math.PI).step(Math.PI/5000).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
