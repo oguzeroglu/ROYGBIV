@@ -1201,6 +1201,7 @@ var CommandDescriptor = function(){
   this.ANY_GRAPH_ID                =   52;
   this.STEERING_BEHAVIOR_NAME      =   53;
   this.ASTAR_ID                    =   54;
+  this.STEERABLE_NAME              =   55;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1941,13 +1942,13 @@ var CommandDescriptor = function(){
   // assignSteeringBehavior
   this.assignSteeringBehavior = new Object();
   this.assignSteeringBehavior.types = [];
-  this.assignSteeringBehavior.types.push(this.OBJECT_NAME); //objectName
+  this.assignSteeringBehavior.types.push(this.STEERABLE_NAME); //objectName
   this.assignSteeringBehavior.types.push(this.STEERING_BEHAVIOR_NAME); //steeringBehaviorName
 
   // unassignSteeringBehavior
   this.unassignSteeringBehavior = new Object();
   this.unassignSteeringBehavior.types = [];
-  this.unassignSteeringBehavior.types.push(this.OBJECT_NAME); //objectName
+  this.unassignSteeringBehavior.types.push(this.STEERABLE_NAME); //objectName
   this.unassignSteeringBehavior.types.push(this.STEERING_BEHAVIOR_NAME); //steeringBehaviorName
 
   // newAStar

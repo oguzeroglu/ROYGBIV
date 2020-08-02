@@ -914,6 +914,17 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[AStars]: ";
 			break;
+			case commandDescriptor.STEERABLE_NAME:
+				var steerables = steeringHandler.steerablesBySceneName[sceneHandler.getActiveSceneName()];
+				if (steerables){
+					for (var id in steerables){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}
+					}
+				}
+				helpString = "[Steerables]: ";
+			break;
 		}
 
 		//  **********************************************************
