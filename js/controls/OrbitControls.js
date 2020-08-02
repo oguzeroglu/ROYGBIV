@@ -128,7 +128,7 @@ OrbitControls.prototype.onPinch = function(diff){
   }
 }
 
-OrbitControls.prototype.onSwipe = function(diffX, diffY){
+OrbitControls.prototype.onSwipe = function(x, y, diffX, diffY){
   activeControl.spherical.theta += (diffX / 10000) * activeControl.fingerSwipeRotationSpeed;
   activeControl.spherical.phi -= (diffY / 10000) * activeControl.fingerSwipeRotationSpeed;
 }

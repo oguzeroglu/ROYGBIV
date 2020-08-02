@@ -95,7 +95,7 @@ FreeControls.prototype.translateYNegative = function(){
   camera.translateY(-1 * activeControl.translateYAmount);
 }
 
-FreeControls.prototype.onSwipe = function(diffX, diffY){
+FreeControls.prototype.onSwipe = function(x, y, diffX, diffY){
   camera.rotation.y += diffX * activeControl.swipeSpeed;
   camera.rotation.x += diffY * activeControl.swipeSpeed;
 }
