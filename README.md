@@ -19,11 +19,13 @@ ROYGBIV is a WebGL game engine for motivated programmers who do not have the bud
 ROYGBIV is still under development and not documented yet. Estimated documentation release date is April 2021.    
 
 ### Roadmap
-* Integrated AI engine
-* Audio support
-* Plugin support
-* Test coverage
-* Documentation
+- [ ] Integrated AI engine
+  - [x] Movement layer
+  - [ ] Decision layer
+- [ ] Audio support
+- [ ] Plugin support
+- [ ] Test coverage
+- [ ] Documentation
 
 ## How to run?
 
