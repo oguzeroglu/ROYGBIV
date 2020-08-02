@@ -1,0 +1,11 @@
+node_modules/
+.DS_Store
+deploy/
+demo/
+dynamic_textures/
+fonts/
+protocol_definitions/
+scripts/
+skybox/
+texture_atlas/
+texture_packs/

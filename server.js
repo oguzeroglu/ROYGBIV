@@ -591,20 +591,7 @@ function readEngineScripts(projectName, author, noMobile){
         console.log("[*] Skipping SelectionHandler.");
         continue;
       }else if (scriptPath.includes("GUIHandler.js")){
-        console.log("[*] Skipping GUIHandler.");
-        console.log("[*] Skipping ParticleSystemCreatorGUIHandler.");
-        console.log("[*] Skipping MuzzleFlashCreatorGUIHandler.");
-        console.log("[*] Skipping FPSWeaponGUIHandler.");
-        console.log("[*] Skipping TexturePackCreatorGUIHandler.");
-        console.log("[*] Skipping SkyboxCreatorGUIHandler.");
-        console.log("[*] Skipping FogCreatorGUIHandler.");
-        console.log("[*] Skipping FontCreatorGUIHandler.");
-        console.log("[*] Skipping CrosshairCreatorGUIHandler.");
-        console.log("[*] Skipping ScriptsGUIHandler.");
-        console.log("[*] Skipping AnimationCreatorGUIHandler.");
-        console.log("[*] Skipping LightningCreatorGUIHandler.");
-        console.log("[*] Skipping VirtualKeyboardCreatorGUIHandler.");
-        console.log("[*] Skipping LightsGUIHandler.");
+        console.log("[*] Skipping GUI handlers.");
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");

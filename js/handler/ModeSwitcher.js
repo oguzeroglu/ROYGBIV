@@ -84,6 +84,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
 }
 
 ModeSwitcher.prototype.switchFromDesignToPreview = function(){
+  steeringHandler.onModeSwitch();
   TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
@@ -159,6 +160,15 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (object.objectTrailConfigurations){
       new ObjectTrail({object: object, alpha: object.objectTrailConfigurations.alpha, maxTimeInSeconds: object.objectTrailConfigurations.time});
     }
+    if (object.steerableInfo){
+      object.constructedSteeringBehaviors = {};
+      for (var behaviorID in object.steerableInfo.behaviorsByID){
+        var constructedBehavior = object.steerableInfo.behaviorsByID[behaviorID].getBehavior(object);
+        object.constructedSteeringBehaviors[behaviorID] = constructedBehavior;
+      }
+
+      object.pathFinishListenerIDsBySteerableName = {};
+    }
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -178,6 +188,15 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
     if (object.objectTrailConfigurations){
       new ObjectTrail({object: object, alpha: object.objectTrailConfigurations.alpha, maxTimeInSeconds: object.objectTrailConfigurations.time});
+    }
+    if (object.steerableInfo){
+      object.constructedSteeringBehaviors = {};
+      for (var behaviorID in object.steerableInfo.behaviorsByID){
+        var constructedBehavior = object.steerableInfo.behaviorsByID[behaviorID].getBehavior(object);
+        object.constructedSteeringBehaviors[behaviorID] = constructedBehavior;
+      }
+
+      object.pathFinishListenerIDsBySteerableName = {};
     }
   }
   autoInstancingHandler.handle();
@@ -256,13 +275,18 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
-  try{
+  try {
     Rhubarb.destroy();
-  }catch(err){}
+  } catch(err) {}
+
   history.replaceState(null, null, ' ');
+
   if (inputText){
     inputText.deactivateInputMode();
   }
+
+  steeringHandler.onModeSwitch();
+
   mode = 0;
   autoInstancingHandler.reset();
   var objsToRemove = [];
@@ -450,11 +474,32 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       if (!object.physicsKeptWhenHidden && !object.noMass){
         physicsWorld.addBody(object.physicsBody);
       }
+      steeringHandler.show(object);
     }
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
     }
+    if (object.steerable){
+
+      for (var behaviorName in object.pathFinishListenerIDsBySteerableName){
+        var behavior = object.constructedSteeringBehaviors[behaviorName];
+        var listenerID = object.pathFinishListenerIDsBySteerableName[behaviorName];
+
+        behavior.path.removeFinishCallback(listenerID);
+      }
+
+      delete object.pathFinishListenerIDsBySteerableName;
+
+      object.steerable.cancelJump();
+      object.steerable.jumpCompletionCallback = null;
+      object.steerable.velocity.set(0, 0, 0);
+      object.steerable.unsetTargetPosition();
+      object.steerable.unsetTargetEntity();
+      object.steerable.unsetHideTargetEntity();
+    }
+    steeringHandler.updateObject(object);
+    delete object.constructedSteeringBehaviors;
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -477,6 +522,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       if (!object.physicsKeptWhenHidden && !object.noMass){
         physicsWorld.addBody(object.physicsBody);
       }
+      steeringHandler.show(object);
     }
     object.loadState();
     if (object.initOpacitySet){
@@ -491,6 +537,26 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       }
       delete object.originalMass;
     }
+    if (object.steerable){
+
+      for (var behaviorName in object.pathFinishListenerIDsBySteerableName){
+        var behavior = object.constructedSteeringBehaviors[behaviorName];
+        var listenerID = object.pathFinishListenerIDsBySteerableName[behaviorName];
+
+        behavior.path.removeFinishCallback(listenerID);
+      }
+
+      delete object.pathFinishListenerIDsBySteerableName;
+
+      object.steerable.cancelJump();
+      object.steerable.jumpCompletionCallback = null;
+      object.steerable.velocity.set(0, 0, 0);
+      object.steerable.unsetTargetPosition();
+      object.steerable.unsetTargetEntity();
+      object.steerable.unsetHideTargetEntity();
+    }
+    steeringHandler.updateObject(object);
+    delete object.constructedSteeringBehaviors;
   }
   fogHandler.onFromPreviewToDesign();
   renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);

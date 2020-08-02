@@ -84,6 +84,10 @@ PhysicsWorkerBridge.prototype.issueUpdate = function(obj){
   if (!obj.isVisibleOnThePreviewScene() && !obj.physicsKeptWhenHidden){
     ary[i+18] = 0;
   }
+  if (obj.isVelocityReset){
+    ary[i+19] = 1;
+    obj.isVelocityReset = false;
+  }
 }
 
 PhysicsWorkerBridge.prototype.handleCollisions = function(collisionDescription){
@@ -132,7 +136,7 @@ PhysicsWorkerBridge.prototype.updateObjects = function(data){
   this.hasOwnership = true;
   this.updateBuffer.forEach(this.issueUpdate);
   this.updateBuffer.clear();
-  for (var i = 0; i<ary.length; i+=19){
+  for (var i = 0; i<ary.length; i+=20){
     var obj = this.objectsByID[ary[i]];
     obj.physicsBody.position.x = ary[i+1]; obj.physicsBody.position.y = ary[i+2]; obj.physicsBody.position.z = ary[i+3];
     obj.physicsBody.quaternion.x = ary[i+4]; obj.physicsBody.quaternion.y = ary[i+5]; obj.physicsBody.quaternion.z = ary[i+6]; obj.physicsBody.quaternion.w = ary[i+7];
@@ -156,8 +160,9 @@ PhysicsWorkerBridge.prototype.initTransferableBody = function(){
       objDescriptionAry.push(obj.physicsBody.velocity.x); objDescriptionAry.push(obj.physicsBody.velocity.y); objDescriptionAry.push(obj.physicsBody.velocity.z);
       objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0);
       objDescriptionAry.push(1);
+      objDescriptionAry.push(0);
       obj.indexInPhysicsObjDescriptionArray = index;
-      index += 19;
+      index += 20;
     }
   }
   for (var objName in sceneHandler.getObjectGroups()){
@@ -171,8 +176,9 @@ PhysicsWorkerBridge.prototype.initTransferableBody = function(){
       objDescriptionAry.push(obj.physicsBody.velocity.x); objDescriptionAry.push(obj.physicsBody.velocity.y); objDescriptionAry.push(obj.physicsBody.velocity.z);
       objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0);
       objDescriptionAry.push(1);
+      objDescriptionAry.push(0);
       obj.indexInPhysicsObjDescriptionArray = index;
-      index += 19;
+      index += 20;
     }
   }
   var objDescriptionTypedArray = new Float32Array(objDescriptionAry);
@@ -280,6 +286,7 @@ PhysicsWorkerBridge.prototype.resetObjectVelocity = function(obj){
   obj.isVelocityXDirty = true;
   obj.isVelocityYDirty = true;
   obj.isVelocityZDirty = true;
+  obj.isVelocityReset = true;
 }
 
 PhysicsWorkerBridge.prototype.applyImpulse = function(obj, vec1, vec2){

@@ -82,6 +82,7 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
     this.scenes[sceneName].resetClickableSprites();
     this.scenes[sceneName].resetClickableContainers();
     this.scenes[sceneName].resetTrackingObjects();
+    this.scenes[sceneName].resetDynamicObjects();
   }
   this.draggableSpriteStatusBySceneName = new Object();
   this.readyCallback = noop;
@@ -404,6 +405,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
 
   this.scenes[this.getActiveSceneName()].loadLights();
   lightHandler.onAfterSceneChange();
+  steeringHandler.onAfterSceneChange();
 
   if (mode == 0){
     $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");

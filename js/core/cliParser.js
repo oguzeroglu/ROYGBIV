@@ -2017,6 +2017,9 @@ function parse(input){
             sceneHandler.onObjectGroupCreation(objectGroup);
             objectGroups[groupName] = objectGroup;
             for (var childObjName in objectGroup.group){
+              if (objectGroup.group[childObjName].usedAsAIEntity){
+                objectGroup.group[childObjName].unUseAsAIEntity();
+              }
               sceneHandler.onAddedObjectDeletion(objectGroup.group[childObjName]);
               for (var lightningName in lightnings){
                 if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == childObjName){
@@ -2092,6 +2095,10 @@ function parse(input){
           }
           if (!(name.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
+            return true;
+          }
+          if(name.indexOf(",") >= 0){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
             return true;
           }
           if (markedPoints[name]){
@@ -2456,6 +2463,7 @@ function parse(input){
           var upperBound = new THREE.Vector3(maxX, maxY, maxZ);
           LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
           sceneHandler.onWorldLimitsChange();
+          steeringHandler.resetWorld();
           refreshRaycaster(Text.OCTREE_LIMIT_SET);
           return true;
         break;
@@ -2489,6 +2497,7 @@ function parse(input){
           }
           BIN_SIZE = binSize;
           sceneHandler.onBinSizeChange();
+          steeringHandler.resetWorld();
           refreshRaycaster(Text.BIN_SIZE_SET);
           return true;
         break;
@@ -5561,6 +5570,891 @@ function parse(input){
         case 233: //printAcceptedTextureSize
           terminal.printHeader(Text.ACCEPTED_TEXTURE_SIZE);
           terminal.printInfo(Text.TREE.replace(Text.PARAM1, ACCEPTED_TEXTURE_SIZE));
+          return true;
+        break;
+        case 234: //switchAIDebugMode
+          var res = steeringHandler.switchDebugMode();
+          if (res){
+            terminal.printInfo(Text.AI_DEBUG_MODE_SWITCHED_ON);
+          }else {
+            terminal.printInfo(Text.AI_DEBUG_MODE_SWITCHED_OFF);
+          }
+          return true;
+        break;
+        case 235: //newAIObstacle
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var obstacleID = splitted[1];
+          if (!(obstacleID.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          if (!jobHandlerWorking){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
+          }
+
+          var selections = [];
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              selections.push(gridSelections[gridName]);
+            }
+          }else{
+            selections.push(jobHandlerSelectedGrid);
+          }
+
+          if (selections.length == 2){
+            var grid1 = selections[0];
+            var grid2 = selections[1];
+            if (grid1.parentName != grid2.parentName){
+              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+              return true;
+            }
+          }
+
+          var gridSystemName = selections[0].parentName;
+          var gridSystem = gridSystems[gridSystemName];
+
+          var height = parseFloat(splitted[2]);
+
+          if (steeringHandler.usedEntityIDs[obstacleID]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          if (isNaN(height)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
+            return true;
+          }
+
+          gridSystem.newAIObstacle(selections, obstacleID, height);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.AI_OBSTACLE_CREATED);
+          }
+          return true;
+        break;
+        case 236: //destroyAIObstacle
+          if (mode != 0){
+            terminal.printInfo(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var id = splitted[1];
+          if (!(id.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          if (!steeringHandler.usedEntityIDs[id]){
+            terminal.printError(Text.NO_SUCH_OBSTACLE);
+            return true;
+          }
+          var obj = addedObjects[id];
+          if (!obj){
+            for (var objName in objectGroups){
+              for (var childName in objectGroups[objName].group){
+                if (childName == id){
+                  obj = objectGroups[objName];
+                  break;
+                }
+              }
+            }
+          }
+          if (obj && obj.usedAsAIEntity && obj.registeredSceneName == sceneHandler.getActiveSceneName()){
+            obj.unUseAsAIEntity();
+            if (!jobHandlerWorking){
+              terminal.printInfo(Text.OBSTACLE_DESTROYED);
+            }
+            selectionHandler.resetCurrentSelection();
+            return true;
+          }else{
+            var obstacles = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()] || {};
+            for (var key in obstacles){
+              if (key == id){
+                steeringHandler.removeObstacle(id);
+                if (!jobHandlerWorking){
+                  terminal.printInfo(Text.OBSTACLE_DESTROYED);
+                }
+                selectionHandler.resetCurrentSelection();
+                return true;
+              }
+            }
+          }
+          if (!jobHandlerWorking){
+            terminal.printError(Text.OBSTACLE_NOT_IN_ACTIVE_SCENE);
+          }
+          return true;
+        break;
+        case 237: //printAIObstacles
+          var count = 0;
+          var obstacles = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var length = Object.keys(obstacles).length;
+          terminal.printHeader(Text.AI_OBSTACLES_IN_THIS_SCENE);
+          for (var id in obstacles){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, id), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_AI_OBSTACLES_CREATED);
+          }
+          return true;
+        break;
+        case 238: //aiEntity
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(TEXT.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+
+          var parameter = splitted[2].toUpperCase();
+
+          if (parameter != "ON" && parameter != "OFF"){
+            terminal.printError(Text.PARAMETER_MUST_BE_ON_OFF);
+            return true;
+          }
+
+          if (parameter == "ON"){
+            if (obj.usedAsAIEntity){
+              terminal.printError(Text.OBJECT_IS_ALREADY_USED_AS_AI_ENTITY);
+              return true;
+            }
+
+            obj.useAsAIEntity();
+            if (!jobHandlerWorking){
+              terminal.printInfo(Text.OBJECT_WILL_BE_USED_AS_AI_ENTITY);
+            }
+          }else{
+            if (!obj.usedAsAIEntity){
+              terminal.printError(Text.OBJECT_IS_ALREADY_NOT_USED_AS_AI_ENTITY);
+              return true;
+            }
+
+            obj.unUseAsAIEntity();
+            if (!jobHandlerWorking){
+              terminal.printInfo(Text.OBJECT_WONT_BE_USED_AS_AI_ENTITY);
+            }
+          }
+
+          selectionHandler.resetCurrentSelection();
+          return true;
+        break;
+        case 239: //newJumpDescriptor
+          // DEPRECATED
+        break;
+        case 240: //destroyJumpDescriptor
+          // DEPRECATED
+        break;
+        case 241: //printJumpDescriptors
+          // DEPRECATED
+        break;
+        case 242: //newPath
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+          var points = splitted[2];
+          var loop = splitted[3];
+          var rewind = splitted[4];
+
+          if (steeringHandler.usedPathIDs[id] || steeringHandler.usedAStarIDs[id]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          var pointsSplitted = points.split(",");
+
+          var waypoints = [];
+          for (var i = 0; i < pointsSplitted.length; i ++){
+            var point = pointsSplitted[i];
+            var ary = [];
+            if (point.indexOf("*") >= 0){
+              var nameSplitted = point.split("*");
+              for (var ptName in sceneHandler.getMarkedPoints()){
+                if (ptName.toLowerCase().startsWith(nameSplitted[0].toLowerCase())){
+                  ary.push(markedPoints[ptName]);
+                }
+              }
+            }else{
+              if (!markedPoints[point]){
+                terminal.printError(Text.POINT_X_DOES_NOT_EXIST.replace(Text.PARAM1, i));
+                return true;
+              }
+
+              if(!sceneHandler.getMarkedPoints()[point]){
+                terminal.printError(Text.POINT_X_NOT_IN_ACTIVE_SCENE.replace(Text.PARAM1, i));
+                return true;
+              }
+
+              ary.push(markedPoints[point]);
+            }
+
+            for (var i2 = 0; i2 < ary.length; i2 ++){
+              if (waypoints.indexOf(ary[i2]) < 0){
+                waypoints.push(ary[i2]);
+              }
+            }
+          }
+
+          if (waypoints.length < 2){
+            terminal.printError(Text.MUST_SPECIFY_AT_LEAST_TWO_POINTS);
+            return true;
+          }
+
+          loop = loop.toLowerCase();
+
+          if (loop != "true" && loop != "false"){
+            terminal.printError(Text.LOOP_MUST_BE_TRUE_OR_FALSE);
+            return true;
+          }
+
+          rewind = rewind.toLowerCase();
+
+          if (rewind != "true" && rewind != "false"){
+            terminal.printError(Text.REWIND_MUST_BE_TRUE_OR_FALSE);
+            return true;
+          }
+
+          steeringHandler.addPath(id, waypoints, loop === "true", rewind === "true");
+          terminal.printInfo(Text.PATH_CREATED);
+          return true;
+        break;
+        case 243: //destroyPath
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+
+          if (!(id.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          if (!steeringHandler.usedPathIDs[id]){
+            terminal.printError(Text.NO_SUCH_PATH);
+            return true;
+          }
+
+          var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          if (!paths[id]){
+            terminal.printError(Text.PATH_NOT_INSIDE_ACTIVE_SCENE);
+            return true;
+          }
+
+          steeringHandler.removePath(id);
+
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.PATH_DESTROYED);
+          }
+          return true;
+        break;
+        case 244: //printPaths
+          var count = 0;
+          var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          terminal.printHeader(Text.PATHS_IN_THIS_SCENE);
+          for (var id in paths){
+            count ++;
+            var path = paths[id];
+
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, id), true);
+            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "loop").replace(Text.PARAM2, path.loop), true);
+            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "rewind").replace(Text.PARAM2, path.rewind), true);
+            terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "waypoints"), true);
+            for (var i = 0; i < path.waypoints.length; i ++){
+              var wp = path.waypoints[i];
+              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, "("+ wp.x +", " + wp.y + ", " + wp.z + ")"), true);
+            }
+
+            var insertedJDs = {};
+            for (var jdID in steeringHandler.pathsByJumpDescriptors){
+              for (var pid in steeringHandler.pathsByJumpDescriptors[jdID]){
+                if (pid == id){
+                  insertedJDs[jdID] = true;
+                }
+              }
+            }
+
+            var insertedJDsCount = Object.keys(insertedJDs).length;
+            if (insertedJDsCount > 0){
+              terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "Inserted jump descriptors"), true);
+              var ct = 0;
+              for (var jdID in insertedJDs){
+                ct ++;
+                terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, jdID), ct != insertedJDsCount);
+              }
+            }else{
+              terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "Inserted jump descriptors").replace(Text.PARAM2, "none"), false);
+            }
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_PATHS_IN_THIS_SCENE);
+          }
+          return true;
+        break;
+        case 245: //insertJumpDescriptorToPath
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var jdID = splitted[1];
+          var pathID = splitted[2];
+
+          if (!steeringHandler.usedJumpDescriptorIDs[jdID]){
+            terminal.printError(Text.NO_SUCH_JUMPDESCRIPTOR);
+            return true;
+          }
+
+          if (!steeringHandler.usedPathIDs[pathID]){
+            terminal.printError(Text.NO_SUCH_PATH);
+            return true;
+          }
+
+          var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+          if (!jumpDescriptors[jdID]){
+            terminal.printError(Text.JUMPDESCRIPTOR_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+
+          if (!paths[pathID]){
+            terminal.printError(Text.PATH_NOT_INSIDE_ACTIVE_SCENE);
+            return true;
+          }
+
+          for (var pid in steeringHandler.pathsByJumpDescriptors[jdID]){
+            if (pid == pathID){
+              terminal.printError(Text.JUMPDESCRIPTOR_ALREADY_INSERTED_TO_THE_PATH);
+              return true;
+            }
+          }
+
+          if (steeringHandler.insertJumpDescriptorToPath(jdID, pathID)){
+            terminal.printInfo(Text.JUMPDESCRIPTOR_INSERTED_INTO_THE_PATH);
+          }else{
+            terminal.printError(Text.JUMPDESCRIPTOR_IS_NOT_ON_THE_PATH);
+          }
+
+          return true;
+        break;
+        case 246: //constructGraph
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+          if (steeringHandler.usedGraphIDs[id]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          var offsetX = parseFloat(splitted[2]);
+          var offsetY = parseFloat(splitted[3]);
+          var offsetZ = parseFloat(splitted[4]);
+
+          if (isNaN(offsetX)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetX"));
+            return true;
+          }
+
+          if (isNaN(offsetY)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetY"));
+            return true;
+          }
+
+          if (isNaN(offsetZ)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetZ"));
+            return true;
+          }
+
+          if (Object.keys(gridSelections).length < 2){
+            terminal.printError(Text.MUST_HAVE_AT_LEAST_TWO_GRIDS_SELECTED);
+            return true;
+          }
+
+          var gsName = null;
+          for (var gridID in gridSelections){
+            if (gsName == null){
+              gsName = gridSelections[gridID].parentName;
+            }else if (gsName != gridSelections[gridID].parentName){
+              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+              return true;
+            }
+          }
+
+          steeringHandler.constructGraph(id, gridSelections, offsetX, offsetY, offsetZ);
+          for (var gridName in gridSelections){
+            gridSelections[gridName].toggleSelect(false, false, false, true);
+          }
+          terminal.printInfo(Text.GRAPH_CONSTRUCTED);
+          return true;
+        break;
+        case 247: //destroyGraph
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+
+          if (!(id.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          if (!steeringHandler.usedGraphIDs[id]){
+            terminal.printError(Text.NO_SUCH_GRAPH);
+            return true;
+          }
+
+          var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          if (!graphs[id]){
+            terminal.printError(Text.GRAPH_NOT_INSIDE_ACTIVE_SCENE);
+            return true;
+          }
+
+          for (var asid in steeringHandler.graphIDsByAStars){
+            if (steeringHandler.graphIDsByAStars[asid] == id){
+              terminal.printError(Text.GRAPH_USED_IN_ASTAR.replace(Text.PARAM1, asid));
+              return true;
+            }
+          }
+
+          steeringHandler.removeGraph(id);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.GRAPH_DESTROYED);
+          }
+          return true;
+        break;
+        case 248: //printGraphs
+          var count = 0;
+          var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          terminal.printHeader(Text.GRAPHS_IN_THIS_SCENE);
+          for (var id in graphs){
+            count ++;
+            var graph = graphs[id];
+
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, id), true);
+            terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "vertices"), true);
+            graph.forEachVertex(function(x, y, z){
+              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, "("+ x +", " + y + ", " + z + ")"), true);
+            });
+            terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "edges"), true);
+            var totalEdgeCount = 0;
+            var edgeCount = 0;
+            graph.forEachEdge(function(edge){
+              totalEdgeCount ++;
+            });
+            graph.forEachEdge(function(edge){
+              edgeCount ++;
+              var edgeTextFrom = "(" + edge.fromVertex.x + ", " + edge.fromVertex.y + ", " + edge.fromVertex.z +")";
+              var edgeTextTo = "(" + edge.toVertex.x + ", " + edge.toVertex.y + ", " + edge.toVertex.z +")";
+              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, edgeTextFrom + " --> " + edgeTextTo), true);
+            });
+
+            var insertedJDs = {};
+            for (var jdID in steeringHandler.graphsByJumpDescriptors){
+              for (var gid in steeringHandler.graphsByJumpDescriptors[jdID]){
+                if (gid == id){
+                  insertedJDs[jdID] = true;
+                }
+              }
+            }
+
+            var insertedJDsCount = Object.keys(insertedJDs).length;
+            if (insertedJDsCount > 0){
+              terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "Inserted jump descriptors"), true);
+              var ct = 0;
+              for (var jdID in insertedJDs){
+                ct ++;
+                terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, jdID), ct != insertedJDsCount);
+              }
+            }else{
+              terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "Inserted jump descriptors").replace(Text.PARAM2, "none"), false);
+            }
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_GRAPHS_IN_THIS_SCENE);
+          }
+          return true;
+        break;
+        case 249: //newGraph
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+
+          if (steeringHandler.usedGraphIDs[id]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          var pointNames = splitted[2].split(",");
+
+          var usedPoints = [];
+          var vertices = [];
+
+          for (var i = 0; i < pointNames.length; i ++){
+            if (pointNames[i].indexOf("*") >= 0){
+              var nameSplitted = pointNames[i].split("*");
+              for (var ptName in sceneHandler.getMarkedPoints()){
+                if (ptName.toLowerCase().startsWith(nameSplitted[0].toLowerCase())){
+                  usedPoints.push(markedPoints[ptName]);
+                }
+              }
+            }else{
+              var markedPoint = markedPoints[pointNames[i]];
+
+              if (!markedPoint){
+                terminal.printError(Text.POINT_X_DOES_NOT_EXIST.replace(Text.PARAM1, i));
+                return true;
+              }
+
+              if (markedPoint.registeredSceneName != sceneHandler.getActiveSceneName()){
+                terminal.printError(Text.POINT_X_NOT_IN_ACTIVE_SCENE.replace(Text.PARAM1, i));
+                return true;
+              }
+
+              usedPoints.push(markedPoint);
+            }
+
+            for (var i2 = 0; i2 < usedPoints.length; i2 ++){
+              if (vertices.indexOf(usedPoints[i2]) < 0){
+                vertices.push(usedPoints[i2]);
+              }
+            }
+          }
+
+          if (vertices.length < 2){
+            terminal.printError(Text.MUST_SPECIFY_AT_LEAST_TWO_POINTS);
+            return true;
+          }
+
+          graphCreatorGUIHandler.show(id, vertices);
+          return true;
+        break;
+        case 250: //insertJumpDescriptorToGraph
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var jdID = splitted[1];
+          var graphID = splitted[2];
+
+          if (!steeringHandler.usedJumpDescriptorIDs[jdID]){
+            terminal.printError(Text.NO_SUCH_JUMPDESCRIPTOR);
+            return true;
+          }
+
+          if (!steeringHandler.usedGraphIDs[graphID]){
+            terminal.printError(Text.NO_SUCH_GRAPH);
+            return true;
+          }
+
+          var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+          if (!jumpDescriptors[jdID]){
+            terminal.printError(Text.JUMPDESCRIPTOR_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+
+          if (!graphs[graphID]){
+            terminal.printError(Text.GRAPH_NOT_INSIDE_ACTIVE_SCENE);
+            return true;
+          }
+
+          for (var gid in steeringHandler.graphsByJumpDescriptors[jdID]){
+            if (gid == graphID){
+              terminal.printError(Text.JUMPDESCRIPTOR_ALREADY_INSERTED_TO_THE_GRAPH);
+              return true;
+            }
+          }
+
+          if (steeringHandler.insertJumpDescriptorToGraph(jdID, graphID)){
+            terminal.printInfo(Text.JUMPDESCRIPTOR_INSERTED_INTO_THE_GRAPH);
+          }else{
+            terminal.printError(Text.JUMPDESCRIPTOR_IS_NOT_ON_THE_GRAPH);
+          }
+
+          if (steeringHandler.debugHelper){
+            steeringHandler.switchDebugMode();
+            steeringHandler.switchDebugMode();
+          }
+
+          return true;
+        break;
+        case 251: //mergeGraphs
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var graphID = splitted[1];
+          if (steeringHandler.usedGraphIDs[graphID]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          var splittedGraphIDs = splitted[2].split(",");
+          var ary = [];
+          var graphsAry = [];
+          for (var i = 0; i < splittedGraphIDs.length; i ++){
+            if (splittedGraphIDs[i].indexOf("*") >= 0){
+              var idSplitted = splittedGraphIDs[i].split("*");
+              for (var gid in steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()]){
+                if (gid.toLowerCase().startsWith(idSplitted[0].toLowerCase())){
+                  ary.push(gid);
+                }
+              }
+            }else{
+              if (!steeringHandler.usedGraphIDs[splittedGraphIDs[i]]){
+                terminal.printError(Text.GRAPH_X_DOES_NOT_EXIST.replace(Text.PARAM1, i));
+                return true;
+              }
+              var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+              if (!graphs[splittedGraphIDs[i]]){
+                terminal.printError(Text.GRAPH_X_NOT_IN_ACTIVE_SCENE.replace(Text.PARAM1, i));
+                return true;
+              }
+
+              ary.push(splittedGraphIDs[i]);
+            }
+
+            for (var i2 = 0; i2 < ary.length; i2 ++){
+              if (graphsAry.indexOf(ary[i2]) < 0){
+                graphsAry.push(ary[i2]);
+              }
+            }
+          }
+
+          if (graphsAry.length < 2){
+            terminal.printError(Text.MUST_MERGE_AT_LEAST_2_GRAPHS);
+            return true;
+          }
+
+          steeringHandler.mergeGraphs(graphID, graphsAry);
+          terminal.printInfo(Text.GRAPHS_MERGED);
+          return true;
+        break;
+        case 252: //steeringBehaviors
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          steeringBehaviorCreatorGUIHandler.show();
+          return true;
+        break;
+        case 253: //assignSteeringBehavior
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+
+          if (!obj.steerableInfo){
+            terminal.printError(Text.OBJECT_IS_NOT_A_STEERABLE);
+            return true;
+          }
+
+          var allBehaviorsInScene = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var behavior = allBehaviorsInScene[splitted[2]];
+
+          if (!behavior){
+            terminal.printError(Text.NO_SUCH_BEHAVIOR);
+            return true;
+          }
+
+          if (obj.steerableInfo.behaviorsByID[splitted[2]]){
+            terminal.printError(Text.BEHAVIOR_ALREADY_ASSIGNED_TO_THE_OBJECT);
+            return true;
+          }
+
+          obj.steerableInfo.behaviorsByID[splitted[2]] = behavior;
+          selectionHandler.resetCurrentSelection();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.BEHAVIOR_ASSIGNED_TO_THE_OBJECT);
+          }
+          return true;
+        break;
+        case 254: //unassignSteeringBehavior
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+
+          if (!obj.steerableInfo){
+            terminal.printError(Text.OBJECT_IS_NOT_A_STEERABLE);
+            return true;
+          }
+
+          var allBehaviorsInScene = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var behavior = allBehaviorsInScene[splitted[2]];
+
+          if (!behavior){
+            terminal.printError(Text.NO_SUCH_BEHAVIOR);
+            return true;
+          }
+
+          if (!obj.steerableInfo.behaviorsByID[splitted[2]]){
+            terminal.printError(Text.BEHAVIOR_IS_NOT_ASSIGNED_TO_THIS_OBJECT);
+            return true;
+          }
+
+          delete obj.steerableInfo.behaviorsByID[splitted[2]];
+          selectionHandler.resetCurrentSelection();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.BEHAVIOR_UNASSIGNED);
+          }
+          return true;
+        break;
+        case 255: //newAStar
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var aStarID = splitted[1];
+          var graphID = splitted[2];
+
+          if (steeringHandler.usedAStarIDs[aStarID] || steeringHandler.usedPathIDs[aStarID]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          if (!graphs[graphID]){
+            terminal.printError(Text.NO_SUCH_GRAPH_IN_CURRENT_SCENE);
+            return true;
+          }
+
+          steeringHandler.addAStar(aStarID, graphID);
+          terminal.printInfo(Text.ASTAR_CREATED);
+          return true;
+        break;
+        case 256: //destroyAStar
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          var astars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          if (!astars[splitted[1]]){
+            terminal.printError(Text.NO_SUCH_ASTAR_IN_CURRENT_SCENE);
+            return true;
+          }
+
+          var behaviors = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          for (var bid in behaviors){
+            var behavior = behaviors[bid];
+            if (behavior.parameters.type == steeringHandler.steeringBehaviorTypes.PATH_FOLLOWING){
+              if (behavior.parameters.pathID == splitted[1]){
+                terminal.printError(Text.ASTAR_USED_IN_BEHAVIOR.replace(Text.PARAM1, bid));
+                return true;
+              }
+            }
+          }
+
+          steeringHandler.removeAStar(splitted[1]);
+
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.ASTAR_DESTROYED);
+          }
+          return true;
+        break;
+        case 257: //printAStars
+          var count = 0;
+          var astars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var totalCount = Object.keys(astars).length;
+          terminal.printHeader(Text.ASTARS_IN_THIS_SCENE);
+          for (var id in astars){
+            count ++;
+            var astar = astars[id];
+            var graphID = steeringHandler.graphIDsByAStars[id];
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, id).replace(Text.PARAM2, graphID), count != totalCount);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_ASTARS_IN_THIS_SCENE);
+          }
+          return true;
+        break;
+        case 258: //jumpDescriptors
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          jumpDescriptorCreatorGUIHandler.show();
           return true;
         break;
       }

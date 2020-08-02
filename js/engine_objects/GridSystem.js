@@ -418,6 +418,33 @@ GridSystem.prototype.export = function(){
   return exportObject;
 }
 
+GridSystem.prototype.getNeighbourGridsOfGrid = function(grid){
+  var rowNumber = grid.rowNumber;
+  var colNumber = grid.colNumber;
+
+  var neighbours = [];
+
+  var g1 = this.getGridByColRow(colNumber - 1, rowNumber - 1);
+  var g2 = this.getGridByColRow(colNumber, rowNumber -1);
+  var g3 = this.getGridByColRow(colNumber + 1, rowNumber - 1);
+  var g4 = this.getGridByColRow(colNumber - 1, rowNumber);
+  var g5 = this.getGridByColRow(colNumber + 1, rowNumber);
+  var g6 = this.getGridByColRow(colNumber - 1, rowNumber + 1);
+  var g7 = this.getGridByColRow(colNumber, rowNumber + 1);
+  var g8 = this.getGridByColRow(colNumber + 1, rowNumber + 1);
+
+  if (g1){ neighbours.push(g1); }
+  if (g2){ neighbours.push(g2); }
+  if (g3){ neighbours.push(g3); }
+  if (g4){ neighbours.push(g4); }
+  if (g5){ neighbours.push(g5); }
+  if (g6){ neighbours.push(g6); }
+  if (g7){ neighbours.push(g7); }
+  if (g8){ neighbours.push(g8); }
+
+  return neighbours;
+}
+
 GridSystem.prototype.getGridByColRow = function(col, row){
   return this.gridsByColRow[col+"_"+row];
 }
@@ -561,6 +588,67 @@ GridSystem.prototype.crop = function(grid1, grid2){
   if (!isDeployment){
     terminal.printInfo(Text.GS_CROPPED);
   }
+}
+
+GridSystem.prototype.newAIObstacle = function(selections, obstacleID, height){
+  var boxCenterX, boxCenterY, boxCenterZ, boxSizeX, boxSizeY, boxSizeZ;
+  if (selections.length == 1){
+    var grid = selections[0];
+    boxCenterX = grid.centerX;
+    boxCenterZ = grid.centerZ;
+    boxSizeX = this.cellSize;
+    boxSizeZ = this.cellSize;
+  }else{
+    var grid1 = selections[0];
+    var grid2 = selections[1];
+    boxCenterX = (grid1.centerX + grid2.centerX) / 2;
+    boxCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+    boxSizeX = (Math.abs(grid1.colNumber - grid2.colNumber) + 1) * this.cellSize;
+    boxSizeZ = (Math.abs(grid1.rowNumber - grid2.rowNumber) + 1) * this.cellSize;
+  }
+
+  boxCenterY = this.centerY + (height / 2);
+  boxSizeY = Math.abs(height);
+
+  if (this.axis == "XY"){
+    var tmp = boxSizeY;
+    boxSizeY = boxSizeZ;
+    boxSizeZ = tmp;
+    boxCenterZ = this.centerZ + (height / 2);
+    if (selections.length == 1){
+        var grid = selections[0];
+        boxCenterY = grid.centerY;
+    }else{
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      boxCenterY = (grid1.centerY + grid2.centerY) / 2;
+    }
+  }else if (this.axis == "YZ"){
+    var oldX = boxSizeX;
+    var oldY = boxSizeY;
+    var oldZ = boxSizeZ;
+    boxSizeZ = oldX;
+    boxSizeX = oldY;
+    boxSizeY = oldZ;
+    if (selections.length == 1){
+      var grid = selections[0];
+      boxCenterY = grid.centerY;
+      boxCenterZ = grid.centerZ;
+      boxCenterX = grid.centerX + (height / 2);
+    }else{
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      boxCenterY = (grid1.centerY + grid2.centerY) / 2;
+      boxCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+      boxCenterX = grid1.centerX + (height / 2);
+    }
+  }
+
+  for (var i = 0; i<selections.length; i++){
+    selections[i].toggleSelect(false, false, false, true);
+  }
+
+  steeringHandler.addObstacle(obstacleID, new Kompute.Vector3D(boxCenterX, boxCenterY, boxCenterZ), new Kompute.Vector3D(boxSizeX, boxSizeY, boxSizeZ));
 }
 
 GridSystem.prototype.newArea = function(name, height, selections){

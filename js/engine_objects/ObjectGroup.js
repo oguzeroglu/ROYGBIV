@@ -38,6 +38,47 @@ var ObjectGroup = function(name, group){
   this.matrixCache = new THREE.Matrix4();
 }
 
+ObjectGroup.prototype.makeSteerable = function(mode, maxSpeed, maxAcceleration, jumpSpeed, lookSpeed){
+  this.steerableInfo = {
+    mode: mode,
+    maxSpeed: maxSpeed,
+    maxAcceleration: maxAcceleration,
+    jumpSpeed: jumpSpeed,
+    lookSpeed: lookSpeed,
+    behaviorsByID: {}
+  };
+  this.steerable = steeringHandler.createSteerableFromObject(this);
+}
+
+ObjectGroup.prototype.unmakeSteerable = function(){
+  delete this.steerableInfo;
+  delete this.steerable;
+  steeringHandler.removeSteerable(this);
+}
+
+ObjectGroup.prototype.addSteeringBehavior = function(id, behavior){
+  this.steerableInfo.behaviorsByID[id] = behavior;
+}
+
+ObjectGroup.prototype.unUseAsAIEntity = function(){
+  steeringHandler.unUseObjectGroupAsAIEntity(this);
+  this.usedAsAIEntity = false;
+  for (var childName in this.group){
+    this.group[childName].usedAsAIEntity = false;
+  }
+}
+
+ObjectGroup.prototype.useAsAIEntity = function(){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+  var res = steeringHandler.useObjectGroupAsAIEntity(this);
+  this.usedAsAIEntity = res;
+  for (var childName in this.group){
+    this.group[childName].usedAsAIEntity = res;
+  }
+  return res;
+}
 
 ObjectGroup.prototype.refreshTextureRange = function(context){
   var childLen = Object.keys(this.group).length;
@@ -161,6 +202,7 @@ ObjectGroup.prototype.onAfterRotationAnimation = function(){
     physicsWorld.updateObject(this, true, true);
   }
   rayCaster.updateObject(this);
+  steeringHandler.updateObject(this);
 }
 
 ObjectGroup.prototype.isAnimationSuitable = function(animation){
@@ -511,6 +553,7 @@ ObjectGroup.prototype.show = function(){
     }
     this.isHidden = false;
     rayCaster.show(this);
+    steeringHandler.show(this);
   }
 }
 
@@ -543,6 +586,7 @@ ObjectGroup.prototype.hide = function(keepPhysics){
     }
     this.isHidden = true;
     rayCaster.hide(this);
+    steeringHandler.hide(this);
   }
 }
 
@@ -565,6 +609,8 @@ ObjectGroup.prototype.onPositionChange = function(from, to){
       }
     }
   }
+
+  steeringHandler.updateObject(this);
 }
 
 ObjectGroup.prototype.forceColor = function(r, g, b, a){
@@ -2059,6 +2105,12 @@ ObjectGroup.prototype.glue = function(simplifiedChildrenPhysicsBodies){
   var hasAnyPhysicsShape = false;
   for (var objectName in group){
     var addedObject = group[objectName];
+    if (addedObject.usedAsAIEntity){
+      addedObject.unUseAsAIEntity();
+    }
+    if (addedObject.steerableInfo){
+      addedObject.unmakeSteerable();
+    }
     addedObject.setAttachedProperties();
     if (addedObject.isFPSWeapon){
       addedObject.resetFPSWeaponProperties();
@@ -2193,6 +2245,15 @@ ObjectGroup.prototype.destroyParts = function(){
 }
 
 ObjectGroup.prototype.detach = function(childrenNoPhysicsContribution){
+
+  if (this.usedAsAIEntity){
+    this.unUseAsAIEntity();
+  }
+
+  if (this.steerableInfo){
+    this.unmakeSteerable();
+  }
+
   this.graphicsGroup.position.copy(this.mesh.position);
   this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
   this.graphicsGroup.updateMatrixWorld();
@@ -2324,6 +2385,10 @@ ObjectGroup.prototype.detach = function(childrenNoPhysicsContribution){
     addedObject.mesh.updateMatrixWorld(true);
     addedObject.updateBoundingBoxes();
 
+    if (addedObject.usedAsAIEntity){
+      steeringHandler.updateObject(addedObject);
+    }
+
     if (typeof childrenNoPhysicsContribution == UNDEFINED){
       addedObject.noPhysicsContributionWhenGlued = false;
     }else{
@@ -2383,8 +2448,12 @@ ObjectGroup.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector,
   }else{
     this.updateSimplifiedPhysicsBody();
   }
+
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
+
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 
@@ -2407,8 +2476,12 @@ ObjectGroup.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
   }else{
     this.updateSimplifiedPhysicsBody();
   }
+
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
+
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 
@@ -2444,6 +2517,7 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
   }
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 
@@ -2483,6 +2557,7 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   this.graphicsGroup.position.copy(this.mesh.position);
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 
@@ -2500,6 +2575,7 @@ ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
     }
     this.group[name].dispose();
     delete disabledObjectNames[name];
+    steeringHandler.removeObstacle(name);
   }
   this.mesh.material.dispose();
   this.mesh.geometry.dispose();
@@ -2507,7 +2583,6 @@ ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
   if (!skipRaycasterRefresh){
     rayCaster.refresh();
   }
-
 }
 
 ObjectGroup.prototype.exportLightweight = function(){
@@ -2726,6 +2801,22 @@ ObjectGroup.prototype.export = function(){
   }
 
   exportObj.affectedByLight = this.affectedByLight;
+  exportObj.usedAsAIEntity = this.usedAsAIEntity;
+
+  if (this.steerableInfo){
+    exportObj.steerableInfo = {
+      mode: this.steerableInfo.mode,
+      maxSpeed: this.steerableInfo.maxSpeed,
+      maxAcceleration: this.steerableInfo.maxAcceleration,
+      jumpSpeed: this.steerableInfo.jumpSpeed,
+      lookSpeed: this.steerableInfo.lookSpeed,
+      behaviorIDs: []
+    };
+    for (var behaviorID in this.steerableInfo.behaviorsByID){
+      exportObj.steerableInfo.behaviorIDs.push(behaviorID);
+    }
+  }
+
   return exportObj;
 }
 
@@ -3031,6 +3122,7 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
 
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
   for (var animName in this.animations){
     var anim = this.animations[animName];

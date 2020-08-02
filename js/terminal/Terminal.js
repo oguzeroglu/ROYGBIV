@@ -818,6 +818,102 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Dynamic texture folder name]: ";
 			break;
+			case commandDescriptor.AI_OBSTACLE_ID:
+				var obstacles = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()];
+				if (obstacles){
+					for (var id in obstacles){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}
+					}
+				}
+				helpString = "[AI Obstacle ids]: ";
+			break;
+			case commandDescriptor.JUMP_DESCRIPTOR_ID:
+				var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()];
+				if (jumpDescriptors){
+					for (var id in jumpDescriptors){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}
+					}
+				}
+				helpString = "[Jump descriptor ids]: ";
+			break;
+			case commandDescriptor.ANY_MARKED_POINT:
+				var splittedEntry = curEntry.split(",");
+				for (var ptName in sceneHandler.getMarkedPoints()){
+					var found = false;
+					for (var i = 0; i<splittedEntry.length; i++){
+						if (splittedEntry[i] == ptName){
+							found = true;
+						}
+					}
+					if (!found){
+						possibilities.push(ptName);
+					}
+				}
+				replaceCommand = false;
+				helpString = "[Points]: ";
+			break;
+			case commandDescriptor.PATH_ID:
+				var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()];
+				if (paths){
+					for (var id in paths){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}
+					}
+				}
+				helpString = "[Paths]: ";
+			break;
+			case commandDescriptor.GRAPH_ID:
+				var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()];
+				if (graphs){
+					for (var id in graphs){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}
+					}
+				}
+				helpString = "[Graphs]: ";
+			break;
+			case commandDescriptor.ANY_GRAPH_ID:
+				var splittedEntry = curEntry.split(",");
+				for (var graphID in steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()]){
+					var found = false;
+					for (var i = 0; i<splittedEntry.length; i++){
+						if (splittedEntry[i] == graphID){
+							found = true;
+						}
+					}
+					if (!found){
+						possibilities.push(graphID);
+					}
+				}
+				replaceCommand = false;
+				helpString = "[Graphs]: ";
+			break;
+			case commandDescriptor.STEERING_BEHAVIOR_NAME:
+				var behaviors = steeringHandler.behaviorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+				for (var name in behaviors){
+					if (name.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(name);
+					}
+				}
+				helpString = "[Steering behaviors]: ";
+			break;
+			case commandDescriptor.ASTAR_ID:
+				var astars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()];
+				if (astars){
+					for (var id in astars){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}
+					}
+				}
+				helpString = "[AStars]: ";
+			break;
 		}
 
 		//  **********************************************************

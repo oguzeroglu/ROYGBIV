@@ -107,6 +107,24 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyDynamicTextureFolderCommand();
     }else if (this.splitted[0] == "syncanimations"){
       this.handleSyncAnimationsCommand();
+    }else if (this.splitted[0] == "newaiobstacle"){
+      this.handleNewAIObstacleCommand();
+    }else if (this.splitted[0] == "destroyaiobstacle"){
+      this.handleDestroyAIObstacleCommand();
+    }else if (this.splitted[0] == "aientity"){
+      this.handleAIEntityCommand();
+    }else if (this.splitted[0] == "destroyjumpdescriptor"){
+      this.handleDestroyJumpDescriptorCommand();
+    }else if (this.splitted[0] == "destroypath"){
+      this.handleDestroyPathCommand();
+    }else if (this.splitted[0] == "destroygraph"){
+      this.handleDestroyGraphCommand();
+    }else if (this.splitted[0] == "assignsteeringbehavior"){
+      this.handleAssignSteeringBehaviorCommand();
+    }else if (this.splitted[0] == "unassignsteeringbehavior"){
+      this.handleUnassignSteeringBehaviorCommand();
+    }else if (this.splitted[0] == "destroyastar"){
+      this.handleDestroyAStarCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -115,8 +133,196 @@ JobHandler.prototype.handle = function(previewModeCommand){
     console.error(err);
   }
   // because async
-  if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
+  if (this.splitted[0] != "autoconfigurearea"){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyAStarCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  var aStars = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  for (var id in aStars){
+    if (id.toLowerCase().startsWith(idPrefix.toLowerCase())){
+      parseCommand("destroyAStar " + id);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_ASTARS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_ASTARS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleUnassignSteeringBehaviorCommand = function(){
+  var namePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  for (var objName in sceneHandler.getAddedObjects()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("unassignSteeringBehavior " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  for (var objName in sceneHandler.getObjectGroups()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("unassignSteeringBehavior " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBJECT_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleAssignSteeringBehaviorCommand = function(){
+  var namePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  for (var objName in sceneHandler.getAddedObjects()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("assignSteeringBehavior " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  for (var objName in sceneHandler.getObjectGroups()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("assignSteeringBehavior " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBJECT_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleDestroyGraphCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  for (var id in graphs){
+    if (id.toLowerCase().startsWith(idPrefix.toLowerCase())){
+      parseCommand("destroyGraph " + id);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_GRAPHS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_GRAPHS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleDestroyPathCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  for (var id in paths){
+    if (id.toLowerCase().startsWith(idPrefix.toLowerCase())){
+      parseCommand("destroyPath " + id);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_PATHS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_PATHS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleDestroyJumpDescriptorCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  for (var id in jumpDescriptors){
+    if (id.toLowerCase().startsWith(idPrefix.toLowerCase())){
+      parseCommand("destroyJumpDescriptor " + id);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_JUMPDESCRIPTORS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_JUMPDESCRIPTORS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleAIEntityCommand = function(){
+  var namePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var objName in sceneHandler.getAddedObjects()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("aiEntity " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+  for (var objName in sceneHandler.getObjectGroups()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("aiEntity " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBJECT_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleDestroyAIObstacleCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  var obstacles = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()];
+  if (obstacles){
+    for (var id in obstacles){
+      if (id.startsWith(idPrefix)){
+        parseCommand("destroyAIObstacle "+id);
+        ctr ++
+      }
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBSTACLES_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBSTACLES.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleNewAIObstacleCommand = function(){
+  var obstacleIDPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var gridName in gridSelections){
+    jobHandlerSelectedGrid = gridSelections[gridName];
+    parseCommand("newAIObstacle "+obstacleIDPrefix+"_"+ctr+" "+this.splitted[2]);
+    ctr ++;
+  }
+  jobHandlerSelectedGrid = 0;
+  if (ctr != 0){
+    terminal.printInfo(Text.CREATED_X_AI_OBSTACLES.replace(Text.PARAM1, ctr));
+  }else{
+    terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
   }
 }
 

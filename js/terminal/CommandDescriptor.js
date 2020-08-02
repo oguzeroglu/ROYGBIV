@@ -234,7 +234,32 @@ var CommandDescriptor = function(){
       2, //syncAnimations
       0, //lights
       1, //setAcceptedTextureSize
-      0 //printAcceptedTextureSize
+      0, //printAcceptedTextureSize
+      0, //switchAIDebugMode
+      2, //newAIObstacle
+      1, //destroyAIObstacle
+      0, //printAIObstacles
+      2, //aiEntity
+      6, //newJumpDescriptor
+      1, //destroyJumpDescriptor
+      0, //printJumpDescriptors
+      4, //newPath
+      1, //destroyPath
+      0, //printPaths
+      2, //insertJumpDescriptorToPath
+      4, //constructGraph
+      1, //destroyGraph
+      0, //printGraphs
+      2, //newGraph
+      2, //insertJumpDescriptorToGraph
+      2, //mergeGraphs
+      0, //steeringBehaviors
+      2, //assignSteeringBehavior
+      2, //unassignSteeringBehavior
+      2, //newAStar
+      1, //destroyAStar
+      0, //printAStars
+      0 //jumpDescriptors
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -471,7 +496,32 @@ var CommandDescriptor = function(){
     "syncAnimations sourceName targetName",
     "lights",
     "setAcceptedTextureSize textureSize",
-    "printAcceptedTextureSize"
+    "printAcceptedTextureSize",
+    "switchAIDebugMode",
+    "newAIObstacle id height",
+    "destroyAIObstacle id",
+    "printAIObstacles",
+    "aiEntity objectName on/off",
+    "newJumpDescriptor id takeoffPoint landingPoint runupSatisfactionRadius takeoffPositionSatisfactionRadius takeoffVelocitySatisfactionRadius",
+    "destroyJumpDescriptor id",
+    "printJumpDescriptors",
+    "newPath id point[0],point[1],....point[n] loop rewind",
+    "destroyPath id",
+    "printPaths",
+    "insertJumpDescriptorToPath jumpDescriptorID pathID",
+    "constructGraph id offsetX offsetY offsetZ",
+    "destroyGraph id",
+    "printGraphs",
+    "newGraph id point[0],point[1],....point[n]",
+    "insertJumpDescriptorToGraph jumpDescriptorID graphID",
+    "mergeGraphs mergedGraphID id[0],id[1],.....id[n]",
+    "steeringBehaviors",
+    "assignSteeringBehavior objectName steeringBehaviorName",
+    "unassignSteeringBehavior objectName steeringBehaviorName",
+    "newAStar astarID graphID",
+    "destroyAStar id",
+    "printAStars",
+    "jumpDescriptors"
   ];
 
   this.commands = [
@@ -708,7 +758,32 @@ var CommandDescriptor = function(){
     "syncAnimations",
     "lights",
     "setAcceptedTextureSize",
-    "printAcceptedTextureSize"
+    "printAcceptedTextureSize",
+    "switchAIDebugMode",
+    "newAIObstacle",
+    "destroyAIObstacle",
+    "printAIObstacles",
+    "aiEntity",
+    "newJumpDescriptor",
+    "destroyJumpDescriptor",
+    "printJumpDescriptors",
+    "newPath",
+    "destroyPath",
+    "printPaths",
+    "insertJumpDescriptorToPath",
+    "constructGraph",
+    "destroyGraph",
+    "printGraphs",
+    "newGraph",
+    "insertJumpDescriptorToGraph",
+    "mergeGraphs",
+    "steeringBehaviors",
+    "assignSteeringBehavior",
+    "unassignSteeringBehavior",
+    "newAStar",
+    "destroyAStar",
+    "printAStars",
+    "jumpDescriptors"
   ];
 
   this.commandInfo = [
@@ -945,7 +1020,32 @@ var CommandDescriptor = function(){
     "syncAnimations: Resets animations of target text/object/sprite and copies each animation of source to target.",
     "lights: Opens the light editing GUI.",
     "setAcceptedTextureSize: Sets the texture size accepted by the engine.",
-    "printAcceptedTextureSize: Prints the texture size accepted by the engine."
+    "printAcceptedTextureSize: Prints the texture size accepted by the engine.",
+    "switchAIDebugMode: Switches AI debug mode (on/off)",
+    "newAIObstacle: Creates a new AI obstacle.",
+    "destroyAIObstacle: Destroys an AI obstacle of given id.",
+    "printAIObstacles: Prints created AI obstacles.",
+    "aiEntity: Sets/unsets an object as AI entity.",
+    "newJumpDescriptor: Creates a new jump descriptor.",
+    "destroyJumpDescriptor: Destroys a jump descriptor of given id.",
+    "printJumpDescriptors: Prints created jump descriptors.",
+    "newPath: Creates a new path from given waypoints.",
+    "destroyPath: Destroys a path of given id.",
+    "printPaths: Prints created paths.",
+    "insertJumpDescriptorToPath: Inserts a jump descriptor to a path.",
+    "constructGraph: Automatically constructs a graph from selected grids.",
+    "destroyGraph: Destroys a graph of given id.",
+    "printGraphs: Prints created graphs.",
+    "newGraph: Opens graph creation GUI to manually create a graph from given vertices.",
+    "insertJumpDescriptorToGraph: Inserts a jump descriptor to a graph.",
+    "mergeGraphs: Creates a new graph by merging given graphs.",
+    "steeringBehaviors: Shows the steering behavior configuration GUI.",
+    "assignSteeringBehavior: Assigns a steering behavior to an object.",
+    "unassignSteeringBehavior: Unassigns a steering behavior from an object.",
+    "newAStar: Creates a new AStar object from given graph.",
+    "destroyAStar: Destroys an AStar of given id.",
+    "printAStars: Prints a list of created AStar objects.",
+    "jumpDescriptors: Shows the jump descriptor configuration GUI."
   ];
 
   this.keyboardInfo = [
@@ -1025,7 +1125,10 @@ var CommandDescriptor = function(){
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
     128, //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
     146, //skyboxConfigurations -> Deprecated due to architectural changes in Skybox creation process.
-    147 //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
+    147, //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
+    239, //newJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
+    240, //destroyJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
+    241 //printJumpDescriptors -> Deprecated due to architectural changes in JumpDescriptor creation process.
   ];
 
   if (this.commandInfo.length != this.commands.length){
@@ -1090,6 +1193,14 @@ var CommandDescriptor = function(){
   this.VIRTUAL_KEYBOARD_NAME       =   44;
   this.RESOLUTION_PARAM            =   45;
   this.DYNAMIC_TEXTURE_FOLDER_NAME =   46;
+  this.AI_OBSTACLE_ID              =   47;
+  this.JUMP_DESCRIPTOR_ID          =   48;
+  this.ANY_MARKED_POINT            =   49;
+  this.PATH_ID                     =   50;
+  this.GRAPH_ID                    =   51;
+  this.ANY_GRAPH_ID                =   52;
+  this.STEERING_BEHAVIOR_NAME      =   53;
+  this.ASTAR_ID                    =   54;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1759,6 +1870,96 @@ var CommandDescriptor = function(){
   this.setAcceptedTextureSize = new Object();
   this.setAcceptedTextureSize.types = [];
   this.setAcceptedTextureSize.types.push(this.UNKNOWN_INDICATOR); //textureSize
+
+  // newAIObstacle
+  this.newAIObstacle = new Object();
+  this.newAIObstacle.types = [];
+  this.newAIObstacle.types.push(this.UNKNOWN_INDICATOR); //id
+  this.newAIObstacle.types.push(this.UNKNOWN_INDICATOR); //height
+
+  // destroyAIObstacle
+  this.destroyAIObstacle = new Object();
+  this.destroyAIObstacle.types = [];
+  this.destroyAIObstacle.types.push(this.AI_OBSTACLE_ID); //id
+
+  // aiEntity
+  this.aiEntity = new Object();
+  this.aiEntity.types = [];
+  this.aiEntity.types.push(this.OBJECT_NAME); //objectName
+  this.aiEntity.types.push(this.STATE_ON_OFF); //on/off
+
+  // newPath
+  this.newPath = new Object();
+  this.newPath.types = [];
+  this.newPath.types.push(this.UNKNOWN_INDICATOR); //id
+  this.newPath.types.push(this.ANY_MARKED_POINT); //point[0],point[1],....,point[n]
+  this.newPath.types.push(this.BOOLEAN); //loop
+  this.newPath.types.push(this.BOOLEAN); //rewind
+
+  // destroyPath
+  this.destroyPath = new Object();
+  this.destroyPath.types = [];
+  this.destroyPath.types.push(this.PATH_ID); //id
+
+  // insertJumpDescriptorToPath
+  this.insertJumpDescriptorToPath = new Object();
+  this.insertJumpDescriptorToPath.types = [];
+  this.insertJumpDescriptorToPath.types.push(this.JUMP_DESCRIPTOR_ID); //jumpDescriptorID
+  this.insertJumpDescriptorToPath.types.push(this.PATH_ID); //pathID
+
+  // constructGraph
+  this.constructGraph = new Object();
+  this.constructGraph.types = [];
+  this.constructGraph.types.push(this.UNKNOWN_INDICATOR); //id
+  this.constructGraph.types.push(this.UNKNOWN_INDICATOR); //offsetX
+  this.constructGraph.types.push(this.UNKNOWN_INDICATOR); //offsetY
+  this.constructGraph.types.push(this.UNKNOWN_INDICATOR); //offsetZ
+
+  // destroyGraph
+  this.destroyGraph = new Object();
+  this.destroyGraph.types = [];
+  this.destroyGraph.types.push(this.GRAPH_ID); //id
+
+  // newGraph
+  this.newGraph = new Object();
+  this.newGraph.types = [];
+  this.newGraph.types.push(this.UNKNOWN_INDICATOR); //id
+  this.newGraph.types.push(this.ANY_MARKED_POINT); //point[0],point[1],....,point[n]
+
+  // insertJumpDescriptorToGraph
+  this.insertJumpDescriptorToGraph = new Object();
+  this.insertJumpDescriptorToGraph.types = [];
+  this.insertJumpDescriptorToGraph.types.push(this.JUMP_DESCRIPTOR_ID); //jumpDescriptorID
+  this.insertJumpDescriptorToGraph.types.push(this.GRAPH_ID); //graphID
+
+  // mergeGraphs
+  this.mergeGraphs = new Object();
+  this.mergeGraphs.types = [];
+  this.mergeGraphs.types.push(this.UNKNOWN_INDICATOR); //mergedGraphID
+  this.mergeGraphs.types.push(this.ANY_GRAPH_ID); //id[0],id[1],.....id[n]
+
+  // assignSteeringBehavior
+  this.assignSteeringBehavior = new Object();
+  this.assignSteeringBehavior.types = [];
+  this.assignSteeringBehavior.types.push(this.OBJECT_NAME); //objectName
+  this.assignSteeringBehavior.types.push(this.STEERING_BEHAVIOR_NAME); //steeringBehaviorName
+
+  // unassignSteeringBehavior
+  this.unassignSteeringBehavior = new Object();
+  this.unassignSteeringBehavior.types = [];
+  this.unassignSteeringBehavior.types.push(this.OBJECT_NAME); //objectName
+  this.unassignSteeringBehavior.types.push(this.STEERING_BEHAVIOR_NAME); //steeringBehaviorName
+
+  // newAStar
+  this.newAStar = new Object();
+  this.newAStar.types = [];
+  this.newAStar.types.push(this.UNKNOWN_INDICATOR); //astarID
+  this.newAStar.types.push(this.GRAPH_ID); //graphID
+
+  // destroyAStar
+  this.destroyAStar = new Object();
+  this.destroyAStar.types = [];
+  this.destroyAStar.types.push(this.ASTAR_ID); //id
 };
 
 CommandDescriptor.prototype.test = function(){

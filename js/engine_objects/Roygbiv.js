@@ -22,6 +22,7 @@
 //  * Virtual keyboard functions
 //  * Script related functions
 //  * Networking functions
+//  * AI functions
 var Roygbiv = function(){
   this.functionNames = [
     "getObject",
@@ -273,7 +274,24 @@ var Roygbiv = function(){
     "updateLightColor",
     "updateLightDirection",
     "updateLightPosition",
-    "attachPointLightToObject"
+    "attachPointLightToObject",
+    "setSteeringBehavior",
+    "stopSteerable",
+    "setSteerableTargetPosition",
+    "unsetSteerableTargetPosition",
+    "setSteerableLookTarget",
+    "getAStar",
+    "findShortestPath",
+    "hideFrom",
+    "stopHiding",
+    "pursue",
+    "evade",
+    "stopPursuing",
+    "stopEvading",
+    "getJumpDescriptor",
+    "jump",
+    "setPathFinishListener",
+    "removePathFinishListener"
   ];
 
   this.globals = new Object();
@@ -721,6 +739,34 @@ Roygbiv.prototype.getDynamicLight = function(dynamicLightName){
   }
   preConditions.checkIfDefined(ROYGBIV.getDynamicLight, preConditions.dynamicLightName, dynamicLightName);
   return lightHandler.dynamicLights[dynamicLightName] || 0;
+}
+
+// Returns an AStar object or 0 if AStar does not exist.
+Roygbiv.prototype.getAStar = function(aStarName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getAStar, preConditions.aStarName, aStarName);
+  var aStar = steeringHandler.usedAStarIDs[aStarName];
+  if (aStar){
+    preConditions.checkIfAStarInActiveScene(ROYGBIV.getAStar, aStarName);
+    return aStar;
+  }
+  return 0;
+}
+
+// Returns a JumpDescriptor object or 0 if JumpDescriptor does not exist.
+Roygbiv.prototype.getJumpDescriptor = function(jdName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getJumpDescriptor, preConditions.jdName, jdName);
+  var jumpDescriptor = steeringHandler.usedJumpDescriptorIDs[jdName];
+  if (jumpDescriptor){
+    preConditions.checkIfJumpDescriptorInActiveScene(ROYGBIV.getJumpDescriptor, jdName);
+    return jumpDescriptor;
+  }
+  return 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -2462,6 +2508,46 @@ Roygbiv.prototype.removeLocationHashChangeListener = function(){
   hashChangeCallbackFunction = noop;
 }
 
+// Sets a path finish listener for PathFollowingBehavior of given steerable object.
+// The callbackFunction is executed when the path of given PathFollowingBehavior
+// is consumed.
+Roygbiv.prototype.setPathFinishListener = function(object, behaviorName, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.setPathFinishListener, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setPathFinishListener, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfDefined(ROYGBIV.setPathFinishListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setPathFinishListener, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setPathFinishListener, object);
+  preConditions.checkIfSteerable(ROYGBIV.setPathFinishListener, object);
+  preConditions.checkIfString(ROYGBIV.setPathFinishListener, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setPathFinishListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectHasBehavior(ROYGBIV.setPathFinishListener, object, behaviorName);
+  preConditions.checkIfPathFollowingBehavior(ROYGBIV.setPathFinishListener, object, behaviorName);
+
+  steeringHandler.setPathFinishListener(object, behaviorName, callbackFunction);
+}
+
+// Removes a path finish listener for PathFollowingBehavior of given steerable object.
+Roygbiv.prototype.removePathFinishListener = function(object, behaviorName){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removePathFinishListener, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.removePathFinishListener, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removePathFinishListener, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removePathFinishListener, object);
+  preConditions.checkIfSteerable(ROYGBIV.removePathFinishListener, object);
+  preConditions.checkIfString(ROYGBIV.removePathFinishListener, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfObjectHasBehavior(ROYGBIV.removePathFinishListener, object, behaviorName);
+  preConditions.checkIfPathFollowingBehavior(ROYGBIV.removePathFinishListener, object, behaviorName);
+
+  steeringHandler.removePathFinishListener(object, behaviorName);
+}
+
 // TEXT FUNCTIONS **************************************************************
 
 // Sets a text to a text object.
@@ -3542,6 +3628,244 @@ Roygbiv.prototype.onLatencyUpdated = function(callbackFunction){
   Rhubarb.onLatencyUpdated(callbackFunction);
 }
 
+// AI FUNCTIONS ****************************************************************
+
+// Sets the steering behavior of given object.
+Roygbiv.prototype.setSteeringBehavior = function(object, behaviorName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSteeringBehavior, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setSteeringBehavior, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteeringBehavior, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteeringBehavior, object);
+  preConditions.checkIfString(ROYGBIV.setSteeringBehavior, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfSteerable(ROYGBIV.setSteeringBehavior, object);
+  preConditions.checkIfObjectHasBehavior(ROYGBIV.setSteeringBehavior, object, behaviorName);
+
+  steeringHandler.setBehavior(object, behaviorName);
+}
+
+// Stops a steerable.
+Roygbiv.prototype.stopSteerable = function(object){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSteeringBehavior, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteeringBehavior, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteeringBehavior, object);
+  preConditions.checkIfSteerable(ROYGBIV.setSteeringBehavior, object);
+
+  steeringHandler.stopSteerable(object);
+}
+
+// Sets a target position of a steerable. Target position is consumed by these
+// steering behaviors:
+// * Seek
+// * Flee
+// * Arrive
+Roygbiv.prototype.setSteerableTargetPosition = function(object, positionVector){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.positionVector, positionVector);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteerableTargetPosition, object);
+  preConditions.checkIfSteerable(ROYGBIV.setSteerableTargetPosition, object);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableTargetPosition, preConditions.positionVector, positionVector);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.setSteerableTargetPosition, object);
+
+  steeringHandler.setTargetPosition(object, positionVector);
+}
+
+// Unsets a target position of a steerable set via setSteerableTargetPosition API.
+Roygbiv.prototype.unsetSteerableTargetPosition = function(object){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.unsetSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.unsetSteerableTargetPosition, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.unsetSteerableTargetPosition, object);
+  preConditions.checkIfSteerable(ROYGBIV.unsetSteerableTargetPosition, object);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.unsetSteerableTargetPosition, object);
+
+  steeringHandler.unsetTargetPosition(object);
+}
+
+// Makes a steerable look at given target position.
+Roygbiv.prototype.setSteerableLookTarget = function(object, targetVector){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSteerableLookTarget, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setSteerableLookTarget, preConditions.targetVector, targetVector);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteerableLookTarget, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteerableLookTarget, object);
+  preConditions.checkIfSteerable(ROYGBIV.setSteerableLookTarget, object);
+  preConditions.checkIfSteerableIsBeingUpdated(ROYGBIV.setSteerableLookTarget, object);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableLookTarget, preConditions.targetVector, targetVector);
+
+  steeringHandler.setLookTarget(object, targetVector);
+}
+
+// Calculates the shortest path between given points. This API returns nothing
+// as it automatically pipes the resulting path to the PathFollowingBehavior, if
+// the behavior is constructed with given AStar object. So use this API together
+// with the PathFollowingBehavior. If there's no nearby graph vertex of given
+// vectors, this API does not calculate any path. In that case increasing the world
+// bin size might help.
+Roygbiv.prototype.findShortestPath = function(aStar, fromVector, toVector){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.findShortestPath, preConditions.aStar, aStar);
+  preConditions.checkIfDefined(ROYGBIV.findShortestPath, preConditions.fromVector, fromVector);
+  preConditions.checkIfDefined(ROYGBIV.findShortestPath, preConditions.toVector, toVector);
+  preConditions.checkIfAStar(ROYGBIV.findShortestPath, aStar);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.findShortestPath, preConditions.fromVector, fromVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.findShortestPath, preConditions.toVector, toVector);
+
+  steeringHandler.calculateShortestPath(aStar, fromVector, toVector);
+}
+
+// Makes a steerable represented as hidingObject hide from another steerable
+// represented as targetObject. This API should be used with HideBehavior.
+Roygbiv.prototype.hideFrom = function(hidingObject, targetObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.hideFrom, preConditions.hidingObject, hidingObject);
+  preConditions.checkIfDefined(ROYGBIV.hideFrom, preConditions.targetObject, targetObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.hideFrom, preConditions.hidingObject, hidingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.hideFrom, preConditions.targetObject, targetObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.hideFrom, hidingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.hideFrom, targetObject);
+  preConditions.checkIfSteerable(ROYGBIV.hideFrom, hidingObject);
+  preConditions.checkIfSteerable(ROYGBIV.hideFrom, targetObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.hideFrom, hidingObject);
+
+  steeringHandler.makeSteerableHideFromSteerable(hidingObject, targetObject);
+}
+
+// Makes a steerable stop hiding from other entities. It makes sense to use this
+// API with HideBehavior, after using hideFrom API.
+Roygbiv.prototype.stopHiding = function(hidingObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.stopHiding, preConditions.hidingObject, hidingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopHiding, preConditions.hidingObject, hidingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopHiding, hidingObject);
+  preConditions.checkIfSteerable(ROYGBIV.stopHiding, hidingObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.stopHiding, hidingObject);
+
+  steeringHandler.makeSteerableStopHiding(hidingObject);
+}
+
+// Makes a steerable represented by pursuingObject chase another steerable
+// represented by targetObject. This API should be used with PursueBehavior.
+Roygbiv.prototype.pursue = function(pursuingObject, targetObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.pursue, preConditions.pursuingObject, pursuingObject);
+  preConditions.checkIfDefined(ROYGBIV.pursue, preConditions.targetObject, targetObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.pursue, preConditions.pursuingObject, pursuingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.pursue, preConditions.targetObject, targetObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.pursue, pursuingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.pursue, targetObject);
+  preConditions.checkIfSteerable(ROYGBIV.pursue, pursuingObject);
+  preConditions.checkIfSteerable(ROYGBIV.pursue, targetObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.pursue, pursuingObject);
+
+  steeringHandler.setTargetSteerable(pursuingObject, targetObject);
+}
+
+// Makes a steerable represented by evadingObject evade another steerable
+// represented by targetObject. This API should be used with EvadeBehavior.
+Roygbiv.prototype.evade = function(evadingObject, targetObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.evade, preConditions.evadingObject, evadingObject);
+  preConditions.checkIfDefined(ROYGBIV.evade, preConditions.targetObject, targetObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.evade, preConditions.evadingObject, evadingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.evade, preConditions.targetObject, targetObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.evade, evadingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.evade, targetObject);
+  preConditions.checkIfSteerable(ROYGBIV.evade, evadingObject);
+  preConditions.checkIfSteerable(ROYGBIV.evade, targetObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.evade, evadingObject);
+
+  steeringHandler.setTargetSteerable(evadingObject, targetObject);
+}
+
+// Makes a steerable stop pursuing other steerables. It makes sense to use this API
+// with PursueBehavior, after using pursue API.
+Roygbiv.prototype.stopPursuing = function(pursuingObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.stopPursuing, preConditions.pursuingObject, pursuingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopPursuing, preConditions.pursuingObject, pursuingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopPursuing, pursuingObject);
+  preConditions.checkIfSteerable(ROYGBIV.stopPursuing, pursuingObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.stopPursuing, pursuingObject);
+
+  steeringHandler.unsetTargetSteerable(pursuingObject);
+}
+
+// Makes a steerable stop evading other steerables. It makes sense to use this API
+// with EvadeBehavior, after using evade API.
+Roygbiv.prototype.stopEvading = function(evadingObject){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.stopEvading, preConditions.evadingObject, evadingObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopEvading, preConditions.evadingObject, evadingObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopEvading, evadingObject);
+  preConditions.checkIfSteerable(ROYGBIV.stopEvading, evadingObject);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.stopEvading, evadingObject);
+
+  steeringHandler.unsetTargetSteerable(evadingObject);
+}
+
+// Makes a steerable manually jump. toTakeoffBehaviorName parameter represents the
+// steering behavior used until the steerable reaches to the takeoff point.
+// completeCallback function is executed when the jump is completed. When a
+// jump is completed, a steering behavior needs to be set to the steerable in order
+// to continue the movement. Note that this API returns false if the jump described
+// by the jumpDescriptor is not achievable by given steerable, true otherwise.
+Roygbiv.prototype.jump = function(object, jumpDescriptor, toTakeoffBehaviorName, completeCallback){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.jump, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.jump, preConditions.jumpDescriptor, jumpDescriptor);
+  preConditions.checkIfDefined(ROYGBIV.jump, preConditions.toTakeoffBehaviorName, toTakeoffBehaviorName);
+  preConditions.checkIfDefined(ROYGBIV.jump, preConditions.completeCallback, completeCallback);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.jump, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.jump, object);
+  preConditions.checkIfSteerable(ROYGBIV.jump, object);
+  preConditions.checkIfJumpDescriptor(ROYGBIV.jump, jumpDescriptor);
+  preConditions.checkIfJumpDescriptorInActiveScene(ROYGBIV.jump, jumpDescriptor.roygbivName);
+  preConditions.checkIfString(ROYGBIV.jump, preConditions.toTakeoffBehaviorName, toTakeoffBehaviorName);
+  preConditions.checkIfObjectHasBehavior(ROYGBIV.jump, object, toTakeoffBehaviorName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.jump, preConditions.completeCallback, completeCallback);
+  preConditions.checkIfObjectIsJumping(ROYGBIV.jump, object);
+
+  return steeringHandler.jump(object, jumpDescriptor, toTakeoffBehaviorName, completeCallback);
+}
+
 // SCRIPT RELATED FUNCTIONS ****************************************************
 
 // Starts a script. To get scripts use this format as scriptName:
@@ -3883,6 +4207,8 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   preConditions.checkIfChangeable(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.trackObjectPosition, sourceObject);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.trackObjectPosition, targetObject);
+  preConditions.checkIfNotFPSWeapon(ROYGBIV.trackObjectPosition, sourceObject);
+  preConditions.checkIfNotSteerable(ROYGBIV.trackObjectPosition, sourceObject);
   sourceObject.trackObjectPosition(targetObject);
 }
 

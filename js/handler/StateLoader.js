@@ -113,6 +113,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importContainers(this.stateObj);
   this.importHandler.importVirtualKeyboards(this.stateObj);
   this.importHandler.importScenes(this.stateObj);
+  this.importHandler.importSteeringHandler(this.stateObj);
 
   this.closePhysicsWorkerIfNotUsed();
   this.closeRaycasterWorkerIfNotUsed();
@@ -123,6 +124,11 @@ StateLoader.prototype.finalize = function(){
 
 StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
   if (!isDeployment || !WORKERS_SUPPORTED || !RAYCASTER_WORKER_ON){
+
+    if (isDeployment && WORKERS_SUPPORTED && !RAYCASTER_WORKER_ON){
+      raycasterFactory.turnOffWorker();
+    }
+
     return;
   }
   var hasRaycasting = false;
@@ -182,6 +188,11 @@ StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
 
 StateLoader.prototype.closePhysicsWorkerIfNotUsed = function(){
   if (!isDeployment || !WORKERS_SUPPORTED || !PHYSICS_WORKER_ON){
+
+    if (isDeployment && WORKERS_SUPPORTED && !PHYSICS_WORKER_ON){
+      physicsFactory.turnOffWorker();
+    }
+
     return;
   }
   var hasPhyiscs = false;
@@ -329,6 +340,7 @@ StateLoader.prototype.resetProject = function(){
   fpsHandler.reset();
   animationHandler.reset();
   lightningHandler.reset();
+  steeringHandler.reset();
   fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;

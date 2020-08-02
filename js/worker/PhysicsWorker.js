@@ -7,6 +7,8 @@ importScripts("../engine_objects/CollisionInfo.js");
 
 var IS_WORKER_CONTEXT = true;
 
+var THREE = { Matrix4: function(){} };
+
 // CLASS DEFINITION
 var PhysicsWorker = function(){
   this.record = false;
@@ -157,7 +159,7 @@ PhysicsWorker.prototype.step = function(data){
     data.collisionDescription = collisionDescriptionArray;
   }
   var ary = data.objDescription;
-  for (var i = 0; i<ary.length; i+=19){
+  for (var i = 0; i<ary.length; i+=20){
     var obj = worker.objectsByID[ary[i]];
     obj.physicsBody.position.x = ary[i+1]; obj.physicsBody.position.y = ary[i+2]; obj.physicsBody.position.z = ary[i+3];
     obj.physicsBody.quaternion.x = ary[i+4]; obj.physicsBody.quaternion.y = ary[i+5]; obj.physicsBody.quaternion.z = ary[i+6]; obj.physicsBody.quaternion.w = ary[i+7];
@@ -179,9 +181,13 @@ PhysicsWorker.prototype.step = function(data){
         obj.hidden = true;
       }
     }
+    if(ary[i+19] == 1){
+      obj.physicsBody.angularVelocity.set(0, 0, 0);
+      ary[i+19] = 0;
+    }
   }
   physicsWorld.step(STEP);
-  for (var i = 0; i<ary.length; i+=19){
+  for (var i = 0; i<ary.length; i+=20){
     var obj = worker.objectsByID[ary[i]];
     ary[i+1] = obj.physicsBody.position.x; ary[i+2] = obj.physicsBody.position.y; ary[i+3] = obj.physicsBody.position.z;
     ary[i+4] = obj.physicsBody.quaternion.x; ary[i+5] = obj.physicsBody.quaternion.y; ary[i+6] = obj.physicsBody.quaternion.z; ary[i+7] = obj.physicsBody.quaternion.w;

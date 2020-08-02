@@ -5,7 +5,7 @@ var Preconditions = function(){
   this.targetVector = "targetVector";
   this.axis = "axis";
   this.markedPointName = "markedPointName";
-  this.targetVector = "targetVector";
+  this.positionVector = "positionVector";
   this.particleSystem = "particleSystem";
   this.time = "time";
   this.name = "name";
@@ -138,6 +138,7 @@ var Preconditions = function(){
   this.offsetY = "offsetY";
   this.offsetZ = "offsetZ";
   this.fromVector = "fromVector";
+  this.toVector = "toVector";
   this.directionVector = "directionVector";
   this.targetResultObject = "targetResultObject";
   this.vector1 = "vector1";
@@ -267,6 +268,17 @@ var Preconditions = function(){
   this.newPosX = "newPosX";
   this.newPosY = "newPosY";
   this.newPosZ = "newPosZ";
+  this.behaviorName = "behaviorName";
+  this.aStarName = "aStarName";
+  this.aStar = "aStar";
+  this.hidingObject = "hidingObject";
+  this.pursuingObject = "pursuingObject";
+  this.evadingObject = "evadingObject";
+  this.jdName = "jdName";
+  this.steerable = "steerable";
+  this.jumpDescriptor = "jumpDescriptor";
+  this.toTakeoffBehaviorName = "toTakeoffBehaviorName";
+  this.completeCallback = "completeCallback";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -275,6 +287,65 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfObjectIsJumping = function(callerFunc, object){
+  var steerable = object.steerable;
+
+  if (steerable.isJumpInitiated || steerable.isJumpReady || steerable.isJumpTakenOff){
+    this.throw(callerFunc, "Object is in the middle of a jump. Cannot use this API.");
+  }
+}
+
+Preconditions.prototype.checkIfJumpDescriptor = function(callerFunc, jumpDescriptor){
+  if (!(jumpDescriptor instanceof Kompute.JumpDescriptor)){
+    this.throw(callerFunc, "Object is not a JumpDescriptor");
+  }
+}
+
+Preconditions.prototype.checkIfAStar = function(callerFunc, aStar){
+  if (!aStar instanceof Kompute.AStar){
+    this.throw(callerFunc, "Object is not an AStar.");
+  }
+}
+
+Preconditions.prototype.checkIfJumpDescriptorInActiveScene = function(callerFunc, jdName){
+  var allJumpDescriptorsInScene = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()];
+  if (!(allJumpDescriptorsInScene && allJumpDescriptorsInScene[jdName])){
+    this.throw(callerFunc, "JumpDescriptor not in active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfAStarInActiveScene = function(callerFunc, aStarName){
+  var allAStarsInScene = steeringHandler.astarsBySceneName[sceneHandler.getActiveSceneName()];
+  if (!(allAStarsInScene && allAStarsInScene[aStarName])){
+    this.throw(callerFunc, "AStar not in active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfSteerableIsBeingUpdated = function(callerFunc, object){
+  if (!steeringHandler.activeSteerablesMap.get(object.name)){
+    this.throw(callerFunc, "Object has no active steering behavior.");
+  }
+}
+
+Preconditions.prototype.checkIfPathFollowingBehavior = function(callerFunc, object, behaviorName){
+  var constructedBehavior = object.constructedSteeringBehaviors[behaviorName];
+  if (!(constructedBehavior instanceof Kompute.PathFollowingBehavior)){
+    this.throw(callerFunc, "Behavior is not a PathFollowingBehavior.");
+  }
+}
+
+Preconditions.prototype.checkIfObjectHasBehavior = function(callerFunc, object, behaviorName){
+  if (!object.steerableInfo.behaviorsByID[behaviorName]){
+    this.throw(callerFunc, "Object does not have such steering behavior assigned.");
+  }
+}
+
+Preconditions.prototype.checkIfSteerable = function(callerFunc, object){
+  if (!object.steerableInfo){
+    this.throw(callerFunc, "Object is not a steerable.");
+  }
 }
 
 Preconditions.prototype.checkIfLightInActiveScene = function(callerFunc, light){
@@ -699,6 +770,18 @@ Preconditions.prototype.checkIfAddedObjectObjectGroupAddedText = function(caller
 Preconditions.prototype.checkIfAddedObjectObjectGroupAddedTextSprite = function(callerFunc, parameterName, obj){
   if (!(obj.isAddedObject) && !(obj.isObjectGroup) && !(obj.isAddedText) && !(obj.isSprite)){
     this.throw(callerFunc, parameterName+" must be an object, object group, text or sprite.");
+  }
+}
+
+Preconditions.prototype.checkIfNotSteerable = function(callerFunc, obj){
+  if (obj.steerableInfo){
+    this.throw(callerFunc, "Steerable objects do not support this API.");
+  }
+}
+
+Preconditions.prototype.checkIfNotFPSWeapon = function(callerFunc, obj){
+  if (obj.isFPSWeapon){
+    this.throw(callerFunc, "FPS weapon objects do not support this API.");
   }
 }
 

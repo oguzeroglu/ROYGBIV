@@ -303,6 +303,11 @@ Scene.prototype.unregisterDynamicObject = function(obj){
   }
 }
 
+Scene.prototype.resetDynamicObjects = function(){
+  this.dynamicObjects.clear();
+  this.dynamicObjectGroups.clear();
+}
+
 Scene.prototype.registerAutoInstancedObject = function(autoInstancedObject){
   this.autoInstancedObjects[autoInstancedObject.name] = autoInstancedObject;
 }

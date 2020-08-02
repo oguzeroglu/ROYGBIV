@@ -2,6 +2,32 @@ var ImportHandler = function(){
 
 }
 
+ImportHandler.prototype.importSteeringHandler = function(obj){
+  steeringHandler.import(obj.steeringHandler);
+
+  for (var objName in obj.addedObjects){
+    var steerableInfo = obj.addedObjects[objName].steerableInfo;
+    if (steerableInfo){
+      var addedObject = addedObjects[objName];
+      addedObject.makeSteerable(steerableInfo.mode, steerableInfo.maxSpeed, steerableInfo.maxAcceleration, steerableInfo.jumpSpeed, steerableInfo.lookSpeed);
+      for (var i = 0; i < steerableInfo.behaviorIDs.length; i ++){
+        addedObject.steerableInfo.behaviorsByID[steerableInfo.behaviorIDs[i]] = steeringHandler.usedBehaviorIDs[steerableInfo.behaviorIDs[i]];
+      }
+    }
+  }
+
+  for (var objName in obj.objectGroups){
+    var steerableInfo = obj.objectGroups[objName].steerableInfo;
+    if (steerableInfo){
+      var objectGroup = objectGroups[objName];
+      objectGroup.makeSteerable(steerableInfo.mode, steerableInfo.maxSpeed, steerableInfo.maxAcceleration, steerableInfo.jumpSpeed, steerableInfo.lookSpeed);
+      for (var i = 0; i < steerableInfo.behaviorIDs.length; i ++){
+        objectGroup.steerableInfo.behaviorsByID[steerableInfo.behaviorIDs[i]] = steeringHandler.usedBehaviorIDs[steerableInfo.behaviorIDs[i]];
+      }
+    }
+  }
+}
+
 ImportHandler.prototype.importScenes = function(obj){
   sceneHandler.import(obj.scenes);
 }
@@ -737,6 +763,8 @@ ImportHandler.prototype.importAddedObjects = function(obj){
        addedObjectInstance.setCustomDisplacementTextureRepeat(curAddedObjectExport.customDisplacementTextureMatrixInfo.repeatU, curAddedObjectExport.customDisplacementTextureMatrixInfo.repeatV);
        addedObjectInstance.setCustomDisplacementTextureOffset(curAddedObjectExport.customDisplacementTextureMatrixInfo.offsetX, curAddedObjectExport.customDisplacementTextureMatrixInfo.offsetY);
      }
+
+     addedObjectInstance.usedAsAIEntity = curAddedObjectExport.usedAsAIEntity;
   }
   for (var objName in addedObjects){
     if (addedObjects[objName].softCopyParentName){
@@ -1142,6 +1170,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
       objectGroupInstance.setPosition(curObjectGroupExport.manualPositionInfo.x, curObjectGroupExport.manualPositionInfo.y, curObjectGroupExport.manualPositionInfo.z, true);
     }
     objectGroupInstance.setAffectedByLight(curObjectGroupExport.affectedByLight);
+    objectGroupInstance.usedAsAIEntity = curObjectGroupExport.usedAsAIEntity;
   }
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){
@@ -1208,7 +1237,8 @@ ImportHandler.prototype.importLightnings = function(obj){
       lightningHandler.onSetCorrectionProperties(lightning);
     }
   }
-  if (noLightningsExist && isDeployment){
+
+  if ((noLightningsExist && isDeployment) || (isDeployment && WORKERS_SUPPORTED && !LIGHTNING_WORKER_ON)){
     lightningHandler.turnOff();
   }
 }

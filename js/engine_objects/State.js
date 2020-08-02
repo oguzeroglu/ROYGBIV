@@ -182,4 +182,6 @@ var State = function(projectName, author){
   this.protocolDefinitionFileName = protocolDefinitionFileName;
   // WS SERVER URL *************************************************
   this.serverWSURL = serverWSURL;
+  // STEERING HANDLER **********************************************
+  this.steeringHandler = steeringHandler.export();
 }
