@@ -41,6 +41,7 @@ SteeringHandler.prototype.setBehavior = function(object, behaviorName){
 
 SteeringHandler.prototype.stopSteerable = function(object){
   this.activeSteerablesMap.delete(object.name);
+  object.steerable.velocity.set(0, 0, 0);
   if (object.steerableInfo.mode == this.steeringModes.TRACK_VELOCITY){
     object.resetVelocity();
   }
