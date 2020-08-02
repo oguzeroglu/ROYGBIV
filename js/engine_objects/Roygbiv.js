@@ -3923,7 +3923,7 @@ Roygbiv.prototype.stopScript = function(scriptName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.stopScript, preConditions.scriptName, scriptName);
-  var script = scripts[scriptName];
+  var script = scripts[scriptName.replace("-", "")];
   preConditions.checkIfScriptExists(ROYGBIV.stopScript, null, script);
   script.stop();
 }
