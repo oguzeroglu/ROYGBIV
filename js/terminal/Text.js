@@ -1184,4 +1184,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETPATHFINISHLISTENER = "Sets a path finish listener for PathFollowingBehavior of given steerable object. The callbackFunction is executed\nwhen the path of given PathFollowingBehavior is consumed.";
   this.ROYGBIV_SCRIPTING_API_REMOVEPATHFINISHLISTENER = "Removes a path finish listener for PathFollowingBehavior of given steerable object.";
   this.ROYGBIV_SCRIPTING_API_SETOBJECTMOUSEMOVELISTENER = "Sets a mouse move listener for given object. The callbackFunction is executed with x, y, z parameters every frame\nthe mouse is on given object.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTMOUSEMOVELISTENER = "Removes the mouse move listener from given object.";
 }

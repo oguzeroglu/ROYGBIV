@@ -292,7 +292,8 @@ var Roygbiv = function(){
     "jump",
     "setPathFinishListener",
     "removePathFinishListener",
-    "setObjectMouseMoveListener"
+    "setObjectMouseMoveListener",
+    "removeObjectMouseMoveListener"
   ];
 
   this.globals = new Object();
@@ -2564,6 +2565,20 @@ Roygbiv.prototype.setObjectMouseMoveListener = function(object, callbackFunction
 
   object.mouseMoveCallbackFunction = callbackFunction;
   objectsWithMouseMoveListeners.set(object.name, object);
+}
+
+// Removes the mouse move listener from given object.
+Roygbiv.prototype.removeObjectMouseMoveListener = function(object){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeObjectMouseMoveListener, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectMouseMoveListener, preConditions.object, object);
+  preConditions.checkIfTrue(ROYGBIV.removeObjectMouseMoveListener, "object marked as unintersectable, cannot be selected.", (!object.isIntersectable));
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeObjectMouseMoveListener, object);
+
+  delete object.mouseMoveCallbackFunction;
+  objectsWithMouseMoveListeners.delete(object.name);
 }
 
 // TEXT FUNCTIONS **************************************************************
