@@ -298,7 +298,7 @@ var NO_MOBILE = false;
 var isPaused = false;
 var defaultFont;
 var fonts = new Object();
-var MAX_TEXT_CHAR_COUNT = 64;
+var MAX_TEXT_CHAR_COUNT = 50;
 var DEFAULT_OFFSET_BETWEEN_CHARS = 20;
 var DEFAULT_OFFSET_BETWEEN_LINES = 20;
 var MARGIN_MODE_2D_TOP_LEFT = 0;
