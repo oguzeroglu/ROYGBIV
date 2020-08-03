@@ -1898,16 +1898,18 @@ ObjectGroup.prototype.merge = function(){
           this.push(textureMatrixInfos, addedObject.getTextureRepeatX(), ((4*a) + 2), isIndexed);
           this.push(textureMatrixInfos, addedObject.getTextureRepeatY(), ((4*a) + 3), isIndexed);
 
-          if (addedObject.customDisplacementTextureMatrixInfo){
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX, (4*a), isIndexed);
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY, ((4*a) + 1), isIndexed);
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU, ((4*a) + 2), isIndexed);
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV, ((4*a) + 3), isIndexed);
-          }else{
-            this.push(displacementTextureMatrixInfos, -100, (4*a), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*a) + 1), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*a) + 2), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*a) + 3), isIndexed);
+          if (this.hasDisplacement){
+            if (addedObject.customDisplacementTextureMatrixInfo){
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX, (4*a), isIndexed);
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY, ((4*a) + 1), isIndexed);
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU, ((4*a) + 2), isIndexed);
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV, ((4*a) + 3), isIndexed);
+            }else{
+              this.push(displacementTextureMatrixInfos, -100, (4*a), isIndexed);
+              this.push(displacementTextureMatrixInfos, -100, ((4*a) + 1), isIndexed);
+              this.push(displacementTextureMatrixInfos, -100, ((4*a) + 2), isIndexed);
+              this.push(displacementTextureMatrixInfos, -100, ((4*a) + 3), isIndexed);
+            }
           }
         }else{
           this.push(textureMatrixInfos, 0, (4*a), isIndexed);
@@ -1928,16 +1930,18 @@ ObjectGroup.prototype.merge = function(){
           this.push(textureMatrixInfos, addedObject.getTextureRepeatX(), ((4*b) + 2), isIndexed);
           this.push(textureMatrixInfos, addedObject.getTextureRepeatY(), ((4*b) + 3), isIndexed);
 
-          if (addedObject.customDisplacementTextureMatrixInfo){
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX, (4*b), isIndexed);
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY, ((4*b) + 1), isIndexed);
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU, ((4*b) + 2), isIndexed);
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV, ((4*b) + 3), isIndexed);
-          }else{
-            this.push(displacementTextureMatrixInfos, -100, (4*b), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*b) + 1), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*b) + 2), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*b) + 3), isIndexed);
+          if (this.hasDisplacement){
+            if (addedObject.customDisplacementTextureMatrixInfo){
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX, (4*b), isIndexed);
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY, ((4*b) + 1), isIndexed);
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU, ((4*b) + 2), isIndexed);
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV, ((4*b) + 3), isIndexed);
+            }else{
+              this.push(displacementTextureMatrixInfos, -100, (4*b), isIndexed);
+              this.push(displacementTextureMatrixInfos, -100, ((4*b) + 1), isIndexed);
+              this.push(displacementTextureMatrixInfos, -100, ((4*b) + 2), isIndexed);
+              this.push(displacementTextureMatrixInfos, -100, ((4*b) + 3), isIndexed);
+            }
           }
         }else{
           this.push(textureMatrixInfos, 0, (4*b), isIndexed);
@@ -1958,16 +1962,18 @@ ObjectGroup.prototype.merge = function(){
           this.push(textureMatrixInfos, addedObject.getTextureRepeatX(), ((4*c) + 2), isIndexed);
           this.push(textureMatrixInfos, addedObject.getTextureRepeatY(), ((4*c) + 3), isIndexed);
 
-          if (addedObject.customDisplacementTextureMatrixInfo){
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX, (4*c), isIndexed);
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY, ((4*c) + 1), isIndexed);
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU, ((4*c) + 2), isIndexed);
-            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV, ((4*c) + 3), isIndexed);
-          }else{
-            this.push(displacementTextureMatrixInfos, -100, (4*c), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*c) + 1), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*c) + 2), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*c) + 3), isIndexed);
+          if (this.hasDisplacement){
+            if (addedObject.customDisplacementTextureMatrixInfo){
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX, (4*c), isIndexed);
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY, ((4*c) + 1), isIndexed);
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU, ((4*c) + 2), isIndexed);
+              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV, ((4*c) + 3), isIndexed);
+            }else{
+              this.push(displacementTextureMatrixInfos, -100, (4*c), isIndexed);
+              this.push(displacementTextureMatrixInfos, -100, ((4*c) + 1), isIndexed);
+              this.push(displacementTextureMatrixInfos, -100, ((4*c) + 2), isIndexed);
+              this.push(displacementTextureMatrixInfos, -100, ((4*c) + 3), isIndexed);
+            }
           }
         }else{
           this.push(textureMatrixInfos, 0, (4*c), isIndexed);
