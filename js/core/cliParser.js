@@ -2894,6 +2894,8 @@ function parse(input){
           if (splitted[1] == "ORIGINAL_RESOLUTION"){
             resolutionParam = window.devicePixelRatio;
             useOriginalResolution = true;
+          }else{
+            useOriginalResolution = false;
           }
           if (isNaN(resolutionParam)){
             terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "resolution"));
