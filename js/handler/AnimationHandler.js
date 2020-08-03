@@ -583,6 +583,8 @@ AnimationHandler.prototype.assignInitialValue = function(animation){
     animation.params.totalTranslationY = 0;
   }else if (animation.description.action == this.actionTypes.OBJECT.TRANSLATE_Z){
     animation.params.totalTranslationZ = 0;
+  }else if (animation.description.action == this.actionTypes.SPRITE.COLOR){
+    animation.params.sourceColor.copy(animation.attachedObject.getColor());
   }
   animation.hasInitialValue = true;
 }

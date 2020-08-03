@@ -207,6 +207,11 @@ Sprite.prototype.setRefHeight = function(){
   this.refHeight = (renderer.getCurrentViewport().w / screenResolution);
 }
 
+Sprite.prototype.getColor = function(){
+  REUSABLE_COLOR.copy(this.mesh.material.uniforms.color.value);
+  return REUSABLE_COLOR;
+}
+
 Sprite.prototype.export = function(){
   var animations = new Object();
   for (var animationName in this.animations){
