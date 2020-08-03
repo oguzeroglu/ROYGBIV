@@ -306,7 +306,6 @@ function getMaxWidthHeightGivenAspect(currentWidth, currentHeight, givenAspect){
 }
 
 function build(projectName, author){
-  terminal.clear();
   terminal.printInfo(Text.BUILDING_PROJECT);
   canvas.style.visibility = "hidden";
   terminal.disable();
@@ -315,7 +314,6 @@ function build(projectName, author){
   xhr.setRequestHeader("Content-type", "application/json");
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200){
-      terminal.clear();
       var json = JSON.parse(xhr.responseText);
       if (json.error){
         terminal.printError(json.error);
@@ -830,6 +828,109 @@ function generateUUID() {
 // best formula of the universe.
 function affineTransformation(oldValue, oldMax, oldMin, newMax, newMin){
   return (((oldValue - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
+}
+
+// iPhones are shitty devices for WebGL.
+function checkForTextureBleedingInIOS(){
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+
+    if (obj.customDisplacementTextureMatrixInfo){
+      return true;
+    }
+
+    if (obj.getTextureOffsetX() > 0){
+      return true;
+    }
+
+    if (obj.getTextureOffsetY() > 0){
+      return true;
+    }
+
+    if (obj.getTextureRepeatX() > 1){
+      return true;
+    }
+
+    if (obj.getTextureRepeatY() > 1){
+      return true;
+    }
+
+    for (var animName in obj.animations){
+      var action = obj.animations[animName].description.action;
+      if (action == animationHandler.actionTypes.OBJECT.TEXTURE_OFFSET_X){
+        return true;
+      }
+
+      if (action == animationHandler.actionTypes.OBJECT.TEXTURE_OFFSET_Y){
+        return true;
+      }
+
+      if (action == animationHandler.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_X){
+        return true;
+      }
+
+      if (action == animationHandler.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_Y){
+        return true;
+      }
+    }
+  }
+
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+
+    for (var childName in obj.group){
+      var child = obj.group[childName];
+
+      if (child.customDisplacementTextureMatrixInfo){
+        return true;
+      }
+
+      if (child.getTextureOffsetX() > 0){
+        return true;
+      }
+
+      if (child.getTextureOffsetY() > 0){
+        return true;
+      }
+
+      if (child.getTextureRepeatX() > 1){
+        return true;
+      }
+
+      if (child.getTextureRepeatY() > 1){
+        return true;
+      }
+    }
+
+    if (obj.getTextureOffsetX() > 0){
+      return true;
+    }
+
+    if (obj.getTextureOffsetY() > 0){
+      return true;
+    }
+
+    for (var animName in obj.animations){
+      var action = obj.animations[animName].description.action;
+      if (action == animationHandler.actionTypes.OBJECT.TEXTURE_OFFSET_X){
+        return true;
+      }
+
+      if (action == animationHandler.actionTypes.OBJECT.TEXTURE_OFFSET_Y){
+        return true;
+      }
+
+      if (action == animationHandler.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_X){
+        return true;
+      }
+
+      if (action == animationHandler.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_Y){
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 //******************************************************************

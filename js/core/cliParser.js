@@ -3463,7 +3463,10 @@ function parse(input){
             break;
           }
           if (hasParticleSystems && !particleSystemRefHeight){
-            console.warn("[!] Consider using makeParticleSystemsResponsive CLI command.")
+            terminal.printError("[!] Consider using makeParticleSystemsResponsive CLI command.")
+          }
+          if (checkForTextureBleedingInIOS()){
+            terminal.printError("[!] Some of the objects contain custom texture offset, repeat properties or a texture offset animation.\nThis may cause rendering problems in iOS devices.");
           }
           return true;
         break;

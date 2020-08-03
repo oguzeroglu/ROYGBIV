@@ -849,6 +849,10 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
     float coordX = (original.x * (endU - startU) + startU);
     float coordY = (original.y * (startV - endV) + endV);
 
+    #ifdef PREVENT_IOS_TEXTURE_BLEEDING
+      return vec2(coordX, coordY);
+    #endif
+
     if (coordX > endU){
       if(textureMirrorInfo.x < 0.0){
         coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);

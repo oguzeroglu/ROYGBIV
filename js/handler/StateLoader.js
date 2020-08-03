@@ -93,6 +93,16 @@ StateLoader.prototype.onAfterFinalized = function(){
     }
     rayCaster.refresh();
   }else{
+
+    if (!checkForTextureBleedingInIOS()){
+      for (var objName in addedObjects){
+        macroHandler.injectMacro("PREVENT_IOS_TEXTURE_BLEEDING", addedObjects[objName].mesh.material, true, true);
+      }
+      for (var objName in objectGroups){
+        macroHandler.injectMacro("PREVENT_IOS_TEXTURE_BLEEDING", objectGroups[objName].mesh.material, true, true);
+      }
+    }
+
     appendtoDeploymentConsole("Initializing workers.");
     modeSwitcher.switchMode();
   }

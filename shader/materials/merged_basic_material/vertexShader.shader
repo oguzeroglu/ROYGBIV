@@ -787,6 +787,10 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     float coordX = (original.x * (endU - startU) + startU);
     float coordY = (original.y * (startV - endV) + endV);
 
+    #ifdef PREVENT_IOS_TEXTURE_BLEEDING
+      return vec2(coordX, coordY);
+    #endif
+
     if (coordX > endU){
       if (vTextureMirrorInfo.x < 0.0){
         coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
