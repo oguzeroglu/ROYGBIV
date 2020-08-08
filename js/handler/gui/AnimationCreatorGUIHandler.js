@@ -214,6 +214,11 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
           continue;
         }
       }
+      if (key == "AO_INTENSITY"){
+        if (!object.hasAOMap()){
+          continue;
+        }
+      }
       if (key == "SCALE_X" || key == "SCALE_Y" || key == "SCALE_Z"){
         if (!object.noMass){
           continue;
