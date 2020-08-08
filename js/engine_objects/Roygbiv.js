@@ -296,7 +296,8 @@ var Roygbiv = function(){
     "removeObjectMouseMoveListener",
     "startAllAnimations",
     "setPositionChangeListener",
-    "removePositionChangeListener"
+    "removePositionChangeListener",
+    "executeForEachWaypoint"
   ];
 
   this.globals = new Object();
@@ -3942,6 +3943,27 @@ Roygbiv.prototype.jump = function(object, jumpDescriptor, toTakeoffBehaviorName,
   preConditions.checkIfObjectIsJumping(ROYGBIV.jump, object);
 
   return steeringHandler.jump(object, jumpDescriptor, toTakeoffBehaviorName, completeCallback);
+}
+
+// Executes func parameter with x, y, z coordinates for each waypoint of
+// the path of given AStar object. Note that paths of AStar objects are
+// reconstructed after finding the shortest distance, either manually or
+// automatically by RandomPathBehavior.
+Roygbiv.prototype.executeForEachWaypoint = function(aStar, func){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.executeForEachWaypoint, preConditions.aStar, aStar);
+  preConditions.checkIfDefined(ROYGBIV.executeForEachWaypoint, preConditions.func, func);
+  preConditions.checkIfAStar(ROYGBIV.executeForEachWaypoint, aStar);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.executeForEachWaypoint, preConditions.func, func);
+
+  var path = aStar.path;
+  for (var i = 0; i < path.length; i ++){
+    var wp = path.waypoints[i];
+    func(wp.x, wp.y, wp.z);
+  }
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************
