@@ -1071,3 +1071,41 @@ SteeringHandler.prototype.removePathFinishListener = function(object, behaviorNa
     delete object.pathFinishListenerIDsBySteerableName[behaviorName];
   }
 }
+
+SteeringHandler.prototype.removeEdgeFromGraph = function(graphID, vertex1, vertex2){
+  var graph = this.usedGraphIDs[graphID];
+
+  var res1 =  graph.removeEdge(vertex1, vertex2);
+  var res2 = graph.removeEdge(vertex2, vertex1);
+
+  var count = 0;
+
+  if (res1){
+    for (var astID in this.graphIDsByAStars){
+      var gid = this.graphIDsByAStars[astID];
+      if (gid == graphID){
+        this.usedAStarIDs[astID].graph.removeEdge(vertex1, vertex2)
+      }
+    }
+
+    count ++;
+  }
+
+  if (res2){
+    for (var astID in this.graphIDsByAStars){
+      var gid = this.graphIDsByAStars[astID];
+      if (gid == graphID){
+        this.usedAStarIDs[astID].graph.removeEdge(vertex2, vertex1)
+      }
+    }
+
+    count ++;
+  }
+
+  if (count && this.debugHelper){
+    this.switchDebugMode();
+    this.switchDebugMode();
+  }
+
+  return count;
+}

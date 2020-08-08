@@ -6462,6 +6462,67 @@ function parse(input){
           jumpDescriptorCreatorGUIHandler.show();
           return true;
         break;
+        case 259: //removeEdgeFromGraph
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var graphID = splitted[1];
+          var offsetX = parseFloat(splitted[2]);
+          var offsetY = parseFloat(splitted[3]);
+          var offsetZ = parseFloat(splitted[4]);
+
+          var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var graph = graphs[graphID];
+
+          if (!graph){
+            terminal.printError(Text.NO_SUCH_GRAPH_IN_CURRENT_SCENE);
+            return true;
+          }
+
+          var selectedGridAry = Object.keys(gridSelections);
+
+          if (selectedGridAry.length != 2){
+            terminal.printError(Text.MUST_HAVE_TWO_GRIDS_SELECTED);
+            return true;
+          }
+
+          if (isNaN(offsetX)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetX"));
+            return true;
+          }
+
+          if (isNaN(offsetY)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetY"));
+            return true;
+          }
+
+          if (isNaN(offsetZ)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetZ"));
+            return true;
+          }
+
+          var grid1 = gridSelections[selectedGridAry[0]];
+          var grid2 = gridSelections[selectedGridAry[1]];
+
+          var vertex1 = new Kompute.Vector3D(grid1.centerX + offsetX, grid1.centerY + offsetY, grid1.centerZ + offsetZ);
+          var vertex2 = new Kompute.Vector3D(grid2.centerX + offsetX, grid2.centerY + offsetY, grid2.centerZ + offsetZ);
+
+          var result = steeringHandler.removeEdgeFromGraph(graphID, vertex1, vertex2);
+
+          if (!result){
+            terminal.printError(Text.NO_EDGES_FOUND_IN_THE_GRAPH);
+            return true;
+          }
+
+          for (var gridName in gridSelections){
+            gridSelections[gridName].toggleSelect(false, false, false, true);
+          }
+
+          terminal.printInfo(Text.EDGES_REMOVED.replace(Text.PARAM1, result));
+          return true;
+        break;
       }
       return true;
     }catch(err){

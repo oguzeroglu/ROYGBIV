@@ -259,7 +259,8 @@ var CommandDescriptor = function(){
       2, //newAStar
       1, //destroyAStar
       0, //printAStars
-      0 //jumpDescriptors
+      0, //jumpDescriptors
+      4 //removeEdgeFromGraph
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -521,7 +522,8 @@ var CommandDescriptor = function(){
     "newAStar astarID graphID",
     "destroyAStar id",
     "printAStars",
-    "jumpDescriptors"
+    "jumpDescriptors",
+    "removeEdgeFromGraph graphID offsetX offsetY offsetZ"
   ];
 
   this.commands = [
@@ -783,7 +785,8 @@ var CommandDescriptor = function(){
     "newAStar",
     "destroyAStar",
     "printAStars",
-    "jumpDescriptors"
+    "jumpDescriptors",
+    "removeEdgeFromGraph"
   ];
 
   this.commandInfo = [
@@ -1045,7 +1048,8 @@ var CommandDescriptor = function(){
     "newAStar: Creates a new AStar object from given graph.",
     "destroyAStar: Destroys an AStar of given id.",
     "printAStars: Prints a list of created AStar objects.",
-    "jumpDescriptors: Shows the jump descriptor configuration GUI."
+    "jumpDescriptors: Shows the jump descriptor configuration GUI.",
+    "removeEdgeFromGraph: Removes an edge from given graph."
   ];
 
   this.keyboardInfo = [
@@ -1961,6 +1965,14 @@ var CommandDescriptor = function(){
   this.destroyAStar = new Object();
   this.destroyAStar.types = [];
   this.destroyAStar.types.push(this.ASTAR_ID); //id
+
+  // removeEdgeFromGraph
+  this.removeEdgeFromGraph = new Object();
+  this.removeEdgeFromGraph.types = [];
+  this.removeEdgeFromGraph.types.push(this.GRAPH_ID); //graphID
+  this.removeEdgeFromGraph.types.push(this.UNKNOWN_INDICATOR); //offsetX
+  this.removeEdgeFromGraph.types.push(this.UNKNOWN_INDICATOR); //offsetY
+  this.removeEdgeFromGraph.types.push(this.UNKNOWN_INDICATOR); //offsetZ
 };
 
 CommandDescriptor.prototype.test = function(){
