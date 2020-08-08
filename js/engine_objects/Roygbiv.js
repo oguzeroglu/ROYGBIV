@@ -294,7 +294,9 @@ var Roygbiv = function(){
     "removePathFinishListener",
     "setObjectMouseMoveListener",
     "removeObjectMouseMoveListener",
-    "startAllAnimations"
+    "startAllAnimations",
+    "setPositionChangeListener",
+    "removePositionChangeListener"
   ];
 
   this.globals = new Object();
@@ -2580,6 +2582,37 @@ Roygbiv.prototype.removeObjectMouseMoveListener = function(object){
 
   delete object.mouseMoveCallbackFunction;
   objectsWithMouseMoveListeners.delete(object.name);
+}
+
+// Sets a position change listener to given object or object group. The callbackFunction
+// is executed with x, y, z coordinates everytime the position of the object changes.
+Roygbiv.prototype.setPositionChangeListener = function(object, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.setPositionChangeListener, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setPositionChangeListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setPositionChangeListener, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setPositionChangeListener, object);
+  preConditions.checkIfPositionChangeable(ROYGBIV.setPositionChangeListener, object);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setPositionChangeListener, preConditions.callbackFunction, callbackFunction);
+
+  object.positionChangeCallbackFunction = callbackFunction;
+}
+
+// Removes a position change listener from given object.
+Roygbiv.prototype.removePositionChangeListener = function(object){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removePositionChangeListener, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removePositionChangeListener, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removePositionChangeListener, object);
+  preConditions.checkIfPositionChangeable(ROYGBIV.removePositionChangeListener, object);
+
+  object.positionChangeCallbackFunction = noop;
 }
 
 // TEXT FUNCTIONS **************************************************************

@@ -378,6 +378,12 @@ Preconditions.prototype.checkIfLightSuitableForPositionUpdate = function(callerF
   }
 }
 
+Preconditions.prototype.checkIfPositionChangeable = function(callerFunc, object){
+  if (!(object.isChangeable || object.isDynamicObject)){
+    this.throw(callerFunc, "Object is not changeable or a dynamic object.");
+  }
+}
+
 Preconditions.prototype.checkIfDynamicLight = function(callerFunc, light){
   var noTypeKey = (typeof light.typeKey == UNDEFINED);
   var noName = (typeof light.name == UNDEFINED);

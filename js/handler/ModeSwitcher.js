@@ -461,6 +461,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;
+    delete object.positionChangeCallbackFunction;
     if (!(typeof object.originalMass == UNDEFINED)){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
@@ -516,6 +517,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;
+    delete object.positionChangeCallbackFunction;
     object.resetColor();
     if (object.isHidden){
       object.mesh.visible = true;

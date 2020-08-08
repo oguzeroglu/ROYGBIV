@@ -1189,4 +1189,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETOBJECTMOUSEMOVELISTENER = "Sets a mouse move listener for given object. The callbackFunction is executed with x, y, z parameters every frame\nthe mouse is on given object.";
   this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTMOUSEMOVELISTENER = "Removes the mouse move listener from given object.";
   this.ROYGBIV_SCRIPTING_API_STARTALLANIMATIONS = "Starts all animations of given object, object group, text or sprite.";
+  this.ROYGBIV_SCRIPTING_API_SETPOSITIONCHANGELISTENER = "Sets a position change listener to given object or object group. The callbackFunction is executed with\nx, y, z coordinates everytime the position of the object changes.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEPOSITIONCHANGELISTENER = "Removes a position change listener from given object.";
 }

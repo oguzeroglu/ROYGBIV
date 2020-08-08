@@ -615,6 +615,10 @@ AddedObject.prototype.onPositionChange = function(from, to){
     }
   }
 
+  if (this.positionChangeCallbackFunction){
+    this.positionChangeCallbackFunction(to.x, to.y, to.z);
+  }
+
   steeringHandler.updateObject(this);
 }
 
