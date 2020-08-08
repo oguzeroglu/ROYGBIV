@@ -121,7 +121,7 @@ MacroHandler.prototype.compressAttribute = function(material, compressionInfo){
     newValueString = newValueString.replace("@@1", innerStr);
   }
 
-  material.vertexShader = material.vertexShader.replace("attribute " + attrTypeString + " " + compressionInfo.name, attrTypeString + " " + compressionInfo.name + " = " + newValueString );
+  material.vertexShader = material.vertexShader.replace("attribute " + attrTypeString + " " + compressionInfo.name + ";", attrTypeString + " " + compressionInfo.name + " = " + newValueString + ";");
   material.needsUpdate = true;
 }
 
