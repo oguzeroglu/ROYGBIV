@@ -608,6 +608,15 @@ AnimationHandler.prototype.startAnimation = function(animation){
   animation.onStart(this.initialValueGetterFunctionsByType[animation.description.action](animation.attachedObject));
 }
 
+AnimationHandler.prototype.startAllAnimations = function(obj){
+  for (var animName in obj.animations){
+    var animation = obj.animations[animName];
+
+    this.forceFinish(animation);
+    this.startAnimation(animation);
+  }
+}
+
 AnimationHandler.prototype.reset = function(){
   this.activeAnimations = new Map();
 }

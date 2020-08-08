@@ -293,7 +293,8 @@ var Roygbiv = function(){
     "setPathFinishListener",
     "removePathFinishListener",
     "setObjectMouseMoveListener",
-    "removeObjectMouseMoveListener"
+    "removeObjectMouseMoveListener",
+    "startAllAnimations"
   ];
 
   this.globals = new Object();
@@ -3097,6 +3098,17 @@ Roygbiv.prototype.rewindAnimation = function(object, animationName){
   preConditions.checkIfAnimationExists(ROYGBIV.rewindAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.rewindAnimation, object);
   animationHandler.forceRewind(object.animations[animationName]);
+}
+
+// Starts all animations of given object, object group, text or sprite.
+Roygbiv.prototype.startAllAnimations = function(object) {
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.startAllAnimations, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.startAllAnimations, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.startAllAnimations, object);
+  animationHandler.startAllAnimations(object);
 }
 
 // MUZZLEFLASH FUNCTIONS *******************************************************
