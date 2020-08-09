@@ -125,7 +125,10 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleUnassignSteeringBehaviorCommand();
     }else if (this.splitted[0] == "destroyastar"){
       this.handleDestroyAStarCommand();
+    }else if (this.splitted[0] == "excludefromhidebehavior"){
+      this.handleExcludeFromHideBehaviorCommand();
     }
+
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
     }
@@ -135,6 +138,26 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoconfigurearea"){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleExcludeFromHideBehaviorCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  var entities = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  for (var id in entities){
+    if (id.toLowerCase().startsWith(idPrefix.toLowerCase())){
+      parseCommand("excludeFromHideBehavior " + id + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBSTACLES_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBSTACLES.replace(Text.PARAM1, ctr));
   }
 }
 

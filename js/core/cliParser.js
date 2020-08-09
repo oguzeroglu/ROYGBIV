@@ -5706,7 +5706,9 @@ function parse(input){
             if (count == length){
               options = false;
             }
-            terminal.printInfo(Text.TREE.replace(Text.PARAM1, id), options);
+            var entity = obstacles[id];
+            var printedID = entity.excludeFromHide? (id + " (excluded from HideBehavior)"): id;
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, printedID), options);
           }
           if (count == 0){
             terminal.printError(Text.NO_AI_OBSTACLES_CREATED);
@@ -6530,6 +6532,12 @@ function parse(input){
           }
 
           var obsID = splitted[1];
+
+          if (!(obsID.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           var bool = splitted[2].toLowerCase();
 
           var allObs = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()] || {};
@@ -6548,10 +6556,12 @@ function parse(input){
 
           entity.excludeFromHide = (bool == "true");
 
-          if (entity.excludeFromHide){
-            terminal.printInfo(Text.ENTITY_IS_EXCLUDED_FROM_HIDE_BEHAVIOR);
-          }else{
-            terminal.printInfo(Text.ENTITY_IS_INCLUDED_IN_HIDE_BEHAVIOR);
+          if (!jobHandlerWorking){
+            if (entity.excludeFromHide){
+              terminal.printInfo(Text.ENTITY_IS_EXCLUDED_FROM_HIDE_BEHAVIOR);
+            }else{
+              terminal.printInfo(Text.ENTITY_IS_INCLUDED_IN_HIDE_BEHAVIOR);
+            }
           }
 
           return true;
