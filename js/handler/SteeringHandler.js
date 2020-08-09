@@ -82,6 +82,7 @@ SteeringHandler.prototype.import = function(exportObj){
       var pos = curExport.position;
       var size = curExport.size;
       this.addObstacle(id, new Kompute.Vector3D(pos.x, pos.y, pos.z), new Kompute.Vector3D(size.x, size.y, size.z), sceneName);
+      this.usedEntityIDs[id].excludeFromHide = !!curExport.excludeFromHide;
     }
   }
 
@@ -215,7 +216,8 @@ SteeringHandler.prototype.export = function(){
       var entity = obstacles[id];
       exportObject.obstacleInfo[sceneName][id] = {
         position: {x: entity.position.x, y: entity.position.y, z: entity.position.z},
-        size: {x: entity.size.x, y: entity.size.y, z: entity.size.z}
+        size: {x: entity.size.x, y: entity.size.y, z: entity.size.z},
+        excludeFromHide: !!entity.excludeFromHide
       };
     }
   }

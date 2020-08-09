@@ -260,7 +260,8 @@ var CommandDescriptor = function(){
       1, //destroyAStar
       0, //printAStars
       0, //jumpDescriptors
-      4 //removeEdgeFromGraph
+      4, //removeEdgeFromGraph
+      2 //excludeFromHideBehavior
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -523,7 +524,8 @@ var CommandDescriptor = function(){
     "destroyAStar id",
     "printAStars",
     "jumpDescriptors",
-    "removeEdgeFromGraph graphID offsetX offsetY offsetZ"
+    "removeEdgeFromGraph graphID offsetX offsetY offsetZ",
+    "excludeFromHideBehavior id true/false"
   ];
 
   this.commands = [
@@ -786,7 +788,8 @@ var CommandDescriptor = function(){
     "destroyAStar",
     "printAStars",
     "jumpDescriptors",
-    "removeEdgeFromGraph"
+    "removeEdgeFromGraph",
+    "excludeFromHideBehavior"
   ];
 
   this.commandInfo = [
@@ -1049,7 +1052,8 @@ var CommandDescriptor = function(){
     "destroyAStar: Destroys an AStar of given id.",
     "printAStars: Prints a list of created AStar objects.",
     "jumpDescriptors: Shows the jump descriptor configuration GUI.",
-    "removeEdgeFromGraph: Removes an edge from given graph."
+    "removeEdgeFromGraph: Removes an edge from given graph.",
+    "excludeFromHideBehavior: Excludes/includes an AI entity from/to Hide behavior. Steerables cannot hide behind given entity if the entity is excluded."
   ];
 
   this.keyboardInfo = [
@@ -1973,6 +1977,12 @@ var CommandDescriptor = function(){
   this.removeEdgeFromGraph.types.push(this.UNKNOWN_INDICATOR); //offsetX
   this.removeEdgeFromGraph.types.push(this.UNKNOWN_INDICATOR); //offsetY
   this.removeEdgeFromGraph.types.push(this.UNKNOWN_INDICATOR); //offsetZ
+
+  // excludeFromHideBehavior
+  this.excludeFromHideBehavior = new Object();
+  this.excludeFromHideBehavior.types = [];
+  this.excludeFromHideBehavior.types.push(this.AI_OBSTACLE_ID); //id
+  this.excludeFromHideBehavior.types.push(this.BOOLEAN); //true/false
 };
 
 CommandDescriptor.prototype.test = function(){

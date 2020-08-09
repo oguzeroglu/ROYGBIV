@@ -6523,6 +6523,39 @@ function parse(input){
           terminal.printInfo(Text.EDGES_REMOVED.replace(Text.PARAM1, result));
           return true;
         break;
+        case 260: //excludeFromHideBehavior
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var obsID = splitted[1];
+          var bool = splitted[2].toLowerCase();
+
+          var allObs = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+          var entity = allObs[obsID];
+
+          if (!entity){
+            terminal.printError(Text.NO_SUCH_OBSTACLE_IN_CURRENT_SCENE);
+            return true;
+          }
+
+          if (bool != "true" && bool != "false"){
+            terminal.printError(Text.PROPERTY_MUST_BE_TRUE_OR_FALSE);
+            return true;
+          }
+
+          entity.excludeFromHide = (bool == "true");
+
+          if (entity.excludeFromHide){
+            terminal.printInfo(Text.ENTITY_IS_EXCLUDED_FROM_HIDE_BEHAVIOR);
+          }else{
+            terminal.printInfo(Text.ENTITY_IS_INCLUDED_IN_HIDE_BEHAVIOR);
+          }
+
+          return true;
+        break;
       }
       return true;
     }catch(err){
