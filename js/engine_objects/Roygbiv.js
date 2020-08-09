@@ -297,7 +297,9 @@ var Roygbiv = function(){
     "startAllAnimations",
     "setPositionChangeListener",
     "removePositionChangeListener",
-    "executeForEachWaypoint"
+    "executeForEachWaypoint",
+    "onSceneExit",
+    "removeSceneExitListener"
   ];
 
   this.globals = new Object();
@@ -2614,6 +2616,33 @@ Roygbiv.prototype.removePositionChangeListener = function(object){
   preConditions.checkIfPositionChangeable(ROYGBIV.removePositionChangeListener, object);
 
   object.positionChangeCallbackFunction = noop;
+}
+
+// Sets an exit callback function for given scene. The callback function is
+// executed before the scene changes.
+Roygbiv.prototype.onSceneExit = function(sceneName, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.onSceneExit, preConditions.sceneName, sceneName);
+  preConditions.checkIfDefined(ROYGBIV.onSceneExit, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfSceneExists(ROYGBIV.onSceneExit, sceneName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSceneExit, preConditions.callbackFunction, callbackFunction);
+
+  sceneHandler.scenes[sceneName].beforeExitCallback = callbackFunction;
+}
+
+// Removes a scene exit listener for given scene.
+Roygbiv.prototype.removeSceneExitListener = function(sceneName){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removeSceneExitListener, preConditions.sceneName, sceneName);
+  preConditions.checkIfSceneExists(ROYGBIV.removeSceneExitListener, sceneName);
+
+  sceneHandler.scenes[sceneName].beforeExitCallback = noop;
 }
 
 // TEXT FUNCTIONS **************************************************************

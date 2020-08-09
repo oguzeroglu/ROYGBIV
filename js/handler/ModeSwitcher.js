@@ -561,6 +561,11 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     steeringHandler.updateObject(object);
     delete object.constructedSteeringBehaviors;
   }
+
+  for (var sceneName in sceneHandler.scenes){
+    delete sceneHandler.scenes[sceneName].beforeExitCallback;
+  }
+
   fogHandler.onFromPreviewToDesign();
   renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
 

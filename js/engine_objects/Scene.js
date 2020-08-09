@@ -35,6 +35,12 @@ Scene.prototype.reset = function(){
   this.lightInfo = {};
 }
 
+Scene.prototype.onBeforeExit = function(){
+  if (this.beforeExitCallback){
+    this.beforeExitCallback();
+  }
+}
+
 Scene.prototype.loadLights = function(){
   lightHandler.import(this.lightInfo);
 }

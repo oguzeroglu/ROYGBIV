@@ -260,6 +260,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
   }
   if (mode == 1){
     this.readyCallback = readyCallback;
+    this.scenes[this.getActiveSceneName()].onBeforeExit();
   }
   this.ready = false;
   this.physicsReady = false;
