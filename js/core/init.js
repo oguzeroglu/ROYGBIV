@@ -902,11 +902,11 @@ function checkForTextureBleedingInIOS(){
       }
     }
 
-    if (obj.getTextureOffsetX() > 0){
+    if (obj.hasTexture && obj.getTextureOffsetX() > 0){
       return true;
     }
 
-    if (obj.getTextureOffsetY() > 0){
+    if (obj.hasTexture && obj.getTextureOffsetY() > 0){
       return true;
     }
 
