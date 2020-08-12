@@ -572,9 +572,10 @@ ObjectGroup.prototype.hide = function(keepPhysics){
     this.mesh.visible = false;
     if (!keepPhysics){
       if (!this.noMass){
+        var that = this;
         setTimeout(function(){
-          physicsWorld.remove(this.physicsBody);
-          this.physicsKeptWhenHidden = false;
+          physicsWorld.remove(that.physicsBody);
+          that.physicsKeptWhenHidden = false;
         });
         physicsWorld.hide(this);
         if (physicsDebugMode){
