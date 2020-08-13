@@ -169,6 +169,8 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
 
       object.pathFinishListenerIDsBySteerableName = {};
+
+      object.steerable.lookDirection.set(0, 0, 1);
     }
   }
   for (var objectName in addedObjects){
@@ -198,6 +200,8 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
 
       object.pathFinishListenerIDsBySteerableName = {};
+
+      object.steerable.lookDirection.set(0, 0, 1);
     }
   }
   autoInstancingHandler.handle();
@@ -499,6 +503,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.steerable.unsetTargetPosition();
       object.steerable.unsetTargetEntity();
       object.steerable.unsetHideTargetEntity();
+
+      object.steerable.lookDirection.set(0, 0, 1);
     }
     steeringHandler.updateObject(object);
     delete object.constructedSteeringBehaviors;
@@ -557,6 +563,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.steerable.unsetTargetPosition();
       object.steerable.unsetTargetEntity();
       object.steerable.unsetHideTargetEntity();
+
+      object.steerable.lookDirection.set(0, 0, 1);
     }
     steeringHandler.updateObject(object);
     delete object.constructedSteeringBehaviors;
