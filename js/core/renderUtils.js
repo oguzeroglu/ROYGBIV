@@ -199,6 +199,7 @@ function updateTrackingObjects(){
       obj.mesh.position.y + obj.trackedObject.dy,
       obj.mesh.position.z + obj.trackedObject.dz
     );
+
     obj.physicsBody.position.copy(obj.mesh.position);
     if (isObjectGroup){
       obj.graphicsGroup.position.copy(obj.mesh.position);

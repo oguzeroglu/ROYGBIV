@@ -65,7 +65,6 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   isPaused = false;
   maxInactiveTime = 0;
   inactiveCounter = 0;
-  trackingObjects = new Object();
   objectsWithOnClickListeners = new Map();
   objectsWithMouseOverListeners = new Map();
   objectsWithMouseMoveListeners = new Map();
@@ -153,6 +152,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (object.isDynamicObject && !object.noMass){
       dynamicObjectGroups.set(objectName, object);
       sceneHandler.onDynamicObjectAddition(object);
+
+      object.oldPX = object.physicsBody.position.x;
+      object.oldPY = object.physicsBody.position.y;
+      object.oldPz = object.physicsBody.position.z;
     }
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
@@ -183,6 +186,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (object.isDynamicObject && !object.noMass){
       dynamicObjects.set(objectName, object);
       sceneHandler.onDynamicObjectAddition(object);
+
+      object.oldPX = object.physicsBody.position.x;
+      object.oldPY = object.physicsBody.position.y;
+      object.oldPz = object.physicsBody.position.z;
     }
     object.saveState();
     if (object.initOpacitySet){
@@ -466,6 +473,19 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;
     delete object.positionChangeCallbackFunction;
+
+    delete object.dx;
+    delete object.dy;
+    delete object.dz;
+
+    object.oldPX = 0;
+    object.oldPY = 0;
+    object.oldPZ = 0;
+
+    if (object.trackedObject){
+      object.untrackObjectPosition();
+    }
+
     if (!(typeof object.originalMass == UNDEFINED)){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
@@ -524,6 +544,19 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;
     delete object.positionChangeCallbackFunction;
+
+    delete object.dx;
+    delete object.dy;
+    delete object.dz;
+
+    object.oldPX = 0;
+    object.oldPY = 0;
+    object.oldPZ = 0;
+
+    if (object.trackedObject){
+      object.untrackObjectPosition();
+    }
+
     object.resetColor();
     if (object.isHidden){
       object.mesh.visible = true;

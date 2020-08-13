@@ -325,7 +325,6 @@ StateLoader.prototype.resetProject = function(){
   textureUniformCache = new Object();
   dynamicObjects = new Map();
   dynamicObjectGroups = new Map();
-  trackingObjects = new Object();
   screenResolution = 1;
   draggingSprite = false;
   dragCandidate = false;
