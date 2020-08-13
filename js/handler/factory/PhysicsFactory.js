@@ -15,10 +15,10 @@ PhysicsFactory.prototype.turnOffWorker = function(){
 
 PhysicsFactory.prototype.refresh = function(){
   this.cannonWorld = new CANNON.World();
-  physicsWorld = this.cannonWorld;
   this.init();
   var elem = this.get();
   if (elem instanceof CANNON.World){
+    physicsWorld = this.cannonWorld;
     for (var objName in sceneHandler.getAddedObjects()){
       if (!addedObjects[objName].noMass){
         elem.add(addedObjects[objName].physicsBody);
