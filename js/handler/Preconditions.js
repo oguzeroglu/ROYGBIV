@@ -279,6 +279,7 @@ var Preconditions = function(){
   this.jumpDescriptor = "jumpDescriptor";
   this.toTakeoffBehaviorName = "toTakeoffBehaviorName";
   this.completeCallback = "completeCallback";
+  this.lookDirectionVector = "lookDirectionVector";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

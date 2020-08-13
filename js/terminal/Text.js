@@ -1177,7 +1177,7 @@ var Text = function(){
                                                           "    * Flee\n" +
                                                           "    * Arrive";
   this.ROYGBIV_SCRIPTING_API_UNSETSTEERABLETARGETPOSITION = "Unsets a target position of a steerable set via setSteerableTargetPosition API.";
-  this.ROYGBIV_SCRIPTING_API_SETSTEERABLELOOKTARGET = "Makes a steerable look at given target position.";
+  this.ROYGBIV_SCRIPTING_API_SETSTEERABLELOOKTARGET = "Makes a steerable gradually look at given target position.";
   this.ROYGBIV_SCRIPTING_API_GETASTAR = "Returns an AStar object or 0 if AStar does not exist.";
   this.ROYGBIV_SCRIPTING_API_FINDSHORTESTPATH = "Calculates the shortest path between given points. This API returns nothing as it automatically pipes\nthe resulting path to the PathFollowingBehavior, if the behavior is constructed with given AStar object.\nSo use this API together with the PathFollowingBehavior.\nIf there's no nearby graph vertex of given vectors, this API does not calculate any path. In that case,\nincreasing the world bin size might help.";
   this.ROYGBIV_SCRIPTING_API_HIDEFROM = "Makes a steerable represented as hidingObject hide from another steerable represented as targetObject.\nThis API should be used with HideBehavior.";
@@ -1198,4 +1198,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_EXECUTEFOREACHWAYPOINT = "Executes func parameter with x, y, z coordinates for each waypoint of the path of given AStar object.\nNote that paths of AStar objects are reconstructed after finding the shortest distance, either manually\nor automatically by RandomPathBehavior.";
   this.ROYGBIV_SCRIPTING_API_ONSCENEEXIT = "Sets an exit callback function for given scene. The callback function is executed before the scene changes.";
   this.ROYGBIV_SCRIPTING_API_REMOVESCENEEXITLISTENER = "Removes a scene exit listener for given scene.";
+  this.ROYGBIV_SCRIPTING_API_SETSTEERABLELOOKDIRECTION = "Sets the look direction of given steerable. Unlike setSteerableLookTarget API which eventually makes a steerable\ngradually look at given target depending on the lookSpeed of the steerable, this API immediately modifies the look\ndirection.";
 }

@@ -299,7 +299,8 @@ var Roygbiv = function(){
     "removePositionChangeListener",
     "executeForEachWaypoint",
     "onSceneExit",
-    "removeSceneExitListener"
+    "removeSceneExitListener",
+    "setSteerableLookDirection"
   ];
 
   this.globals = new Object();
@@ -3801,7 +3802,7 @@ Roygbiv.prototype.unsetSteerableTargetPosition = function(object){
   steeringHandler.unsetTargetPosition(object);
 }
 
-// Makes a steerable look at given target position.
+// Makes a steerable gradually look at given target position.
 Roygbiv.prototype.setSteerableLookTarget = function(object, targetVector){
   if (mode == 0){
     return;
@@ -3993,6 +3994,23 @@ Roygbiv.prototype.executeForEachWaypoint = function(aStar, func){
     var wp = path.waypoints[i];
     func(wp.x, wp.y, wp.z);
   }
+}
+
+// Sets the look direction of given steerable. Unlike setSteerableLookTarget API which
+// eventually makes a steerable gradually look at given target depending on the lookSpeed
+// of the steerable, this API immediately modifies the look direction.
+Roygbiv.prototype.setSteerableLookDirection = function(object, lookDirectionVector){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSteerableLookDirection, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setSteerableLookDirection, preConditions.positionVector, lookDirectionVector);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setSteerableLookDirection, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setSteerableLookDirection, object);
+  preConditions.checkIfSteerable(ROYGBIV.setSteerableLookDirection, object);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableLookDirection, preConditions.positionVector, lookDirectionVector);
+
+  steeringHandler.setLookDirection(object, lookDirectionVector);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

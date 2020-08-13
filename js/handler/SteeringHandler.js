@@ -1116,3 +1116,8 @@ SteeringHandler.prototype.removeEdgeFromGraph = function(graphID, vertex1, verte
 
   return count;
 }
+
+SteeringHandler.prototype.setLookDirection = function(object, lookDirection){
+  var komputeVector = this.vectorPool.get().set(lookDirection.x, lookDirection.y, lookDirection.z);
+  object.steerable.setLookDirection(komputeVector);
+}
