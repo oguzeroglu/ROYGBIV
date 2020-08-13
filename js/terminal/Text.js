@@ -1199,4 +1199,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ONSCENEEXIT = "Sets an exit callback function for given scene. The callback function is executed before the scene changes.";
   this.ROYGBIV_SCRIPTING_API_REMOVESCENEEXITLISTENER = "Removes a scene exit listener for given scene.";
   this.ROYGBIV_SCRIPTING_API_SETSTEERABLELOOKDIRECTION = "Sets the look direction of given steerable. Unlike setSteerableLookTarget API which eventually makes a steerable\ngradually look at given target depending on the lookSpeed of the steerable, this API immediately modifies the look\ndirection.";
+  this.ROYGBIV_SCRIPTING_API_GETSTEERABLELOOKDIRECTION = "Fills the targetVectot with the look direction of given steerable object and returns it.";
 }

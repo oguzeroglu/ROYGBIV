@@ -300,7 +300,8 @@ var Roygbiv = function(){
     "executeForEachWaypoint",
     "onSceneExit",
     "removeSceneExitListener",
-    "setSteerableLookDirection"
+    "setSteerableLookDirection",
+    "getSteerableLookDirection"
   ];
 
   this.globals = new Object();
@@ -4011,6 +4012,22 @@ Roygbiv.prototype.setSteerableLookDirection = function(object, lookDirectionVect
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setSteerableLookDirection, preConditions.positionVector, lookDirectionVector);
 
   steeringHandler.setLookDirection(object, lookDirectionVector);
+}
+
+// Fills the targetVectot with the look direction of given steerable object and returns it.
+Roygbiv.prototype.getSteerableLookDirection = function(object, targetVector){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.getSteerableLookDirection, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.getSteerableLookDirection, preConditions.targetVector, targetVector);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.getSteerableLookDirection, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getSteerableLookDirection, object);
+  preConditions.checkIfSteerable(ROYGBIV.getSteerableLookDirection, object);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getSteerableLookDirection, preConditions.targetVector, targetVector);
+
+  return steeringHandler.getLookDirection(object, targetVector);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

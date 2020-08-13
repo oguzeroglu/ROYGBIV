@@ -1121,3 +1121,12 @@ SteeringHandler.prototype.setLookDirection = function(object, lookDirection){
   var komputeVector = this.vectorPool.get().set(lookDirection.x, lookDirection.y, lookDirection.z);
   object.steerable.setLookDirection(komputeVector);
 }
+
+SteeringHandler.prototype.getLookDirection = function(object, targetVector){
+  var lookDirection = object.steerable.lookDirection;
+  targetVector.x = lookDirection.x;
+  targetVector.y = lookDirection.y;
+  targetVector.z = lookDirection.z;
+  
+  return targetVector;
+}
