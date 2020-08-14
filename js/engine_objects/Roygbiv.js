@@ -24,6 +24,9 @@
 //  * Networking functions
 //  * AI functions
 var Roygbiv = function(){
+
+  this.rotationModes = rotationModes;
+
   this.functionNames = [
     "getObject",
     "getParticleSystem",
@@ -301,7 +304,8 @@ var Roygbiv = function(){
     "onSceneExit",
     "removeSceneExitListener",
     "setSteerableLookDirection",
-    "getSteerableLookDirection"
+    "getSteerableLookDirection",
+    "setObjectRotationMode"
   ];
 
   this.globals = new Object();
@@ -1176,6 +1180,26 @@ Roygbiv.prototype.resetObjectVelocity = function(object){
   preConditions.checkIfDynamic(ROYGBIV.resetObjectVelocity, preConditions.object, object);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.resetObjectVelocity, object);
   object.resetVelocity();
+}
+
+// Sets the rotation mode of given object. rotationMode parameter may be either
+// ROYGBIV.rotationModes.LOCAL or ROYGBIV.rotationModes.WORLD. Local rotation
+// mode indicates objects rotating around their own local axis unlike the world
+// axis.
+Roygbiv.prototype.setObjectRotationMode = function(object, rotationMode){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.setObjectRotationMode, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setObjectRotationMode, preConditions.rotationMode, rotationMode);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectRotationMode, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectRotationMode, object);
+  preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.setObjectRotationMode, preConditions.object, object);
+  preConditions.checkIfRotationMode(ROYGBIV.setObjectRotationMode, rotationMode);
+  preConditions.checkIfHaveNotPivotPoint(ROYGBIV.setObjectRotationMode, preConditions.object, object);
+
+  object.setRotationMode(rotationMode);
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************

@@ -280,6 +280,7 @@ var Preconditions = function(){
   this.toTakeoffBehaviorName = "toTakeoffBehaviorName";
   this.completeCallback = "completeCallback";
   this.lookDirectionVector = "lookDirectionVector";
+  this.rotationMode = "rotationMode";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -893,6 +894,12 @@ Preconditions.prototype.checkIfChildObjectOnlyIfExists = function(callerFunc, pa
   }
 }
 
+Preconditions.prototype.checkIfRotationMode = function(callerFunc, rotationMode){
+  if (!(rotationMode == rotationModes.LOCAL || rotationMode == rotationModes.WORLD)){
+    this.throw(callerFunc, "rotationMode should be ROYGBIV.rotationModes.LOCAL or ROYGBIV.rotaitonModes.WORLD");
+  }
+}
+
 Preconditions.prototype.checkIfNoMass = function(callerFunc, parameterName, obj){
   if (obj.noMass){
     this.throw(callerFunc, parameterName+" has no mass.");
@@ -950,6 +957,12 @@ Preconditions.prototype.checkIfRotationPivot = function(callerFunc, parameterNam
 Preconditions.prototype.checkIfHavePivotPoint = function(callerFunc, parameterName, obj){
   if (!obj.pivotObject){
     this.throw(callerFunc, parameterName+" does not have a pivot point.");
+  }
+}
+
+Preconditions.prototype.checkIfHaveNotPivotPoint = function(callerFunc, parameterName, obj){
+  if (obj.pivotObject){
+    this.throw(callerFunc, parameterName+" has a rotation pivot. Cannot use this API.");
   }
 }
 

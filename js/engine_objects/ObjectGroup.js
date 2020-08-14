@@ -753,6 +753,8 @@ ObjectGroup.prototype.loadState = function(){
     this.pivotOffsetY = this.originalPivotOffsetY;
     this.pivotOffsetZ = this.originalPivotOffsetZ;
   }
+
+  this.setRotationMode(this.state.rotationMode);
 }
 
 ObjectGroup.prototype.saveState = function(){
@@ -783,6 +785,7 @@ ObjectGroup.prototype.saveState = function(){
     this.originalPivotOffsetY = this.pivotOffsetY;
     this.originalPivotOffsetZ = this.pivotOffsetZ;
   }
+  this.state.rotationMode = this.rotationMode;
 }
 
 ObjectGroup.prototype.areGeometriesIdentical = function(){

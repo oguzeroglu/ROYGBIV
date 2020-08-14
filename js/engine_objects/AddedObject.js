@@ -1075,6 +1075,8 @@ AddedObject.prototype.loadState = function(){
     this.pivotOffsetY = this.originalPivotOffsetY;
     this.pivotOffsetZ = this.originalPivotOffsetZ;
   }
+
+  this.setRotationMode(this.state.rotationMode);
 }
 
 AddedObject.prototype.saveState = function(){
@@ -1105,6 +1107,7 @@ AddedObject.prototype.saveState = function(){
     this.originalPivotOffsetY = this.pivotOffsetY;
     this.originalPivotOffsetZ = this.pivotOffsetZ;
   }
+  this.state.rotationMode = this.rotationMode;
 }
 
 AddedObject.prototype.handleRenderSide = function(val){

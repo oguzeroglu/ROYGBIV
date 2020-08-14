@@ -1202,4 +1202,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVESCENEEXITLISTENER = "Removes a scene exit listener for given scene.";
   this.ROYGBIV_SCRIPTING_API_SETSTEERABLELOOKDIRECTION = "Sets the look direction of given steerable. Unlike setSteerableLookTarget API which eventually makes a steerable\ngradually look at given target depending on the lookSpeed of the steerable, this API immediately modifies the look\ndirection.";
   this.ROYGBIV_SCRIPTING_API_GETSTEERABLELOOKDIRECTION = "Fills the targetVectot with the look direction of given steerable object and returns it.";
+  this.ROYGBIV_SCRIPTING_API_SETOBJECTROTATIONMODE = "Sets the rotation mode of given object. rotationMode parameter may be either ROYGBIV.rotationModes.LOCAL or ROYGBIV.rotationModes.WORLD.\nLocal rotation mode indicates objects rotating around their own local axis unlike the world axis.";
 }
