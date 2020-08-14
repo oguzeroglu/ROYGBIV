@@ -415,7 +415,7 @@ var rotationModes = {
   WORLD: "WORLD"
 };
 
-// AXEDS
+// AXES
 var axes = {"X": "x", "Y": "y", "Z": "z"};
 
 // LIGHTING LIMITS
