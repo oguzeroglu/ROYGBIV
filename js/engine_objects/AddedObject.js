@@ -323,7 +323,7 @@ AddedObject.prototype.setPositionThresholdExceededListener = function(axis, thre
   if (!this.positionThresholdExceededListenerInfo){
     this.positionThresholdExceededListenerInfo = new Object();
   }
-  this.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
+  this.positionThresholdExceededListenerInfo.axis = axis;
   this.positionThresholdExceededListenerInfo.isActive = true;
   this.positionThresholdExceededListenerInfo.threshold = threshold;
   this.positionThresholdExceededListenerInfo.controlMode = controlMode;
@@ -1691,19 +1691,19 @@ AddedObject.prototype.getTextureStack = function(){
 }
 
 AddedObject.prototype.getPositionAtAxis = function(axis){
-  if (axis.toLowerCase() == "x"){
+  if (axis == axes.X){
     if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
       return parseInt(this.metaData["centerX"]);
     }else if (this.type == "surface"){
       return parseInt(this.metaData["positionX"]);
     }
-  }else if (axis.toLowerCase() == "y"){
+  }else if (axis == axes.Y){
     if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
       return parseInt(this.metaData["centerY"]);
     }else if (this.type == "surface"){
       return parseInt(this.metaData["positionY"]);
     }
-  }else if (axis.toLowerCase() == "z"){
+  }else if (axis == axes.Z){
     if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
       return parseInt(this.metaData["centerZ"]);
     }else if (this.type == "surface"){
@@ -1955,11 +1955,11 @@ AddedObject.prototype.rotateBox = function(axis, radians, fromScript){
 }
 
 AddedObject.prototype.rotatePhysicsBody = function(axis, radians){
-  if (axis.toLowerCase() == "x"){
+  if (axis == axes.X){
     REUSABLE_CANNON_QUATERNION.setFromAxisAngle(CANNON_AXIS_VECTOR_X, radians);
-  }else if (axis.toLowerCase() == "y"){
+  }else if (axis == axes.Y){
     REUSABLE_CANNON_QUATERNION.setFromAxisAngle(CANNON_AXIS_VECTOR_Y, radians);
-  }else if (axis.toLowerCase() == "z"){
+  }else if (axis == axes.Z){
     REUSABLE_CANNON_QUATERNION.setFromAxisAngle(CANNON_AXIS_VECTOR_Z, radians);
   }
   REUSABLE_CANNON_QUATERNION.mult(this.physicsBody.quaternion, REUSABLE_CANNON_QUATERNION_2);

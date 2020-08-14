@@ -415,6 +415,9 @@ var rotationModes = {
   WORLD: "WORLD"
 };
 
+// AXEDS
+var axes = {"X": "x", "Y": "y", "Z": "z"};
+
 // LIGHTING LIMITS
 var MAX_STATIC_DIFFUSE_LIGHT_COUNT = 5;
 var MAX_STATIC_POINT_LIGHT_COUNT = 5;

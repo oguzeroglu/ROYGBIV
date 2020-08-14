@@ -25,7 +25,18 @@
 //  * AI functions
 var Roygbiv = function(){
 
+  this.axes = axes;
+
   this.rotationModes = rotationModes;
+
+  this.endpoints = {
+    PLUS_X: "+x",
+    PLUS_Y: "+y",
+    PLUS_Z: "+z",
+    MINUS_X: "-x",
+    MINUS_Y: "-y",
+    MINUS_Z: "-z"
+  };
 
   this.functionNames = [
     "getObject",
@@ -372,6 +383,7 @@ Roygbiv.prototype.getRandomColor = function(){
 // getPosition
 //  Returns the (x, y, z) coordinates of an object, glued object or a particle system.
 //  If a specific axis is specified, only the position on the specified axis is returned.
+//  Note that axis should be one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.
 Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   if (mode == 0){
     return;
@@ -392,19 +404,19 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
         var child = parentObject.graphicsGroup.children[object.indexInParent];
         child.getWorldPosition(REUSABLE_VECTOR);
         var worldPosition = REUSABLE_VECTOR;
-        if (axis.toLowerCase() == "x"){
+        if (axis == this.axes.X){
           return worldPosition.x;
-        }else if (axis.toLowerCase() == "y"){
+        }else if (axis == this.axes.Y){
           return worldPosition.y;
-        }else if (axis.toLowerCase() == "z"){
+        }else if (axis == this.axes.Z){
           return worldPosition.z;
         }
       }
-      if (axis.toLowerCase() == "x"){
+      if (axis == this.axes.X){
         return object.mesh.position.x;
-      }else if (axis.toLowerCase() == "y"){
+      }else if (axis == this.axes.Y){
         return object.mesh.position.y;
-      }else if (axis.toLowerCase() == "z"){
+      }else if (axis == this.axes.Z){
         return object.mesh.position.z;
       }
     }else{
@@ -441,11 +453,11 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
     }
   }else if (object.isObjectGroup){
     if (axis){
-      if (axis.toLowerCase() == "x"){
+      if (axis == this.axes.X){
         return object.mesh.position.x;
-      }else if (axis.toLowerCase() == "y"){
+      }else if (axis == this.axes.Y){
         return object.mesh.position.y;
-      }else if (axis.toLowerCase() == "z"){
+      }else if (axis == this.axes.Z){
         return object.mesh.position.z;
       }
     }else{
@@ -464,11 +476,11 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
     }
   }else if (object.isParticleSystem){
     if (axis){
-      if (axis.toLowerCase() == "x"){
+      if (axis == this.axes.X){
         return object.mesh.position.x;
-      }else if (axis.toLowerCase() == "y"){
+      }else if (axis == this.axes.Y){
         return object.mesh.position.y;
-      }else if (axis.toLowerCase() == "z"){
+      }else if (axis == this.axes.Z){
         return object.mesh.position.z;
       }
     }else{
@@ -589,10 +601,17 @@ Roygbiv.prototype.getParticleSystemFromPool = function(pool){
   return pool.get();
 }
 
-// Gets an end point of an object. The axis may be +x,-x,+y,-y,+z or -z. Note that
-// object groups do not support this function but child objects do. This function
-// may be useful in cases where for example a particle system needs to be started
-// from the tip point of an object.
+// Gets an end point of an object. The axis may be one of:
+// ROYGBIV.axes.MINUS_X
+// ROYGBIV.axes.MINUS_Y
+// ROYGBIV.axes.MINUS_Z
+// ROYGBIV.axes.PLUS_X
+// ROYGBIV.axes.PLUS_Y
+// ROYGBIV.axes.PLUS_Z
+//
+// Note that object groups do not support this function but child objects do.
+// This function may be useful in cases where for example a particle system needs
+// to be started from the tip point of an object.
 Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
   if (mode == 0){
     return;
@@ -603,7 +622,6 @@ Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
   preConditions.checkIfDefined(ROYGBIV.getEndPoint, preConditions.targetVector, targetVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getEndPoint, preConditions.targetVector, targetVector);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getEndPoint, object);
-  axis = axis.toLowerCase();
   preConditions.checkIfEndPointAxis(ROYGBIV.getEndPoint, preConditions.axis, axis);
   var endPoint = object.getEndPoint(axis);
   targetVector.x = endPoint.x;
@@ -857,17 +875,16 @@ Roygbiv.prototype.applyForce = function(object, force, point){
 }
 
 //  Rotates an object or a glued object around a given axis by given radians.
-//  The parameter axis must be one of x, y or z. Objects are rotated around
-//  their own centers, so their positions do not change when rotated using this
-//  function. If object has a local rotation mode set, the rotation is performed
-//  around it's local axis, it's performed around the world axis otherwise. 
+//  The parameter axis must be one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.
+//  Objects are rotated around their own centers, so their positions do not change when
+//  rotated using this function. If object has a local rotation mode set, the rotation
+//  is performed around it's local axis, it's performed around the world axis otherwise.
 Roygbiv.prototype.rotate = function(object, axis, radians){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.rotate, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.rotate, preConditions.axis, axis);
-  axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotate, preConditions.axis, axis);
   preConditions.checkIfNumber(ROYGBIV.rotate, preConditions.radians, radians);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.rotate, preConditions.object, object);
@@ -892,7 +909,8 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
 
 //  Rotates an object or a glued object around the given (x, y, z)
 //  Unlike the rotate function, the positions of the objects can change when rotated
-//  using this function.
+//  using this function. Note that axis must be one of ROYGBIV.axes.X, ROYGBIV.axes.Y
+//  or ROYGBIV.axes.Z.
 Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   if (mode == 0){
     return;
@@ -909,14 +927,13 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   preConditions.checkIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.axis, axis);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.rotateAroundXYZ, object);
-  axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.axis, axis);
   var axisVector;
-  if (axis.toLowerCase() == "x"){
+  if (axis == this.axes.X){
     axisVector = THREE_AXIS_VECTOR_X;
-  }else if (axis.toLowerCase() == "y"){
+  }else if (axis== this.axes.Y){
     axisVector = THREE_AXIS_VECTOR_Y;
-  }else if (axis.toLowerCase() == "z"){
+  }else if (axis == this.axes.Z){
     axisVector = THREE_AXIS_VECTOR_Z;
   }
   var mesh;
@@ -1013,7 +1030,7 @@ Roygbiv.prototype.setMass = function(object, mass){
 }
 
 //  Translates an object or glued object on the given axis by the given amount.
-//  Axis must be one of x, y or z.
+//  Axis must be one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.
 Roygbiv.prototype.translate = function(object, axis, amount){
   if (mode == 0){
     return;
@@ -1021,7 +1038,6 @@ Roygbiv.prototype.translate = function(object, axis, amount){
   preConditions.checkIfDefined(ROYGBIV.translate, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.translate, preConditions.axis, axis);
   preConditions.checkIfDefined(ROYGBIV.translate, preConditions.amount, amount);
-  axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.translate, preConditions.axis, axis);
   preConditions.checkIfNumber(ROYGBIV.translate, preConditions.amount, amount);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.translate, preConditions.object, object);
@@ -1080,7 +1096,9 @@ Roygbiv.prototype.opacity = function(object, delta){
 }
 
 //  Sets the velocity of an object or a glued object. The object must be a dynamic object
-//  (mass > 0) in order to have a velocity.
+//  (mass > 0) in order to have a velocity. If optional axis parameter is used
+//  velocity on only given axis is set. Note that axis must be one of ROYGBIV.axes.X,
+//  ROYGBIV.axes.Y or ROYGBIV.axes.Z.
 Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
   if (mode == 0){
     return;
@@ -1094,13 +1112,12 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setObjectVelocity, preConditions.velocityVector, velocityVector);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectVelocity, object);
   if (!(typeof axis == UNDEFINED)){
-    axis = axis.toLowerCase();
     preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.setObjectVelocity, preConditions.axis, axis);
-    if (axis == "x"){
+    if (axis == this.axes.X){
       object.setVelocityX(velocityVector.x);
-    }else if (axis == "y"){
+    }else if (axis == this.axes.Y){
       object.setVelocityY(velocityVector.y);
-    }else if (axis == "z"){
+    }else if (axis == this.axes.Z){
       object.setVelocityZ(velocityVector.z);
     }
     return;
@@ -1205,7 +1222,8 @@ Roygbiv.prototype.setObjectRotationMode = function(object, rotationMode){
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************
 
-//  Sets the rotation of a particle system around given axis.
+//  Sets the rotation of a particle system around given axis. Note that axis must be
+//  one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.
 Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, radians){
   if (mode == 0){
     return;
@@ -1213,7 +1231,6 @@ Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, rad
   preConditions.checkIfDefined(ROYGBIV.setParticleSystemRotation, preConditions.particleSystem, particleSystem);
   preConditions.checkIfDefined(ROYGBIV.setParticleSystemRotation, preConditions.axis, axis);
   preConditions.checkIfDefined(ROYGBIV.setParticleSystemRotation, preConditions.radians, radians);
-  axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.setParticleSystemRotation, preConditions.axis, axis);
   preConditions.checkIfNumber(ROYGBIV.setParticleSystemRotation, preConditions.radians, radians);
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem is not visible", (!particleSystem.mesh.visible));
@@ -1222,11 +1239,11 @@ Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, rad
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a trailed particle. Cannot set rotation.", particleSystem.hasTrailedParticle);
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a defined motion. Cannot set rotation.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
   preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setParticleSystemRotation, particleSystem);
-  if (axis == "x"){
+  if (axis == this.axes.X){
     particleSystem.mesh.rotation.x = radians;
-  }else if (axis == "y"){
+  }else if (axis == this.axes.Y){
     particleSystem.mesh.rotation.y = radians;
-  }else if (axis == "z"){
+  }else if (axis == this.axes.Z){
     particleSystem.mesh.rotation.z = radians;
   }
   particleSystem.hasManualRotationSet = true;
@@ -4432,7 +4449,8 @@ Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY,
   return sourceObject.makePivot(offsetX, offsetY, offsetZ);
 }
 
-// Rotates the camera around its axis by given radians.
+// Rotates the camera around its axis by given radians. Note that axis must be
+// one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.
 Roygbiv.prototype.rotateCamera = function(axis, radians){
   if (mode == 0){
     return;
@@ -4440,18 +4458,18 @@ Roygbiv.prototype.rotateCamera = function(axis, radians){
   preConditions.checkIfDefined(ROYGBIV.rotateCamera, preConditions.axis, axis);
   preConditions.checkIfDefined(ROYGBIV.rotateCamera, preConditions.radians, radians);
   preConditions.checkIfNumber(ROYGBIV.rotateCamera, preConditions.radians, radians);
-  axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotateCamera, preConditions.axis, axis);
-  if (axis == "x"){
+  if (axis == this.axes.X){
     cameraRotationBuffer.x += radians;
-  }else if (axis == "y"){
+  }else if (axis == this.axes.Y){
     cameraRotationBuffer.y += radians;
-  }else if (axis == "z"){
+  }else if (axis == this.axes.Z){
     cameraRotationBuffer.z += radians;
   }
 }
 
-// Translates the camera along given axis by given amount.
+// Translates the camera along given axis by given amount. Note that axis must be
+// one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.
 Roygbiv.prototype.translateCamera = function(axis, amount){
   if (mode == 0){
     return;
@@ -4459,13 +4477,12 @@ Roygbiv.prototype.translateCamera = function(axis, amount){
   preConditions.checkIfDefined(ROYGBIV.translateCamera, preConditions.axis, axis);
   preConditions.checkIfDefined(ROYGBIV.translateCamera, preConditions.amount, amount);
   preConditions.checkIfNumber(ROYGBIV.translateCamera, preConditions.amount, amount);
-  axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.translateCamera, preConditions.axis, axis);
-  if (axis == "x"){
+  if (axis == this.axes.X){
     camera.translateX(amount);
-  }else if (axis == "y"){
+  }else if (axis == this.axes.Y){
     camera.translateY(amount);
-  }else if (axis == "z"){
+  }else if (axis == this.axes.Z){
     camera.translateZ(amount);
   }
 }

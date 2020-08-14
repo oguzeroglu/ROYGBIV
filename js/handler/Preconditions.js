@@ -700,8 +700,7 @@ Preconditions.prototype.checkIfQuaternionOnlyIfDefined = function(callerFunc, pa
 
 Preconditions.prototype.checkIfAxisOnlyIfDefined = function(callerFunc, parameterName, obj){
   if (!(typeof obj == UNDEFINED)){
-    var axis = obj.toLowerCase();
-    if (axis != "x" && axis != "y" && axis != "z"){
+    if (axis != ROYGBIV.axes.X && axis != ROYGBIV.axes.Y && axis != ROYGBIV.axes.Z){
       this.throw(callerFunc, parameterName+" must be x, y, or z.");
     }
   }
@@ -877,7 +876,7 @@ Preconditions.prototype.checkIfPoolDestroyed = function(callerFunc, parameterNam
 }
 
 Preconditions.prototype.checkIfEndPointAxis = function(callerFunc, parameterName, obj){
-  if (!(obj == "+x" || obj == "-x" || obj == "+y" || obj == "-y" || obj == "+z" || obj == "-z")){
+  if (!(obj == plusX || obj == minusX || obj == plusY || obj == minusY || obj == plusZ || obj == minusZ)){
     this.throw(callerFunc, parameterName+" must be one of +x, +y, +z, -x, -y, -z");
   }
 }

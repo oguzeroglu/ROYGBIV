@@ -390,7 +390,7 @@ ObjectGroup.prototype.setPositionThresholdExceededListener = function(axis, thre
   if (!this.positionThresholdExceededListenerInfo){
     this.positionThresholdExceededListenerInfo = new Object();
   }
-  this.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
+  this.positionThresholdExceededListenerInfo.axis = axis;
   this.positionThresholdExceededListenerInfo.isActive = true;
   this.positionThresholdExceededListenerInfo.threshold = threshold;
   this.positionThresholdExceededListenerInfo.controlMode = controlMode;
