@@ -1,9 +1,9 @@
 var GUIHandler = function(){
   this.objectManipulationParameters = {
     "Object": "objectName",
-    "Rotate x": 0.0,
-    "Rotate y": 0.0,
-    "Rotate z": 0.0,
+    "Rotate x": "0",
+    "Rotate y": "0",
+    "Rotate z": "0",
     "Rotation mode": rotationModes.WORLD,
     "Mass": 0.0,
     "Phy. simpl.": false,
@@ -475,9 +475,9 @@ GUIHandler.prototype.afterObjectSelection = function(){
     obj.visualiseBoundingBoxes();
     guiHandler.objectManipulationParameters["Object"] = obj.name;
     if (obj.isAddedObject){
-      guiHandler.objectManipulationParameters["Rotate x"] = 0;
-      guiHandler.objectManipulationParameters["Rotate y"] = 0;
-      guiHandler.objectManipulationParameters["Rotate z"] = 0;
+      guiHandler.objectManipulationParameters["Rotate x"] = "0";
+      guiHandler.objectManipulationParameters["Rotate y"] = "0";
+      guiHandler.objectManipulationParameters["Rotate z"] = "0";
       guiHandler.objectManipulationParameters["Opacity"] = obj.getOpacity();
       if (obj.metaData.isSlippery){
         guiHandler.objectManipulationParameters["Slippery"] = true;
@@ -571,9 +571,9 @@ GUIHandler.prototype.afterObjectSelection = function(){
       guiHandler.disableController(guiHandler.omPhysicsSimplifiedController);
       obj.mesh.add(axesHelper);
     }else if (obj.isObjectGroup){
-      guiHandler.objectManipulationParameters["Rotate x"] = 0;
-      guiHandler.objectManipulationParameters["Rotate y"] = 0;
-      guiHandler.objectManipulationParameters["Rotate z"] = 0;
+      guiHandler.objectManipulationParameters["Rotate x"] = "0";
+      guiHandler.objectManipulationParameters["Rotate y"] = "0";
+      guiHandler.objectManipulationParameters["Rotate z"] = "0";
       if (obj.isSlippery){
         guiHandler.objectManipulationParameters["Slippery"] = true;
       }else{
@@ -785,13 +785,13 @@ GUIHandler.prototype.omGUIRotateEvent = function(axis, val){
   terminal.clear();
   parseCommand("rotateObject "+obj.name+" "+axis+" "+val);
   if (axis == "x"){
-    guiHandler.objectManipulationParameters["Rotate x"] = 0;
+    guiHandler.objectManipulationParameters["Rotate x"] = "0";
     guiHandler.omRotationXController.updateDisplay();
   }else if (axis == "y"){
-    guiHandler.objectManipulationParameters["Rotate y"] = 0;
+    guiHandler.objectManipulationParameters["Rotate y"] = "0";
     guiHandler.omRotationYController.updateDisplay();
   }else if (axis == "z"){
-    guiHandler.objectManipulationParameters["Rotate z"] = 0;
+    guiHandler.objectManipulationParameters["Rotate z"] = "0";
     guiHandler.omRotationZController.updateDisplay();
   }
 }
@@ -1257,6 +1257,19 @@ GUIHandler.prototype.initializeShaderPrecisionGUI = function(){
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Done");
 }
 
+GUIHandler.prototype.getNumericValue = function(expression){
+  try{
+    var evaluationResult = eval(expression);
+    var radian = parseFloat(evaluationResult);
+    if (isNaN(radian)){
+      return null;
+    }
+    return radian;
+  }catch (err){
+    return null;
+  }
+}
+
 GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   guiHandler.datGuiObjectManipulation = new dat.GUI({hideable: false, width: 420});
   guiHandler.datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
@@ -1275,14 +1288,32 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   var motionBlurFolder = guiHandler.datGuiObjectManipulation.addFolder("Motion Blur");
 
   // ROTATION
-  guiHandler.omRotationXController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate x").onChange(function(val){
-    guiHandler.omGUIRotateEvent("x", val);
+  guiHandler.omRotationXController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate x").onFinishChange(function(val){
+    var parsed = guiHandler.getNumericValue(val);
+    if (parsed === null){
+      terminal.clear();
+      terminal.printError(Text.INVALID_EXPRESSION);
+      return;
+    }
+    guiHandler.omGUIRotateEvent("x", parsed);
   });
-  guiHandler.omRotationYController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate y").onChange(function(val){
-    guiHandler.omGUIRotateEvent("y", val);
+  guiHandler.omRotationYController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate y").onFinishChange(function(val){
+    var parsed = guiHandler.getNumericValue(val);
+    if (parsed === null){
+      terminal.clear();
+      terminal.printError(Text.INVALID_EXPRESSION);
+      return;
+    }
+    guiHandler.omGUIRotateEvent("y", parsed);
   });
-  guiHandler.omRotationZController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate z").onChange(function(val){
-    guiHandler.omGUIRotateEvent("z", val);
+  guiHandler.omRotationZController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate z").onFinishChange(function(val){
+    var parsed = guiHandler.getNumericValue(val);
+    if (parsed === null){
+      terminal.clear();
+      terminal.printError(Text.INVALID_EXPRESSION);
+      return;
+    }
+    guiHandler.omGUIRotateEvent("z", parsed);
   });
   guiHandler.omRotationModeController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotation mode", Object.keys(rotationModes)).onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
