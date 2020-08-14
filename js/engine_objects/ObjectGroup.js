@@ -2840,6 +2840,8 @@ ObjectGroup.prototype.export = function(){
     }
   }
 
+  exportObj.rotationMode = this.rotationMode;
+
   return exportObj;
 }
 

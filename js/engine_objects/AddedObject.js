@@ -942,6 +942,8 @@ AddedObject.prototype.export = function(){
     }
   }
 
+  exportObject.rotationMode = this.rotationMode;
+
   return exportObject;
 }
 

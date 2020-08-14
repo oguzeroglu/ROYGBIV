@@ -590,6 +590,8 @@ ImportHandler.prototype.importAddedObjects = function(obj){
     addedObjectInstance.metaData["textureRepeatU"] = curAddedObjectExport.textureRepeatU;
     addedObjectInstance.metaData["textureRepeatV"] = curAddedObjectExport.textureRepeatV;
 
+    addedObjectInstance.setRotationMode(curAddedObjectExport.rotationMode);
+
     if (!curAddedObjectExport.fromObjectGroup){
 
       var rotationX = curAddedObjectExport.rotationX;
@@ -1039,6 +1041,9 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     objectGroupInstance.graphicsGroup.quaternion.copy(objectGroupInstance.initQuaternion.clone());
     objectGroupInstance.physicsBody.quaternion.copy(objectGroupInstance.graphicsGroup.quaternion);
     objectGroupInstance.physicsBody.initQuaternion = new CANNON.Quaternion().copy(objectGroupInstance.graphicsGroup.quaternion);
+
+    objectGroupInstance.setRotationMode(curObjectGroupExport.rotationMode);
+
     var isDynamicObject = false;
     if (curObjectGroupExport.isDynamicObject){
       isDynamicObject = curObjectGroupExport.isDynamicObject;
