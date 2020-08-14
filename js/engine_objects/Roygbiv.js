@@ -856,10 +856,11 @@ Roygbiv.prototype.applyForce = function(object, force, point){
   physicsWorld.applyImpulse(object, REUSABLE_CANNON_VECTOR, REUSABLE_CANNON_VECTOR_2);
 }
 
-//  Rotates an object or a glued object around a given world axis by given radians.
+//  Rotates an object or a glued object around a given axis by given radians.
 //  The parameter axis must be one of x, y or z. Objects are rotated around
 //  their own centers, so their positions do not change when rotated using this
-//  function.
+//  function. If object has a local rotation mode set, the rotation is performed
+//  around it's local axis, it's performed around the world axis otherwise. 
 Roygbiv.prototype.rotate = function(object, axis, radians){
   if (mode == 0){
     return;
