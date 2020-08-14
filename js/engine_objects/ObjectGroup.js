@@ -36,6 +36,12 @@ var ObjectGroup = function(name, group){
   this.animations = new Object();
 
   this.matrixCache = new THREE.Matrix4();
+
+  this.rotationMode = rotationModes.WORLD;
+}
+
+ObjectGroup.prototype.setRotationMode = function(rotationMode){
+  this.rotationMode = rotationMode;
 }
 
 ObjectGroup.prototype.makeSteerable = function(mode, maxSpeed, maxAcceleration, jumpSpeed, lookSpeed){
@@ -2494,6 +2500,14 @@ ObjectGroup.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
   }
 }
 
+ObjectGroup.prototype.rotateMesh = function(axisVector, radians){
+  if (this.rotationMode == rotationModes.WORLD){
+    this.mesh.rotateOnWorldAxis(axisVector, radians);
+  }else{
+    this.mesh.rotateOnAxis(axisVector, radians);
+  }
+}
+
 ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
   REUSABLE_QUATERNION.copy(this.mesh.quaternion);
   var axisVector
@@ -2504,7 +2518,7 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
   }else if (axis == "z"){
     axisVector = THREE_AXIS_VECTOR_Z;
   }
-  this.mesh.rotateOnWorldAxis(axisVector, radian);
+  this.rotateMesh(axisVector, radian);
   if (!this.isPhysicsSimplified){
     this.physicsBody.quaternion.copy(this.mesh.quaternion);
     this.graphicsGroup.quaternion.copy(this.mesh.quaternion);

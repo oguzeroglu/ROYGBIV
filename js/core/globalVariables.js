@@ -409,6 +409,12 @@ var serverWSURL = 0;
 var objectExportImportHandler;
 var DUMMY_TEXTURE = new THREE.Texture();
 
+// ROTATION MODES
+var rotationModes = {
+  LOCAL: "LOCAL",
+  WORLD: "WORLD"
+};
+
 // LIGHTING LIMITS
 var MAX_STATIC_DIFFUSE_LIGHT_COUNT = 5;
 var MAX_STATIC_POINT_LIGHT_COUNT = 5;

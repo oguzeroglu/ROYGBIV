@@ -72,7 +72,13 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   this.matrixCache = new THREE.Matrix4();
 
+  this.rotationMode = rotationModes.WORLD;
+
   webglCallbackHandler.registerEngineObject(this);
+}
+
+AddedObject.prototype.setRotationMode = function(rotationMode){
+  this.rotationMode = rotationMode;
 }
 
 AddedObject.prototype.makeSteerable = function(mode, maxSpeed, maxAcceleration, jumpSpeed, lookSpeed){
@@ -1818,6 +1824,14 @@ AddedObject.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
   }
 }
 
+AddedObject.prototype.rotateMesh = function(axisVector, radians){
+  if (this.rotationMode == rotationModes.WORLD){
+    this.mesh.rotateOnWorldAxis(axisVector, radians);
+  }else{
+    this.mesh.rotateOnAxis(axisVector, radians);
+  }
+}
+
 AddedObject.prototype.rotate = function(axis, radians, fromScript){
   if (this.type == "surface"){
     this.rotateSurface(axis, radians, fromScript);
@@ -1856,11 +1870,11 @@ AddedObject.prototype.rotateSphere = function(axis, radians, fromScript){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
   if (axis == "x"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_X, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_X, radians);
   }else if (axis == "y"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Y, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_Y, radians);
   }else if (axis == "z"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Z, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_Z, radians);
   }
   this.syncPhysicsRotation();
   if (!fromScript){
@@ -1873,11 +1887,11 @@ AddedObject.prototype.rotateCylinder = function(axis, radians, fromScript){
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
   if (axis == "x"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_X, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_X, radians);
   }else if (axis == "y"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Y, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_Y, radians);
   }else if (axis == "z"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Z, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_Z, radians);
   }
   this.syncPhysicsRotation();
   if (!fromScript){
@@ -1890,11 +1904,11 @@ AddedObject.prototype.rotateRamp = function(axis, radians, fromScript){
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
   if (axis == "x"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_X, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_X, radians);
   }else if (axis == "y"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Y, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_Y, radians);
   }else if (axis == "z"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Z, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_Z, radians);
   }
   this.syncPhysicsRotation();
   if (!fromScript){
@@ -1907,11 +1921,11 @@ AddedObject.prototype.rotateSurface = function(axis, radians, fromScript){
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
   if (axis == "x"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_X, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_X, radians);
   }else if (axis == "y"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Y, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_Y, radians);
   }else if (axis == "z"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Z, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_Z, radians);
   }
   this.syncPhysicsRotation();
   if (!fromScript){
@@ -1923,11 +1937,11 @@ AddedObject.prototype.rotateBox = function(axis, radians, fromScript){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
   if (axis == "x"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_X, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_X, radians);
   }else if (axis == "y"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Y, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_Y, radians);
   }else if (axis == "z"){
-    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Z, radians);
+    this.rotateMesh(THREE_AXIS_VECTOR_Z, radians);
   }
   this.syncPhysicsRotation();
   if (!fromScript){

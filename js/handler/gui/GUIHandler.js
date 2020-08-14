@@ -4,6 +4,7 @@ var GUIHandler = function(){
     "Rotate x": 0.0,
     "Rotate y": 0.0,
     "Rotate z": 0.0,
+    "Rotation mode": rotationModes.WORLD,
     "Mass": 0.0,
     "Phy. simpl.": false,
     "Slippery": false,
@@ -673,6 +674,9 @@ GUIHandler.prototype.afterObjectSelection = function(){
       obj.mesh.add(axesHelper);
     }
 
+    var rotationMode = obj.rotationMode;
+    guiHandler.objectManipulationParameters["Rotation mode"] = rotationMode == rotationModes.LOCAL? "LOCAL": "WORLD";
+
     guiHandler.objectManipulationParameters["AI entity"] = obj.usedAsAIEntity || false;
 
     if (!obj.isChangeable){
@@ -910,6 +914,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omMaxSpeedController);
   guiHandler.enableController(guiHandler.omJumpSpeedController);
   guiHandler.enableController(guiHandler.omLookSpeedController);
+  guiHandler.enableController(guiHandler.omRotationModeController);
 }
 
 GUIHandler.prototype.show = function(guiType){
@@ -1125,7 +1130,7 @@ GUIHandler.prototype.hide = function(guiType){
     case this.guiTypes.JUMP_DESCRIPTOR_CREATION:
       if (this.datGuiJumpDescriptorCreation){
         this.destroyGUI(this.datGuiJumpDescriptorCreation);
-        this.datGuiJumpDescriptorCreation = 0;        
+        this.datGuiJumpDescriptorCreation = 0;
       }
     return;
   }
@@ -1279,6 +1284,9 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   guiHandler.omRotationZController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate z").onChange(function(val){
     guiHandler.omGUIRotateEvent("z", val);
   });
+  guiHandler.omRotationModeController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotation mode", Object.keys(rotationModes)).onChange(function(val){
+    selectionHandler.getSelectedObject().setRotationMode(rotationModes[val]);
+  }).listen();
 
   // PHYSICS
   guiHandler.omMassController = physicsFolder.add(guiHandler.objectManipulationParameters, "Mass").onChange(function(val){
