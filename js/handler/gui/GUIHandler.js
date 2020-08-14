@@ -1285,7 +1285,16 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     guiHandler.omGUIRotateEvent("z", val);
   });
   guiHandler.omRotationModeController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotation mode", Object.keys(rotationModes)).onChange(function(val){
-    selectionHandler.getSelectedObject().setRotationMode(rotationModes[val]);
+    var obj = selectionHandler.getSelectedObject();
+
+    if (obj.pivotObject){
+      terminal.clear();
+      terminal.printError(Text.OBJECT_HAS_A_ROTATION_PIVOT_NO_LOCAL);
+      selectionHandler.resetCurrentSelection();
+      return;
+    }
+
+    obj.setRotationMode(rotationModes[val]);
   }).listen();
 
   // PHYSICS

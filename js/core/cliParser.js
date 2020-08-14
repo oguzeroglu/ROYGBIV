@@ -3216,6 +3216,10 @@ function parse(input){
             terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetZ"));
             return true;
           }
+          if (obj.rotationMode == rotationModes.LOCAL){
+            terminal.printError(Text.OBJECT_HAS_LOCAL_ROTATION_CANNOT_SET_PIVOT);
+            return true;
+          }
           var pivot = obj.makePivot(offsetX, offsetY, offsetZ);
           obj.pivotObject = pivot;
           obj.pivotOffsetX = offsetX;
