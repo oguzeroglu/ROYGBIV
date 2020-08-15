@@ -317,7 +317,8 @@ var Roygbiv = function(){
     "setSteerableLookDirection",
     "getSteerableLookDirection",
     "setObjectRotationMode",
-    "resetObjectRotation"
+    "resetObjectRotation",
+    "calculateAngleBetweenVectors"
   ];
 
   this.globals = new Object();
@@ -603,12 +604,12 @@ Roygbiv.prototype.getParticleSystemFromPool = function(pool){
 }
 
 // Gets an end point of an object. The axis may be one of:
-// ROYGBIV.axes.MINUS_X
-// ROYGBIV.axes.MINUS_Y
-// ROYGBIV.axes.MINUS_Z
-// ROYGBIV.axes.PLUS_X
-// ROYGBIV.axes.PLUS_Y
-// ROYGBIV.axes.PLUS_Z
+// ROYGBIV.endpoints.MINUS_X
+// ROYGBIV.endpoints.MINUS_Y
+// ROYGBIV.endpoints.MINUS_Z
+// ROYGBIV.endpoints.PLUS_X
+// ROYGBIV.endpoints.PLUS_Y
+// ROYGBIV.endpoints.PLUS_Z
 //
 // Note that object groups do not support this function but child objects do.
 // This function may be useful in cases where for example a particle system needs
@@ -4827,4 +4828,20 @@ Roygbiv.prototype.getFromVectorPool = function(vectorPool){
   preConditions.checkIfTrue(ROYGBIV.getFromVectorPool, "Object is not a vector pool", !vectorPool.isVectorPool);
 
   return vectorPool.get();
+}
+
+// Returns the angle between two vectors in radians.
+Roygbiv.prototype.calculateAngleBetweenVectors = function(vec1, vec2){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.distance, preConditions.vec1, vec1);
+  preConditions.checkIfDefined(ROYGBIV.distance, preConditions.vec2, vec2);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.distance, preConditions.vec1, vec1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.distance, preConditions.vec2, vec2);
+
+  REUSABLE_VECTOR.set(vec1.x, vec1.y, vec1.z);
+  REUSABLE_VECTOR_2.set(vec2.x, vec2.y, vec2.z);
+
+  return REUSABLE_VECTOR.angleTo(REUSABLE_VECTOR_2);
 }

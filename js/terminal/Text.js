@@ -921,7 +921,7 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVEFULLSCREENCHANGECALLBACKFUNCTION = "Removes the fullscreen change listener.";
    this.ROYGBIV_SCRIPTING_API_ISMOUSEDOWN = "Returns true if the mouse is pressed, false otherwise.";
    this.ROYGBIV_SCRIPTING_API_INTERSECTIONTEST = "Finds the first intersected object on a ray. The onComplete callback function is executed with x, y, z and objectName parameters.\nIf there's no intersection, the objectName is set to null. If the web workers not supported, the onComplete is executed immediately."
-   this.ROYGBIV_SCRIPTING_API_GETENDPOINT = "Gets an end point of an object. The axis may be one of:\nROYGBIV.axes.MINUS_X\nROYGBIV.axes.MINUS_Y\nROYGBIV.axes.MINUS_Z\nROYGBIV.axes.PLUS_X\nROYGBIV.axes.PLUS_Y\nROYGBIV.axes.PLUS_Z\n\nNote that object groups do not support this function but child objects do. This function may be useful in cases where\nfor example a particle system needs to be started from the tip point of an object.";
+   this.ROYGBIV_SCRIPTING_API_GETENDPOINT = "Gets an end point of an object. The axis may be one of:\nROYGBIV.endpoints.MINUS_X\nROYGBIV.endpoints.MINUS_Y\nROYGBIV.endpoints.MINUS_Z\nROYGBIV.endpoints.PLUS_X\nROYGBIV.endpoints.PLUS_Y\nROYGBIV.endpoints.PLUS_Z\n\nNote that object groups do not support this function but child objects do. This function may be useful in cases where\nfor example a particle system needs to be started from the tip point of an object.";
    this.ROYGBIV_SCRIPTING_API_ISMOBILE = "Returns if the current client is a mobile client.";
    this.ROYGBIV_SCRIPTING_API_LERP = "Linearly interpolate between vector1 and vector2. The result is vector1 if amount = 0 and vector2 if amount = 1.";
    this.ROYGBIV_SCRIPTING_API_RESETOBJECTVELOCITY = "Resets the velocity and angular velocity of an object.";
@@ -1204,4 +1204,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETSTEERABLELOOKDIRECTION = "Fills the targetVectot with the look direction of given steerable object and returns it.";
   this.ROYGBIV_SCRIPTING_API_SETOBJECTROTATIONMODE = "Sets the rotation mode of given object. rotationMode parameter may be either ROYGBIV.rotationModes.LOCAL or ROYGBIV.rotationModes.WORLD.\nLocal rotation mode indicates objects rotating around their own local axis unlike the world axis.";
   this.ROYGBIV_SCRIPTING_API_RESETOBJECTROTATION = "Resets all the rotations applied to given object.";
+  this.ROYGBIV_SCRIPTING_API_CALCULATEANGLEBETWEENVECTORS = "Returns the angle between two vectors in radians.";
 }
