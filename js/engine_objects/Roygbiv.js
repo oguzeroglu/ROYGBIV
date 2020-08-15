@@ -317,8 +317,7 @@ var Roygbiv = function(){
     "setSteerableLookDirection",
     "getSteerableLookDirection",
     "setObjectRotationMode",
-    "resetObjectRotation",
-    "calculateAngleBetweenVectors"
+    "resetObjectRotation"
   ];
 
   this.globals = new Object();
@@ -4828,20 +4827,4 @@ Roygbiv.prototype.getFromVectorPool = function(vectorPool){
   preConditions.checkIfTrue(ROYGBIV.getFromVectorPool, "Object is not a vector pool", !vectorPool.isVectorPool);
 
   return vectorPool.get();
-}
-
-// Returns the angle between two vectors in radians.
-Roygbiv.prototype.calculateAngleBetweenVectors = function(vec1, vec2){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.distance, preConditions.vec1, vec1);
-  preConditions.checkIfDefined(ROYGBIV.distance, preConditions.vec2, vec2);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.distance, preConditions.vec1, vec1);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.distance, preConditions.vec2, vec2);
-
-  REUSABLE_VECTOR.set(vec1.x, vec1.y, vec1.z);
-  REUSABLE_VECTOR_2.set(vec2.x, vec2.y, vec2.z);
-
-  return REUSABLE_VECTOR.angleTo(REUSABLE_VECTOR_2);
 }

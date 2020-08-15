@@ -1204,5 +1204,4 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETSTEERABLELOOKDIRECTION = "Fills the targetVectot with the look direction of given steerable object and returns it.";
   this.ROYGBIV_SCRIPTING_API_SETOBJECTROTATIONMODE = "Sets the rotation mode of given object. rotationMode parameter may be either ROYGBIV.rotationModes.LOCAL or ROYGBIV.rotationModes.WORLD.\nLocal rotation mode indicates objects rotating around their own local axis unlike the world axis.";
   this.ROYGBIV_SCRIPTING_API_RESETOBJECTROTATION = "Resets all the rotations applied to given object.";
-  this.ROYGBIV_SCRIPTING_API_CALCULATEANGLEBETWEENVECTORS = "Returns the angle between two vectors in radians.";
 }
