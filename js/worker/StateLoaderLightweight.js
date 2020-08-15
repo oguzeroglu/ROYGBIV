@@ -273,6 +273,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
   var addedObjectExports = this.state.addedObjects;
   var childAddedObjectExports = this.state.childAddedObjects;
   var objectGroupExports = this.state.objectGroups;
+  var massExports = this.state.masses;
   var totalAddedObjectExports = new Object();
   var childBodies = new Object();
   for (var objName in addedObjectExports){
@@ -408,6 +409,13 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     if (objectGroups[objName].isSlippery){
       objectGroups[objName].setSlippery(true);
     }
+  }
+
+  for (var massName in massExports){
+    var curMassExport = massExports[massName];
+    var mass = new Mass(massName, new CANNON.Vec3(), new CANNON.Vec3());
+    mass.import(curMassExport);
+    physicsWorld.addBody(mass.physicsBody);
   }
 }
 

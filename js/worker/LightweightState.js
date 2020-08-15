@@ -95,4 +95,11 @@ var LightweightState = function(){
       this.particleSystems[psName].particles = particles;
     }
   }
+  // MASSES
+  this.masses = new Object();
+  var masses = sceneHandler.getMasses();
+  for (var massName in masses){
+    var mass = masses[massName];
+    this.masses[massName] = mass.export();
+  }
 }

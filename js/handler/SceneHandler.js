@@ -694,3 +694,7 @@ SceneHandler.prototype.getTrackingObjects = function(){
 SceneHandler.prototype.getLightnings = function(){
   return this.scenes[this.activeSceneName].lightnings;
 }
+
+SceneHandler.prototype.getMasses = function(){
+  return this.scenes[this.activeSceneName].masses;
+}
