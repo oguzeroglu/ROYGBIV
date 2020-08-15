@@ -404,14 +404,14 @@ AddedObject.prototype.syncSurfacePhysicsRotation = function(){
   var gridSystemAxis = this.metaData.gridSystemAxis;
   var physicsBody = this.physicsBody;
   var mesh = this.mesh;
-  if (gridSystemAxis == "XY"){
+  if (gridSystemAxis == GS_AXIS_XY){
     physicsBody.quaternion.copy(mesh.quaternion);
-  }else if (gridSystemAxis == "XZ"){
+  }else if (gridSystemAxis == GS_AXIS_XZ){
     REUSABLE_QUATERNION.copy(mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
     physicsBody.quaternion.copy(REUSABLE_QUATERNION);
-  }else if (gridSystemAxis == "YZ"){
+  }else if (gridSystemAxis == GS_AXIS_YZ){
     REUSABLE_QUATERNION.copy(mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_Y, Math.PI / 2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
@@ -423,17 +423,17 @@ AddedObject.prototype.syncRampPhysicsRotation = function(){
   var gridSystemAxis = this.metaData.gridSystemAxis;
   var physicsBody = this.physicsBody;
   var mesh = this.mesh;
-  if (gridSystemAxis == "XY"){
+  if (gridSystemAxis == GS_AXIS_XY){
     REUSABLE_QUATERNION.copy(mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
     physicsBody.quaternion.copy(REUSABLE_QUATERNION);
-  }else if (gridSystemAxis == "XZ"){
+  }else if (gridSystemAxis == GS_AXIS_XZ){
     REUSABLE_QUATERNION.copy(mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
     physicsBody.quaternion.copy(REUSABLE_QUATERNION);
-  }else if (gridSystemAxis == "YZ"){
+  }else if (gridSystemAxis == GS_AXIS_YZ){
     REUSABLE_QUATERNION.copy(mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
@@ -448,14 +448,14 @@ AddedObject.prototype.syncSpherePhysicsRotation = function(){
 AddedObject.prototype.syncCylinderPhysicsRotation = function(){
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
-  if (gridSystemAxis == "XZ"){
+  if (gridSystemAxis == GS_AXIS_XZ){
     physicsBody.quaternion.copy(this.mesh.quaternion);
-  }else if (gridSystemAxis == "XY"){
+  }else if (gridSystemAxis == GS_AXIS_XY){
     REUSABLE_QUATERNION.copy(this.mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, -Math.PI/2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
     physicsBody.quaternion.copy(REUSABLE_QUATERNION);
-  }else if (gridSystemAxis == "YZ"){
+  }else if (gridSystemAxis == GS_AXIS_YZ){
     REUSABLE_QUATERNION.copy(this.mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_Z, Math.PI/2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
@@ -478,15 +478,15 @@ AddedObject.prototype.onAfterRotationAnimation = function(){
 }
 
 AddedObject.prototype.syncPhysicsRotation = function(){
-  if (this.type == "surface"){
+  if (this.type == ADDED_OBJECT_TYPE_SURFACE){
     this.syncSurfacePhysicsRotation();
-  }else if (this.type == "box"){
+  }else if (this.type == ADDED_OBJECT_TYPE_BOX){
     this.syncBoxPhysicsRotation();
-  }else if (this.type == "ramp"){
+  }else if (this.type == ADDED_OBJECT_TYPE_RAMP){
     this.syncRampPhysicsRotation();
-  }else if (this.type == "sphere"){
+  }else if (this.type == ADDED_OBJECT_TYPE_SPHERE){
     this.syncSpherePhysicsRotation();
-  }else if (this.type == "cylinder"){
+  }else if (this.type == ADDED_OBJECT_TYPE_CYLINDER){
     this.syncCylinderPhysicsRotation();
   }
 }
@@ -1692,22 +1692,22 @@ AddedObject.prototype.getTextureStack = function(){
 
 AddedObject.prototype.getPositionAtAxis = function(axis){
   if (axis == axes.X){
-    if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
-      return parseInt(this.metaData["centerX"]);
-    }else if (this.type == "surface"){
-      return parseInt(this.metaData["positionX"]);
+    if (this.type == ADDED_OBJECT_TYPE_BOX || this.type == ADDED_OBJECT_TYPE_RAMP || this.type == ADDED_OBJECT_TYPE_SPHERE || this.type == ADDED_OBJECT_TYPE_CYLINDER){
+      return parseInt(this.metaData.centerX);
+    }else if (this.type == ADDED_OBJECT_TYPE_SURFACE){
+      return parseInt(this.metaData.positionX);
     }
   }else if (axis == axes.Y){
-    if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
-      return parseInt(this.metaData["centerY"]);
-    }else if (this.type == "surface"){
-      return parseInt(this.metaData["positionY"]);
+    if (this.type == ADDED_OBJECT_TYPE_BOX || this.type == ADDED_OBJECT_TYPE_RAMP || this.type == ADDED_OBJECT_TYPE_SPHERE || this.type == ADDED_OBJECT_TYPE_CYLINDER){
+      return parseInt(this.metaData.centerY);
+    }else if (this.type == ADDED_OBJECT_TYPE_SURFACE){
+      return parseInt(this.metaData.positionY);
     }
   }else if (axis == axes.Z){
-    if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
-      return parseInt(this.metaData["centerZ"]);
-    }else if (this.type == "surface"){
-      return parseInt(this.metaData["positionZ"]);
+    if (this.type == ADDED_OBJECT_TYPE_BOX || this.type == ADDED_OBJECT_TYPE_RAMP || this.type == ADDED_OBJECT_TYPE_SPHERE || this.type == ADDED_OBJECT_TYPE_CYLINDER){
+      return parseInt(this.metaData.centerZ);
+    }else if (this.type == ADDED_OBJECT_TYPE_SURFACE){
+      return parseInt(this.metaData.positionZ);
     }
   }
 }
@@ -1752,14 +1752,14 @@ AddedObject.prototype.setPosition = function(x, y, z, skipBBUpdate){
 AddedObject.prototype.resetPosition = function(){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
-  if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
-    mesh.position.x = this.metaData["centerX"];
-    mesh.position.y = this.metaData["centerY"];
-    mesh.position.z = this.metaData["centerZ"];
-  }else if (this.type == "surface"){
-    mesh.position.x = this.metaData["positionX"];
-    mesh.position.y = this.metaData["positionY"];
-    mesh.position.z = this.metaData["positionZ"];
+  if (this.type == ADDED_OBJECT_TYPE_BOX || this.type == ADDED_OBJECT_TYPE_RAMP || this.type == ADDED_OBJECT_TYPE_SPHERE || this.type == ADDED_OBJECT_TYPE_CYLINDER){
+    mesh.position.x = this.metaData.centerX;
+    mesh.position.y = this.metaData.centerY;
+    mesh.position.z = this.metaData.centerZ;
+  }else if (this.type == ADDED_OBJECT_TYPE_SURFACE){
+    mesh.position.x = this.metaData.positionX;
+    mesh.position.y = this.metaData.positionY;
+    mesh.position.z = this.metaData.positionZ;
   }
 
   physicsBody.position.copy(mesh.position);
@@ -1767,11 +1767,11 @@ AddedObject.prototype.resetPosition = function(){
 
 AddedObject.prototype.translate = function(axis, amount, fromScript){
   var physicsBody = this.physicsBody;
-  if (axis == "x"){
+  if (axis == axes.X){
     this.mesh.translateX(amount);
-  }else if (axis == "y"){
+  }else if (axis == axes.Y){
     this.mesh.translateY(amount);
-  }else if (axis == "z"){
+  }else if (axis == axes.Z){
     this.mesh.translateZ(amount);
   }
   physicsBody.position.copy(this.mesh.position);
@@ -1838,23 +1838,23 @@ AddedObject.prototype.rotateMesh = function(axisVector, radians){
 }
 
 AddedObject.prototype.rotate = function(axis, radians, fromScript){
-  if (this.type == "surface"){
+  if (this.type == ADDED_OBJECT_TYPE_SURFACE){
     this.rotateSurface(axis, radians, fromScript);
-  }else if (this.type == "box"){
+  }else if (this.type == ADDED_OBJECT_TYPE_BOX){
     this.rotateBox(axis, radians, fromScript);
-  }else if (this.type == "ramp"){
+  }else if (this.type == ADDED_OBJECT_TYPE_RAMP){
     this.rotateRamp(axis, radians, fromScript);
-  }else if (this.type == "sphere"){
+  }else if (this.type == ADDED_OBJECT_TYPE_SPHERE){
     this.rotateSphere(axis, radians, fromScript);
-  }else if (this.type == "cylinder"){
+  }else if (this.type == ADDED_OBJECT_TYPE_CYLINDER){
     this.rotateCylinder(axis, radians, fromScript);
   }
   if (!fromScript){
-    if (axis == "x"){
+    if (axis == axes.X){
       this.rotationX += radians;
-    }else if (axis == "y"){
+    }else if (axis == axes.Y){
       this.rotationY += radians;
-    }else if (axis == "z"){
+    }else if (axis == axes.Z){
       this.rotationZ += radians;
     }
     this.initQuaternion.copy(this.mesh.quaternion);
@@ -1874,11 +1874,11 @@ AddedObject.prototype.setPhysicsAfterRotationAroundPoint = function(){
 AddedObject.prototype.rotateSphere = function(axis, radians, fromScript){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
-  if (axis == "x"){
+  if (axis == axes.X){
     this.rotateMesh(THREE_AXIS_VECTOR_X, radians);
-  }else if (axis == "y"){
+  }else if (axis == axes.Y){
     this.rotateMesh(THREE_AXIS_VECTOR_Y, radians);
-  }else if (axis == "z"){
+  }else if (axis == axes.Z){
     this.rotateMesh(THREE_AXIS_VECTOR_Z, radians);
   }
   this.syncPhysicsRotation();
@@ -1891,11 +1891,11 @@ AddedObject.prototype.rotateCylinder = function(axis, radians, fromScript){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
-  if (axis == "x"){
+  if (axis == axes.X){
     this.rotateMesh(THREE_AXIS_VECTOR_X, radians);
-  }else if (axis == "y"){
+  }else if (axis == axes.Y){
     this.rotateMesh(THREE_AXIS_VECTOR_Y, radians);
-  }else if (axis == "z"){
+  }else if (axis == axes.Z){
     this.rotateMesh(THREE_AXIS_VECTOR_Z, radians);
   }
   this.syncPhysicsRotation();
@@ -1908,11 +1908,11 @@ AddedObject.prototype.rotateRamp = function(axis, radians, fromScript){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
-  if (axis == "x"){
+  if (axis == axes.X){
     this.rotateMesh(THREE_AXIS_VECTOR_X, radians);
-  }else if (axis == "y"){
+  }else if (axis == axes.Y){
     this.rotateMesh(THREE_AXIS_VECTOR_Y, radians);
-  }else if (axis == "z"){
+  }else if (axis == axes.Z){
     this.rotateMesh(THREE_AXIS_VECTOR_Z, radians);
   }
   this.syncPhysicsRotation();
@@ -1925,11 +1925,11 @@ AddedObject.prototype.rotateSurface = function(axis, radians, fromScript){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
-  if (axis == "x"){
+  if (axis == axes.X){
     this.rotateMesh(THREE_AXIS_VECTOR_X, radians);
-  }else if (axis == "y"){
+  }else if (axis == axes.Y){
     this.rotateMesh(THREE_AXIS_VECTOR_Y, radians);
-  }else if (axis == "z"){
+  }else if (axis == axes.Z){
     this.rotateMesh(THREE_AXIS_VECTOR_Z, radians);
   }
   this.syncPhysicsRotation();
@@ -1941,11 +1941,11 @@ AddedObject.prototype.rotateSurface = function(axis, radians, fromScript){
 AddedObject.prototype.rotateBox = function(axis, radians, fromScript){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
-  if (axis == "x"){
+  if (axis == axes.X){
     this.rotateMesh(THREE_AXIS_VECTOR_X, radians);
-  }else if (axis == "y"){
+  }else if (axis == axes.Y){
     this.rotateMesh(THREE_AXIS_VECTOR_Y, radians);
-  }else if (axis == "z"){
+  }else if (axis == axes.Z){
     this.rotateMesh(THREE_AXIS_VECTOR_Z, radians);
   }
   this.syncPhysicsRotation();
@@ -2972,11 +2972,11 @@ AddedObject.prototype.rotateAroundPivotObject = function(axis, radians){
   this.updatePivot();
   this.pivotObject.updateMatrix();
   this.pivotObject.updateMatrixWorld();
-  if (axis == "x"){
+  if (axis == axes.X){
     this.pivotObject.rotation.x += radians;
-  }else if (axis == "y"){
+  }else if (axis == axes.Y){
     this.pivotObject.rotation.y += radians;
-  }else if (axis == "z"){
+  }else if (axis == axes.Z){
     this.pivotObject.rotation.z += radians;
   }
   this.updateTransformBasedOnPivot();
@@ -3011,80 +3011,80 @@ AddedObject.prototype.getEndPoint = function(axis){
   var translationAmount = 0;
   if (axis == plusX){
     REUSABLE_VECTOR_6.set(1, 0, 0);
-    if (this.type == "surface"){
+    if (this.type == ADDED_OBJECT_TYPE_SURFACE){
       translationAmount = this.metaData.width / 2;
-    }else if (this.type == "ramp"){
+    }else if (this.type == ADDED_OBJECT_TYPE_RAMP){
       translationAmount = this.metaData.rampWidth / 2;
-    }else if (this.type == "box"){
+    }else if (this.type == ADDED_OBJECT_TYPE_BOX){
       translationAmount = this.metaData.boxSizeX / 2;
-    }else if (this.type == "sphere"){
+    }else if (this.type == ADDED_OBJECT_TYPE_SPHERE){
       translationAmount = this.metaData.radius;
-    }else if (this.type == "cylinder"){
+    }else if (this.type == ADDED_OBJECT_TYPE_CYLINDER){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
   }else if (axis == minusX){
     REUSABLE_VECTOR_6.set(-1, 0, 0);
-    if (this.type == "surface"){
+    if (this.type == ADDED_OBJECT_TYPE_SURFACE){
       translationAmount = this.metaData.width / 2;
-    }else if (this.type == "ramp"){
+    }else if (this.type == ADDED_OBJECT_TYPE_RAMP){
       translationAmount = this.metaData.rampWidth / 2;
-    }else if (this.type == "box"){
+    }else if (this.type == ADDED_OBJECT_TYPE_BOX){
       translationAmount = this.metaData.boxSizeX / 2;
-    }else if (this.type == "sphere"){
+    }else if (this.type == ADDED_OBJECT_TYPE_SPHERE){
       translationAmount = this.metaData.radius;
-    }else if (this.type == "cylinder"){
+    }else if (this.type == ADDED_OBJECT_TYPE_CYLINDER){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
   }else if (axis == plusY){
     REUSABLE_VECTOR_6.set(0, 1, 0);
-    if (this.type == "surface"){
+    if (this.type == ADDED_OBJECT_TYPE_SURFACE){
       translationAmount = this.metaData.height / 2;
-    }else if (this.type == "ramp"){
+    }else if (this.type == ADDED_OBJECT_TYPE_RAMP){
       translationAmount = this.metaData.rampHeight / 2;
-    }else if (this.type == "box"){
+    }else if (this.type == ADDED_OBJECT_TYPE_BOX){
       translationAmount = this.metaData.boxSizeY / 2;
-    }else if (this.type == "sphere"){
+    }else if (this.type == ADDED_OBJECT_TYPE_SPHERE){
       translationAmount = this.metaData.radius;
-    }else if (this.type == "cylinder"){
+    }else if (this.type == ADDED_OBJECT_TYPE_CYLINDER){
       translationAmount = this.metaData.height / 2;
     }
   }else if (axis == minusY){
     REUSABLE_VECTOR_6.set(0, -1, 0);
-    if (this.type == "surface"){
+    if (this.type == ADDED_OBJECT_TYPE_SURFACE){
       translationAmount = this.metaData.height / 2;
-    }else if (this.type == "ramp"){
+    }else if (this.type == ADDED_OBJECT_TYPE_RAMP){
       translationAmount = this.metaData.rampHeight / 2;
-    }else if (this.type == "box"){
+    }else if (this.type == ADDED_OBJECT_TYPE_BOX){
       translationAmount = this.metaData.boxSizeY / 2;
-    }else if (this.type == "sphere"){
+    }else if (this.type == ADDED_OBJECT_TYPE_SPHERE){
       translationAmount = this.metaData.radius;
-    }else if (this.type == "cylinder"){
+    }else if (this.type == ADDED_OBJECT_TYPE_CYLINDER){
       translationAmount = this.metaData.height / 2;
     }
   }else if (axis == plusZ){
     REUSABLE_VECTOR_6.set(0, 0, 1);
-    if (this.type == "surface"){
+    if (this.type == ADDED_OBJECT_TYPE_SURFACE){
       translationAmount = 0;
-    }else if (this.type == "ramp"){
+    }else if (this.type == ADDED_OBJECT_TYPE_RAMP){
       translationAmount = 0;
-    }else if (this.type == "box"){
+    }else if (this.type == ADDED_OBJECT_TYPE_BOX){
       translationAmount = this.metaData.boxSizeZ / 2;
-    }else if (this.type == "sphere"){
+    }else if (this.type == ADDED_OBJECT_TYPE_SPHERE){
       translationAmount = this.metaData.radius;
-    }else if (this.type == "cylinder"){
+    }else if (this.type == ADDED_OBJECT_TYPE_CYLINDER){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
   }else if (axis == minusZ){
     REUSABLE_VECTOR_6.set(0, 0, -1);
-    if (this.type == "surface"){
+    if (this.type == ADDED_OBJECT_TYPE_SURFACE){
       translationAmount = 0;
-    }else if (this.type == "ramp"){
+    }else if (this.type == ADDED_OBJECT_TYPE_RAMP){
       translationAmount = 0;
-    }else if (this.type == "box"){
+    }else if (this.type == ADDED_OBJECT_TYPE_BOX){
       translationAmount = this.metaData.boxSizeZ / 2;
-    }else if (this.type == "sphere"){
+    }else if (this.type == ADDED_OBJECT_TYPE_SPHERE){
       translationAmount = this.metaData.radius;
-    }else if (this.type == "cylinder"){
+    }else if (this.type == ADDED_OBJECT_TYPE_CYLINDER){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
   }

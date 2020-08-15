@@ -2514,11 +2514,11 @@ ObjectGroup.prototype.rotateMesh = function(axisVector, radians){
 ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
   REUSABLE_QUATERNION.copy(this.mesh.quaternion);
   var axisVector
-  if (axis == "x"){
+  if (axis == axes.X){
     axisVector = THREE_AXIS_VECTOR_X;
-  }else if (axis == "y"){
+  }else if (axis == axes.Y){
     axisVector = THREE_AXIS_VECTOR_Y;
-  }else if (axis == "z"){
+  }else if (axis == axes.Z){
     axisVector = THREE_AXIS_VECTOR_Z;
   }
   this.rotateMesh(axisVector, radian);
@@ -2533,11 +2533,11 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
     this.physicsBody.initQuaternion.copy(
       this.physicsBody.quaternion
     );
-    if (axis == "x"){
+    if (axis == axes.X){
       this.rotationX += radian;
-    }else if (axis == "y"){
+    }else if (axis == axes.Y){
       this.rotationY += radian;
-    }else if (axis == "z"){
+    }else if (axis == axes.Z){
       this.rotationZ += radian;
     }
   }
@@ -2568,11 +2568,11 @@ ObjectGroup.prototype.updateSimplifiedPhysicsBody = function(){
 
 ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   var physicsBody = this.physicsBody;
-  if (axis == "x"){
+  if (axis == axes.X){
     this.mesh.translateX(amount);
-  }else if (axis == "y"){
+  }else if (axis == axes.Y){
     this.mesh.translateY(amount);
-  }else if (axis == "z"){
+  }else if (axis == axes.Z){
     this.mesh.translateZ(amount);
   }
   if (!this.isPhysicsSimplified){

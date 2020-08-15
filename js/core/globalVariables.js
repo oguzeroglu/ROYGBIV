@@ -380,6 +380,14 @@ var endpointInverses = {
   "-y": "+y",
   "-z": "+z"
 };
+var GS_AXIS_XY = "XY";
+var GS_AXIS_XZ = "XZ";
+var GS_AXIS_YZ = "YZ";
+var ADDED_OBJECT_TYPE_SURFACE = "surface";
+var ADDED_OBJECT_TYPE_BOX = "box";
+var ADDED_OBJECT_TYPE_RAMP = "ramp";
+var ADDED_OBJECT_TYPE_SPHERE = "sphere";
+var ADDED_OBJECT_TYPE_CYLINDER = "cylinder";
 var DEFAULT_UV_RANGE = {startU: 0, startV: 1, endU: 1, endV: 0};
 var activeMuzzleFlashes = new Map();
 var activeLightnings = new Map();
