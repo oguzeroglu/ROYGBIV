@@ -316,7 +316,8 @@ var Roygbiv = function(){
     "removeSceneExitListener",
     "setSteerableLookDirection",
     "getSteerableLookDirection",
-    "setObjectRotationMode"
+    "setObjectRotationMode",
+    "resetObjectRotation"
   ];
 
   this.globals = new Object();
@@ -1218,6 +1219,19 @@ Roygbiv.prototype.setObjectRotationMode = function(object, rotationMode){
   preConditions.checkIfHaveNotPivotPoint(ROYGBIV.setObjectRotationMode, preConditions.object, object);
 
   object.setRotationMode(rotationMode);
+}
+
+// Resets all the rotations applied to given object.
+Roygbiv.prototype.resetObjectRotation = function(object){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.rotate, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.rotate, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.rotate, object);
+  preConditions.checkIfChangeable(ROYGBIV.rotate, preConditions.object, object);
+
+  object.resetRotation();
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************
