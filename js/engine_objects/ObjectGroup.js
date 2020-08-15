@@ -1929,10 +1929,12 @@ ObjectGroup.prototype.merge = function(){
           this.push(textureMatrixInfos, 0, ((4*a) + 2), isIndexed);
           this.push(textureMatrixInfos, 0, ((4*a) + 3), isIndexed);
 
-          this.push(displacementTextureMatrixInfos, -100, (4*a), isIndexed);
-          this.push(displacementTextureMatrixInfos, -100, ((4*a) + 1), isIndexed);
-          this.push(displacementTextureMatrixInfos, -100, ((4*a) + 2), isIndexed);
-          this.push(displacementTextureMatrixInfos, -100, ((4*a) + 3), isIndexed);
+          if (this.hasDisplacement){
+            this.push(displacementTextureMatrixInfos, -100, (4*a), isIndexed);
+            this.push(displacementTextureMatrixInfos, -100, ((4*a) + 1), isIndexed);
+            this.push(displacementTextureMatrixInfos, -100, ((4*a) + 2), isIndexed);
+            this.push(displacementTextureMatrixInfos, -100, ((4*a) + 3), isIndexed);
+          }
         }
       }
       if (!bSkipped){
@@ -1961,10 +1963,12 @@ ObjectGroup.prototype.merge = function(){
           this.push(textureMatrixInfos, 0, ((4*b) + 2), isIndexed);
           this.push(textureMatrixInfos, 0, ((4*b) + 3), isIndexed);
 
-          this.push(displacementTextureMatrixInfos, -100, (4*b), isIndexed);
-          this.push(displacementTextureMatrixInfos, -100, ((4*b) + 1), isIndexed);
-          this.push(displacementTextureMatrixInfos, -100, ((4*b) + 2), isIndexed);
-          this.push(displacementTextureMatrixInfos, -100, ((4*b) + 3), isIndexed);
+          if (this.hasDisplacement){
+            this.push(displacementTextureMatrixInfos, -100, (4*b), isIndexed);
+            this.push(displacementTextureMatrixInfos, -100, ((4*b) + 1), isIndexed);
+            this.push(displacementTextureMatrixInfos, -100, ((4*b) + 2), isIndexed);
+            this.push(displacementTextureMatrixInfos, -100, ((4*b) + 3), isIndexed);
+          }
         }
       }
       if (!cSkipped){
@@ -1993,10 +1997,12 @@ ObjectGroup.prototype.merge = function(){
           this.push(textureMatrixInfos, 0, ((4*c) + 2), isIndexed);
           this.push(textureMatrixInfos, 0, ((4*c) + 3), isIndexed);
 
-          this.push(displacementTextureMatrixInfos, -100, (4*c), isIndexed);
-          this.push(displacementTextureMatrixInfos, -100, ((4*c) + 1), isIndexed);
-          this.push(displacementTextureMatrixInfos, -100, ((4*c) + 2), isIndexed);
-          this.push(displacementTextureMatrixInfos, -100, ((4*c) + 3), isIndexed);
+          if (this.hasDisplacement){
+            this.push(displacementTextureMatrixInfos, -100, (4*c), isIndexed);
+            this.push(displacementTextureMatrixInfos, -100, ((4*c) + 1), isIndexed);
+            this.push(displacementTextureMatrixInfos, -100, ((4*c) + 2), isIndexed);
+            this.push(displacementTextureMatrixInfos, -100, ((4*c) + 3), isIndexed);
+          }
         }
       }
     }
@@ -2518,7 +2524,7 @@ ObjectGroup.prototype.resetRotation = function(){
   this.physicsBody.quaternion.set(
     this.state.physicsQX, this.state.physicsQY, this.state.physicsQZ, this.state.physicsQW
   );
-  
+
   physicsWorld.updateObject(this, false, true);
 
   if (this.autoInstancedParent){
