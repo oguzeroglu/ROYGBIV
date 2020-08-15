@@ -1,9 +1,9 @@
 var Mass = function(name, center, size){
   this.name = name;
   this.center = center.clone();
-  this.size= size.cline();
+  this.size= size.clone();
 
-  if (!this.size.x == 0 && this.size.y == 0 && this.size.z == 0){
+  if (!(this.size.x == 0 && this.size.y == 0 && this.size.z == 0)){
     this.constructPhysicsBody();
   }
 }
