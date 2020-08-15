@@ -30,6 +30,7 @@ Scene.prototype.reset = function(){
   this.sprites = new Object();
   this.containers = new Object();
   this.virtualKeyboards = new Object();
+  this.masses = new Object();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
   this.lightInfo = {};
@@ -94,6 +95,9 @@ Scene.prototype.destroy = function(){
   }
   for (var virtualKeyboardName in this.virtualKeyboards){
     parseCommand("destroyVirtualKeyboard "+virtualKeyboardName);
+  }
+  for (var massName in this.masses){
+    parseCommand("destroyMass " + massName);
   }
   this.reset();
 }
@@ -194,6 +198,12 @@ Scene.prototype.import = function(exportObj){
   }
   this.postProcessing = exportObj.postProcessing;
   this.lightInfo = exportObj.lightInfo;
+
+  for (var massName in exportObj.masses){
+    var mass = new Mass(massName, new THREE.Vector3(), new THREE.Vector3());
+    mass.import(exportObj.masses[massName]);
+    this.registerMass(mass);
+  }
 }
 
 Scene.prototype.export = function(){
@@ -224,6 +234,12 @@ Scene.prototype.export = function(){
   if (this.fogConfigurations){
     exportObj.fogConfigurations = this.fogConfigurations;
   }
+
+  exportObj.masses = {};
+  for (var massName in this.masses){
+    exportObj.masses[massName] = this.masses[massName].export();
+  }
+
   return exportObj;
 }
 
@@ -462,4 +478,14 @@ Scene.prototype.registerMarkedPoint = function(markedPoint){
 Scene.prototype.unregisterMarkedPoint = function(markedPoint){
   delete this.markedPoints[markedPoint.name];
   delete markedPoint.registeredSceneName;
+}
+
+Scene.prototype.registerMass = function(mass){
+  this.masses[mass.name] = mass;
+  mass.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterMass = function(mass){
+  delete this.masses[mass.name];
+  delete mass.registeredSceneName;
 }

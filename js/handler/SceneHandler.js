@@ -583,6 +583,14 @@ SceneHandler.prototype.onMarkedPointDeletion = function(markedPoint){
   this.scenes[markedPoint.registeredSceneName].unregisterMarkedPoint(markedPoint);
 }
 
+SceneHandler.prototype.onMassCreation = function(mass){
+  this.scenes[this.activeSceneName].registerMass(mass);
+}
+
+SceneHandler.prototype.onMassDeletion = function(mass){
+  this.scenes[mass.registeredSceneName].unregisterMass(mass);
+}
+
 SceneHandler.prototype.getActiveSceneName = function(){
   return this.activeSceneName;
 }
