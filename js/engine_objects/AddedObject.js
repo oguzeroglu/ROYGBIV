@@ -1837,6 +1837,24 @@ AddedObject.prototype.rotateMesh = function(axisVector, radians){
   }
 }
 
+AddedObject.prototype.resetRotation = function(){
+  this.mesh.quaternion.set(
+    this.state.quaternionX, this.state.quaternionY, this.state.quaternionZ, this.state.quaternionW
+  );
+
+  this.syncPhysicsRotation();
+  physicsWorld.updateObject(this, false, true);
+
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
+
+  if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
+    rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
+  }
+}
+
 AddedObject.prototype.rotate = function(axis, radians, fromScript){
   if (this.type == ADDED_OBJECT_TYPE_SURFACE){
     this.rotateSurface(axis, radians, fromScript);

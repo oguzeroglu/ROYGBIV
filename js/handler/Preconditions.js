@@ -700,7 +700,7 @@ Preconditions.prototype.checkIfQuaternionOnlyIfDefined = function(callerFunc, pa
 
 Preconditions.prototype.checkIfAxisOnlyIfDefined = function(callerFunc, parameterName, obj){
   if (!(typeof obj == UNDEFINED)){
-    if (axis != ROYGBIV.axes.X && axis != ROYGBIV.axes.Y && axis != ROYGBIV.axes.Z){
+    if (obj != ROYGBIV.axes.X && obj != ROYGBIV.axes.Y && obj != ROYGBIV.axes.Z){
       this.throw(callerFunc, parameterName+" must be x, y, or z.");
     }
   }
