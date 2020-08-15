@@ -2511,6 +2511,26 @@ ObjectGroup.prototype.rotateMesh = function(axisVector, radians){
   }
 }
 
+ObjectGroup.prototype.resetRotation = function(){
+  this.mesh.quaternion.set(
+    this.state.quaternionX, this.state.quaternionY, this.state.quaternionZ, this.state.quaternionW
+  );
+  this.physicsBody.quaternion.set(
+    this.state.physicsQX, this.state.physicsQY, this.state.physicsQZ, this.state.physicsQW
+  );
+  
+  physicsWorld.updateObject(this, false, true);
+
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
+
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
+  }
+}
+
 ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
   REUSABLE_QUATERNION.copy(this.mesh.quaternion);
   var axisVector
