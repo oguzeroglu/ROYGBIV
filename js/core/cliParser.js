@@ -6642,6 +6642,24 @@ function parse(input){
           }
           return true;
         break;
+        case 262: //printMasses
+          terminal.printHeader(Text.MASSES_IN_THIS_SCENE);
+
+          var totalCount = Object.keys(sceneHandler.getMasses()).length;
+          for (var massName in sceneHandler.getMasses()){
+            var mass = masses[massName];
+            var center = mass.center;
+            var size = mass.size;
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, massName), true);
+            terminal.printInfo(Text.COORD_TREE_TAB.replace(Text.PARAM1, "center").replace(Text.PARAM2, " " + center.x).replace(Text.PARAM3, " " + center.y).replace(Text.PARAM4, " " + center.z), true);
+            terminal.printInfo(Text.COORD_TREE_SIZE_TAB.replace(Text.PARAM1, "size").replace(Text.PARAM2, " " + size.x).replace(Text.PARAM3, " " + size.y).replace(Text.PARAM4, " " + size.z), false);
+          }
+
+          if (totalCount == 0){
+            terminal.printError(Text.NO_MASSES_IN_THE_SCENE);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

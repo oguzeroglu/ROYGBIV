@@ -262,7 +262,8 @@ var CommandDescriptor = function(){
       0, //jumpDescriptors
       4, //removeEdgeFromGraph
       2, //excludeFromHideBehavior
-      2 //newMass
+      2, //newMass
+      0 //printMasses
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -527,7 +528,8 @@ var CommandDescriptor = function(){
     "jumpDescriptors",
     "removeEdgeFromGraph graphID offsetX offsetY offsetZ",
     "excludeFromHideBehavior id true/false",
-    "newMass id height"
+    "newMass id height",
+    "printMasses"
   ];
 
   this.commands = [
@@ -792,7 +794,8 @@ var CommandDescriptor = function(){
     "jumpDescriptors",
     "removeEdgeFromGraph",
     "excludeFromHideBehavior",
-    "newMass"
+    "newMass",
+    "printMasses"
   ];
 
   this.commandInfo = [
@@ -1057,7 +1060,8 @@ var CommandDescriptor = function(){
     "jumpDescriptors: Shows the jump descriptor configuration GUI.",
     "removeEdgeFromGraph: Removes an edge from given graph.",
     "excludeFromHideBehavior: Excludes/includes an AI entity from/to Hide behavior. Steerables cannot hide behind given entity if the entity is excluded.",
-    "newMass: Creates a new physical mass without a graphical representation."
+    "newMass: Creates a new physical mass without a graphical representation.",
+    "printMasses: Prints a list of created masses."
   ];
 
   this.keyboardInfo = [
