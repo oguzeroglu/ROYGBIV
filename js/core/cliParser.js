@@ -6669,6 +6669,12 @@ function parse(input){
           }
 
           var massID = splitted[1];
+
+          if (!(massID.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           var mass = sceneHandler.getMasses()[massID];
 
           if (!mass){
@@ -6686,7 +6692,9 @@ function parse(input){
 
           terminal.clear();
 
-          terminal.printInfo(Text.MASS_DESTROYED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.MASS_DESTROYED);
+          }
           return true;
         break;
       }
