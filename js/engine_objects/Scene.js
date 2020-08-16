@@ -203,6 +203,7 @@ Scene.prototype.import = function(exportObj){
     var mass = new Mass(massName, new THREE.Vector3(), new THREE.Vector3());
     mass.import(exportObj.masses[massName]);
     this.registerMass(mass);
+    masses[massName] = mass;
   }
 }
 

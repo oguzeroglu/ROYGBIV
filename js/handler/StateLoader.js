@@ -374,6 +374,7 @@ StateLoader.prototype.resetProject = function(){
   serverWSURL = 0;
   fogHandler.reset();
   lightHandler.reset();
+  masses = new Object();
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;
   if (!isDeployment){

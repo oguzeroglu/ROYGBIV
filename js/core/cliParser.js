@@ -921,7 +921,7 @@ function parse(input){
             }
           }
 
-          height = parseInt(height);
+          height = parseFloat(height);
           if (isNaN(height)){
             terminal.printError(Text.HEIGHT_MUST_BE_A_NUMBER);
             return true;
@@ -6568,6 +6568,66 @@ function parse(input){
             }
           }
 
+          return true;
+        break;
+        case 261: //newMass
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var massID = splitted[1];
+          var height = parseFloat(splitted[2]);
+
+          if (masses[massID]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          if (isNaN(height)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
+            return true;
+          }
+
+          if (height == 0){
+            terminal.printError(Text.HEIGHT_CANNOT_BE_0);
+            return true;
+          }
+
+          var gridSelectionSize = Object.keys(gridSelections).length;
+          if (gridSelectionSize != 1 && gridSelectionSize != 2){
+            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+            return true;
+          }
+
+          var selections = [];
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              selections.push(gridSelections[gridName]);
+            }
+          }else{
+            selections.push(jobHandlerSelectedGrid);
+          }
+
+          if (selections.length == 2){
+            var grid1 = selections[0];
+            var grid2 = selections[1];
+            if (grid1.parentName != grid2.parentName){
+              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+              return true;
+            }
+          }
+
+          var gridSystemName = selections[0].parentName;
+          var gridSystem = gridSystems[gridSystemName];
+
+          gridSystem.newMass(selections, height, massID);
+          if (physicsDebugMode){
+            parseCommand("switchPhysicsDebugMode");
+            parseCommand("switchPhysicsDebugMode");
+          }
+
+          terminal.printInfo(Text.MASS_CREATED);
           return true;
         break;
       }

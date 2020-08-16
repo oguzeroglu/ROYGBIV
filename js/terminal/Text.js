@@ -369,6 +369,7 @@ var Text = function(){
   this.MUZZLE_FLASH_DESTROYED = "Muzzleflash destroyed."
   this.HEIGHT_CANNOT_BE_0 = "Height cannot be 0.";
   this.WALL_COLLECTION_CREATED = "Wall collection created.";
+  this.MASS_CREATED = "Mass created.";
   this.JUMPDESCRIPTOR_ALREADY_INSERTED_TO_THE_PATH = "Jump descriptor is already inserted into the path.";
   this.JUMPDESCRIPTOR_ALREADY_INSERTED_TO_THE_GRAPH = "Jump descriptor is already inserted into the graph.";
   this.JUMP_DESCRIPTOR_INSERTED_TO_A_PATH = "Jump descriptor is inserted to a path. Cannot delete.";
