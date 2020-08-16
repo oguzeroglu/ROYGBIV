@@ -6627,6 +6627,7 @@ function parse(input){
             parseCommand("switchPhysicsDebugMode");
           }
 
+          terminal.clear();
           terminal.printInfo(Text.MASS_CREATED);
           return true;
         break;
