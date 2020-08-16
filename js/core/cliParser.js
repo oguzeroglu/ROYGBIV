@@ -6577,6 +6577,12 @@ function parse(input){
           }
 
           var massID = splitted[1];
+
+          if (!(massID.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           var height = parseFloat(splitted[2]);
 
           if (masses[massID]){
@@ -6594,10 +6600,12 @@ function parse(input){
             return true;
           }
 
-          var gridSelectionSize = Object.keys(gridSelections).length;
-          if (gridSelectionSize != 1 && gridSelectionSize != 2){
-            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
-            return true;
+          if (!jobHandlerWorking){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
           }
 
           var selections = [];
@@ -6628,7 +6636,10 @@ function parse(input){
           }
 
           terminal.clear();
-          terminal.printInfo(Text.MASS_CREATED);
+
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.MASS_CREATED);
+          }
           return true;
         break;
       }
