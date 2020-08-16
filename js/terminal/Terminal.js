@@ -925,6 +925,15 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Steerables]: ";
 			break;
+			case commandDescriptor.MASS_ID:
+				var massesInTheScene = sceneHandler.getMasses();
+				for (var massName in massesInTheScene){
+					if (massName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(massName);
+					}
+				}
+				helpString = "[Masses in the scene]: ";
+			break;
 		}
 
 		//  **********************************************************

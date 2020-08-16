@@ -6662,6 +6662,33 @@ function parse(input){
           }
           return true;
         break;
+        case 263: //destroyMass
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var massID = splitted[1];
+          var mass = sceneHandler.getMasses()[massID];
+
+          if (!mass){
+            terminal.printError(Text.NO_SUCH_MASS_IN_THE_SCENE);
+            return true;
+          }
+
+          delete masses[massID];
+          sceneHandler.onMassDeletion(mass);
+
+          if (physicsDebugMode){
+            parseCommand("switchPhysicsDebugMode");
+            parseCommand("switchPhysicsDebugMode");
+          }
+
+          terminal.clear();
+
+          terminal.printInfo(Text.MASS_DESTROYED);
+          return true;
+        break;
       }
       return true;
     }catch(err){
