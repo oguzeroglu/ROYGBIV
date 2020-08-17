@@ -47,7 +47,11 @@ SteeringHandler.prototype.onSceneDeletion = function(sceneName){
   var graphsInScene = this.graphsBySceneName[sceneName] || {};
   for (var gid in graphsInScene){
     delete this.usedGraphIDs[gid];
-    
+  }
+
+  var pathsInScene = this.pathsBySceneName[sceneName] || {};
+  for (var pid in pathsInScene){
+    delete this.usedPathIDs[pid];
   }
 
   delete this.obstaclesBySceneName[sceneName];
