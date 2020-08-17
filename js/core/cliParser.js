@@ -579,12 +579,12 @@ function parse(input){
           }
           selectionHandler.resetCurrentSelection();
           if (object){
-            sceneHandler.onAddedObjectDeletion(object);
             object.destroy(true);
+            sceneHandler.onAddedObjectDeletion(object);
             delete addedObjects[objectName];
           }else if (objectGroup){
-            sceneHandler.onObjectGroupDeletion(objectGroup);
             objectGroup.destroy(true);
+            sceneHandler.onObjectGroupDeletion(objectGroup);
             delete objectGroups[objectName];
           }
           for (var lightningName in lightnings){

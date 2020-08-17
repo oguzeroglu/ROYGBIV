@@ -2010,7 +2010,7 @@ AddedObject.prototype.destroy = function(skipRaycasterRefresh){
   if (!skipRaycasterRefresh){
     rayCaster.refresh();
   }
-  steeringHandler.removeObstacle(this.name);
+  steeringHandler.removeObstacle(this.name, this.registeredSceneName);
 }
 
 AddedObject.prototype.dispose = function(){

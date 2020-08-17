@@ -100,6 +100,8 @@ Scene.prototype.destroy = function(){
     parseCommand("destroyMass " + massName);
   }
   this.reset();
+
+  steeringHandler.onSceneDeletion(this.name);
 }
 
 Scene.prototype.resetTrackingObjects = function(){

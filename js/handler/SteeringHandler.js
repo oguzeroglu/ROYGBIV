@@ -32,6 +32,16 @@ var SteeringHandler = function(){
   };
 }
 
+SteeringHandler.prototype.onSceneDeletion = function(sceneName){
+  delete this.obstaclesBySceneName[sceneName];
+  delete this.steerablesBySceneName[sceneName];
+  delete this.jumpDescriptorsBySceneName[sceneName];
+  delete this.pathsBySceneName[sceneName];
+  delete this.graphsBySceneName[sceneName];
+  delete this.astarsBySceneName[sceneName];
+  delete this.behaviorsBySceneName[sceneName];
+}
+
 SteeringHandler.prototype.setBehavior = function(object, behaviorName){
   var constructedBehavior = object.constructedSteeringBehaviors[behaviorName];
   var steerable = object.steerable;
@@ -523,7 +533,7 @@ SteeringHandler.prototype.addObstacle = function(id, position, size, overrideSce
   return true;
 }
 
-SteeringHandler.prototype.removeObstacle = function(id){
+SteeringHandler.prototype.removeObstacle = function(id, overrideSceneName){
   var entity = this.usedEntityIDs[id];
   if (!entity){
     return false;
@@ -532,9 +542,9 @@ SteeringHandler.prototype.removeObstacle = function(id){
   this.world.removeEntity(entity);
 
   if (entity instanceof Kompute.Steerable){
-    delete this.steerablesBySceneName[sceneHandler.getActiveSceneName()][id];
+    delete this.steerablesBySceneName[overrideSceneName || sceneHandler.getActiveSceneName()][id];
   }else{
-    delete this.obstaclesBySceneName[sceneHandler.getActiveSceneName()][id];
+    delete this.obstaclesBySceneName[overrideSceneName || sceneHandler.getActiveSceneName()][id];
   }
 
   delete this.usedEntityIDs[id];
@@ -1127,6 +1137,6 @@ SteeringHandler.prototype.getLookDirection = function(object, targetVector){
   targetVector.x = lookDirection.x;
   targetVector.y = lookDirection.y;
   targetVector.z = lookDirection.z;
-  
+
   return targetVector;
 }
