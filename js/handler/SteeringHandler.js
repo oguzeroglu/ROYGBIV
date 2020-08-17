@@ -54,6 +54,11 @@ SteeringHandler.prototype.onSceneDeletion = function(sceneName){
     delete this.usedPathIDs[pid];
   }
 
+  var aStarsInScene = this.astarsBySceneName[sceneName] || {};
+  for (var asid in aStarsInScene){
+    delete this.usedAStarIDs[asid];
+  }
+
   delete this.obstaclesBySceneName[sceneName];
   delete this.steerablesBySceneName[sceneName];
   delete this.jumpDescriptorsBySceneName[sceneName];
