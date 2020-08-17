@@ -4808,10 +4808,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SPRITE);
             return true;
           }
-          if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
-            return true;
-          }
           selectionHandler.select(sprite);
           terminal.printInfo(Text.SPRITE_SELECTED);
           return true;
@@ -5119,10 +5115,6 @@ function parse(input){
           var vkName = splitted[1];
           if (!virtualKeyboards[vkName]){
             terminal.printError(Text.NO_SUCH_VIRTUAL_KEYBOARD);
-            return true;
-          }
-          if (sceneHandler.getActiveSceneName() != virtualKeyboards[vkName].registeredSceneName){
-            terminal.printError(Text.VIRTUAL_KEYBOARD_NOT_IN_ACTIVE_SCENE);
             return true;
           }
           virtualKeyboards[vkName].destroy();
@@ -6675,10 +6667,10 @@ function parse(input){
             return true;
           }
 
-          var mass = sceneHandler.getMasses()[massID];
+          var mass = masses[massID];
 
           if (!mass){
-            terminal.printError(Text.NO_SUCH_MASS_IN_THE_SCENE);
+            terminal.printError(Text.NO_SUCH_MASS);
             return true;
           }
 
