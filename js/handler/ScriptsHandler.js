@@ -184,5 +184,5 @@ ScriptsHandler.prototype.getScriptNameFromPath = function(path){
       name += splitted[i] + "_"
     }
   }
-  return name.replace(".js", "").replace("-", "");
+  return name.replace(".js", "").replace(/-/g, "");
 }
