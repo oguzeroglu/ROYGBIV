@@ -936,7 +936,7 @@ ObjectGroup.prototype.isAttributeRepeating = function(attribute){
 
 ObjectGroup.prototype.compressGeometry = function(){
   var compressableAttributes = [
-    "quaternion", "alpha" , "color", "textureInfo", "textureMatrixInfo",
+    "quaternion", "alpha", "textureInfo", "textureMatrixInfo",
     "diffuseUV", "emissiveIntensity", "emissiveColor", "emissiveUV",
     "aoIntensity", "aoUV", "displacementInfo", "displacementUV", "alphaUV",
     "affectedByLight", "textureMirrorInfo", "displacementTextureMatrixInfo"
