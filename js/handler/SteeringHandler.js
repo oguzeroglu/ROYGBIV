@@ -39,6 +39,11 @@ SteeringHandler.prototype.onSceneDeletion = function(sceneName){
     delete this.usedBehaviorIDs[bid];
   }
 
+  var obstaclesInScene = this.obstaclesBySceneName[sceneName] || {};
+  for (var obsID in obstaclesInScene){
+    delete this.usedEntityIDs[obsID];
+  }
+
   delete this.obstaclesBySceneName[sceneName];
   delete this.steerablesBySceneName[sceneName];
   delete this.jumpDescriptorsBySceneName[sceneName];
