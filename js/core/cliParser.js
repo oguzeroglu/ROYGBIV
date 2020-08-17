@@ -921,7 +921,7 @@ function parse(input){
             }
           }
 
-          height = parseInt(height);
+          height = parseFloat(height);
           if (isNaN(height)){
             terminal.printError(Text.HEIGHT_MUST_BE_A_NUMBER);
             return true;
@@ -4808,10 +4808,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SPRITE);
             return true;
           }
-          if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
-            return true;
-          }
           selectionHandler.select(sprite);
           terminal.printInfo(Text.SPRITE_SELECTED);
           return true;
@@ -5119,10 +5115,6 @@ function parse(input){
           var vkName = splitted[1];
           if (!virtualKeyboards[vkName]){
             terminal.printError(Text.NO_SUCH_VIRTUAL_KEYBOARD);
-            return true;
-          }
-          if (sceneHandler.getActiveSceneName() != virtualKeyboards[vkName].registeredSceneName){
-            terminal.printError(Text.VIRTUAL_KEYBOARD_NOT_IN_ACTIVE_SCENE);
             return true;
           }
           virtualKeyboards[vkName].destroy();
@@ -6568,6 +6560,133 @@ function parse(input){
             }
           }
 
+          return true;
+        break;
+        case 261: //newMass
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var massID = splitted[1];
+
+          if (!(massID.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          var height = parseFloat(splitted[2]);
+
+          if (masses[massID]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          if (isNaN(height)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
+            return true;
+          }
+
+          if (height == 0){
+            terminal.printError(Text.HEIGHT_CANNOT_BE_0);
+            return true;
+          }
+
+          if (!jobHandlerWorking){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
+          }
+
+          var selections = [];
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              selections.push(gridSelections[gridName]);
+            }
+          }else{
+            selections.push(jobHandlerSelectedGrid);
+          }
+
+          if (selections.length == 2){
+            var grid1 = selections[0];
+            var grid2 = selections[1];
+            if (grid1.parentName != grid2.parentName){
+              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+              return true;
+            }
+          }
+
+          var gridSystemName = selections[0].parentName;
+          var gridSystem = gridSystems[gridSystemName];
+
+          gridSystem.newMass(selections, height, massID);
+          if (physicsDebugMode){
+            parseCommand("switchPhysicsDebugMode");
+            parseCommand("switchPhysicsDebugMode");
+          }
+
+          terminal.clear();
+
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.MASS_CREATED);
+          }
+          return true;
+        break;
+        case 262: //printMasses
+          terminal.printHeader(Text.MASSES_IN_THIS_SCENE);
+
+          var totalCount = Object.keys(sceneHandler.getMasses()).length;
+          var count = 0;
+          for (var massName in sceneHandler.getMasses()){
+            var mass = masses[massName];
+            var center = mass.center;
+            var size = mass.size;
+            count ++;
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, massName), true);
+            terminal.printInfo(Text.COORD_TREE_TAB.replace(Text.PARAM1, "center").replace(Text.PARAM2, " " + center.x).replace(Text.PARAM3, " " + center.y).replace(Text.PARAM4, " " + center.z), true);
+            terminal.printInfo(Text.COORD_TREE_SIZE_TAB.replace(Text.PARAM1, "size").replace(Text.PARAM2, " " + size.x).replace(Text.PARAM3, " " + size.y).replace(Text.PARAM4, " " + size.z), count != totalCount);
+          }
+
+          if (totalCount == 0){
+            terminal.printError(Text.NO_MASSES_IN_THE_SCENE);
+          }
+          return true;
+        break;
+        case 263: //destroyMass
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var massID = splitted[1];
+
+          if (!(massID.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          var mass = masses[massID];
+
+          if (!mass){
+            terminal.printError(Text.NO_SUCH_MASS);
+            return true;
+          }
+
+          delete masses[massID];
+          sceneHandler.onMassDeletion(mass);
+
+          if (physicsDebugMode){
+            parseCommand("switchPhysicsDebugMode");
+            parseCommand("switchPhysicsDebugMode");
+          }
+
+          terminal.clear();
+
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.MASS_DESTROYED);
+          }
           return true;
         break;
       }

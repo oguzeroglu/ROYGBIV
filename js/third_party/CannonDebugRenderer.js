@@ -48,6 +48,11 @@ THREE.CannonDebugRenderer.prototype = {
           this.world.add(objectGroups[objName].physicsBody);
         }
       }
+
+      var masses = sceneHandler.getMasses();
+      for (var massName in masses){
+        this.world.add(masses[massName].physicsBody);
+      }
     },
 
     hide: function(obj){

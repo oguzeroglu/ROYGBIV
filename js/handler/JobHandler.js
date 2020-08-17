@@ -127,6 +127,10 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyAStarCommand();
     }else if (this.splitted[0] == "excludefromhidebehavior"){
       this.handleExcludeFromHideBehaviorCommand();
+    }else if(this.splitted[0] == "newmass"){
+      this.handleNewMassCommand();
+    }else if (this.splitted[0] == "destroymass"){
+      this.handleDestroyMassCommand();
     }
 
     if (jobHandlerRaycasterRefresh){
@@ -138,6 +142,43 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoconfigurearea"){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyMassCommand = function(){
+  var massNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  var allMassesInTheScene = sceneHandler.getMasses();
+
+  for (var massID in allMassesInTheScene){
+    if (massID.toLowerCase().startsWith(massNamePrefix.toLowerCase())){
+      parseCommand("destroyMass " + massID);
+      ctr ++;
+    }
+  }
+
+  if (ctr > 0){
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_MASSES.replace(Text.PARAM1, ctr));
+  }else{
+    terminal.printError(Text.NO_MASSES_FOUND);
+  }
+}
+
+JobHandler.prototype.handleNewMassCommand = function(){
+  var massNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var gridName in gridSelections){
+    jobHandlerSelectedGrid = gridSelections[gridName];
+    parseCommand(
+      "newMass " + massNamePrefix + "_" + ctr + " " + this.splitted[2]
+    );
+    ctr ++;
+  }
+  jobHandlerSelectedGrid = 0;
+  if (ctr != 0){
+    terminal.printInfo(Text.CREATED_X_MASSES.replace(Text.PARAM1, ctr));
+  }else{
+    terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
   }
 }
 

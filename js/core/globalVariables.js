@@ -416,6 +416,7 @@ var protocolDefinitionFileName = 0;
 var serverWSURL = 0;
 var objectExportImportHandler;
 var DUMMY_TEXTURE = new THREE.Texture();
+var masses = new Object();
 
 // ROTATION MODES
 var rotationModes = {

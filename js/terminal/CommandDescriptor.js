@@ -261,7 +261,10 @@ var CommandDescriptor = function(){
       0, //printAStars
       0, //jumpDescriptors
       4, //removeEdgeFromGraph
-      2 //excludeFromHideBehavior
+      2, //excludeFromHideBehavior
+      2, //newMass
+      0, //printMasses
+      1 //destroyMass
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -525,7 +528,10 @@ var CommandDescriptor = function(){
     "printAStars",
     "jumpDescriptors",
     "removeEdgeFromGraph graphID offsetX offsetY offsetZ",
-    "excludeFromHideBehavior id true/false"
+    "excludeFromHideBehavior id true/false",
+    "newMass id height",
+    "printMasses",
+    "destroyMass massID"
   ];
 
   this.commands = [
@@ -789,7 +795,10 @@ var CommandDescriptor = function(){
     "printAStars",
     "jumpDescriptors",
     "removeEdgeFromGraph",
-    "excludeFromHideBehavior"
+    "excludeFromHideBehavior",
+    "newMass",
+    "printMasses",
+    "destroyMass"
   ];
 
   this.commandInfo = [
@@ -1053,7 +1062,10 @@ var CommandDescriptor = function(){
     "printAStars: Prints a list of created AStar objects.",
     "jumpDescriptors: Shows the jump descriptor configuration GUI.",
     "removeEdgeFromGraph: Removes an edge from given graph.",
-    "excludeFromHideBehavior: Excludes/includes an AI entity from/to Hide behavior. Steerables cannot hide behind given entity if the entity is excluded."
+    "excludeFromHideBehavior: Excludes/includes an AI entity from/to Hide behavior. Steerables cannot hide behind given entity if the entity is excluded.",
+    "newMass: Creates a new physical mass without a graphical representation.",
+    "printMasses: Prints a list of created masses.",
+    "destroyMass: Destroys a mass of given id."
   ];
 
   this.keyboardInfo = [
@@ -1210,6 +1222,7 @@ var CommandDescriptor = function(){
   this.STEERING_BEHAVIOR_NAME      =   53;
   this.ASTAR_ID                    =   54;
   this.STEERABLE_NAME              =   55;
+  this.MASS_ID                     =   56;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1983,6 +1996,17 @@ var CommandDescriptor = function(){
   this.excludeFromHideBehavior.types = [];
   this.excludeFromHideBehavior.types.push(this.AI_OBSTACLE_ID); //id
   this.excludeFromHideBehavior.types.push(this.BOOLEAN); //true/false
+
+  // newMass
+  this.newMass = new Object();
+  this.newMass.types = [];
+  this.newMass.types.push(this.UNKNOWN_INDICATOR); //id
+  this.newMass.types.push(this.UNKNOWN_INDICATOR); //height
+
+  // destroyMass
+  this.destroyMass = new Object();
+  this.destroyMass.types = [];
+  this.destroyMass.types.push(this.MASS_ID); //massID
 };
 
 CommandDescriptor.prototype.test = function(){

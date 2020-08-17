@@ -4,6 +4,7 @@ importScripts("../handler/PhysicsBodyGenerator.js");
 importScripts("../engine_objects/AddedObject.js");
 importScripts("../engine_objects/ObjectGroup.js");
 importScripts("../engine_objects/CollisionInfo.js");
+importScripts("../engine_objects/Mass.js");
 
 var IS_WORKER_CONTEXT = true;
 
