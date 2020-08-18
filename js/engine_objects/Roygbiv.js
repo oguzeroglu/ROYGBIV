@@ -317,7 +317,8 @@ var Roygbiv = function(){
     "setSteerableLookDirection",
     "getSteerableLookDirection",
     "setObjectRotationMode",
-    "resetObjectRotation"
+    "resetObjectRotation",
+    "resetRandomPathBehavior"
   ];
 
   this.globals = new Object();
@@ -4082,6 +4083,28 @@ Roygbiv.prototype.getSteerableLookDirection = function(object, targetVector){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getSteerableLookDirection, preConditions.targetVector, targetVector);
 
   return steeringHandler.getLookDirection(object, targetVector);
+}
+
+// Ensures the RandomPathBehavior tries to start from the closest graph vertex
+// to given steerable. This API may be useful when the random path behavior of
+// object is changed to some other behavior before the object reaches to the
+// destination vertex, and then the random path behavior is activated again.
+// If given behavior is a blended or a priority steering behavior, the child
+// random path behaviors are reset.
+Roygbiv.prototype.resetRandomPathBehavior = function(object, behaviorName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.resetRandomPathBehavior, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.resetRandomPathBehavior, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.resetRandomPathBehavior, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.resetRandomPathBehavior, object);
+  preConditions.checkIfString(ROYGBIV.resetRandomPathBehavior, preConditions.behaviorName, behaviorName);
+  preConditions.checkIfSteerable(ROYGBIV.resetRandomPathBehavior, object);
+  preConditions.checkIfObjectHasBehavior(ROYGBIV.resetRandomPathBehavior, object, behaviorName);
+  preConditions.checkIfRandomPathOrBlendedOrPriorityBehavior(Roygbiv.resetRandomPathBehavior, object, behaviorName);
+
+  steeringHandler.resetRandomPathBehavior(object, behaviorName);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

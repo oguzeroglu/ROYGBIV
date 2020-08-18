@@ -331,6 +331,13 @@ Preconditions.prototype.checkIfSteerableIsBeingUpdated = function(callerFunc, ob
   }
 }
 
+Preconditions.prototype.checkIfRandomPathOrBlendedOrPriorityBehavior = function(callerFunc, object, behaviorName){
+  var constructedBehavior = object.constructedSteeringBehaviors[behaviorName];
+  if (!(constructedBehavior instanceof Kompute.RandomPathBehavior || constructedBehavior instanceof Kompute.PrioritySteeringBehavior || constructedBehavior instanceof Kompute.BlendedSteeringBehavior)){
+    this.throw(callerFunc, "Behavior is not a RandomPathBehavior, PrioritySteeringBehavior or BlendedSteeringBehavior.");
+  }
+}
+
 Preconditions.prototype.checkIfPathFollowingBehavior = function(callerFunc, object, behaviorName){
   var constructedBehavior = object.constructedSteeringBehaviors[behaviorName];
   if (!(constructedBehavior instanceof Kompute.PathFollowingBehavior)){

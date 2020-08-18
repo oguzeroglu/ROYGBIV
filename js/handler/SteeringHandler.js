@@ -1197,3 +1197,25 @@ SteeringHandler.prototype.getLookDirection = function(object, targetVector){
 
   return targetVector;
 }
+
+SteeringHandler.prototype.resetRandomPathBehavior = function(object, behaviorName){
+  var constructedBehavior = object.constructedSteeringBehaviors[behaviorName];
+
+  if (constructedBehavior instanceof Kompute.RandomPathBehavior){
+    constructedBehavior.isPathConstructed = false;
+  }else if (constructedBehavior instanceof Kompute.PrioritySteeringBehavior){
+    for (var i = 0; i < constructedBehavior.list.length; i ++){
+      var behavior = constructedBehavior[i];
+      if (behavior instanceof Kompute.RandomPathBehavior){
+        behavior.isPathConstructed = false;
+      }
+    }
+  }else if (constructedBehavior instanceof Kompute.BlendedSteeringBehavior){
+    for (var i = 0; i < constructedBehavior.definitions.length; i ++){
+      var behavior = constructedBehavior.definitions[i].behavior;
+      if (behavior instanceof Kompute.RandomPathBehavior){
+        behavior.isPathConstructed = false;
+      }
+    }
+  }
+}
