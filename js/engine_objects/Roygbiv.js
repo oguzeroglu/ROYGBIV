@@ -1384,7 +1384,7 @@ Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
 }
 
 // Runs the provided function for each particle system of given particle system pool. The callbackFunction
-// is executed with particleSystem parameter.
+// is executed with particleSystem and particleSystemName parameters.
 Roygbiv.prototype.executeForEachParticleSystem = function(psPool, callbackFunction){
   if (mode == 0){
     return;
@@ -1395,7 +1395,7 @@ Roygbiv.prototype.executeForEachParticleSystem = function(psPool, callbackFuncti
   preConditions.checkIfParticleSystemPool(ROYGBIV.executeForEachParticleSystem, preConditions.psPool, psPool);
   preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.executeForEachParticleSystem, psPool);
   for (var psName in psPool.particleSystems){
-    callbackFunction(psPool.particleSystems[psName]);
+    callbackFunction(psPool.particleSystems[psName], psName);
   }
 }
 

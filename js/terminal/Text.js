@@ -1073,7 +1073,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ISORIENTATIONLANDSCAPE = "For mobile devices returns if the orientation is landscape for mobile devices. Returns false for desktop devices";
   this.ROYGBIV_SCRIPTING_API_SETSCREENORIENTATIONCHANGELISTENER = "Sets a listener for orientation change events. For mobile devices, the callbackFunction is executed with isLandscape parameter\nwhen the orientation is changed.";
   this.ROYGBIV_SCRIPTING_API_REMOVESCREENORIENTATIONCHANGELISTENER = "Removes the listener for orientation change events.";
-  this.ROYGBIV_SCRIPTING_API_EXECUTEFOREACHPARTICLESYSTEM = "Runs the provided function for each particle system of given particle system pool. The callbackFunction is executed with\nparticleSystem parameter.";
+  this.ROYGBIV_SCRIPTING_API_EXECUTEFOREACHPARTICLESYSTEM = "Runs the provided function for each particle system of given particle system pool. The callbackFunction is executed with\nparticleSystem and particleSystemName parameters.";
   this.ROYGBIV_SCRIPTING_API_STARTSCRIPT = "Starts a script. To get scripts use this format as scriptName:\n"+
                                            "parentdir1_parentdir2_....._parentdirX_scriptFileName\n"+
                                            "For example in order to get a script under the scripts/ root folder example.js, the scriptName parameter should be example. However,\nto get a script under scripts/testFolder/test.js, the scriptName parameter should be testFolder_test.";
