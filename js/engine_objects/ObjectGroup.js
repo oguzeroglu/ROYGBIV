@@ -596,7 +596,7 @@ ObjectGroup.prototype.hide = function(keepPhysics){
 }
 
 ObjectGroup.prototype.onPositionChange = function(from, to){
-  if (mode == 0){
+  if (mode == 0 || this.isHidden){
     return;
   }
   if (this.positionThresholdExceededListenerInfo && this.positionThresholdExceededListenerInfo.isActive){

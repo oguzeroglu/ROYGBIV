@@ -602,7 +602,7 @@ AddedObject.prototype.hide = function(keepPhysics){
 }
 
 AddedObject.prototype.onPositionChange = function(from, to){
-  if(mode == 0){
+  if(mode == 0 || this.isHidden){
     return;
   }
 
