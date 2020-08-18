@@ -868,7 +868,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_COMPUTEQUATERNIONFROMVECTORS = "Returns the quaternion between two vectors.";
   this.ROYGBIV_SCRIPTING_API_MULTIPLYSCALAR = "Multiplies a vector by a scalar.";
   this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEMVELOCITYATTIME = "Calcualtes and returns the velocity vector of a particle system at given time. For particles with circular motion, this function returns\nthe angular velocity at given time.";
-  this.ROYGBIV_SCRIPTING_API_STOPPARTICLESYSTEM = "Stops the motion of a particle system. This can be useful for smooth after collision effects of particle systems as it lets particles\nto dissapear smoothly. The particle system is killed after stopDuration seconds.If particle systems have collision listener attached,\nthe collision listener needs to be reset when starting the particle system after stopping.";
+  this.ROYGBIV_SCRIPTING_API_STOPPARTICLESYSTEM = "Stops the motion of a particle system. This can be useful for smooth after collision effects of particle systems as it lets particles\nto dissapear smoothly. The particle system is killed after stopDuration seconds.";
   this.ROYGBIV_SCRIPTING_API_STARTPARTICLESYSTEM = "Starts a particle system after its creation. Configurations are:\n"+
                                                      "particleSystem: The particle system to start. (mandatory)\n"+
                                                      "startPosition: The initial position vector of the particle system. (optional)\n"+

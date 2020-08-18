@@ -1286,9 +1286,7 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
 
 // Stops the motion of a particle system. This can be useful for smooth after collision
 // effects of particle systems as it lets particles to dissapear smoothly. The particle
-// system is killed after stopDuration seconds. If particle systems have collision listener
-// attached, the collision listener needs to be reset when starting the particle system
-// after stopping.
+// system is killed after stopDuration seconds.
 Roygbiv.prototype.stopParticleSystem = function(particleSystem, stopDuration){
   if (mode == 0){
     return;
