@@ -290,9 +290,9 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
     }
   }
   if (transferableMessageBody.flagsDescription[1] > 0){
-    intersectionObject = 0, intersectionPoint = 0;
     var intersectionTestDescription = transferableMessageBody.intersectionTestDescription;
     for (var i = 0; i<intersectionTestDescription.length; i+= 11){
+      intersectionObject = 0, intersectionPoint = 0;
       if (intersectionTestDescription[i] >= 0){
         var test2D = intersectionTestDescription[i + 8] > 0;
         if (test2D && !(mode == 0 && keyboardBuffer["Shift"])){
