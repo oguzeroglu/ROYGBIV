@@ -392,6 +392,18 @@ SteeringHandler.prototype.switchDebugMode = function(){
           var behavior = obj.constructedSteeringBehaviors[bid];
           if (behavior instanceof Kompute.RandomPathBehavior){
             this.debugHelper.visualiseAStar(behavior.aStar);
+          }else if(behavior instanceof Kompute.BlendedSteeringBehavior){
+            for (var i = 0; i < behavior.definitions.length; i ++){
+              if (behavior.definitions[i].behavior instanceof Kompute.RandomPathBehavior){
+                this.debugHelper.visualiseAStar(behavior.definitions[i].behavior.aStar);
+              }
+            }
+          }else if (behavior instanceof Kompute.PrioritySteeringBehavior){
+            for (var i = 0; i < behavior.list.length; i ++){
+              if (behavior.list[i] instanceof Kompute.RandomPathBehavior){
+                this.debugHelper.visualiseAStar(behavior.list[i].aStar);
+              }
+            }
           }
         }
       }
@@ -403,6 +415,18 @@ SteeringHandler.prototype.switchDebugMode = function(){
           var behavior = obj.constructedSteeringBehaviors[bid];
           if (behavior instanceof Kompute.RandomPathBehavior){
             this.debugHelper.visualiseAStar(behavior.aStar);
+          }else if(behavior instanceof Kompute.BlendedSteeringBehavior){
+            for (var i = 0; i < behavior.definitions.length; i ++){
+              if (behavior.definitions[i].behavior instanceof Kompute.RandomPathBehavior){
+                this.debugHelper.visualiseAStar(behavior.definitions[i].behavior.aStar);
+              }
+            }
+          }else if (behavior instanceof Kompute.PrioritySteeringBehavior){
+            for (var i = 0; i < behavior.list.length; i ++){
+              if (behavior.list[i] instanceof Kompute.RandomPathBehavior){
+                this.debugHelper.visualiseAStar(behavior.list[i].aStar);
+              }
+            }
           }
         }
       }
