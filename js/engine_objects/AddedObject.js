@@ -3297,6 +3297,8 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     copyInstance.setCustomDisplacementTextureRepeat(this.customDisplacementTextureMatrixInfo.repeatU, this.customDisplacementTextureMatrixInfo.repeatV);
   }
 
+  copyInstance.setRotationMode(this.rotationMode);
+
   return copyInstance;
 }
 

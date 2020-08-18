@@ -3401,6 +3401,9 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   if (this.hasCustomPrecision){
     newObjGroup.useCustomShaderPrecision(this.customPrecision);
   }
+
+  newObjGroup.setRotationMode(this.rotationMode);
+
   return newObjGroup;
 }
 
