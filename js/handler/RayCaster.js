@@ -111,6 +111,9 @@ RayCaster.prototype.updateObject = function(obj, forceUpdate){
 
 RayCaster.prototype.issueUpdate = function(obj){
   if (!(mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable)){
+    if (obj.isHidden){
+      return;
+    }
     rayCaster.binHandler.updateObject(obj);
   }
 }
