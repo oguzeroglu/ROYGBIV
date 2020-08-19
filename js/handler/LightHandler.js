@@ -196,6 +196,7 @@ LightHandler.prototype.calculateDynamicTypeWeight = function(typeKey){
 }
 
 LightHandler.prototype.onSwitchFromPreviewToDesign = function(){
+
   this.unbakeLights();
 
   for (var sceneName in sceneHandler.scenes){
@@ -208,7 +209,6 @@ LightHandler.prototype.onSwitchFromPreviewToDesign = function(){
 }
 
 LightHandler.prototype.onSwitchFromDesignToPreview = function(){
-  this.bakeLights();
 
   this.originalLightInfos = new Object();
 
@@ -433,9 +433,18 @@ LightHandler.prototype.onAfterSceneChange = function(){
       this.addLightToObject(autoInstancedObject);
     }
   }
+
+  if (mode == 1){
+    this.bakeLights();
+  }
 }
 
 LightHandler.prototype.onBeforeSceneChange = function(){
+
+  if (mode == 1){
+    this.unbakeLights();
+  }
+
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
   var autoInstancedObjectsInScene = sceneHandler.getAutoInstancedObjects();
