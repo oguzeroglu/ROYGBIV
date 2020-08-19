@@ -2,8 +2,7 @@
 
 ROYGBIV is a WebGL game engine for motivated programmers who do not have the budget for buying fancy 3D models or licensing a popular engine but still want to make 60 FPS web games for both mobile and desktop. It is being developed by one of such programmers on top of low level THREE.js features for the graphics and CANNON.js for physics. It is named after this [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).    
 
-![](/screen_shots/fps.gif?raw=true)   
-![](/screen_shots/bots.gif?raw=true)
+![](/screen_shots/roygbiv.gif?raw=true)   
 
 ## Demos    
 [Autonomous Battle](https://oguzeroglu.github.io/kompute-demos-with-roygbiv/autonomousBattle/application.html)    
