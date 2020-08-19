@@ -2,9 +2,11 @@
 
 ROYGBIV is a WebGL game engine for motivated programmers who do not have the budget for buying fancy 3D models or licensing a popular engine but still want to make 60 FPS web games for both mobile and desktop. It is being developed by one of such programmers on top of low level THREE.js features for the graphics and CANNON.js for physics. It is named after this [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).    
 
-![](/screen_shots/roygbiv.gif?raw=true)    
+![](/screen_shots/fps.gif?raw=true)   
+![](/screen_shots/bots.gif?raw=true)
 
 ## Demos    
+[Autonomous Battle](https://oguzeroglu.github.io/kompute-demos-with-roygbiv/autonomousBattle/application.html)
 [Blaster](https://oguzeroglu.github.io/ROYGBIV/demo/blaster/application.html)    
 [Cooking space kebab with a flamethrower](https://oguzeroglu.github.io/ROYGBIV/demo/spaceKebab/application.html)    
 [Plasma Rifle - Inspired by Doom's Plasma Rifle](https://oguzeroglu.github.io/ROYGBIV/demo/plasmaGun/application.html)    
@@ -37,14 +39,6 @@ ROYGBIV works on browsers (preferably Chrome or Firefox). It works with a set of
 * Run **node server** to start the server. You should see something like this:
 ![](/screen_shots/server.png?raw=true)
 * Using your favorite browser, go to page **localhost:8085**
-
-## Screenshots
-
-![](/screen_shots/jumpPads.png?raw=true)    
-![](/screen_shots/fpsWeaponDesign.png?raw=true)
-![](/screen_shots/scene.png?raw=true)
-![](/screen_shots/scifi2.png?raw=true)
-![](/screen_shots/psShowcase.png?raw=true)
 
 ## License
 
