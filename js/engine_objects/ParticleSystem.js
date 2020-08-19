@@ -41,7 +41,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
 ParticleSystem.prototype.compressGeometry = function(){
   macroHandler.compressAttributes(this.mesh, [
     "position", "velocity", "acceleration", "flags1", "flags3", "flags4", "angularQuaternion",
-    "rgbThreshold", "uvCoordinates", "targetColor" 
+    "rgbThreshold", "uvCoordinates", "targetColor"
   ]);
 }
 
@@ -103,6 +103,9 @@ ParticleSystem.prototype.createCopy = function(newParticleSystemName){
   copyParticleSystem.creationConfigurations = JSON.parse(JSON.stringify(this.creationConfigurations));
   copyParticleSystem.creationConfigurations.name = newParticleSystemName;
   copyParticleSystem.registeredSceneName = this.registeredSceneName;
+
+  copyParticleSystem.mesh.scale.copy(this.mesh.scale);
+
   return copyParticleSystem;
 }
 
