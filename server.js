@@ -581,8 +581,8 @@ function readEngineScripts(projectName, author, noMobile){
       }else if (scriptPath.includes("JobHandler.js")){
         console.log("[*] Skipping JobHandler");
         continue;
-      }else if (scriptPath.includes("jquery.terminal-1.11.3.min.js")){
-        console.log("[*] Skipping jquery terminal plugin");
+      }else if (scriptPath.includes("jquery")){
+        console.log("[*] Skipping jquery");
         continue;
       }else if (scriptPath.includes("Terminal.js")){
         console.log("[*] Skipping Terminal.");

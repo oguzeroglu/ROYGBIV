@@ -161,7 +161,7 @@ window.onload = function() {
   }
 
   // LOAD
-  loadInput = $("#loadInput");
+  loadInput = document.getElementById("loadInput");
   // 3D CANVAS
   canvas = document.getElementById("rendererCanvas");
   onCanvasInitiated();
@@ -450,7 +450,17 @@ function startDeployment(){
     appendtoDeploymentConsole("[!] This application does not support mobile devices. Please run this with a non mobile device.");
     return;
   }
-  $.getJSON("js/application.json").done(function(data){
+
+  var xobj = new XMLHttpRequest();
+  xobj.overrideMimeType("application/json");
+  xobj.open("GET", "js/application.json", true);
+  xobj.onreadystatechange = function(){
+    if (!(xobj.readyState === 4 && xobj.status === 200)){
+      return;
+    }
+
+    var data = JSON.parse(xobj.responseText);
+
     appendtoDeploymentConsole("Initializing.");
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
@@ -461,10 +471,10 @@ function startDeployment(){
     }else{
       appendtoDeploymentConsole("[!] Project failed to load: "+stateLoader.reason);
     }
-  }).fail(function(jqxhr, textStatus, error){
-    appendtoDeploymentConsole("[!] Application cannot be loaded.");
-  });
+  };
+
   appendtoDeploymentConsole("Loading application.");
+  xobj.send(null);
 }
 
 function clearDeploymentConsole(){

@@ -218,7 +218,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;
   particleCollisionCallbackRequests = new Object();
   ROYGBIV.globals = new Object();
-  $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
+  if (!isDeployment){
+    $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
+  }
   mode = 1;
   particleSystemGenerator.handleModeSwitch();
   var that = this;
@@ -627,7 +629,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     canvas.style.visibility = "hidden";
     terminal.disable();
     rayCaster.onReadyCallback = function(){
-      $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
+      if (!isDeployment){
+        $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
+      }
       that.enableTerminal();
       canvas.style.visibility = "";
       terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
