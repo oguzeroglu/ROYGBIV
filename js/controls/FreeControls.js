@@ -112,8 +112,26 @@ FreeControls.prototype.onMouseWheel = function(event){
   var deltaX = event.deltaX;
   var deltaY = event.deltaY;
   if (Math.abs(deltaX) < Math.abs(deltaY)){
+
+    if (deltaY > 290){
+      deltaY = 290;
+    }
+
+    if (deltaY < -290){
+      deltaY = -290;
+    }
+
     camera.translateZ(activeControl.mouseWheelSpeed * deltaY);
   }else{
+
+    if (deltaX > 290){
+      deltaX = 290;
+    }
+
+    if (deltaX < -290){
+      deltaX = -290;
+    }
+
     camera.translateX(activeControl.mouseWheelSpeed * deltaX);
   }
 }
