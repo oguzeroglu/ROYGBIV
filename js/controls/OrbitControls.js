@@ -108,10 +108,31 @@ OrbitControls.prototype.rotateAroundYNegativeKeyboard = function(){
 OrbitControls.prototype.onMouseWheel = function(event){
   var deltaX = event.deltaX / 10000;
   var deltaY = event.deltaY / 10000;
+
   if (Math.abs(deltaX) > Math.abs(deltaY)){
-    activeControl.spherical.theta += deltaX * activeControl.mouseWheelRotationSpeed;
+    var thetaDelta = deltaX * activeControl.mouseWheelRotationSpeed;
+
+    if (thetaDelta > 0.09){
+      thetaDelta = 0.09;
+    }
+
+    if (thetaDelta < -0.09){
+      thetaDelta = -0.09;
+    }
+
+    activeControl.spherical.theta += thetaDelta;
   }else{
-    activeControl.spherical.phi -= deltaY * activeControl.mouseWheelRotationSpeed;
+    var phiDelta = deltaY * activeControl.mouseWheelRotationSpeed;
+
+    if (phiDelta > 0.09){
+      phiDelta = 0.09;
+    }
+
+    if (phiDelta < -0.09){
+      phiDelta = -0.09;
+    }
+
+    activeControl.spherical.phi -= phiDelta;
   }
 }
 
