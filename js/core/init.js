@@ -35,6 +35,8 @@ window.onload = function() {
   lightningHandler = new LightningHandler();
   // STEERING HANDLER
   steeringHandler = new SteeringHandler();
+  // DECISION HANDLER
+  decisionHandler = new DecisionHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI

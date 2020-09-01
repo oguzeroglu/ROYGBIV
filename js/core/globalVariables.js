@@ -356,6 +356,8 @@ var scriptsHandler;
 var animationHandler;
 var lightHandler;
 var lightningHandler;
+var steeringHandler;
+var decisionHandler;
 var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
 var muzzleFlashes = new Object();
