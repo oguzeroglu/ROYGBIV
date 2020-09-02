@@ -13,6 +13,7 @@ var DecisionHandler = function(){
 
 DecisionHandler.prototype.reset = function(){
   this.knowledgesBySceneName = {};
+  this.informationTypesByKnowledgeName = {};
 }
 
 DecisionHandler.prototype.import = function(exportObj){
@@ -58,18 +59,28 @@ DecisionHandler.prototype.addInformationToKnowledge = function(knowledgeName, in
     return false;
   }
 
-  switch(informationType){
-    case this.informationTypes.BOOLEAN: return knowledge.addBooleanInformation(informationName, initialValue);
-    case this.informationTypes.NUMERICAL: return knowledge.addNumericalInformation(informationName, initialValue);
-    case this.informationTypes.VECTOR: return knowledge.addVectorInformation(informationName, initialValue.x, initialValue.y, initialValue.z);
-    case this.informationTypes.CAN_SEE: return knowledge.addBooleanInformation(informationName, false);
-    case this.informationTypes.DISTANCE_TO: return knowledge.addNumericalInformation(informationName, 0);
+  if (this.informationTypesByKnowledgeName[knowledgeName][informationName]){
+    return false;
   }
 
-  return false;
+  var returnVal = false;
+
+  switch(informationType){
+    case this.informationTypes.BOOLEAN: returnVal = knowledge.addBooleanInformation(informationName, initialValue); break;
+    case this.informationTypes.NUMERICAL: returnVal = knowledge.addNumericalInformation(informationName, initialValue); break;
+    case this.informationTypes.VECTOR: returnVal = knowledge.addVectorInformation(informationName, initialValue.x, initialValue.y, initialValue.z); break;
+    case this.informationTypes.CAN_SEE: returnVal = knowledge.addBooleanInformation(informationName, false); break;
+    case this.informationTypes.DISTANCE_TO: returnVal = knowledge.addNumericalInformation(informationName, 0); break;
+  }
+
+  if (returnVal){
+    this.informationTypesByKnowledgeName[knowledgeName][informationName] = informationType;
+  }
+
+  return returnVal;
 }
 
-DecisionHandler.prototype.removeInformationFromKnowledge = function(knowledgeName, informationName, informationType){
+DecisionHandler.prototype.removeInformationFromKnowledge = function(knowledgeName, informationName){
 
   var knowledgesInScene = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()] || {};
   var knowledge = knowledgesInScene[knowledgeName];
@@ -77,6 +88,14 @@ DecisionHandler.prototype.removeInformationFromKnowledge = function(knowledgeNam
   if (!knowledge){
     return false;
   }
+
+  var informationType = this.informationTypesByKnowledgeName[knowledgeName][informationName];
+
+  if (!informationType){
+    return false;
+  }
+
+  delete this.informationTypesByKnowledgeName[knowledgeName][informationName];
 
   switch(informationType){
     case this.informationTypes.BOOLEAN: return knowledge.deleteBooleanInformation(informationName);
@@ -97,8 +116,13 @@ DecisionHandler.prototype.createKnowledge = function(knowledgeName){
     return false;
   }
 
+  if (this.informationTypesByKnowledgeName[knowledgeName]){
+    return false;
+  }
+
   knowledgesInScene[knowledgeName] = new Ego.Knowledge();
   this.knowledgesBySceneName[sceneHandler.getActiveSceneName()] = knowledgesInScene;
+  this.informationTypesByKnowledgeName[knowledgeName] = {};
 
   return true;
 }
@@ -112,6 +136,7 @@ DecisionHandler.prototype.destroyKnowledge = function(knowledgeName){
   }
 
   delete knowledgesInScene[knowledgeName];
+  delete this.informationTypesByKnowledgeName[knowledgeName];
 
   return true;
 }
