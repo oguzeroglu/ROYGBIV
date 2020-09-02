@@ -350,6 +350,7 @@ var lightsGUIHandler;
 var graphCreatorGUIHandler;
 var steeringBehaviorCreatorGUIHandler;
 var jumpDescriptorCreatorGUIHandler;
+var knowledgeCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
