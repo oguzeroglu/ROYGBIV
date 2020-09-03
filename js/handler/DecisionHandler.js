@@ -3,9 +3,7 @@ var DecisionHandler = function(){
   this.informationTypes = {
     "BOOLEAN": "BOOLEAN",
     "NUMERICAL": "NUMERICAL",
-    "VECTOR": "VECTOR",
-    "CAN_SEE": "CAN_SEE",
-    "DISTANCE_TO": "DISTANCE_TO"
+    "VECTOR": "VECTOR"
   };
 
   this.reset();
@@ -93,8 +91,6 @@ DecisionHandler.prototype.addInformationToKnowledge = function(knowledgeName, in
     case this.informationTypes.BOOLEAN: returnVal = knowledge.addBooleanInformation(informationName, initialValue); break;
     case this.informationTypes.NUMERICAL: returnVal = knowledge.addNumericalInformation(informationName, initialValue); break;
     case this.informationTypes.VECTOR: returnVal = knowledge.addVectorInformation(informationName, initialValue.x, initialValue.y, initialValue.z); break;
-    case this.informationTypes.CAN_SEE: returnVal = knowledge.addBooleanInformation(informationName, false); break;
-    case this.informationTypes.DISTANCE_TO: returnVal = knowledge.addNumericalInformation(informationName, 0); break;
   }
 
   if (returnVal){
@@ -125,11 +121,26 @@ DecisionHandler.prototype.removeInformationFromKnowledge = function(knowledgeNam
     case this.informationTypes.BOOLEAN: return knowledge.deleteBooleanInformation(informationName);
     case this.informationTypes.NUMERICAL: return knowledge.deleteNumericalInformation(informationName);
     case this.informationTypes.VECTOR: return knowledge.deleteVectorInformation(informationName);
-    case this.informationTypes.CAN_SEE: return knowledge.deleteBooleanInformation(informationName);
-    case this.informationTypes.DISTANCE_TO: return knowledge.deleteNumericalInformation(informationName);
   }
 
   return false;
+}
+
+DecisionHandler.prototype.getInformationFromKnowledge = function(knowledgeName, informationName){
+  var knowledge = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()][knowledgeName];
+
+  var booleanVal = knowledge.getBooleanInformation(informationName);
+  var numericalVal = knowledge.getNumericalInformation(informationName);
+  var vectorVal = knowledge.getVectorInformation(informationName);
+
+  if (booleanVal != null){
+    return {name: informationName, type: this.informationTypes.BOOLEAN, value: booleanVal};
+  }else if (numericalVal != null){
+    return {name: informationName, type: this.informationTypes.NUMERICAL, value: numericalVal};
+  }else if (vectorVal != null){
+    return {name: informationName, type: this.informationTypes.VECTOR, value: vectorVal};
+  }
+
 }
 
 DecisionHandler.prototype.createKnowledge = function(knowledgeName, overrideSceneName){

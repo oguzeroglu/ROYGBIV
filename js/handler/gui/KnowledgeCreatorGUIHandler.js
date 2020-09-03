@@ -45,14 +45,28 @@ KnowledgeCreatorGUIHandler.prototype.addKnowledgeFolder = function(knowledgeName
 
   var informationCreationParams = {
     "Information Name": "",
-    "Information Type": Object.keys(decisionHandler.informationTypes)[0],
     "Create Information": function(){
+      terminal.clear();
 
+      var informationName = this["Information Name"];
+
+      if (!informationName){
+        terminal.printError(Text.NAME_CANNOT_BE_EMPTY);
+        return;
+      }
+
+      if (!decisionHandler.addInformationToKnowledge(knowledgeName, informationName, decisionHandler.informationTypes.BOOLEAN, false)){
+        terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+        return;
+      }
+
+      knowledgeCreatorGUIHandler.addInformationFolder(informationName, knowledgeName, knowledgeFolder);
+
+      terminal.printInfo(Text.INFORMATION_CREATED);
     }
   };
 
   knowledgeFolder.add(informationCreationParams, "Information Name");
-  knowledgeFolder.add(informationCreationParams, "Information Type", Object.keys(decisionHandler.informationTypes));
   knowledgeFolder.add(informationCreationParams, "Create Information");
 
   knowledgeFolder.add({
@@ -65,6 +79,112 @@ KnowledgeCreatorGUIHandler.prototype.addKnowledgeFolder = function(knowledgeName
   }, "Destroy");
 }
 
-KnowledgeCreatorGUIHandler.prototype.addInformationFolder = function(informationName, knowledgeName){
+KnowledgeCreatorGUIHandler.prototype.addInformationFolder = function(informationName, knowledgeName, knowledgeFolder){
+  var informationFolder = knowledgeFolder.addFolder(informationName);
 
+  var information = decisionHandler.getInformationFromKnowledge(knowledgeName, informationName);
+
+  var params = {
+    "Type": information.type,
+    "Destroy": function(){
+      terminal.clear();
+      decisionHandler.removeInformationFromKnowledge(knowledgeName, informationName);
+      knowledgeFolder.removeFolder(informationFolder);
+      terminal.printInfo(Text.INFORMATION_REMOVED);
+    }
+  };
+
+  var valueController;
+
+  informationFolder.add(params, "Type", Object.keys(decisionHandler.informationTypes)).onChange(function(val){
+    informationFolder.remove(valueController);
+    decisionHandler.removeInformationFromKnowledge(knowledgeName, informationName);
+
+    var initialValue;
+
+    if (val == decisionHandler.informationTypes.BOOLEAN){
+      initialValue = false;
+    }else if (val == decisionHandler.informationTypes.NUMERICAL){
+      initialValue = 0;
+    }else if (val == decisionHandler.informationTypes.VECTOR){
+      initialValue = {x: 0, y: 0, z: 0};
+    }
+
+    decisionHandler.addInformationToKnowledge(knowledgeName, informationName, val, initialValue);
+    information = decisionHandler.getInformationFromKnowledge(knowledgeName, informationName);
+
+    valueController = knowledgeCreatorGUIHandler.addInformationValueController(information, informationFolder, knowledgeName, function(newInformation){
+      informaiton = newInformation;
+    });
+  });
+
+  informationFolder.add(params, "Destroy");
+
+  valueController = this.addInformationValueController(information, informationFolder, knowledgeName, function(newInformation){
+    information = newInformation;
+  });
+}
+
+KnowledgeCreatorGUIHandler.prototype.addInformationValueController = function(information, informationFolder, knowledgeName, onInformationUpdated){
+
+  var controller;
+
+  var informationName = information.name;
+
+  if (information.type == decisionHandler.informationTypes.BOOLEAN){
+    controller = informationFolder.add({
+      "Value": information.value? "true": "false"
+    }, "Value", ["true", "false"]).onChange(function(val){
+      terminal.clear();
+
+      decisionHandler.removeInformationFromKnowledge(knowledgeName, informationName);
+      decisionHandler.addInformationToKnowledge(knowledgeName, informationName, decisionHandler.informationTypes.BOOLEAN, val == "true");
+      onInformationUpdated(decisionHandler.getInformationFromKnowledge(knowledgeName, informationName));
+
+      terminal.printInfo(Text.INFORMATION_UPDATED);
+    });
+  }else if (information.type == decisionHandler.informationTypes.NUMERICAL){
+    controller = informationFolder.add({
+      "Value": "" + information.value
+    }, "Value").onFinishChange(function(val){
+      terminal.clear();
+
+      var parsed = parseFloat(val);
+
+      if (isNaN(parsed)){
+        terminal.printError(Text.INVALID_NUMERICAL_VALUE);
+        return;
+      }
+
+      decisionHandler.removeInformationFromKnowledge(knowledgeName, informationName);
+      decisionHandler.addInformationToKnowledge(knowledgeName, informationName, decisionHandler.informationTypes.NUMERICAL, parsed);
+      onInformationUpdated(decisionHandler.getInformationFromKnowledge(knowledgeName, informationName));
+
+      terminal.printInfo(Text.INFORMATION_UPDATED);
+    });
+  }else if (information.type == decisionHandler.informationTypes.VECTOR){
+    controller = informationFolder.add({
+      "Value": information.value.x + "," + information.value.y + "," + information.value.z
+    }, "Value").onFinishChange(function(val){
+      terminal.clear();
+
+      var splitted = val.split(",");
+      var parsedX = parseFloat(splitted[0]);
+      var parsedY = parseFloat(splitted[1]);
+      var parsedZ = parseFloat(splitted[2]);
+
+      if (isNaN(parsedX) || isNaN(parsedY) || isNaN(parsedZ)){
+        terminal.printError(Text.INVALID_VECTOR_VALUE);
+        return;
+      }
+
+      decisionHandler.removeInformationFromKnowledge(knowledgeName, informationName);
+      decisionHandler.addInformationToKnowledge(knowledgeName, informationName, decisionHandler.informationTypes.VECTOR, {x: parsedX, y: parsedY, z: parsedZ});
+      onInformationUpdated(decisionHandler.getInformationFromKnowledge(knowledgeName, informationName));
+
+      terminal.printInfo(Text.INFORMATION_UPDATED);
+    });
+  }
+
+  return controller;
 }
