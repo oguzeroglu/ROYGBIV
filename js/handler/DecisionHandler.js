@@ -126,6 +126,26 @@ DecisionHandler.prototype.removeInformationFromKnowledge = function(knowledgeNam
   return false;
 }
 
+DecisionHandler.prototype.getAllInformationsOfKnowledge = function(knowledgeName){
+  var knowledge = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()][knowledgeName];
+
+  var ary = [];
+
+  for (var infName in knowledge._booleanMap){
+    ary.push(this.getInformationFromKnowledge(knowledgeName, infName));
+  }
+
+  for (var infName in knowledge._numericalMap){
+    ary.push(this.getInformationFromKnowledge(knowledgeName, infName));
+  }
+
+  for (var infName in knowledge._vectorMap){
+    ary.push(this.getInformationFromKnowledge(knowledgeName, infName));
+  }
+
+  return ary;
+}
+
 DecisionHandler.prototype.getInformationFromKnowledge = function(knowledgeName, informationName){
   var knowledge = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()][knowledgeName];
 

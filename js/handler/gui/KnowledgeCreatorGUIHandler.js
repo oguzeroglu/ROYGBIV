@@ -33,11 +33,23 @@ KnowledgeCreatorGUIHandler.prototype.show = function(){
         terminal.printInfo(Text.KNOWLEDGE_CREATED);
         return;
       }
+    },
+    "Done": function(){
+      terminal.clear();
+      terminal.enable();
+      guiHandler.hide(guiHandler.guiTypes.KNOWLEDGE_CREATION);
+      terminal.printInfo(Text.GUI_CLOSED);
     }
   };
 
   guiHandler.datGuiKnowledgeCreation.add(defaultControls, "Name");
   guiHandler.datGuiKnowledgeCreation.add(defaultControls, "Create");
+  guiHandler.datGuiKnowledgeCreation.add(defaultControls, "Done");
+
+  var knowledgesInScene = decisionHandler.knowledgesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  for (var knowledgeName in knowledgesInScene){
+    this.addKnowledgeFolder(knowledgeName);
+  }
 }
 
 KnowledgeCreatorGUIHandler.prototype.addKnowledgeFolder = function(knowledgeName){
@@ -77,6 +89,11 @@ KnowledgeCreatorGUIHandler.prototype.addKnowledgeFolder = function(knowledgeName
       terminal.printInfo(Text.KNOWLEDGE_DESTROYED);
     }
   }, "Destroy");
+
+  var existingInformations = decisionHandler.getAllInformationsOfKnowledge(knowledgeName);
+  for (var i = 0; i < existingInformations.length; i ++){
+    knowledgeCreatorGUIHandler.addInformationFolder(existingInformations[i].name, knowledgeName, knowledgeFolder);
+  }
 }
 
 KnowledgeCreatorGUIHandler.prototype.addInformationFolder = function(informationName, knowledgeName, knowledgeFolder){
