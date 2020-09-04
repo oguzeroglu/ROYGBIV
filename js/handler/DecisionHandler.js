@@ -6,16 +6,24 @@ var DecisionHandler = function(){
     "VECTOR": "VECTOR"
   };
 
+  this.decisionMethods = {
+    "IS_FALSE": "IS_FALSE",
+    "IS_IN_RANGE": "IS_IN_RANGE",
+    "IS_TRUE": "IS_TRUE"
+  };
+
   this.reset();
 }
 
 DecisionHandler.prototype.reset = function(){
   this.knowledgesBySceneName = {};
+  this.decisionsBySceneName = {};
   this.informationTypesByKnowledgeName = {};
 }
 
 DecisionHandler.prototype.import = function(exportObj){
   var knowledgesBySceneName = exportObj.knowledgesBySceneName;
+  var decisionsBySceneName = exportObj.decisionsBySceneName;
 
   for (var sceneName in knowledgesBySceneName){
     this.knowledgesBySceneName[sceneName] = {};
@@ -38,11 +46,35 @@ DecisionHandler.prototype.import = function(exportObj){
       }
     }
   }
+
+  for (var sceneName in decisionsBySceneName){
+    this.decisionsBySceneName[sceneName] = {};
+
+    for (var decisionName in decisionsBySceneName[sceneName]){
+      var decisionExport = decisionsBySceneName[sceneName][decisionName];
+      var range = null;
+      if (decisionExport.range){
+        range = new Ego.Range(decisionExport.range.lowerBound, decisionExport.range.upperBound);
+        if (decisionExport.range.isLowerBoundInclusive){
+          range.makeLowerBoundInclusive();
+        }else{
+          range.makeLowerBoundExclusive();
+        }
+        if (decisionExport.range.isUpperBoundInclusive){
+          range.makeUpperBoundInclusive();
+        }else{
+          range.makeUpperBoundExclusive();
+        }
+      }
+      this.createDecision(decisionName, decisionExport.knowledgeName, decisionExport.informationName, decisionExport.method, range, sceneName);
+    }
+  }
 }
 
 DecisionHandler.prototype.export = function(){
   var exportObj = {
-    knowledgesBySceneName: {}
+    knowledgesBySceneName: {},
+    decisionsBySceneName: {}
   };
 
   for (var sceneName in this.knowledgesBySceneName){
@@ -67,7 +99,80 @@ DecisionHandler.prototype.export = function(){
     }
   }
 
+  for (var sceneName in this.decisionsBySceneName){
+    exportObj.decisionsBySceneName[sceneName] = {};
+    for (var decisionName in this.decisionsBySceneName[sceneName]){
+      var curExport = JSON.parse(JSON.stringify(this.decisionsBySceneName[sceneName][decisionName]));
+      exportObj.decisionsBySceneName[sceneName][decisionName] = curExport;
+    }
+  }
+
   return exportObj;
+}
+
+DecisionHandler.prototype.destroyDecision = function(decisionName){
+  var decisionsInScene = this.decisionsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  if (decisionsInScene[decisionName]){
+    delete decisionsInScene[decisionName];
+    return true;
+  }
+
+  return false;
+}
+
+DecisionHandler.prototype.createDecision = function(decisionName, knowledgeName, informationName, method, range, overrideSceneName){
+
+  var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
+
+  var decisionsInScene = this.decisionsBySceneName[sceneName] || {};
+
+  if (decisionsInScene[decisionName]){
+    return false;
+  }
+
+  var knowledge = this.knowledgesBySceneName[sceneName];
+  var information = this.getInformationFromKnowledge(knowledgeName, informationName, overrideSceneName);
+
+  var informationType;
+  if (information.type == this.informationTypes.BOOLEAN){
+    informationType = Ego.InformationTypes.TYPE_BOOLEAN;
+  }else if (information.type == this.informationTypes.NUMERICAL){
+    informationType = Ego.InformationTypes.TYPE_NUMERICAL;
+  }else if (information.type == this.informationTypes.VECTOR){
+    informationType = Ego.InformationTypes.TYPE_VECTOR;
+  }
+
+  var decisionMethod;
+  if (method == this.decisionMethods.IS_FALSE){
+    decisionMethod = new Ego.IsFalse();
+  }else if (method == this.decisionMethods.IS_IN_RANGE){
+    decisionMethod = new Ego.IS_IN_RANGE(range);
+  }else if (method == this.decisionMethods.IS_TRUE){
+    decisionMethod = new Ego.IsTrue();
+  }
+
+  var decisionObj = {
+    name: decisionName,
+    knowledgeName: knowledgeName,
+    informationName: informationName,
+    method: method
+  };
+
+  decisionsInScene[decisionName] = decisionObj;
+
+  if (range){
+    decisionObj.range = {
+      lowerBound: range._lowerBound,
+      upperBound: range._upperBound,
+      isLowerBoundInclusive: range._isLowerBoundInclusive,
+      isUpperBoundInclusive: range._isUpperBoundInclusive
+    };
+  }
+
+  this.decisionsBySceneName[sceneName] = decisionsInScene;
+
+  return true;
 }
 
 DecisionHandler.prototype.addInformationToKnowledge = function(knowledgeName, informationName, informationType, initialValue, overrideSceneName){
@@ -146,8 +251,11 @@ DecisionHandler.prototype.getAllInformationsOfKnowledge = function(knowledgeName
   return ary;
 }
 
-DecisionHandler.prototype.getInformationFromKnowledge = function(knowledgeName, informationName){
-  var knowledge = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()][knowledgeName];
+DecisionHandler.prototype.getInformationFromKnowledge = function(knowledgeName, informationName, overrideSceneName){
+
+  var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
+
+  var knowledge = this.knowledgesBySceneName[sceneName][knowledgeName];
 
   var booleanVal = knowledge.getBooleanInformation(informationName);
   var numericalVal = knowledge.getNumericalInformation(informationName);
