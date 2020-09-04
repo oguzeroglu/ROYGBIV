@@ -6689,6 +6689,15 @@ function parse(input){
           }
           return true;
         break;
+        case 264: //knowledges
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          knowledgeCreatorGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){

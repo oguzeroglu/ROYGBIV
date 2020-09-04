@@ -264,7 +264,8 @@ var CommandDescriptor = function(){
       2, //excludeFromHideBehavior
       2, //newMass
       0, //printMasses
-      1 //destroyMass
+      1, //destroyMass
+      0 //knowledges
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -531,7 +532,8 @@ var CommandDescriptor = function(){
     "excludeFromHideBehavior id true/false",
     "newMass id height",
     "printMasses",
-    "destroyMass massID"
+    "destroyMass massID",
+    "knowledges"
   ];
 
   this.commands = [
@@ -798,7 +800,8 @@ var CommandDescriptor = function(){
     "excludeFromHideBehavior",
     "newMass",
     "printMasses",
-    "destroyMass"
+    "destroyMass",
+    "knowledges"
   ];
 
   this.commandInfo = [
@@ -1065,7 +1068,8 @@ var CommandDescriptor = function(){
     "excludeFromHideBehavior: Excludes/includes an AI entity from/to Hide behavior. Steerables cannot hide behind given entity if the entity is excluded.",
     "newMass: Creates a new physical mass without a graphical representation.",
     "printMasses: Prints a list of created masses.",
-    "destroyMass: Destroys a mass of given id."
+    "destroyMass: Destroys a mass of given id.",
+    "knowledges: Opens the knowledge editing GUI."
   ];
 
   this.keyboardInfo = [
