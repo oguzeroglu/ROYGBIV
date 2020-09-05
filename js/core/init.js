@@ -88,6 +88,7 @@ window.onload = function() {
     steeringBehaviorCreatorGUIHandler = new SteeringBehaviorCreatorGUIHandler();
     jumpDescriptorCreatorGUIHandler = new JumpDescriptorCreatorGUIHandler();
     knowledgeCreatorGUIHandler = new KnowledgeCreatorGUIHandler();
+    decisionCreatorGUIHandler = new DecisionCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

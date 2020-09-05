@@ -351,6 +351,7 @@ var graphCreatorGUIHandler;
 var steeringBehaviorCreatorGUIHandler;
 var jumpDescriptorCreatorGUIHandler;
 var knowledgeCreatorGUIHandler;
+var decisionCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
