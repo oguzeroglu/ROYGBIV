@@ -59,10 +59,70 @@ DecisionCreatorGUIHandler.prototype.show = function(){
   guiHandler.datGuiDecisionCreation.add(creationParams, "Decision name");
   guiHandler.datGuiDecisionCreation.add(creationParams, "Create");
   guiHandler.datGuiDecisionCreation.add(creationParams, "Done");
+
+  var decisionsInScene = decisionHandler.decisionsBySceneName[sceneHandler.getActiveSceneName()] || {};
+  for (var decisionName in decisionsInScene){
+    this.createDecisionFolder(decisionName);
+  }
 }
 
 DecisionCreatorGUIHandler.prototype.generateRangeText = function(range){
-  return "";
+  var text = range._isLowerBoundInclusive? "[": "]";
+  text += range._lowerBound + "," + range._upperBound;
+  text += range._isUpperBoundInclusive? "]": "[";
+  return text;
+}
+
+DecisionCreatorGUIHandler.prototype.parseRange = function(rangeText){
+  var firstChar = rangeText.charAt(0);
+  var lastChar = rangeText.charAt(rangeText.length - 1);
+
+  var isLowerBoundInclusive = false;
+  var isUpperBoundInclusive = false;
+  var lowerBound = null;
+  var upperBound = null;
+
+  if (firstChar == "["){
+    isLowerBoundInclusive = true;
+  }else if (firstChar != "]"){
+    return false;
+  }
+
+  if (lastChar == "]"){
+    isUpperBoundInclusive = true;
+  }else if (lastChar != "["){
+    return false;
+  }
+
+  rangeText = rangeText.substring(1, rangeText.length - 1);
+
+  var splitted = rangeText.split(",");
+
+  if (splitted.length != 2){
+    return false;
+  }
+
+  var lowerBound = parseFloat(splitted[0]);
+  var upperBound = parseFloat(splitted[1]);
+
+  if (isNaN(lowerBound) || isNaN(upperBound)){
+    return false;
+  }
+
+  var range = new Ego.Range(lowerBound, upperBound);
+  if (isLowerBoundInclusive){
+    range.makeLowerBoundInclusive();
+  }else{
+    range.makeLowerBoundExclusive();
+  }
+
+  if (isUpperBoundInclusive){
+    range.makeUpperBoundInclusive();
+  }else{
+    range.makeUpperBoundExclusive();
+  }
+
+  return range;
 }
 
 DecisionCreatorGUIHandler.prototype.createDecisionFolder = function(decisionName){
@@ -75,10 +135,27 @@ DecisionCreatorGUIHandler.prototype.createDecisionFolder = function(decisionName
     allInformationNames.push(allInformations[i].name);
   }
 
+  var rangeText = "";
+  if (decision.range){
+    var range = new Ego.Range(decision.range.lowerBound, decision.range.upperBound);
+    if (range.isUpperBoundInclusive){
+      range.makeUpperBoundInclusive();
+    }else{
+      range.makeUpperBoundExclusive();
+    }
+    if(range.isLowerBoundInclusive){
+      range.makeLowerBoundInclusive();
+    }else{
+      range.makeLowerBoundExclusive();
+    }
+
+    rangeText = this.generateRangeText(range);
+  }
+
   var params = {
     "Information": decision.informationName,
     "Decision method": decision.method,
-    "Range": decision.range? this.generateRangeText(decision.range): "",
+    "Range": rangeText,
     "Destroy": function(){
       terminal.clear();
       decisionHandler.destroyDecision(decisionName);
@@ -90,14 +167,45 @@ DecisionCreatorGUIHandler.prototype.createDecisionFolder = function(decisionName
   var rangeController;
 
   decisionFolder.add(params, "Information", allInformationNames).onChange(function(val){
-
+    terminal.clear();
+    decisionHandler.destroyDecision(decisionName);
+    decisionHandler.createDecision(decisionName, decision.knowledgeName, val, decision.method, decision.range || null);
+    decision = decisionHandler.decisionsBySceneName[sceneHandler.getActiveSceneName()][decisionName];
+    terminal.printInfo(Text.DECISION_UPDATED);
   });
   decisionFolder.add(params, "Decision method", Object.keys(decisionHandler.decisionMethods)).onChange(function(val){
+    terminal.clear();
+    decisionHandler.destroyDecision(decisionName);
 
+    var range = null
+    if (val == decisionHandler.decisionMethods.IS_IN_RANGE){
+      guiHandler.enableController(rangeController);
+      range = new Ego.Range(0, 100);
+      params["Range"] = decisionCreatorGUIHandler.generateRangeText(range);
+    }else{
+      guiHandler.disableController(rangeController);
+    }
+
+    decisionHandler.createDecision(decisionName, decision.knowledgeName, decision.informationName, val, range);
+    decision = decisionHandler.decisionsBySceneName[sceneHandler.getActiveSceneName()][decisionName];
+    terminal.printInfo(Text.DECISION_UPDATED);
   });
   rangeController = decisionFolder.add(params, "Range").onFinishChange(function(val){
 
-  });
+    terminal.clear();
+
+    var range = decisionCreatorGUIHandler.parseRange(val);
+
+    if (!range){
+      terminal.printError(Text.INVALID_RANGE);
+      return;
+    }
+
+    decisionHandler.destroyDecision(decisionName);
+    decisionHandler.createDecision(decisionName, decision.knowledgeName, decision.informationName, decision.method, range);
+    decision = decisionHandler.decisionsBySceneName[sceneHandler.getActiveSceneName()][decisionName];
+    terminal.printInfo(Text.DECISION_UPDATED);
+  }).listen();
 
   decisionFolder.add(params, "Destroy");
 

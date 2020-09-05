@@ -54,7 +54,23 @@ DecisionHandler.prototype.import = function(exportObj){
       var decisionExport = decisionsBySceneName[sceneName][decisionName];
       var range = null;
       if (decisionExport.range){
-        range = new Ego.Range(decisionExport.range.lowerBound, decisionExport.range.upperBound);
+
+        var lowerBound = decisionExport.range.lowerBound;
+        var upperBound = decisionExport.range.upperBound;
+
+        if (decisionExport.isLowerBoundInfinity){
+          lowerBound = Infinity;
+        }else if (decisionExport.isLowerBoundMinusInfinity){
+          lowerBound = -Infinity;
+        }
+
+        if (decisionExport.isUpperBoundInfinity){
+          upperBound = Infinity;
+        }else if (decisionExport.isUpperBoundMinusInfinity){
+          upperBound = -Infinity;
+        }
+
+        range = new Ego.Range(lowerBound, upperBound);
         if (decisionExport.range.isLowerBoundInclusive){
           range.makeLowerBoundInclusive();
         }else{
@@ -102,7 +118,20 @@ DecisionHandler.prototype.export = function(){
   for (var sceneName in this.decisionsBySceneName){
     exportObj.decisionsBySceneName[sceneName] = {};
     for (var decisionName in this.decisionsBySceneName[sceneName]){
-      var curExport = JSON.parse(JSON.stringify(this.decisionsBySceneName[sceneName][decisionName]));
+      var decision = this.decisionsBySceneName[sceneName][decisionName];
+      var curExport = JSON.parse(JSON.stringify(decision));
+      if (decision.range){
+        if (decision.range.lowerBound == Infinity){
+          curExport.isLowerBoundInfinity = true;
+        }else if (decision.range.lowerBound == -Infinity){
+          curExport.isLowerBoundMinusInfinity = true;
+        }
+        if (decision.range.upperBound == Infinity){
+          curExport.isUpperBoundInfinity = true;
+        }else if (decision.range.upperBound == -Infinity){
+          curExport.isUpperBoundMinusInfinity = true;
+        }
+      }
       exportObj.decisionsBySceneName[sceneName][decisionName] = curExport;
     }
   }
@@ -141,15 +170,6 @@ DecisionHandler.prototype.createDecision = function(decisionName, knowledgeName,
     informationType = Ego.InformationTypes.TYPE_NUMERICAL;
   }else if (information.type == this.informationTypes.VECTOR){
     informationType = Ego.InformationTypes.TYPE_VECTOR;
-  }
-
-  var decisionMethod;
-  if (method == this.decisionMethods.IS_FALSE){
-    decisionMethod = new Ego.IsFalse();
-  }else if (method == this.decisionMethods.IS_IN_RANGE){
-    decisionMethod = new Ego.IS_IN_RANGE(range);
-  }else if (method == this.decisionMethods.IS_TRUE){
-    decisionMethod = new Ego.IsTrue();
   }
 
   var decisionObj = {
