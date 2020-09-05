@@ -300,6 +300,7 @@ var Text = function(){
   this.MASS_MUST_BE_A_NUMBER = "Mass must be a number.";
   this.INVALID_POSITION = "Invalid position.";
   this.KNOWLEDGE_USED_IN_DECISION_CANNOT_DESTROY = "Knowledge used in decision @@1. Cannot destroy.";
+  this.INFORMATION_USED_IN_DECISION_CANNOT_DESTROY = "Information used in decision @@1. Cannot destroy.";
   this.POSITION_X_MUST_BE_A_NUMBER = "PositionX must be a number.";
   this.POSITION_Y_MUST_BE_A_NUMBER = "PositionY must be a number.";
   this.POSITION_Z_MUST_BE_A_NUMBER = "PositionZ must be a number.";

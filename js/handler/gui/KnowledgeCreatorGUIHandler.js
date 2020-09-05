@@ -114,6 +114,15 @@ KnowledgeCreatorGUIHandler.prototype.addInformationFolder = function(information
     "Type": information.type,
     "Destroy": function(){
       terminal.clear();
+
+      var decisionsInScene = decisionHandler.decisionsBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var decisionName in decisionsInScene){
+        if (decisionsInScene[decisionName].informationName == informationName){
+          terminal.printError(Text.INFORMATION_USED_IN_DECISION_CANNOT_DESTROY.replace(Text.PARAM1, decisionName));
+          return;
+        }
+      }
+
       decisionHandler.removeInformationFromKnowledge(knowledgeName, informationName);
       knowledgeFolder.removeFolder(informationFolder);
       terminal.printInfo(Text.INFORMATION_REMOVED);
