@@ -6698,6 +6698,15 @@ function parse(input){
           knowledgeCreatorGUIHandler.show();
           return true;
         break;
+        case 265: //decisions
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          decisionCreatorGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){

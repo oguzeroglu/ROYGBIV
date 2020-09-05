@@ -265,7 +265,8 @@ var CommandDescriptor = function(){
       2, //newMass
       0, //printMasses
       1, //destroyMass
-      0 //knowledges
+      0, //knowledges
+      0 //decisions
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -533,7 +534,8 @@ var CommandDescriptor = function(){
     "newMass id height",
     "printMasses",
     "destroyMass massID",
-    "knowledges"
+    "knowledges",
+    "decisions"
   ];
 
   this.commands = [
@@ -801,7 +803,8 @@ var CommandDescriptor = function(){
     "newMass",
     "printMasses",
     "destroyMass",
-    "knowledges"
+    "knowledges",
+    "decisions"
   ];
 
   this.commandInfo = [
@@ -1069,7 +1072,8 @@ var CommandDescriptor = function(){
     "newMass: Creates a new physical mass without a graphical representation.",
     "printMasses: Prints a list of created masses.",
     "destroyMass: Destroys a mass of given id.",
-    "knowledges: Opens the knowledge editing GUI."
+    "knowledges: Opens the knowledge editing GUI.",
+    "decisions: Opens the decision editing GUI."
   ];
 
   this.keyboardInfo = [
