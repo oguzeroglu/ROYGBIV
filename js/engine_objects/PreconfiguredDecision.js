@@ -8,6 +8,7 @@ var PreconfiguredDecision = function(decisionName, sceneName){
 
 PreconfiguredDecision.prototype.export = function(){
   var exportObj = {
+    isPreconfiguredDecision: true,
     decisionName: this.decisionName,
     sceneName: this.sceneName
   };
@@ -23,6 +24,31 @@ PreconfiguredDecision.prototype.export = function(){
   }else{
     exportObj.noNode = this.noNode;
   }
+
+  return exportObj;
+}
+
+PreconfiguredDecision.prototype.import = function(exportObj){
+  this.decisionName = exportObj.decisionName;
+  this.sceneName = exportObj.sceneName;
+
+  if (exportObj.yesNode){
+    if (exportObj.yesNode.isPreconfiguredDecision){
+      this.setYesNode(new PreconfiguredDecision(null, null).import(exportObj.yesNode));
+    }else{
+      this.setYesNode(exportObj.yesNode);
+    }
+  }
+
+  if (exportObj.noNode){
+    if (exportObj.noNode.isPreconfiguredDecision){
+      this.setNoNode(new PreconfiguredDecision(null, null).import(exportObj.noNode));
+    }else{
+      this.setNoNode(exportObj.noNode);
+    }
+  }
+
+  return this;
 }
 
 PreconfiguredDecision.prototype.setYesNode = function(yesNode){
