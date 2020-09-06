@@ -18,6 +18,7 @@ var DecisionHandler = function(){
 DecisionHandler.prototype.reset = function(){
   this.knowledgesBySceneName = {};
   this.decisionsBySceneName = {};
+  this.decisionTreesBySceneName = {};
   this.informationTypesByKnowledgeName = {};
 }
 
@@ -137,6 +138,39 @@ DecisionHandler.prototype.export = function(){
   }
 
   return exportObj;
+}
+
+DecisionHandler.prototype.setRootDecisionOfDecisionTree = function(decisionTreeName, preconfiguredDecision){
+  this.decisionTreesBySceneName[sceneHandler.getActiveSceneName()][decisionTreeName].setRootDecision(preconfiguredDecision);
+}
+
+DecisionHandler.prototype.destroyDecisionTree = function(decisionTreeName){
+  var decisionTreesInScene = this.decisionTreesBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  if (decisionTreesInScene[decisionTreeName]){
+    delete decisionTreesInScene[decisionTreeName];
+    return true;
+  }
+
+  return false;
+}
+
+DecisionHandler.prototype.createDecisionTree = function(decisionTreeName, knowledgeName, overrideSceneName){
+
+  var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
+
+  var decisionTreesInScene = this.decisionTreesBySceneName[sceneName] || {};
+
+  if (decisionTreesInScene[decisionTreeName]){
+    return false;
+  }
+
+  var preconfiguredDecisionTree = new PreconfiguredDecisionTree(decisionTreeName, knowledgeName, sceneName);
+
+  decisionTreesInScene[decisionTreeName] = preconfiguredDecisionTree;
+  this.decisionTreesBySceneName[sceneName] = decisionTreesInScene;
+
+  return true;
 }
 
 DecisionHandler.prototype.destroyDecision = function(decisionName){
