@@ -138,12 +138,12 @@ DecisionCreatorGUIHandler.prototype.createDecisionFolder = function(decisionName
   var rangeText = "";
   if (decision.range){
     var range = new Ego.Range(decision.range.lowerBound, decision.range.upperBound);
-    if (range.isUpperBoundInclusive){
+    if (decision.range.isUpperBoundInclusive){
       range.makeUpperBoundInclusive();
     }else{
       range.makeUpperBoundExclusive();
     }
-    if(range.isLowerBoundInclusive){
+    if(decision.range.isLowerBoundInclusive){
       range.makeLowerBoundInclusive();
     }else{
       range.makeLowerBoundExclusive();

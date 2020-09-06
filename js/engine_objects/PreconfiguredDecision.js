@@ -19,12 +19,12 @@ PreconfiguredDecision.prototype.get = function(){
     decisionMethod = new Ego.IsTrue();
   }else{
     var range = new Ego.Range(decisionObj.range.lowerBound, decisionObj.range.upperBound);
-    if (range.isLowerBoundInclusive){
+    if (decisionObj.range.isLowerBoundInclusive){
       range.makeLowerBoundInclusive();
     }else{
       range.makeLowerBoundExclusive();
     }
-    if (range.isUpperBoundInclusive){
+    if (decisionObj.range.isUpperBoundInclusive){
       range.makeUpperBoundInclusive();
     }else{
       range.makeUpperBoundExclusive();
