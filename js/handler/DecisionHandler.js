@@ -228,6 +228,7 @@ DecisionHandler.prototype.createDecision = function(decisionName, knowledgeName,
     name: decisionName,
     knowledgeName: knowledgeName,
     informationName: informationName,
+    informationType: informationType,
     method: method
   };
 

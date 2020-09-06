@@ -6,6 +6,52 @@ var PreconfiguredDecision = function(decisionName, sceneName){
   this.noNode = null;
 }
 
+PreconfiguredDecision.prototype.get = function(){
+  var decisionObj = decisionHandler.decisionsBySceneName[this.sceneName][this.decisionName];
+
+  var informationName = decisionObj.informationName;
+  var informationType = decisionObj.informationType;
+  var decisionMethod = null;
+
+  if (decisionObj.method == decisionHandler.decisionMethods.IS_FALSE){
+    decisionMethod = new Ego.IsFalse();
+  }else if (decisionObj.method == decisionHandler.decisionMethods.IS_TRUE){
+    decisionMethod = new Ego.IsTrue();
+  }else{
+    var range = new Ego.Range(decisionObj.range.lowerBound, decisionObj.range.upperBound);
+    if (range.isLowerBoundInclusive){
+      range.makeLowerBoundInclusive();
+    }else{
+      range.makeLowerBoundExclusive();
+    }
+    if (range.isUpperBoundInclusive){
+      range.makeUpperBoundInclusive();
+    }else{
+      range.makeUpperBoundExclusive();
+    }
+    decisionMethod = new Ego.IsInRange(range);
+  }
+
+  var decision = new Ego.Decision(informationName, informationType, decisionMethod);
+
+  if (this.yesNode != null){
+    if (this.yesNode instanceof PreconfiguredDecision){
+      decision.setYesNode(this.yesNode.get());
+    }else{
+      decision.setYesNode(this.yesNode);
+    }
+  }
+  if (this.noNode != null){
+    if (this.noNode instanceof PreconfiguredDecision){
+      decision.setNoNode(this.noNode.get());
+    }else{
+      decision.setNoNode(this.noNode);
+    }
+  }
+
+  return decision;
+}
+
 PreconfiguredDecision.prototype.export = function(){
   var exportObj = {
     isPreconfiguredDecision: true,
