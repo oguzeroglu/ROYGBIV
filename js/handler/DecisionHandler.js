@@ -25,6 +25,7 @@ DecisionHandler.prototype.reset = function(){
 DecisionHandler.prototype.import = function(exportObj){
   var knowledgesBySceneName = exportObj.knowledgesBySceneName;
   var decisionsBySceneName = exportObj.decisionsBySceneName;
+  var decisionTreesBySceneName = exportObj.decisionTreesBySceneName;
 
   for (var sceneName in knowledgesBySceneName){
     this.knowledgesBySceneName[sceneName] = {};
@@ -86,12 +87,22 @@ DecisionHandler.prototype.import = function(exportObj){
       this.createDecision(decisionName, decisionExport.knowledgeName, decisionExport.informationName, decisionExport.method, range, sceneName);
     }
   }
+
+  for (var sceneName in decisionTreesBySceneName){
+    this.decisionTreesBySceneName[sceneName] = {};
+    for (var decisionTreeName in decisionTreesBySceneName[sceneName]){
+      var curDecisionTreeExport = decisionTreesBySceneName[sceneName][decisionTreeName];
+      var decisionTree = new PreconfiguredDecisionTree().import(curDecisionTreeExport);
+      this.decisionTreesBySceneName[sceneName][decisionTreeName] = decisionTree;
+    }
+  }
 }
 
 DecisionHandler.prototype.export = function(){
   var exportObj = {
     knowledgesBySceneName: {},
-    decisionsBySceneName: {}
+    decisionsBySceneName: {},
+    decisionTreesBySceneName: {}
   };
 
   for (var sceneName in this.knowledgesBySceneName){
@@ -134,6 +145,13 @@ DecisionHandler.prototype.export = function(){
         }
       }
       exportObj.decisionsBySceneName[sceneName][decisionName] = curExport;
+    }
+  }
+
+  for (var sceneName in this.decisionTreesBySceneName){
+    exportObj.decisionTreesBySceneName[sceneName] = {};
+    for (var decisionTreeName in this.decisionTreesBySceneName[sceneName]){
+      exportObj.decisionTreesBySceneName[sceneName][decisionTreeName] = this.decisionTreesBySceneName[sceneName][decisionTreeName].export();
     }
   }
 

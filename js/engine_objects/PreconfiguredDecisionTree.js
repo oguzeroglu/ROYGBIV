@@ -20,6 +20,18 @@ PreconfiguredDecisionTree.prototype.export = function(){
   return exportObj;
 }
 
+PreconfiguredDecisionTree.prototype.import = function(exportObj){
+  this.name = exportObj.name;
+  this.knowledgeName = exportObj.knowledgeName;
+  this.sceneName = exportObj.sceneName;
+
+  if (exportObj.rootDecision){
+    this.setRootDecision(new PreconfiguredDecision().import(exportObj.rootDecision));
+  }
+
+  return this;
+}
+
 PreconfiguredDecisionTree.prototype.setRootDecision = function(preconfiguredDecision){
   this.rootDecision = preconfiguredDecision;
 }
