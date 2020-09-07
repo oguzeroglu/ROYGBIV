@@ -352,6 +352,7 @@ var steeringBehaviorCreatorGUIHandler;
 var jumpDescriptorCreatorGUIHandler;
 var knowledgeCreatorGUIHandler;
 var decisionCreatorGUIHandler;
+var decisionTreeCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;

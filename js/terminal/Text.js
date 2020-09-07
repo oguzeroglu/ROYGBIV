@@ -441,6 +441,7 @@ var Text = function(){
   this.USE_GUI_TO_CREATE_JUMP_DESCRIPTORS = "Use the GUI to create/edit jump descriptors.";
   this.USE_GUI_TO_CREATE_KNOWLEDGE = "Use the GUI to create/edit knowledge.";
   this.USE_GUI_TO_CREATE_DECISION = "Use the GUI to create/edit decision.";
+  this.USE_GUI_TO_CREATE_DECISION_TREE = "Use the GUI to create/edit decision tree.";
   this.EDGE_ALREADY_EXISTS = "Edge already exists.";
   this.EDGE_ADDED = "Edge added: @@1 -> @@2";
   this.EDGE_REMOVED = "Edge removed: @@1 -> @@2";

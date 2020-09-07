@@ -89,6 +89,7 @@ window.onload = function() {
     jumpDescriptorCreatorGUIHandler = new JumpDescriptorCreatorGUIHandler();
     knowledgeCreatorGUIHandler = new KnowledgeCreatorGUIHandler();
     decisionCreatorGUIHandler = new DecisionCreatorGUIHandler();
+    decisionTreeCreatorGUIHandler = new DecisionTreeCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
