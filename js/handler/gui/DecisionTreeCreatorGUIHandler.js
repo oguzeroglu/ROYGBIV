@@ -136,7 +136,7 @@ DecisionTreeCreatorGUIHandler.prototype.getDecisionMermaidText = function(precon
       text += nameText + " -->|Yes| " + yesNodeText + "\n";
       text += this.getDecisionMermaidText(preconfiguredDecision.yesNode, yesNodeID);
     }else{
-      var yesNodeText = yesNodeID + "{" + preconfiguredDecision.yesNode + "}";
+      var yesNodeText = yesNodeID + "[" + preconfiguredDecision.yesNode + "]";
       text += nameText + " -->|Yes| " + yesNodeText + "\n";
     }
   }
@@ -148,7 +148,7 @@ DecisionTreeCreatorGUIHandler.prototype.getDecisionMermaidText = function(precon
       text += nameText + " -->|No| " + noNodeText + "\n";
       text += this.getDecisionMermaidText(preconfiguredDecision.noNode, noNodeID);
     }else{
-      var noNodeText = noNodeID + "{" + preconfiguredDecision.noNode + "}";
+      var noNodeText = noNodeID + "[" + preconfiguredDecision.noNode + "]";
       text += nameText + " -->|No| " + noNodeText + "\n";
     }
   }
