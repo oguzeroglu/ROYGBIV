@@ -104,3 +104,11 @@ PreconfiguredDecision.prototype.setYesNode = function(yesNode){
 PreconfiguredDecision.prototype.setNoNode = function(noNode){
   this.noNode = noNode;
 }
+
+PreconfiguredDecision.prototype.unsetYesNode = function(){
+  this.yesNode = null;
+}
+
+PreconfiguredDecision.prototype.unsetNoNode = function(){
+  this.noNode = null;
+}
