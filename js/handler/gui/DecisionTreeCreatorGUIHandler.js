@@ -17,6 +17,9 @@ DecisionTreeCreatorGUIHandler.prototype.show = function(){
   var knowledgesInScene = decisionHandler.knowledgesBySceneName[sceneHandler.getActiveSceneName()] || {};
   var knowledgeNames = Object.keys(knowledgesInScene);
 
+  this.decisionTreeParamsByDecisionTreeName = {};
+  this.visualisingDecisionTreeName = null;
+
   var params = {
     "Knowledge": knowledgeNames[0] || "",
     "Tree name": "",
@@ -41,7 +44,8 @@ DecisionTreeCreatorGUIHandler.prototype.show = function(){
         return;
       }
 
-      decisionTreeCreatorGUIHandler.addDecisionTreeFolder(treeName, knowledgeName);
+      var dtParams = decisionTreeCreatorGUIHandler.addDecisionTreeFolder(treeName, knowledgeName);
+      decisionTreeCreatorGUIHandler.decisionTreeParamsByDecisionTreeName[treeName] = dtParams;
       terminal.printInfo(Text.DECISION_TREE_CREATED);
     },
     "Done": function(){
@@ -53,9 +57,20 @@ DecisionTreeCreatorGUIHandler.prototype.show = function(){
   guiHandler.datGuiDecisionTreeCreation.add(params, "Tree name");
   guiHandler.datGuiDecisionTreeCreation.add(params, "Create");
   guiHandler.datGuiDecisionTreeCreation.add(params, "Done");
+
+  var decisionTreesInScene = decisionHandler.decisionTreesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  for (var dtName in decisionTreesInScene){
+    var pcdt = decisionTreesInScene[dtName];
+    var dtParams = this.addDecisionTreeFolder(dtName, pcdt.knowledgeName);
+    this.decisionTreeParamsByDecisionTreeName[dtName] = dtParams;
+  }
 }
 
 DecisionTreeCreatorGUIHandler.prototype.hide = function(){
+
+  delete this.decisionTreeParamsByDecisionTreeName;
+  delete this.visualisingDecisionTreeName;
+
   document.body.removeChild(this.mermaidContainer);
   delete this.mermaidContainer;
 
@@ -65,6 +80,21 @@ DecisionTreeCreatorGUIHandler.prototype.hide = function(){
   terminal.enable();
   guiHandler.hide(guiHandler.guiTypes.DECISION_TREE_CREATION);
   terminal.printInfo(Text.GUI_CLOSED);
+}
+
+DecisionTreeCreatorGUIHandler.prototype.onVisualisedDecitionTreeChanged = function(newDTName, isVisualising){
+  if (!isVisualising){
+    this.unVisualise();
+    return;
+  }
+
+  for (var dtName in this.decisionTreeParamsByDecisionTreeName){
+    var params = this.decisionTreeParamsByDecisionTreeName[dtName];
+    params["Visualise"] = (dtName == newDTName);
+  }
+
+  this.visualiseDecisionTree(decisionHandler.decisionTreesBySceneName[sceneHandler.getActiveSceneName()][newDTName]);
+  this.visualisingDecisionTreeName = newDTName;
 }
 
 DecisionTreeCreatorGUIHandler.prototype.createMermaidContainer = function(){
@@ -121,6 +151,10 @@ DecisionTreeCreatorGUIHandler.prototype.getDecisionMermaidText = function(precon
   return text;
 }
 
+DecisionTreeCreatorGUIHandler.prototype.unVisualise = function(){
+  this.mermaidContainer.innerHTML = "";
+}
+
 DecisionTreeCreatorGUIHandler.prototype.visualiseDecisionTree = function(preconfiguredDecisionTree){
   if (!preconfiguredDecisionTree.rootDecision){
     return false;
@@ -135,6 +169,10 @@ DecisionTreeCreatorGUIHandler.prototype.visualiseDecisionTree = function(preconf
 
   mermaid.init();
   return true;
+}
+
+DecisionTreeCreatorGUIHandler.prototype.addDecisionFolder = function(decisionTreeName, decisionTreeFolder, preconfiguredDecision){
+
 }
 
 DecisionTreeCreatorGUIHandler.prototype.addDecisionTreeFolder = function(decisionTreeName, knowledgeName){
@@ -154,17 +192,50 @@ DecisionTreeCreatorGUIHandler.prototype.addDecisionTreeFolder = function(decisio
   var params = {
     "Decision": decisionNames[0] || "",
     "Add as root": function(){
+      terminal.clear();
+      var decisionName = this["Decision"];
+      if (!decisionName){
+        terminal.printError(Text.DECISION_NAME_CANNOT_BE_EMPTY);
+        return;
+      }
+      if (preconfiguredDecisionTree.hasRootDecision()){
+        terminal.printError(Text.DECISION_TREE_ALREADY_HAS_A_ROOT_DECISION);
+        return;
+      }
 
+      var preconfiguredDecision = new PreconfiguredDecision(decisionName, sceneHandler.getActiveSceneName());
+      preconfiguredDecisionTree.setRootDecision(preconfiguredDecision);
+      decisionTreeCreatorGUIHandler.addDecisionFolder(decisionTreeName, decisionTreeFolder, preconfiguredDecision);
+      terminal.printInfo(Text.ROOT_DECISION_SET);
     },
+    "Visualise": false,
     "Destroy": function(){
       terminal.clear();
       decisionHandler.destroyDecisionTree(decisionTreeName);
       guiHandler.datGuiDecisionTreeCreation.removeFolder(decisionTreeFolder);
+      if (decisionTreeCreatorGUIHandler.visualisingDecisionTreeName == decisionTreeName){
+        decisionTreeCreatorGUIHandler.onVisualisedDecitionTreeChanged(decisionTreeName, false);
+      }
       terminal.printInfo(Text.DECISION_TREE_DESTROYED);
     }
   };
 
   decisionTreeFolder.add(params, "Decision", decisionNames);
   decisionTreeFolder.add(params, "Add as root");
+  decisionTreeFolder.add(params, "Visualise").onChange(function(val){
+    terminal.clear();
+    decisionTreeCreatorGUIHandler.onVisualisedDecitionTreeChanged(decisionTreeName, val);
+    if (val){
+      terminal.printInfo(Text.VISUALISING.replace(Text.PARAM1, decisionTreeName));
+    }else{
+      terminal.printInfo(Text.NOT_VISUALISING.replace(Text.PARAM1, decisionTreeName));
+    }
+  }).listen();
   decisionTreeFolder.add(params, "Destroy");
+
+  if (preconfiguredDecisionTree.hasRootDecision()){
+    this.addDecisionFolder(decisionTreeName, decisionTreeFolder, preconfiguredDecisionTree.rootDecision);
+  }
+
+  return params;
 }
