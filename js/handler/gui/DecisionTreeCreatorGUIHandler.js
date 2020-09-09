@@ -267,7 +267,15 @@ DecisionTreeCreatorGUIHandler.prototype.addDecisionNodeControllers = function(de
     }
   };
 
-  folder.add(params, "Type", nodeTypes).listen();
+  folder.add(params, "Type", nodeTypes).onChange(function(val){
+    if (val == "DECISION"){
+      guiHandler.enableController(decisionController);
+      guiHandler.disableController(valueController);
+    }else{
+      guiHandler.disableController(decisionController);
+      guiHandler.enableController(valueController);
+    }
+  }).listen();
   decisionController = folder.add(params, "Decision", decisionNames).listen();
   valueController = folder.add(params, "Value").listen();
   folder.add(params, "Add");
