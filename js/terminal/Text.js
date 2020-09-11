@@ -578,6 +578,7 @@ var Text = function(){
   this.LOADING_SCRIPTS = "Loading scripts.";
   this.LOADING_FONT = "Loading font.";
   this.LOADING = "Loading.";
+  this.DECISION_NAME_SHOULD_NOT_CONTAIN_SPACES = "Decision name should not contain spaces.";
   this.COMPRESSING_TEXTURE = "Compressing texture.";
   this.TEXTURES_COMPRESSED = "Textures compressed.";
   this.CONFIGURING_AREA = "Configuring area.";

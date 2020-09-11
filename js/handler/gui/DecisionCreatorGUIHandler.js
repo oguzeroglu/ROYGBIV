@@ -33,6 +33,11 @@ DecisionCreatorGUIHandler.prototype.show = function(){
         return;
       }
 
+      if (decisionName.split(" ").length > 1){
+        terminal.printError(Text.DECISION_NAME_SHOULD_NOT_CONTAIN_SPACES);
+        return;
+      }
+
       var allInformations = decisionHandler.getAllInformationsOfKnowledge(knowledgeName);
       if (allInformations.length == 0){
         terminal.printError(Text.KNOWLEDGE_HAS_NO_INFORMATION);
