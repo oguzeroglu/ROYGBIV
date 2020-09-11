@@ -266,7 +266,8 @@ var CommandDescriptor = function(){
       0, //printMasses
       1, //destroyMass
       0, //knowledges
-      0 //decisions
+      0, //decisions
+      0 //decisionTrees
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -535,7 +536,8 @@ var CommandDescriptor = function(){
     "printMasses",
     "destroyMass massID",
     "knowledges",
-    "decisions"
+    "decisions",
+    "decisionTrees"
   ];
 
   this.commands = [
@@ -804,7 +806,8 @@ var CommandDescriptor = function(){
     "printMasses",
     "destroyMass",
     "knowledges",
-    "decisions"
+    "decisions",
+    "decisionTrees"
   ];
 
   this.commandInfo = [
@@ -1073,7 +1076,8 @@ var CommandDescriptor = function(){
     "printMasses: Prints a list of created masses.",
     "destroyMass: Destroys a mass of given id.",
     "knowledges: Opens the knowledge editing GUI.",
-    "decisions: Opens the decision editing GUI."
+    "decisions: Opens the decision editing GUI.",
+    "decisionTrees: Opens the decision tree editing GUI."
   ];
 
   this.keyboardInfo = [
