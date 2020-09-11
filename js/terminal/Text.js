@@ -811,6 +811,7 @@ var Text = function(){
   this.OBJECT_IS_SET_AS_A_STEERABLE = "Object is set as a steerable.";
   this.OBJECT_WONT_BE_USED_AS_STEERABLE = "Object won't be used as a steerable.";
   this.IS_SET = "@@1 set.";
+  this.DECISION_ALREADY_USED = "Decision already used inside this decision tree.";
   this.SWITCHED_TO_TRACK_POSITION = "Steering mode of the object is switched to position tracking.";
   this.POSITION_SET = "Position set.";
   this.CHILD_CONTAINER_IS_ALREADY_ALIGNED = "Child container is already aligned to another parent. Use unalignContainer command first.";

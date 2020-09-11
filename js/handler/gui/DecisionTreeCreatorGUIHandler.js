@@ -177,6 +177,8 @@ DecisionTreeCreatorGUIHandler.prototype.visualiseDecisionTree = function(preconf
 }
 
 DecisionTreeCreatorGUIHandler.prototype.addDecisionNodeControllers = function(decisionTreeName, preconfiguredDecision, folder, isYes, parentDecision){
+  var decisionTree = decisionHandler.decisionTreesBySceneName[sceneHandler.getActiveSceneName()][decisionTreeName];
+
   var nodeTypes = ["DECISION", "STRING"];
   var decisionsInScene = decisionHandler.decisionsBySceneName[sceneHandler.getActiveSceneName()] || {};
   var decisionNames = [];
@@ -223,6 +225,12 @@ DecisionTreeCreatorGUIHandler.prototype.addDecisionNodeControllers = function(de
           terminal.printError(Text.DECISION_NAME_CANNOT_BE_EMPTY);
           return;
         }
+
+        if (decisionTree.isDecisionUsed(dec)){
+          terminal.printError(Text.DECISION_ALREADY_USED);
+          return;
+        }
+
         var newDecision = new PreconfiguredDecision(dec, sceneHandler.getActiveSceneName());
 
         if (isYes){
@@ -261,7 +269,7 @@ DecisionTreeCreatorGUIHandler.prototype.addDecisionNodeControllers = function(de
       }
 
       if (decisionTreeCreatorGUIHandler.visualisingDecisionTreeName == decisionTreeName){
-        decisionTreeCreatorGUIHandler.visualiseDecisionTree(decisionHandler.decisionTreesBySceneName[sceneHandler.getActiveSceneName()][decisionTreeName]);
+        decisionTreeCreatorGUIHandler.visualiseDecisionTree(decisionTree);
       }
       terminal.printInfo(isYes? Text.YES_NODE_UNSET: Text.NO_NODE_UNSET);
     }

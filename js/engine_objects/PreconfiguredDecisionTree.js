@@ -43,3 +43,17 @@ PreconfiguredDecisionTree.prototype.unsetRootDecision = function(){
 PreconfiguredDecisionTree.prototype.hasRootDecision = function(){
   return this.rootDecision != null;
 }
+
+PreconfiguredDecisionTree.prototype.isDecisionUsed = function(decisionName){
+  if (!this.rootDecision){
+    return false;
+  }
+
+  if (this.rootDecision){
+    if (this.rootDecision.decisionName == decisionName){
+      return true;
+    }
+  }
+
+  return this.rootDecision.hasChildDecision(decisionName);
+}

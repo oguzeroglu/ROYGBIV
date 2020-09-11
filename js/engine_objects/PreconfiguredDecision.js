@@ -112,3 +112,30 @@ PreconfiguredDecision.prototype.unsetYesNode = function(){
 PreconfiguredDecision.prototype.unsetNoNode = function(){
   this.noNode = null;
 }
+
+PreconfiguredDecision.prototype.hasChildDecision = function(decisionName){
+  if (this.yesNode && this.yesNode instanceof PreconfiguredDecision){
+    if (this.yesNode.decisionName == decisionName){
+      return true;
+    }
+  }
+
+  if (this.noNode && this.noNode instanceof PreconfiguredDecision){
+    if (this.noNode.decisionName == decisionName){
+      return true;
+    }
+  }
+
+  var yesResult = false;
+  var noResult = false;
+
+  if (this.yesNode && this.yesNode instanceof PreconfiguredDecision){
+    yesResult = this.yesNode.hasChildDecision(decisionName);
+  }
+
+  if (this.noNode && this.noNode instanceof PreconfiguredDecision){
+    noResult = this.noNode.hasChildDecision(decisionName);
+  }
+
+  return yesResult || noResult;
+}
