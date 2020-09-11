@@ -49,6 +49,16 @@ DecisionTreeCreatorGUIHandler.prototype.show = function(){
       terminal.printInfo(Text.DECISION_TREE_CREATED);
     },
     "Done": function(){
+      terminal.clear();
+
+      var dts = decisionHandler.decisionTreesBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var dtName in dts){
+        if (dts[dtName].rootDecision == null){
+          terminal.printError(Text.DECISION_TREE_DOES_NOT_HAVE_A_ROOT.replace(Text.PARAM1, dtName));
+          return;
+        }
+      }
+
       decisionTreeCreatorGUIHandler.hide();
     }
   };
