@@ -286,6 +286,7 @@ var Preconditions = function(){
   this.knowledge = "knowledge";
   this.informationName = "informationName";
   this.newValue = "newValue";
+  this.decisionTree = "decisionTree";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -294,6 +295,18 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfDecisionTreeInActiveScene = function(callerFunc, decisionTree){
+  if (decisionTree.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Decision tree is not inside the active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfDecisionTree = function(callerFunc, decisionTree){
+  if (!(decisionTree instanceof Ego.DecisionTree)){
+    this.throw(callerFunc, "Object is not a decision tree.");
+  }
 }
 
 Preconditions.prototype.checkIfValueTypeSuitableForInformation = function(callerFunc, knowledge, informationName, newValue){

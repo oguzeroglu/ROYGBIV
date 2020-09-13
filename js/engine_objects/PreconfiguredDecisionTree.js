@@ -9,7 +9,8 @@ var PreconfiguredDecisionTree = function(name, knowledgeName, sceneName){
 PreconfiguredDecisionTree.prototype.get = function(){
   var decisionTree = new Ego.DecisionTree(this.rootDecision.get());
   decisionTree.roygbivDecisionTree = this;
-  
+  decisionTree.resultCache = null;
+  decisionTree.registeredSceneName = this.sceneName;
   return decisionTree;
 }
 

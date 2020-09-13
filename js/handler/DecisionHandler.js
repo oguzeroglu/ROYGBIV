@@ -44,6 +44,8 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
         numerical: JSON.parse(JSON.stringify(knowledge._numericalMap)),
         vector: JSON.parse(JSON.stringify(knowledge._vectorMap))
       }
+
+      knowledge.isDirty = true;
     }
   }
 }
@@ -59,6 +61,8 @@ DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
       knowledge._booleanMap = JSON.parse(JSON.stringify(initialData.boolean));
       knowledge._numericalMap = JSON.parse(JSON.stringify(initialData.numerical));
       knowledge._vectorMap = JSON.parse(JSON.stringify(initialData.vector));
+
+      delete knowledge.isDirty;
     }
   }
 
@@ -408,6 +412,8 @@ DecisionHandler.prototype.updateInformation = function(knowledge, informationNam
   }else{
     knowledge.updateVectorInformation(informationName, newValue.x, newValue.y, newValue.z);
   }
+
+  knowledge.isDirty = true;
 }
 
 DecisionHandler.prototype.createKnowledge = function(knowledgeName, overrideSceneName){
@@ -456,4 +462,35 @@ DecisionHandler.prototype.getKnowledge = function(knowledgeName){
   }
 
   return knowledgesInScene[knowledgeName] || false;
+}
+
+DecisionHandler.prototype.makeDecisions = function(){
+  var decisionTreesInScene = this.constructedDecisionTrees[sceneHandler.getActiveSceneName()];
+
+  if (!decisionTreesInScene){
+    return;
+  }
+
+  for (var dtName in decisionTreesInScene){
+    var decisionTree = decisionTreesInScene[dtName];
+    var knowledgeName = decisionTree.roygbivDecisionTree.knowledgeName;
+    var knowledge = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()][knowledgeName];
+
+    if (!knowledge.isDirty){
+      break;
+    }
+
+    var result = decisionTree.makeDecision(knowledge);
+    decisionTree.resultCache = result;
+  }
+
+  var knowledgesInScene = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()];
+
+  if (!knowledgesInScene){
+    return;
+  }
+
+  for (var knowledgeName in knowledgesInScene){
+    knowledgesInScene[knowledgeName].isDirty = false;
+  }
 }

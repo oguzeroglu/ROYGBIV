@@ -321,7 +321,8 @@ var Roygbiv = function(){
     "resetRandomPathBehavior",
     "getKnowledge",
     "getDecisionTree",
-    "updateInformation"
+    "updateInformation",
+    "makeDecision"
   ];
 
   this.globals = new Object();
@@ -4149,6 +4150,19 @@ Roygbiv.prototype.updateInformation = function(knowledge, informationName, newVa
   preConditions.checkIfValueTypeSuitableForInformation(ROYGBIV.updateInformation, knowledge, informationName, newValue);
 
   decisionHandler.updateInformation(knowledge, informationName, newValue);
+}
+
+// Returns the decision result of given decision tree.
+Roygbiv.prototype.makeDecision = function(decisionTree){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.makeDecision, preConditions.decisionTree, decisionTree);
+  preConditions.checkIfDecisionTree(ROYGBIV.makeDecision, decisionTree);
+  preConditions.checkIfDecisionTreeInActiveScene(ROYGBIV.makeDecision, decisionTree);
+
+  return decisionTree.resultCache;
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************
