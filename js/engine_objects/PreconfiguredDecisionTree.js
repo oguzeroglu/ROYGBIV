@@ -6,6 +6,13 @@ var PreconfiguredDecisionTree = function(name, knowledgeName, sceneName){
   this.rootDecision = null;
 }
 
+PreconfiguredDecisionTree.prototype.get = function(){
+  var decisionTree = new Ego.DecisionTree(this.rootDecision.get());
+  decisionTree.roygbivDecisionTree = this;
+  
+  return decisionTree;
+}
+
 PreconfiguredDecisionTree.prototype.export = function(){
   var exportObj = {
     name: this.name,

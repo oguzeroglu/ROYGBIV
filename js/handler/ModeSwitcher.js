@@ -283,6 +283,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   lightHandler.onSwitchFromDesignToPreview();
   sceneHandler.onSwitchFromDesignToPreview();
+  decisionHandler.onSwitchFromDesignToPreview();
   this.commonSwitchFunctions();
   handleViewport();
   renderer.setPixelRatio(screenResolution);
@@ -641,5 +642,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
 
   lightHandler.onSwitchFromPreviewToDesign();
+  decisionHandler.onSwitchFromPreviewToDesign();
   renderer.setPixelRatio(screenResolution);
 }

@@ -22,6 +22,22 @@ DecisionHandler.prototype.reset = function(){
   this.informationTypesByKnowledgeName = {};
 }
 
+DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
+  this.constructedDecisionTrees = {};
+
+  for (var sceneName in this.decisionTreesBySceneName){
+    this.constructedDecisionTrees[sceneName] = {};
+    var decisionTreesInScene = this.decisionTreesBySceneName[sceneName];
+    for (var dtName in decisionTreesInScene){
+      this.constructedDecisionTrees[sceneName][dtName] = decisionTreesInScene[dtName].get();
+    }
+  }
+}
+
+DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
+  delete this.constructedDecisionTrees;
+}
+
 DecisionHandler.prototype.import = function(exportObj){
   var knowledgesBySceneName = exportObj.knowledgesBySceneName;
   var decisionsBySceneName = exportObj.decisionsBySceneName;
