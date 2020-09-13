@@ -24,6 +24,7 @@ DecisionHandler.prototype.reset = function(){
 
 DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
   this.constructedDecisionTrees = {};
+  this.initialKnowledgeData = {};
 
   for (var sceneName in this.decisionTreesBySceneName){
     this.constructedDecisionTrees[sceneName] = {};
@@ -32,10 +33,36 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
       this.constructedDecisionTrees[sceneName][dtName] = decisionTreesInScene[dtName].get();
     }
   }
+
+  for (var sceneName in this.knowledgesBySceneName){
+    this.initialKnowledgeData[sceneName] = {};
+    var knowledgesInScene = this.knowledgesBySceneName[sceneName];
+    for (var knowledgeName in knowledgesInScene){
+      var knowledge = knowledgesInScene[knowledgeName];
+      this.initialKnowledgeData[sceneName][knowledgeName] = {
+        boolean: JSON.parse(JSON.stringify(knowledge._booleanMap)),
+        numerical: JSON.parse(JSON.stringify(knowledge._numericalMap)),
+        vector: JSON.parse(JSON.stringify(knowledge._vectorMap))
+      }
+    }
+  }
 }
 
 DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
   delete this.constructedDecisionTrees;
+
+  for (var sceneName in this.knowledgesBySceneName){
+    var knowledgesInScene = this.knowledgesBySceneName[sceneName];
+    for (var knowledgeName in knowledgesInScene){
+      var knowledge = knowledgesInScene[knowledgeName];
+      var initialData = this.initialKnowledgeData[sceneName][knowledgeName];
+      knowledge._booleanMap = JSON.parse(JSON.stringify(initialData.boolean));
+      knowledge._numericalMap = JSON.parse(JSON.stringify(initialData.numerical));
+      knowledge._vectorMap = JSON.parse(JSON.stringify(initialData.vector));
+    }
+  }
+
+  delete this.initialKnowledgeData;
 }
 
 DecisionHandler.prototype.import = function(exportObj){
@@ -371,6 +398,18 @@ DecisionHandler.prototype.getInformationFromKnowledge = function(knowledgeName, 
 
 }
 
+DecisionHandler.prototype.updateInformation = function(knowledge, informationName, newValue){
+  var informationType = this.informationTypesByKnowledgeName[knowledge.roygbivName][informationName];
+
+  if (informationType == decisionHandler.informationTypes.BOOLEAN){
+    knowledge.updateBooleanInformation(informationName, newValue);
+  }else if (informationType == decisionHandler.informationTypes.NUMERICAL){
+    knowledge.updateNumericalInformation(informationName, newValue);
+  }else{
+    knowledge.updateVectorInformation(informationName, newValue.x, newValue.y, newValue.z);
+  }
+}
+
 DecisionHandler.prototype.createKnowledge = function(knowledgeName, overrideSceneName){
 
   var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
@@ -388,6 +427,9 @@ DecisionHandler.prototype.createKnowledge = function(knowledgeName, overrideScen
   knowledgesInScene[knowledgeName] = new Ego.Knowledge();
   this.knowledgesBySceneName[sceneName] = knowledgesInScene;
   this.informationTypesByKnowledgeName[knowledgeName] = {};
+
+  knowledgesInScene[knowledgeName].roygbivName = knowledgeName;
+  knowledgesInScene[knowledgeName].registeredSceneName = sceneName;
 
   return true;
 }

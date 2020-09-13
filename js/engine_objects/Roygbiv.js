@@ -320,7 +320,8 @@ var Roygbiv = function(){
     "resetObjectRotation",
     "resetRandomPathBehavior",
     "getKnowledge",
-    "getDecisionTree"
+    "getDecisionTree",
+    "updateInformation"
   ];
 
   this.globals = new Object();
@@ -4131,6 +4132,23 @@ Roygbiv.prototype.resetRandomPathBehavior = function(object, behaviorName){
   preConditions.checkIfRandomPathOrBlendedOrPriorityBehavior(Roygbiv.resetRandomPathBehavior, object, behaviorName);
 
   steeringHandler.resetRandomPathBehavior(object, behaviorName);
+}
+
+// Updates an information inside given knowledge.
+Roygbiv.prototype.updateInformation = function(knowledge, informationName, newValue){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.updateInformation, preConditions.knowledge, knowledge);
+  preConditions.checkIfDefined(ROYGBIV.updateInformation, preConditions.informationName, informationName);
+  preConditions.checkIfDefined(ROYGBIV.updateInformation, preConditions.newValue, newValue);
+  preConditions.checkIfKnowledge(ROYGBIV.updateInformation, knowledge);
+  preConditions.checkIfKnowledgeHasInformation(ROYGBIV.updateInformation, knowledge, informationName);
+  preConditions.checkIfKnowledgeInsideActiveScene(ROYGBIV.updateInformation, knowledge);
+  preConditions.checkIfValueTypeSuitableForInformation(ROYGBIV.updateInformation, knowledge, informationName, newValue);
+
+  decisionHandler.updateInformation(knowledge, informationName, newValue);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

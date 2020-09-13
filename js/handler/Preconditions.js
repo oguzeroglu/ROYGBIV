@@ -283,6 +283,9 @@ var Preconditions = function(){
   this.rotationMode = "rotationMode";
   this.knowledgeName = "knowledgeName";
   this.decisionTreeName = "decisionTreeName";
+  this.knowledge = "knowledge";
+  this.informationName = "informationName";
+  this.newValue = "newValue";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -291,6 +294,43 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfValueTypeSuitableForInformation = function(callerFunc, knowledge, informationName, newValue){
+  var expectedType = decisionHandler.informationTypesByKnowledgeName[knowledge.roygbivName][informationName];
+
+  if (expectedType == decisionHandler.informationTypes.BOOLEAN){
+    if (!(typeof newValue == "boolean")){
+      this.throw(callerFunc, "Information must have a value of boolean type.");
+    }
+  }else if (expectedType == decisionHandler.informationTypes.NUMERICAL){
+    if (!(typeof newValue == "number")){
+      this.throw(callerFunc, "Information must have a value of number type.");
+    }
+  }else{
+    if (!((typeof newValue.x == "number") && (typeof newValue.y == "number") && (typeof newValue.z == "number"))){
+      this.throw(callerFunc, "Information must have a value of vector type.");
+    }
+  }
+}
+
+Preconditions.prototype.checkIfKnowledgeInsideActiveScene = function(callerFunc, knowledge){
+  if (knowledge.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Knowledge is not inside the active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfKnowledgeHasInformation = function(callerFunc, knowledge, informationName){
+  var informationTypes = decisionHandler.informationTypesByKnowledgeName[knowledge.roygbivName];
+  if (typeof informationTypes[informationName] == UNDEFINED){
+    this.throw(callerFunc, "Knowledge does not have such information.");
+  }
+}
+
+Preconditions.prototype.checkIfKnowledge = function(callerFunc, knowledge){
+  if (!(knowledge instanceof Ego.Knowledge)){
+    this.throw(callerFunc, "Provided knowledge is not a Knowledge object.");
+  }
 }
 
 Preconditions.prototype.checkIfObjectIsJumping = function(callerFunc, object){
