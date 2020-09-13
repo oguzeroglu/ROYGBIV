@@ -281,6 +281,7 @@ var Preconditions = function(){
   this.completeCallback = "completeCallback";
   this.lookDirectionVector = "lookDirectionVector";
   this.rotationMode = "rotationMode";
+  this.knowledgeName = "knowledgeName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

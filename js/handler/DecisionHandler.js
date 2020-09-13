@@ -394,3 +394,13 @@ DecisionHandler.prototype.destroyKnowledge = function(knowledgeName){
 
   return true;
 }
+
+DecisionHandler.prototype.getKnowledge = function(knowledgeName){
+  var knowledgesInScene = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()];
+
+  if (!knowledgesInScene){
+    return false;
+  }
+
+  return knowledgesInScene[knowledgeName] || false;
+}

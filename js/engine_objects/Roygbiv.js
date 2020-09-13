@@ -318,7 +318,8 @@ var Roygbiv = function(){
     "getSteerableLookDirection",
     "setObjectRotationMode",
     "resetObjectRotation",
-    "resetRandomPathBehavior"
+    "resetRandomPathBehavior",
+    "getKnowledge"
   ];
 
   this.globals = new Object();
@@ -801,6 +802,18 @@ Roygbiv.prototype.getJumpDescriptor = function(jdName){
     return jumpDescriptor;
   }
   return 0;
+}
+
+// Returns a Knowledge or 0 if Knowledge of given name does not exist.
+Roygbiv.prototype.getKnowledge = function(knowledgeName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getKnowledge, preConditions.knowledgeName, knowledgeName);
+
+  var knowledge = decisionHandler.getKnowledge(knowledgeName);
+
+  return knowledge || 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
