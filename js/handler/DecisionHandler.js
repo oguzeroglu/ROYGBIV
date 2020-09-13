@@ -207,6 +207,17 @@ DecisionHandler.prototype.createDecisionTree = function(decisionTreeName, knowle
   return true;
 }
 
+DecisionHandler.prototype.getDecisionTree = function(decisionTreeName){
+
+  var decisionTreesInScene = this.constructedDecisionTrees[sceneHandler.getActiveSceneName()];
+
+  if (!decisionTreesInScene){
+    return false;
+  }
+
+  return decisionTreesInScene[decisionTreeName] || false;
+}
+
 DecisionHandler.prototype.destroyDecision = function(decisionName){
   var decisionsInScene = this.decisionsBySceneName[sceneHandler.getActiveSceneName()] || {};
 

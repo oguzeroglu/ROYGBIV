@@ -319,7 +319,8 @@ var Roygbiv = function(){
     "setObjectRotationMode",
     "resetObjectRotation",
     "resetRandomPathBehavior",
-    "getKnowledge"
+    "getKnowledge",
+    "getDecisionTree"
   ];
 
   this.globals = new Object();
@@ -814,6 +815,18 @@ Roygbiv.prototype.getKnowledge = function(knowledgeName){
   var knowledge = decisionHandler.getKnowledge(knowledgeName);
 
   return knowledge || 0;
+}
+
+// Returns a DecisionTree or 0 if DecisionTree of given name does not exist.
+Roygbiv.prototype.getDecisionTree = function(decisionTreeName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getDecisionTree, preConditions.decisionTreeName, decisionTreeName);
+
+  var decisionTree = decisionHandler.getDecisionTree(decisionTreeName);
+
+  return decisionTree || 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************

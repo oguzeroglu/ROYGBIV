@@ -1260,4 +1260,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_RESETOBJECTROTATION = "Resets all the rotations applied to given object.";
   this.ROYGBIV_SCRIPTING_API_RESETRANDOMPATHBEHAVIOR = "Ensures the RandomPathBehavior tries to start from the closest graph vertex to given steerable. This API may be useful\nwhen the random path behavior of object is changed to some other behavior before the object reaches to the destination vertex,\nand then the random path behavior is activated again. If given behavior is a blended or a priority steering behavior,\nthe child random path behaviors are reset.";
   this.ROYGBIV_SCRIPTING_API_GETKNOWLEDGE = "Returns a Knowledge or 0 if Knowledge of given name does not exist.";
+  this.ROYGBIV_SCRIPTING_API_GETDECISIONTREE = "Returns a DecisionTree or 0 if DecisionTree of given name does not exist.";
 }

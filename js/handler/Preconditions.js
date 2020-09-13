@@ -282,6 +282,7 @@ var Preconditions = function(){
   this.lookDirectionVector = "lookDirectionVector";
   this.rotationMode = "rotationMode";
   this.knowledgeName = "knowledgeName";
+  this.decisionTreeName = "decisionTreeName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
