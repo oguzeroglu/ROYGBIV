@@ -163,6 +163,15 @@ DecisionCreatorGUIHandler.prototype.createDecisionFolder = function(decisionName
     "Range": rangeText,
     "Destroy": function(){
       terminal.clear();
+
+      var decisionTreesInScene = decisionHandler.decisionTreesBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var dtName in decisionTreesInScene){
+        if (decisionTreesInScene[dtName].isDecisionUsed(decisionName)){
+          terminal.printError(Text.DECISION_USED_IN_DECISION_TREE.replace(Text.PARAM1, dtName));
+          return;
+        }
+      }
+
       decisionHandler.destroyDecision(decisionName);
       guiHandler.datGuiDecisionCreation.removeFolder(decisionFolder);
       terminal.printInfo(Text.DECISION_DESTROYED);
