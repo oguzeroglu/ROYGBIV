@@ -353,6 +353,7 @@ var jumpDescriptorCreatorGUIHandler;
 var knowledgeCreatorGUIHandler;
 var decisionCreatorGUIHandler;
 var decisionTreeCreatorGUIHandler;
+var stateCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;

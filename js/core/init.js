@@ -90,6 +90,7 @@ window.onload = function() {
     knowledgeCreatorGUIHandler = new KnowledgeCreatorGUIHandler();
     decisionCreatorGUIHandler = new DecisionCreatorGUIHandler();
     decisionTreeCreatorGUIHandler = new DecisionTreeCreatorGUIHandler();
+    stateCreatorGUIHandler = new StateCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
