@@ -91,6 +91,7 @@ window.onload = function() {
     decisionCreatorGUIHandler = new DecisionCreatorGUIHandler();
     decisionTreeCreatorGUIHandler = new DecisionTreeCreatorGUIHandler();
     stateCreatorGUIHandler = new StateCreatorGUIHandler();
+    transitionCreatorGUIHandler = new TransitionCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

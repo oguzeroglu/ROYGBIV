@@ -155,7 +155,7 @@ var GUIHandler = function(){
     CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17,
     CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
     JUMP_DESCRIPTOR_CREATION: 23, KNOWLEDGE_CREATION: 24, DECISION_CREATION: 25, DECISION_TREE_CREATION: 26,
-    STATE_CREATION: 27
+    STATE_CREATION: 27, TRANSITION_CREATION: 28
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -164,7 +164,7 @@ var GUIHandler = function(){
     this.guiTypes.LIGHTNING, this.guiTypes.VIRTUAL_KEYBOARD_CREATION, this.guiTypes.GRAPH_CREATOR,
     this.guiTypes.STEERING_BEHAVIOR_CREATION, this.guiTypes.JUMP_DESCRIPTOR_CREATION,
     this.guiTypes.KNOWLEDGE_CREATION, this.guiTypes.DECISION_CREATION, this.guiTypes.DECISION_TREE_CREATION,
-    this.guiTypes.STATE_CREATION
+    this.guiTypes.STATE_CREATION, this.guiTypes.TRANSITION_CREATION
   ];
 }
 
@@ -263,6 +263,11 @@ GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
       break;
       case this.guiTypes.STATE_CREATION:
         if (this.datGuiStateCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.TRANSITION_CREATION:
+        if(this.datGuiTransitionCreation){
           return true;
         }
       break;
@@ -1178,6 +1183,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiStateCreation){
         this.destroyGUI(this.datGuiStateCreation);
         this.datGuiStateCreation = 0;
+      }
+    return;
+    case this.guiTypes.TRANSITION_CREATION:
+      if (this.datGuiTransitionCreation){
+        this.destroyGUI(this.datGuiTransitionCreation);
+        this.datGuiTransitionCreation = 0;
       }
     return;
   }
