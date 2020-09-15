@@ -267,7 +267,8 @@ var CommandDescriptor = function(){
       1, //destroyMass
       0, //knowledges
       0, //decisions
-      0 //decisionTrees
+      0, //decisionTrees
+      0 //states
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -537,7 +538,8 @@ var CommandDescriptor = function(){
     "destroyMass massID",
     "knowledges",
     "decisions",
-    "decisionTrees"
+    "decisionTrees",
+    "states"
   ];
 
   this.commands = [
@@ -807,7 +809,8 @@ var CommandDescriptor = function(){
     "destroyMass",
     "knowledges",
     "decisions",
-    "decisionTrees"
+    "decisionTrees",
+    "states"
   ];
 
   this.commandInfo = [
@@ -1077,7 +1080,8 @@ var CommandDescriptor = function(){
     "destroyMass: Destroys a mass of given id.",
     "knowledges: Opens the knowledge editing GUI.",
     "decisions: Opens the decision editing GUI.",
-    "decisionTrees: Opens the decision tree editing GUI."
+    "decisionTrees: Opens the decision tree editing GUI.",
+    "states: Opens the state editing GUI."
   ];
 
   this.keyboardInfo = [

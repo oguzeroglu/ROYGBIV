@@ -6716,6 +6716,15 @@ function parse(input){
           decisionTreeCreatorGUIHandler.show();
           return true;
         break;
+        case 267: //states
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          stateCreatorGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){
