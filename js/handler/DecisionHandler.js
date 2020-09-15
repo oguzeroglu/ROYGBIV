@@ -222,6 +222,15 @@ DecisionHandler.prototype.export = function(){
   return exportObj;
 }
 
+DecisionHandler.prototype.destroyState = function(stateName){
+  var statesInScene = this.statesBySceneName[sceneHandler.getActiveSceneName()];
+  delete statesInScene[stateName];
+
+  if (Object.keys(statesInScene).length == 0){
+    delete this.statesBySceneName[sceneHandler.getActiveSceneName()];
+  }
+}
+
 DecisionHandler.prototype.createState = function(stateName, overrideSceneName){
 
   var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
