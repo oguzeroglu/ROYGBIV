@@ -240,6 +240,15 @@ DecisionHandler.prototype.export = function(){
   return exportObj;
 }
 
+DecisionHandler.prototype.destroyTransition = function(transitionName){
+  var transitionsInScene = this.transitionsBySceneName[sceneHandler.getActiveSceneName()];
+  delete transitionsInScene[transitionName];
+
+  if (Object.keys(transitionsInScene).length == 0){
+    delete this.transitionsBySceneName[sceneHandler.getActiveSceneName()];
+  }
+}
+
 DecisionHandler.prototype.createTransition = function(transitionName, sourceStateName, targetStateName, decisionName, overrideSceneName){
   var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
 
