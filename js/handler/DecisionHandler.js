@@ -21,6 +21,7 @@ DecisionHandler.prototype.reset = function(){
   this.decisionTreesBySceneName = {};
   this.informationTypesByKnowledgeName = {};
   this.statesBySceneName = {};
+  this.transitionsBySceneName = {};
 }
 
 DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
@@ -75,6 +76,7 @@ DecisionHandler.prototype.import = function(exportObj){
   var decisionsBySceneName = exportObj.decisionsBySceneName;
   var decisionTreesBySceneName = exportObj.decisionTreesBySceneName;
   var statesBySceneName = exportObj.statesBySceneName;
+  var transitionsBySceneName = exportObj.transitionsBySceneName;
 
   for (var sceneName in knowledgesBySceneName){
     this.knowledgesBySceneName[sceneName] = {};
@@ -152,6 +154,14 @@ DecisionHandler.prototype.import = function(exportObj){
       this.createState(stateName, sceneName);
     }
   }
+
+  for (var sceneName in transitionsBySceneName){
+    this.transitionsBySceneName[sceneName] = {};
+    for (var transitionName in transitionsBySceneName[sceneName]){
+      var exportObj = transitionsBySceneName[sceneName][transitionName];
+      this.createTransition(transitionName, exportObj.sourceStateName, exportObj.targetStateName, exportObj.decisionName, sceneName);
+    }
+  }
 }
 
 DecisionHandler.prototype.export = function(){
@@ -159,7 +169,8 @@ DecisionHandler.prototype.export = function(){
     knowledgesBySceneName: {},
     decisionsBySceneName: {},
     decisionTreesBySceneName: {},
-    statesBySceneName: {}
+    statesBySceneName: {},
+    transitionsBySceneName: {}
   };
 
   for (var sceneName in this.knowledgesBySceneName){
@@ -219,7 +230,31 @@ DecisionHandler.prototype.export = function(){
     }
   }
 
+  for (var sceneName in this.transitionsBySceneName){
+    exportObj.transitionsBySceneName[sceneName] = {};
+    for (var transitionName in this.transitionsBySceneName[sceneName]){
+      exportObj.transitionsBySceneName[sceneName][transitionName] = this.transitionsBySceneName[sceneName][transitionName].export();
+    }
+  }
+
   return exportObj;
+}
+
+DecisionHandler.prototype.createTransition = function(transitionName, sourceStateName, targetStateName, decisionName, overrideSceneName){
+  var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
+
+  var transitionsInScene = this.transitionsBySceneName[sceneName] || {};
+
+  if (transitionsInScene[transitionName]){
+    return false;
+  }
+
+  var preconfiguredTransition = new PreconfiguredTransition(transitionName, sourceStateName, targetStateName, decisionName, sceneName);
+
+  transitionsInScene[transitionName] = preconfiguredTransition;
+  this.transitionsBySceneName[sceneName] = transitionsInScene;
+
+  return true;
 }
 
 DecisionHandler.prototype.destroyState = function(stateName){
