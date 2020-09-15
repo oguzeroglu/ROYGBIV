@@ -20,6 +20,7 @@ DecisionHandler.prototype.reset = function(){
   this.decisionsBySceneName = {};
   this.decisionTreesBySceneName = {};
   this.informationTypesByKnowledgeName = {};
+  this.statesBySceneName = {};
 }
 
 DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
@@ -73,6 +74,7 @@ DecisionHandler.prototype.import = function(exportObj){
   var knowledgesBySceneName = exportObj.knowledgesBySceneName;
   var decisionsBySceneName = exportObj.decisionsBySceneName;
   var decisionTreesBySceneName = exportObj.decisionTreesBySceneName;
+  var statesBySceneName = exportObj.statesBySceneName;
 
   for (var sceneName in knowledgesBySceneName){
     this.knowledgesBySceneName[sceneName] = {};
@@ -143,13 +145,21 @@ DecisionHandler.prototype.import = function(exportObj){
       this.decisionTreesBySceneName[sceneName][decisionTreeName] = decisionTree;
     }
   }
+
+  for (var sceneName in statesBySceneName){
+    this.statesBySceneName[sceneName] = {};
+    for (var stateName in statesBySceneName[sceneName]){
+      this.createState(stateName, sceneName);
+    }
+  }
 }
 
 DecisionHandler.prototype.export = function(){
   var exportObj = {
     knowledgesBySceneName: {},
     decisionsBySceneName: {},
-    decisionTreesBySceneName: {}
+    decisionTreesBySceneName: {},
+    statesBySceneName: {}
   };
 
   for (var sceneName in this.knowledgesBySceneName){
@@ -202,7 +212,32 @@ DecisionHandler.prototype.export = function(){
     }
   }
 
+  for (var sceneName in this.statesBySceneName){
+    exportObj.statesBySceneName[sceneName] = {};
+    for (var stateName in this.statesBySceneName[sceneName]){
+      exportObj.statesBySceneName[sceneName][stateName] = {};
+    }
+  }
+
   return exportObj;
+}
+
+DecisionHandler.prototype.createState = function(stateName, overrideSceneName){
+
+  var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
+
+  var statesInScene = this.statesBySceneName[sceneName] || {};
+
+  if (statesInScene[stateName]){
+    return false;
+  }
+
+  var state = new Ego.State(stateName);
+
+  statesInScene[stateName] = state;
+  this.statesBySceneName[sceneName] = statesInScene;
+
+  return true;
 }
 
 DecisionHandler.prototype.setRootDecisionOfDecisionTree = function(decisionTreeName, preconfiguredDecision){
