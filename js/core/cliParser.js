@@ -6725,6 +6725,15 @@ function parse(input){
           stateCreatorGUIHandler.show();
           return true;
         break;
+        case 268: //transitions
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          transitionCreatorGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){

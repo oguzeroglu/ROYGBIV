@@ -268,7 +268,8 @@ var CommandDescriptor = function(){
       0, //knowledges
       0, //decisions
       0, //decisionTrees
-      0 //states
+      0, //states
+      0 //transitions
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -539,7 +540,8 @@ var CommandDescriptor = function(){
     "knowledges",
     "decisions",
     "decisionTrees",
-    "states"
+    "states",
+    "transitions"
   ];
 
   this.commands = [
@@ -810,7 +812,8 @@ var CommandDescriptor = function(){
     "knowledges",
     "decisions",
     "decisionTrees",
-    "states"
+    "states",
+    "transitions"
   ];
 
   this.commandInfo = [
@@ -1081,7 +1084,8 @@ var CommandDescriptor = function(){
     "knowledges: Opens the knowledge editing GUI.",
     "decisions: Opens the decision editing GUI.",
     "decisionTrees: Opens the decision tree editing GUI.",
-    "states: Opens the state editing GUI."
+    "states: Opens the state editing GUI.",
+    "transitions: Opens the transition editing GUI."
   ];
 
   this.keyboardInfo = [
