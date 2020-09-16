@@ -23,6 +23,7 @@ DecisionHandler.prototype.reset = function(){
   this.statesBySceneName = {};
   this.transitionsBySceneName = {};
   this.stateMachinesBySceneName = {};
+  this.stateParentsBySceneName = {};
 }
 
 DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
@@ -79,6 +80,7 @@ DecisionHandler.prototype.import = function(exportObj){
   var statesBySceneName = exportObj.statesBySceneName;
   var transitionsBySceneName = exportObj.transitionsBySceneName;
   var stateMachinesBySceneName = exportObj.stateMachinesBySceneName;
+  var stateParentsBySceneName = exportObj.stateParentsBySceneName;
 
   for (var sceneName in knowledgesBySceneName){
     this.knowledgesBySceneName[sceneName] = {};
@@ -172,6 +174,8 @@ DecisionHandler.prototype.import = function(exportObj){
       this.createStateMachine(stateMachineName, exportObj.knowledgeName, exportObj.entryStateName, sceneName);
     }
   }
+
+  this.stateParentsBySceneName = JSON.parse(JSON.stringify(stateParentsBySceneName));
 }
 
 DecisionHandler.prototype.export = function(){
@@ -181,7 +185,8 @@ DecisionHandler.prototype.export = function(){
     decisionTreesBySceneName: {},
     statesBySceneName: {},
     transitionsBySceneName: {},
-    stateMachinesBySceneName: {}
+    stateMachinesBySceneName: {},
+    stateParentsBySceneName: JSON.parse(JSON.stringify(this.stateParentsBySceneName))
   };
 
   for (var sceneName in this.knowledgesBySceneName){
@@ -258,6 +263,34 @@ DecisionHandler.prototype.export = function(){
   return exportObj;
 }
 
+DecisionHandler.prototype.addTransitionToStateMachine = function(stateMachineName, transitionName){
+  var transition = this.transitionsBySceneName[sceneHandler.getActiveSceneName()][transitionName];
+  var stateParents = this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  var sourceStateName = transition.sourceStateName;
+  var targetStateName = transition.targetStateName;
+
+  if (stateParents[sourceStateName] && stateParents[sourceStateName] != stateMachineName){
+    return -1;
+  }
+
+  var stateMachine = this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName];
+  for (var i = 0; i < stateMachine.transitions.length; i ++){
+    var curTransitionName = stateMachine.transitions[i];
+    var curTransition = this.transitionsBySceneName[sceneHandler.getActiveSceneName()][curTransitionName];
+    if (curTransition.sourceStateName == sourceStateName && curTransition.targetStateName == targetStateName){
+      return 0;
+    }
+  }
+
+  stateMachine.addTransition(transition);
+
+  stateParents[sourceStateName] = stateMachineName;
+  this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] = stateParents;
+
+  return true;
+}
+
 DecisionHandler.prototype.destroyStateMachine = function(stateMachineName){
   var stateMachinesInScene = this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()];
   delete stateMachinesInScene[stateMachineName];
@@ -272,20 +305,29 @@ DecisionHandler.prototype.createStateMachine = function(stateMachineName, knowle
 
   var stateMachinesInScene = this.stateMachinesBySceneName[sceneName] || {};
 
+  var stateParents = this.stateParentsBySceneName[sceneName] || {};
+
+  if (stateParents[entryStateName]){
+    return -1;
+  }
+
   if (stateMachinesInScene[stateMachineName]){
-    return false;
+    return -2;
   }
 
   var statesInScene = this.statesBySceneName[sceneName] || {};
 
   if (statesInScene[stateMachineName]){
-    return false;
+    return -3;
   }
 
   var preconfiguredStateMachine = new PreconfiguredStateMachine(stateMachineName, knowledgeName, entryStateName, sceneName);
   stateMachinesInScene[stateMachineName] = preconfiguredStateMachine;
 
   this.stateMachinesBySceneName[sceneName] = stateMachinesInScene;
+
+  stateParents[entryStateName] = stateMachineName;
+  this.stateParentsBySceneName[sceneName] = stateParents;
 
   return true;
 }
