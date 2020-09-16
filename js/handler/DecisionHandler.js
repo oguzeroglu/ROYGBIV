@@ -373,8 +373,9 @@ DecisionHandler.prototype.createState = function(stateName, overrideSceneName){
   var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
 
   var statesInScene = this.statesBySceneName[sceneName] || {};
+  var stateMachinesInScene = this.stateMachinesBySceneName[sceneName] || {};
 
-  if (statesInScene[stateName]){
+  if (statesInScene[stateName] || stateMachinesInScene[stateName]){
     return false;
   }
 
