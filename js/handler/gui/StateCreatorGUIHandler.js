@@ -55,6 +55,16 @@ StateCreatorGUIHandler.prototype.addStateFolder = function(stateName){
   stateFolder.add({
     "Destroy": function(){
       terminal.clear();
+
+      var transitionsInScene = decisionHandler.transitionsBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var transitionName in transitionsInScene){
+        var preconfiguredTransition = transitionsInScene[transitionName];
+        if (preconfiguredTransition.sourceStateName == stateName || preconfiguredTransition.targetStateName == stateName){
+          terminal.printError(Text.STATE_USED_IN_TRANSITION_CANNOT_DESTROY.replace(Text.PARAM1, transitionName));
+          return;
+        }
+      }
+
       decisionHandler.destroyState(stateName);
       guiHandler.datGuiStateCreation.removeFolder(stateFolder);
       terminal.printInfo(Text.STATE_DESTROYED);
