@@ -13,10 +13,16 @@ TransitionCreatorGUIHandler.prototype.show = function(){
   guiHandler.datGuiTransitionCreation = new dat.GUI({hideable: false});
 
   var statesInScene = decisionHandler.statesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var stateMachinesInScene = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
   var decisionInScene = decisionHandler.decisionsBySceneName[sceneHandler.getActiveSceneName()] || {};
 
   var stateNames = Object.keys(statesInScene);
+  var stateMachineNames = Object.keys(stateMachinesInScene);
   var decisionNames = Object.keys(decisionInScene);
+
+  for (var i = 0; i < stateMachineNames.length; i ++){
+    stateNames.push(stateMachineNames[i]);
+  }
 
   var params = {
     "Transition name": "",
