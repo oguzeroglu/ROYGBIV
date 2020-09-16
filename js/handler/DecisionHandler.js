@@ -172,6 +172,7 @@ DecisionHandler.prototype.import = function(exportObj){
     for (var stateMachineName in stateMachinesBySceneName[sceneName]){
       var exportObj = stateMachinesBySceneName[sceneName][stateMachineName];
       this.createStateMachine(stateMachineName, exportObj.knowledgeName, exportObj.entryStateName, sceneName);
+      this.stateMachinesBySceneName[sceneName][stateMachineName].transitions = JSON.parse(JSON.stringify(exportObj.transitions));
     }
   }
 

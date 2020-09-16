@@ -10,7 +10,8 @@ var PreconfiguredStateMachine = function(name, knowledgeName, entryStateName, sc
 PreconfiguredStateMachine.prototype.export = function(){
   return {
     knowledgeName: this.knowledgeName,
-    entryStateName: this.entryStateName
+    entryStateName: this.entryStateName,
+    transitions: JSON.parse(JSON.stringify(this.transitions))
   };
 }
 
