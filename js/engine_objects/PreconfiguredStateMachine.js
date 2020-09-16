@@ -18,3 +18,7 @@ PreconfiguredStateMachine.prototype.export = function(){
     entryStateName: this.entryStateName
   };
 }
+
+PreconfiguredStateMachine.prototype.get = function(){
+  
+}
