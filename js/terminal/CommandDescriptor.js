@@ -269,7 +269,8 @@ var CommandDescriptor = function(){
       0, //decisions
       0, //decisionTrees
       0, //states
-      0 //transitions
+      0, //transitions
+      0 //stateMachines
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -541,7 +542,8 @@ var CommandDescriptor = function(){
     "decisions",
     "decisionTrees",
     "states",
-    "transitions"
+    "transitions",
+    "stateMachines"
   ];
 
   this.commands = [
@@ -813,7 +815,8 @@ var CommandDescriptor = function(){
     "decisions",
     "decisionTrees",
     "states",
-    "transitions"
+    "transitions",
+    "stateMachines"
   ];
 
   this.commandInfo = [
@@ -1010,7 +1013,7 @@ var CommandDescriptor = function(){
     "setEntryScene: Sets the entry scene.",
     "destroyScene: Destroys a scene.",
     "syncTextProperties: Sets the properties of targeText based on sourceText properties.",
-    "newLightning: Opents the Lightning editor GUI for lightning creation.",
+    "newLightning: Opens the Lightning editor GUI for lightning creation.",
     "editLightning: Opens the Lightning editor GUI to edit a lightning.",
     "destroyLightning: Destroys a Lightning.",
     "printLightnings: Prints a list of created lightnings.",
@@ -1029,7 +1032,7 @@ var CommandDescriptor = function(){
     "destroyContainer: Destroys a container.",
     "printContainers: Prints created containers.",
     "newVirtualKeyboard: Opens the virtual keyboard creation GUI.",
-    "editVirtualKeyboard: Opents GUI for virtual keyboard edition.",
+    "editVirtualKeyboard: Opens GUI for virtual keyboard edition.",
     "destroyVirtualKeyboard: Destroys a virtual keyboard.",
     "printVirtualKeyboards: Prints created virtual keyboards.",
     "syncSpriteSize: Makes the size of targetSprite same with sourceSprite",
@@ -1085,7 +1088,8 @@ var CommandDescriptor = function(){
     "decisions: Opens the decision editing GUI.",
     "decisionTrees: Opens the decision tree editing GUI.",
     "states: Opens the state editing GUI.",
-    "transitions: Opens the transition editing GUI."
+    "transitions: Opens the transition editing GUI.",
+    "stateMachines: Opens the state machine editing GUI."
   ];
 
   this.keyboardInfo = [

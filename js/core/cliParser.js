@@ -6734,6 +6734,15 @@ function parse(input){
           transitionCreatorGUIHandler.show();
           return true;
         break;
+        case 269: //stateMachines
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          stateMachineCreatorGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){
