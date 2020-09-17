@@ -355,6 +355,7 @@ var decisionCreatorGUIHandler;
 var decisionTreeCreatorGUIHandler;
 var stateCreatorGUIHandler;
 var transitionCreatorGUIHandler;
+var stateMachineCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;

@@ -1,0 +1,121 @@
+var StateMachineCreatorGUIHandler = function(){
+
+}
+
+StateMachineCreatorGUIHandler.prototype.show = function(){
+  terminal.disable();
+  terminal.clear();
+  terminal.printInfo(Text.USE_GUI_TO_CREATE_STATE_MACHINE);
+
+  selectionHandler.resetCurrentSelection();
+  guiHandler.hideAll();
+
+  this.createMermaidContainer();
+
+  guiHandler.datGuiStateMachineCreation = new dat.GUI({hideable: false});
+
+  var knowledgesInScene = decisionHandler.knowledgesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var knowledgeNames = Object.keys(knowledgesInScene);
+
+  var statesInScene = decisionHandler.statesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var stateMachinesInScene = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  var stateNames = Object.keys(statesInScene);
+  var stateMachineNames = Object.keys(stateMachinesInScene);
+  for (var i = 0; i < stateMachineNames.length; i ++){
+    stateNames.push(stateMachineNames[i]);
+  }
+
+  var params = {
+    "Name": "",
+    "Knowledge": knowledgeNames[0] || "",
+    "Entry state": stateNames[0] || "",
+    "Create": function(){
+      terminal.clear();
+
+      var stateMachineName = this["Name"];
+      var knowledgeName = this["Knowledge"];
+      var entryStateName = this["Entry state"];
+
+      if (!stateMachineName){
+        terminal.printError(Text.STATE_MACHINE_NAME_CANNOT_BE_EMPTY);
+        return;
+      }
+
+      if (!knowledgeName){
+        terminal.printError(Text.KNOWLEDGE_IS_REQUIRED_TO_CREATE_A_STATE_MACHINE);
+        return;
+      }
+
+      if (!entryStateName){
+        terminal.printError(Text.ENTRY_STATE_IS_REQUIRED_TO_CREATE_A_STATE_MACHINE);
+        return;
+      }
+
+      var result = decisionHandler.createStateMachine(stateMachineName, knowledgeName, entryStateName, null);
+
+      if (result == -1){
+        var anotherParentName = decisionHandler.stateParentsBySceneName[sceneHandler.getActiveSceneName()][entryStateName];
+        terminal.printError(Text.ENTRY_STATE_HAS_ANOTHER_PARENT.replace(Text.PARAM1, anotherParentName));
+        return;
+      }
+
+      if (result == -2 || result == -3){
+        terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+        return;
+      }
+
+      stateMachineCreatorGUIHandler.addStateMachineFolder(stateMachineName);
+      terminal.printInfo(Text.STATE_MACHINE_CREATED);
+    },
+    "Done": function(){
+      stateMachineCreatorGUIHandler.hide();
+    }
+  };
+
+  guiHandler.datGuiStateMachineCreation.add(params, "Name");
+  guiHandler.datGuiStateMachineCreation.add(params, "Knowledge", knowledgeNames);
+  guiHandler.datGuiStateMachineCreation.add(params, "Entry state", stateNames);
+  guiHandler.datGuiStateMachineCreation.add(params, "Create");
+  guiHandler.datGuiStateMachineCreation.add(params, "Done");
+
+  for (var smName in stateMachinesInScene){
+    this.addStateMachineFolder(smName);
+  }
+}
+
+StateMachineCreatorGUIHandler.prototype.createMermaidContainer = function(){
+  canvas.style.visibility = "hidden";
+
+  var mermaidContainer = document.createElement("div");
+  mermaidContainer.style.display = "block";
+  mermaidContainer.style.position = "absolute";
+  mermaidContainer.style.top = "0";
+  mermaidContainer.style.left = "0";
+  mermaidContainer.style.width = "100%";
+  mermaidContainer.style.height = "100%";
+  mermaidContainer.style.backgroundColor = "#d3d3d3";
+  mermaidContainer.style.overflowX = "scroll";
+  mermaidContainer.style.overflowY = "scroll";
+  mermaidContainer.className = "mermaid";
+
+  document.body.prepend(mermaidContainer);
+
+  this.mermaidContainer = mermaidContainer;
+}
+
+StateMachineCreatorGUIHandler.prototype.hide = function(){
+  document.body.removeChild(this.mermaidContainer);
+  delete this.mermaidContainer;
+
+  canvas.style.visibility = "";
+
+  terminal.clear();
+  terminal.enable();
+  guiHandler.hide(guiHandler.guiTypes.STATE_MACHINE_CREATION);
+  terminal.printInfo(Text.GUI_CLOSED);
+}
+
+StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName){
+
+}
