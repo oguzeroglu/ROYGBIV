@@ -214,6 +214,18 @@ StateMachineCreatorGUIHandler.prototype.onVisualisedStateMachineChanged = functi
   this.visualisingStateMachineName = newSMName;
 }
 
+StateMachineCreatorGUIHandler.prototype.addTransitionFolder = function(transitionName, parentFolder, stateMachineName){
+  var folder = parentFolder.addFolder(transitionName);
+
+  var params = {
+    "Destroy": function(){
+      
+    }
+  };
+
+  folder.add(params, "Destroy");
+}
+
 StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName){
   var preconfiguredStateMachine = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName];
 
@@ -223,6 +235,8 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
 
   var transitionsInScene = decisionHandler.transitionsBySceneName[sceneHandler.getActiveSceneName()] || {};
   var transitionNames = Object.keys(transitionsInScene);
+
+  var transitionsFolder;
 
   var params = {
     "Transitions": transitionNames[0] || "",
@@ -255,7 +269,11 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
     }
   }).listen();
 
-  var transitionsFolder = stateMachineFolder.addFolder("Transitions");
+  transitionsFolder = stateMachineFolder.addFolder("Transitions");
+
+  for (var i = 0; i < preconfiguredStateMachine.transitions.length; i ++){
+    this.addTransitionFolder(preconfiguredStateMachine.transitions[i], transitionsFolder, stateMachineName);
+  }
 
   this.paramsByStateMachineName[stateMachineName] = params;
 }
