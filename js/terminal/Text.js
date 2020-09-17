@@ -834,6 +834,7 @@ var Text = function(){
   this.DECISION_ALREADY_USED = "Decision already used inside this decision tree.";
   this.SWITCHED_TO_TRACK_POSITION = "Steering mode of the object is switched to position tracking.";
   this.POSITION_SET = "Position set.";
+  this.STATE_MACHINE_DESTROYED = "State machine destroyed.";
   this.CHILD_CONTAINER_IS_ALREADY_ALIGNED = "Child container is already aligned to another parent. Use unalignContainer command first.";
   this.IS_NOT_POWER_OF_TWO = "@@1 is not power of two.";
   this.ATLAS_TEXTURE_SIZE_SET = "Atlas texture size set.";

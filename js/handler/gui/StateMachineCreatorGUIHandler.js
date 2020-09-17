@@ -110,6 +110,7 @@ StateMachineCreatorGUIHandler.prototype.hide = function(){
   document.body.removeChild(this.mermaidContainer);
   delete this.mermaidContainer;
   delete this.paramsByStateMachineName;
+  delete this.visualisingStateMachineName;
 
   canvas.style.visibility = "";
 
@@ -189,6 +190,30 @@ StateMachineCreatorGUIHandler.prototype.visualiseStateMachine = function(preconf
   return mermaidText;
 }
 
+StateMachineCreatorGUIHandler.prototype.unVisualise = function(){
+  this.mermaidContainer.innerHTML = "";
+}
+
+StateMachineCreatorGUIHandler.prototype.onVisualisedStateMachineChanged = function(newSMName, isVisualising){
+  if (!isVisualising){
+    if (this.visualisingStateMachineName){
+      var params = this.paramsByStateMachineName[this.visualisingStateMachineName];
+      params["Visualise"] = false;
+    }
+    this.visualisingStateMachineName = null;
+    this.unVisualise();
+    return;
+  }
+
+  for (var smName in this.paramsByStateMachineName){
+    var params = this.paramsByStateMachineName[smName];
+    params["Visualise"] = (smName == newSMName);
+  }
+
+  this.visualiseStateMachine(decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][newSMName]);
+  this.visualisingStateMachineName = newSMName;
+}
+
 StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName){
   var preconfiguredStateMachine = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName];
 
@@ -205,7 +230,14 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
 
     },
     "Destroy": function(){
-
+      terminal.clear();
+      decisionHandler.destroyStateMachine(stateMachineName);
+      guiHandler.datGuiStateMachineCreation.removeFolder(stateMachineFolder);
+      if (stateMachineCreatorGUIHandler.visualisingStateMachineName == stateMachineName){
+        stateMachineCreatorGUIHandler.onVisualisedStateMachineChanged(stateMachineName, false);
+      }
+      delete stateMachineCreatorGUIHandler.paramsByStateMachineName[stateMachineName];
+      terminal.printInfo(Text.STATE_MACHINE_DESTROYED);
     },
     "Visualise": false
   };
@@ -214,7 +246,13 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
   stateMachineFolder.add(params, "Add transition");
   stateMachineFolder.add(params, "Destroy");
   stateMachineFolder.add(params, "Visualise").onChange(function(val){
-
+    terminal.clear();
+    stateMachineCreatorGUIHandler.onVisualisedStateMachineChanged(stateMachineName, val);
+    if (val){
+      terminal.printInfo(Text.VISUALISING.replace(Text.PARAM1, stateMachineName));
+    }else{
+      terminal.printInfo(Text.NOT_VISUALISING.replace(Text.PARAM1, stateMachineName));
+    }
   }).listen();
 
   var transitionsFolder = stateMachineFolder.addFolder("Transitions");
