@@ -12,6 +12,8 @@ StateMachineCreatorGUIHandler.prototype.show = function(){
 
   this.createMermaidContainer();
 
+  this.paramsByStateMachineName = {};
+
   guiHandler.datGuiStateMachineCreation = new dat.GUI({hideable: false});
 
   var knowledgesInScene = decisionHandler.knowledgesBySceneName[sceneHandler.getActiveSceneName()] || {};
@@ -107,6 +109,7 @@ StateMachineCreatorGUIHandler.prototype.createMermaidContainer = function(){
 StateMachineCreatorGUIHandler.prototype.hide = function(){
   document.body.removeChild(this.mermaidContainer);
   delete this.mermaidContainer;
+  delete this.paramsByStateMachineName;
 
   canvas.style.visibility = "";
 
@@ -116,6 +119,105 @@ StateMachineCreatorGUIHandler.prototype.hide = function(){
   terminal.printInfo(Text.GUI_CLOSED);
 }
 
-StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName){
+StateMachineCreatorGUIHandler.prototype.getStateDeclarationText = function(stateName){
+  return stateName + "\n";
+}
 
+StateMachineCreatorGUIHandler.prototype.getStateMachineDeclaration = function(preconfiguredStateMachine){
+  var text = "state " + preconfiguredStateMachine.name + " {\n";
+  text += this.visualiseStateMachine(preconfiguredStateMachine, true);
+  text += "}\n";
+  return text;
+}
+
+StateMachineCreatorGUIHandler.prototype.visualiseStateMachine = function(preconfiguredStateMachine, skipHeader){
+  var statesInScene = decisionHandler.statesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var stateMachinesInScene = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  var mermaidText = !skipHeader? "stateDiagram-v2\n": "";
+
+  var entryStateName = preconfiguredStateMachine.entryStateName;
+
+  var declaredMap = {};
+  if (statesInScene[entryStateName]){
+    mermaidText += this.getStateDeclarationText(entryStateName);
+  }else{
+    mermaidText += this.getStateMachineDeclaration(stateMachinesInScene[entryStateName]);
+  }
+  declaredMap[entryStateName] = true;
+
+  var transitions = [];
+  for (var i = 0; i < preconfiguredStateMachine.transitions.length; i ++){
+    var transition = decisionHandler.transitionsBySceneName[sceneHandler.getActiveSceneName()][preconfiguredStateMachine.transitions[i]];
+    transitions.push(transition);
+    var sourceStateName = transition.sourceStateName;
+    var targetStateName = transition.targetStateName;
+
+    if (!declaredMap[sourceStateName]){
+      if (statesInScene[sourceStateName]){
+        mermaidText += this.getStateDeclarationText(sourceStateName);
+      }else{
+        mermaidText += this.getStateMachineDeclaration(stateMachinesInScene[sourceStateName]);
+      }
+      declaredMap[sourceStateName] = true;
+    }
+    if (!declaredMap[targetStateName]){
+      if (statesInScene[targetStateName]){
+        mermaidText += this.getStateDeclarationText(targetStateName);
+      }else{
+        mermaidText += this.getStateMachineDeclaration(stateMachinesInScene[targetStateName]);
+      }
+      declaredMap[targetStateName] = true;
+    }
+  }
+
+  for (var i = 0; i < transitions.length; i ++){
+    var transition = transitions[i];
+    var sourceStateName = transition.sourceStateName;
+    var targetStateName = transition.targetStateName;
+    var transitionName = transition.name;
+    mermaidText += sourceStateName + " --> " + targetStateName + ": " + transitionName + "\n";
+  }
+
+  if (!skipHeader){
+    this.mermaidContainer.innerHTML = mermaidText;
+    this.mermaidContainer.removeAttribute("data-processed");
+
+    mermaid.init();
+  }
+
+  return mermaidText;
+}
+
+StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName){
+  var preconfiguredStateMachine = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName];
+
+  var folderText = stateMachineName + " [Entry: " + preconfiguredStateMachine.entryStateName + "]";
+
+  var stateMachineFolder = guiHandler.datGuiStateMachineCreation.addFolder(folderText);
+
+  var transitionsInScene = decisionHandler.transitionsBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var transitionNames = Object.keys(transitionsInScene);
+
+  var params = {
+    "Transitions": transitionNames[0] || "",
+    "Add transition": function(){
+
+    },
+    "Destroy": function(){
+
+    },
+    "Visualise": false
+  };
+
+  stateMachineFolder.add(params, "Transitions", transitionNames);
+  stateMachineFolder.add(params, "Add transition");
+  stateMachineFolder.add(params, "Destroy");
+  stateMachineFolder.add(params, "Visualise").onChange(function(val){
+
+  }).listen();
+
+  var transitionsFolder = stateMachineFolder.addFolder("Transitions");
+
+  this.paramsByStateMachineName[stateMachineName] = params;
 }
