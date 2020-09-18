@@ -285,7 +285,10 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
     },
     "Destroy": function(){
       terminal.clear();
-      decisionHandler.destroyStateMachine(stateMachineName);
+      if (!decisionHandler.destroyStateMachine(stateMachineName)){
+        terminal.printError(Text.STATE_MACHINE_IS_ENTRY_STATE_CANNOT_DESTROY.replace(Text.PARAM1, decisionHandler.stateParentsBySceneName[sceneHandler.getActiveSceneName()][stateMachineName]))
+        return;
+      }
       guiHandler.datGuiStateMachineCreation.removeFolder(stateMachineFolder);
       if (stateMachineCreatorGUIHandler.visualisingStateMachineName == stateMachineName){
         stateMachineCreatorGUIHandler.onVisualisedStateMachineChanged(stateMachineName, false);

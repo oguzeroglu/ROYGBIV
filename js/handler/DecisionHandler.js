@@ -324,19 +324,30 @@ DecisionHandler.prototype.addTransitionToStateMachine = function(stateMachineNam
 }
 
 DecisionHandler.prototype.destroyStateMachine = function(stateMachineName){
+  var stateParentsInScene = this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] || {};
   var stateMachinesInScene = this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()];
+
+  if (stateParentsInScene[stateMachineName]){
+    var parentStateMachine = stateMachinesInScene[stateParentsInScene[stateMachineName]];
+    if (parentStateMachine.entryStateName == stateMachineName){
+      return false;
+    }
+  }
+
   delete stateMachinesInScene[stateMachineName];
 
   if (Object.keys(stateMachinesInScene).length == 0){
     delete this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()];
   }
 
-  var stateParentsInScene = this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] || {};
   for (var stateName in stateParentsInScene){
     if (stateParentsInScene[stateName] == stateMachineName){
       delete stateParentsInScene[stateName];
     }
   }
+
+  delete stateParentsInScene[stateMachineName];
+  return true;
 }
 
 DecisionHandler.prototype.createStateMachine = function(stateMachineName, knowledgeName, entryStateName, overrideSceneName){
@@ -398,12 +409,24 @@ DecisionHandler.prototype.createTransition = function(transitionName, sourceStat
 }
 
 DecisionHandler.prototype.destroyState = function(stateName){
+
+  var stateParentsInScene = this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  if (stateParentsInScene[stateName]){
+    var stateMachine = this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateParentsInScene[stateName]];
+    if (stateMachine.entryStateName == stateName){
+      return false;
+    }
+  }
+
   var statesInScene = this.statesBySceneName[sceneHandler.getActiveSceneName()];
   delete statesInScene[stateName];
 
   if (Object.keys(statesInScene).length == 0){
     delete this.statesBySceneName[sceneHandler.getActiveSceneName()];
   }
+  delete stateParentsInScene[stateName];
+  return true;
 }
 
 DecisionHandler.prototype.createState = function(stateName, overrideSceneName){

@@ -65,7 +65,11 @@ StateCreatorGUIHandler.prototype.addStateFolder = function(stateName){
         }
       }
 
-      decisionHandler.destroyState(stateName);
+      if (!decisionHandler.destroyState(stateName)){
+        terminal.printError(Text.STATE_IS_ENTRY_STATE_CANNOT_DESTROY.replace(Text.PARAM1, decisionHandler.stateParentsBySceneName[sceneHandler.getActiveSceneName()][stateName]));
+        return;
+      }
+      
       guiHandler.datGuiStateCreation.removeFolder(stateFolder);
       terminal.printInfo(Text.STATE_DESTROYED);
     }
