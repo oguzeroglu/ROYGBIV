@@ -173,6 +173,7 @@ DecisionHandler.prototype.import = function(exportObj){
       var exportObj = stateMachinesBySceneName[sceneName][stateMachineName];
       this.createStateMachine(stateMachineName, exportObj.knowledgeName, exportObj.entryStateName, sceneName);
       this.stateMachinesBySceneName[sceneName][stateMachineName].transitions = JSON.parse(JSON.stringify(exportObj.transitions));
+      this.stateMachinesBySceneName[sceneName][stateMachineName].scenes = JSON.parse(JSON.stringify(exportObj.states));
     }
   }
 
@@ -264,6 +265,40 @@ DecisionHandler.prototype.export = function(){
   return exportObj;
 }
 
+DecisionHandler.prototype.addStateToStateMachine = function(stateMachineName, stateName){
+
+  var stateParents = this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  if (stateParents[stateName] && stateParents[stateName] != stateMachineName){
+    return -1;
+  }
+
+  var result = this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName].addState(stateName);
+
+  if (result){
+    stateParents[stateName] = stateMachineName;
+    this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] = stateParents;
+  }
+
+  return result;
+}
+
+DecisionHandler.prototype.removeStateFromStateMachine = function(stateMachineName, stateName){
+  var result = this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName].removeState(stateName);
+
+  if (!result){
+    return false;
+  }
+
+  delete this.stateParentsBySceneName[sceneHandler.getActiveSceneName()][stateName];
+  return true;
+}
+
+DecisionHandler.prototype.removeTransitionFromStateMachine = function(stateMachineName, transitionName){
+  var stateMachine = this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName];
+  stateMachine.removeTransition(transitionName);
+}
+
 DecisionHandler.prototype.addTransitionToStateMachine = function(stateMachineName, transitionName){
   var transition = this.transitionsBySceneName[sceneHandler.getActiveSceneName()][transitionName];
   var stateParents = this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] || {};
@@ -271,7 +306,7 @@ DecisionHandler.prototype.addTransitionToStateMachine = function(stateMachineNam
   var sourceStateName = transition.sourceStateName;
   var targetStateName = transition.targetStateName;
 
-  if (stateParents[sourceStateName] && stateParents[sourceStateName] != stateMachineName){
+  if (stateParents[sourceStateName] != stateMachineName){
     return -1;
   }
 
@@ -285,10 +320,6 @@ DecisionHandler.prototype.addTransitionToStateMachine = function(stateMachineNam
   }
 
   stateMachine.addTransition(transition);
-
-  stateParents[sourceStateName] = stateMachineName;
-  this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] = stateParents;
-
   return true;
 }
 

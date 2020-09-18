@@ -236,7 +236,10 @@ StateMachineCreatorGUIHandler.prototype.addTransitionFolder = function(transitio
 
   var params = {
     "Destroy": function(){
-
+      terminal.clear();
+      decisionHandler.removeTransitionFromStateMachine(stateMachineName, transitionName);
+      parentFolder.removeFolder(folder);
+      terminal.printInfo(Text.TRANSITION_REMOVED_FROM_SM);
     }
   };
 
@@ -256,9 +259,29 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
   var transitionsFolder;
 
   var params = {
-    "Transitions": transitionNames[0] || "",
+    "Transition": transitionNames[0] || "",
     "Add transition": function(){
+      terminal.clear();
+      var transitionName = this["Transition"];
 
+      if (!transitionName){
+        terminal.printError(Text.TRANSITION_NAME_CANNOT_BE_EMPTY);
+        return;
+      }
+
+      var transition = decisionHandler.transitionsBySceneName[sceneHandler.getActiveSceneName()][transitionName];
+      var result = decisionHandler.addTransitionToStateMachine(stateMachineName, transitionName);
+      if (result == -1){
+        terminal.printError(Text.THE_SOURCE_STATE_OF_TRANSITION_DIFFERENT_PARENT);
+        return;
+      }
+      if (result == 0){
+        terminal.printError(Text.TRANSITION_WITH_SAME_SOURCE_TARGET_EXISTS);
+        return;
+      }
+
+      stateMachineCreatorGUIHandler.addTransitionFolder(transitionName, transitionsFolder, stateMachineName);
+      terminal.printInfo(Text.TRANSITION_ADDED);
     },
     "Destroy": function(){
       terminal.clear();
@@ -274,7 +297,7 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
     "Visualise": false
   };
 
-  stateMachineFolder.add(params, "Transitions", transitionNames);
+  stateMachineFolder.add(params, "Transition", transitionNames);
   stateMachineFolder.add(params, "Add transition");
   stateMachineFolder.add(params, "Destroy");
   stateMachineFolder.add(params, "Visualise").onChange(function(val){
