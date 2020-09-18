@@ -28,7 +28,18 @@ StateMachineCreatorGUIHandler.prototype.show = function(){
     stateNames.push(stateMachineNames[i]);
   }
 
-  var params = {
+  var entryStateController;
+  var params;
+
+  var onStateMachineDestroyed = function(stateMachineName){
+    stateNames.splice(stateNames.indexOf(stateMachineName), 1);
+    entryStateController.options(stateNames);
+    entryStateController = guiHandler.datGuiStateMachineCreation.__controllers[4];
+    params["Entry state"] = stateNames[0] || "";
+    entryStateController.listen();
+  };
+
+  params = {
     "Name": "",
     "Knowledge": knowledgeNames[0] || "",
     "Entry state": stateNames[0] || "",
@@ -67,7 +78,13 @@ StateMachineCreatorGUIHandler.prototype.show = function(){
         return;
       }
 
-      stateMachineCreatorGUIHandler.addStateMachineFolder(stateMachineName);
+      stateMachineCreatorGUIHandler.addStateMachineFolder(stateMachineName, onStateMachineDestroyed);
+
+      stateNames.push(stateMachineName);
+      entryStateController.options(stateNames);
+      entryStateController = guiHandler.datGuiStateMachineCreation.__controllers[4];
+      entryStateController.listen();
+
       terminal.printInfo(Text.STATE_MACHINE_CREATED);
     },
     "Done": function(){
@@ -77,12 +94,12 @@ StateMachineCreatorGUIHandler.prototype.show = function(){
 
   guiHandler.datGuiStateMachineCreation.add(params, "Name");
   guiHandler.datGuiStateMachineCreation.add(params, "Knowledge", knowledgeNames);
-  guiHandler.datGuiStateMachineCreation.add(params, "Entry state", stateNames);
+  entryStateController = guiHandler.datGuiStateMachineCreation.add(params, "Entry state", stateNames).listen();
   guiHandler.datGuiStateMachineCreation.add(params, "Create");
   guiHandler.datGuiStateMachineCreation.add(params, "Done");
 
   for (var smName in stateMachinesInScene){
-    this.addStateMachineFolder(smName);
+    this.addStateMachineFolder(smName, onStateMachineDestroyed);
   }
 }
 
@@ -219,14 +236,14 @@ StateMachineCreatorGUIHandler.prototype.addTransitionFolder = function(transitio
 
   var params = {
     "Destroy": function(){
-      
+
     }
   };
 
   folder.add(params, "Destroy");
 }
 
-StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName){
+StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName, onStateMachineDestroyed){
   var preconfiguredStateMachine = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName];
 
   var folderText = stateMachineName + " [Entry: " + preconfiguredStateMachine.entryStateName + "]";
@@ -251,6 +268,7 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
         stateMachineCreatorGUIHandler.onVisualisedStateMachineChanged(stateMachineName, false);
       }
       delete stateMachineCreatorGUIHandler.paramsByStateMachineName[stateMachineName];
+      onStateMachineDestroyed(stateMachineName);
       terminal.printInfo(Text.STATE_MACHINE_DESTROYED);
     },
     "Visualise": false
