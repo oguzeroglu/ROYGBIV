@@ -299,6 +299,13 @@ DecisionHandler.prototype.destroyStateMachine = function(stateMachineName){
   if (Object.keys(stateMachinesInScene).length == 0){
     delete this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()];
   }
+
+  var stateParentsInScene = this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] || {};
+  for (var stateName in stateParentsInScene){
+    if (stateParentsInScene[stateName] == stateMachineName){
+      delete stateParentsInScene[stateName];
+    }
+  }
 }
 
 DecisionHandler.prototype.createStateMachine = function(stateMachineName, knowledgeName, entryStateName, overrideSceneName){
