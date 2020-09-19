@@ -235,7 +235,7 @@ StateMachineCreatorGUIHandler.prototype.addTransitionFolder = function(transitio
   var folder = parentFolder.addFolder(transitionName);
 
   var params = {
-    "Destroy": function(){
+    "Remove": function(){
       terminal.clear();
       decisionHandler.removeTransitionFromStateMachine(stateMachineName, transitionName);
       parentFolder.removeFolder(folder);
@@ -243,7 +243,39 @@ StateMachineCreatorGUIHandler.prototype.addTransitionFolder = function(transitio
     }
   };
 
-  folder.add(params, "Destroy");
+  folder.add(params, "Remove");
+}
+
+StateMachineCreatorGUIHandler.prototype.addStateFolder = function(stateName, parentFolder, stateMachineName){
+  var folder = parentFolder.addFolder(stateName);
+
+  var preconfiguredStateMachine = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName];
+
+  var params = {
+    "Remove": function(){
+      terminal.clear();
+
+      if (preconfiguredStateMachine.entryStateName == stateName){
+        terminal.printError(Text.CANNOT_REMOVE_ENTRY_STATE);
+        return;
+      }
+
+      for (var i = 0; i < preconfiguredStateMachine.transitions.length; i ++){
+        var transitionName = preconfiguredStateMachine.transitions[i];
+        var transition = decisionHandler.transitionsBySceneName[sceneHandler.getActiveSceneName()][transitionName];
+        if (transition.sourceStateName == stateName){
+          terminal.printError(Text.TRANSITION_EXISTS_WITH_SOURCE_STATE.replace(Text.PARAM1, transitionName));
+          return;
+        }
+      }
+
+      decisionHandler.removeStateFromStateMachine(stateMachineName, stateName);
+      parentFolder.removeFolder(folder);
+      terminal.printInfo(Text.STATE_REMOVED_FROM_SM);
+    }
+  };
+
+  folder.add(params, "Remove");
 }
 
 StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName, onStateMachineDestroyed){
@@ -256,10 +288,26 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
   var transitionsInScene = decisionHandler.transitionsBySceneName[sceneHandler.getActiveSceneName()] || {};
   var transitionNames = Object.keys(transitionsInScene);
 
+  var statesInScene = decisionHandler.statesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var stateMachinesInScene = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var stateNames = Object.keys(statesInScene);
+  var stateMachineNames = Object.keys(stateMachinesInScene);
+
+  for (var i = 0; i < stateMachineNames.length; i ++){
+    var curStateMachineName = stateMachineNames[i];
+    if (curStateMachineName != stateMachineName){
+      stateNames.push(curStateMachineName);
+    }
+  }
+
+  stateNames.splice(stateNames.indexOf(preconfiguredStateMachine.entryStateName), 1);
+
   var transitionsFolder;
+  var statesFolder;
 
   var params = {
     "Transition": transitionNames[0] || "",
+    "State": stateNames[0] || "",
     "Add transition": function(){
       terminal.clear();
       var transitionName = this["Transition"];
@@ -283,6 +331,30 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
       stateMachineCreatorGUIHandler.addTransitionFolder(transitionName, transitionsFolder, stateMachineName);
       terminal.printInfo(Text.TRANSITION_ADDED);
     },
+    "Add state": function(){
+      terminal.clear();
+
+      var stateName = this["State"];
+
+      if (!stateName){
+        terminal.printError(Text.STATE_NAME_CANNOT_BE_EMPTY);
+        return;
+      }
+
+      var result = decisionHandler.addStateToStateMachine(stateMachineName, stateName);
+      if (result == -1){
+        terminal.printError(Text.STATE_HAS_ANOTHER_PARENT);
+        return;
+      }
+
+      if (!result){
+        terminal.printError(Text.STATE_MACHINE_ALREADY_HAS_THIS_STATE);
+        return;
+      }
+
+      stateMachineCreatorGUIHandler.addStateFolder(stateName, statesFolder, stateMachineName);
+      terminal.printInfo(Text.STATE_ADDED);
+    },
     "Destroy": function(){
       terminal.clear();
       if (!decisionHandler.destroyStateMachine(stateMachineName)){
@@ -300,8 +372,6 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
     "Visualise": false
   };
 
-  stateMachineFolder.add(params, "Transition", transitionNames);
-  stateMachineFolder.add(params, "Add transition");
   stateMachineFolder.add(params, "Destroy");
   stateMachineFolder.add(params, "Visualise").onChange(function(val){
     terminal.clear();
@@ -314,9 +384,19 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
   }).listen();
 
   transitionsFolder = stateMachineFolder.addFolder("Transitions");
+  transitionsFolder.add(params, "Transition", transitionNames);
+  transitionsFolder.add(params, "Add transition");
 
   for (var i = 0; i < preconfiguredStateMachine.transitions.length; i ++){
     this.addTransitionFolder(preconfiguredStateMachine.transitions[i], transitionsFolder, stateMachineName);
+  }
+
+  statesFolder = stateMachineFolder.addFolder("States");
+  statesFolder.add(params, "State", stateNames);
+  statesFolder.add(params, "Add state");
+
+  for (var i = 0; i < preconfiguredStateMachine.states.length; i ++){
+    this.addStateFolder(preconfiguredStateMachine.states[i], statesFolder, stateMachineName);
   }
 
   this.paramsByStateMachineName[stateMachineName] = params;
