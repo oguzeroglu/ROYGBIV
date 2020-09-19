@@ -243,6 +243,7 @@ StateMachineCreatorGUIHandler.prototype.addTransitionFolder = function(transitio
       terminal.clear();
       decisionHandler.removeTransitionFromStateMachine(stateMachineName, transitionName);
       parentFolder.removeFolder(folder);
+      stateMachineCreatorGUIHandler.onStateMachineUpdated(stateMachineName);
       terminal.printInfo(Text.TRANSITION_REMOVED_FROM_SM);
     }
   };
@@ -275,6 +276,7 @@ StateMachineCreatorGUIHandler.prototype.addStateFolder = function(stateName, par
 
       decisionHandler.removeStateFromStateMachine(stateMachineName, stateName);
       parentFolder.removeFolder(folder);
+      stateMachineCreatorGUIHandler.onStateMachineUpdated(stateMachineName);
       terminal.printInfo(Text.STATE_REMOVED_FROM_SM);
     }
   };
@@ -308,6 +310,14 @@ StateMachineCreatorGUIHandler.prototype.getStateNamesArrayForStateMachine = func
   stateNames.splice(stateNames.indexOf(preconfiguredStateMachine.entryStateName), 1);
 
   return stateNames;
+}
+
+StateMachineCreatorGUIHandler.prototype.onStateMachineUpdated = function(stateMachineName){
+  if (stateMachineCreatorGUIHandler.visualisingStateMachineName != stateMachineName){
+    return;
+  }
+
+  this.visualiseStateMachine(decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName]);
 }
 
 StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName, onStateMachineDestroyed){
@@ -349,6 +359,7 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
       }
 
       stateMachineCreatorGUIHandler.addTransitionFolder(transitionName, transitionsFolder, stateMachineName);
+      stateMachineCreatorGUIHandler.onStateMachineUpdated(stateMachineName);
       terminal.printInfo(Text.TRANSITION_ADDED);
     },
     "Add state": function(){
@@ -373,6 +384,7 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
       }
 
       stateMachineCreatorGUIHandler.addStateFolder(stateName, statesFolder, stateMachineName);
+      stateMachineCreatorGUIHandler.onStateMachineUpdated(stateMachineName);
       terminal.printInfo(Text.STATE_ADDED);
     },
     "Destroy": function(){
