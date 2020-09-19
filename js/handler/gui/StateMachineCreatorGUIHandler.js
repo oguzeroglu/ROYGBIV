@@ -166,12 +166,15 @@ StateMachineCreatorGUIHandler.prototype.visualiseStateMachine = function(preconf
   var entryStateName = preconfiguredStateMachine.entryStateName;
 
   var declaredMap = {};
-  if (statesInScene[entryStateName]){
-    mermaidText += this.getStateDeclarationText(entryStateName);
-  }else{
-    mermaidText += this.getStateMachineDeclaration(stateMachinesInScene[entryStateName]);
+  for (var i = 0; i < preconfiguredStateMachine.states.length; i ++){
+    var curStateName = preconfiguredStateMachine.states[i];
+    if (statesInScene[curStateName]){
+      mermaidText += this.getStateDeclarationText(curStateName);
+    }else{
+      mermaidText += this.getStateMachineDeclaration(stateMachinesInScene[curStateName]);
+    }
+    declaredMap[entryStateName] = true;
   }
-  declaredMap[entryStateName] = true;
 
   var transitions = [];
   for (var i = 0; i < preconfiguredStateMachine.transitions.length; i ++){
@@ -180,14 +183,6 @@ StateMachineCreatorGUIHandler.prototype.visualiseStateMachine = function(preconf
     var sourceStateName = transition.sourceStateName;
     var targetStateName = transition.targetStateName;
 
-    if (!declaredMap[sourceStateName]){
-      if (statesInScene[sourceStateName]){
-        mermaidText += this.getStateDeclarationText(sourceStateName);
-      }else{
-        mermaidText += this.getStateMachineDeclaration(stateMachinesInScene[sourceStateName]);
-      }
-      declaredMap[sourceStateName] = true;
-    }
     if (!declaredMap[targetStateName]){
       if (statesInScene[targetStateName]){
         mermaidText += this.getStateDeclarationText(targetStateName);
