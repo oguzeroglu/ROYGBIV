@@ -13,6 +13,7 @@ StateMachineCreatorGUIHandler.prototype.show = function(){
   this.createMermaidContainer();
 
   this.paramsByStateMachineName = {};
+  this.statesFoldersByStateMachineName = {};
 
   guiHandler.datGuiStateMachineCreation = new dat.GUI({hideable: false});
 
@@ -85,6 +86,13 @@ StateMachineCreatorGUIHandler.prototype.show = function(){
       entryStateController = guiHandler.datGuiStateMachineCreation.__controllers[4];
       entryStateController.listen();
 
+      for (var smName in stateMachineCreatorGUIHandler.statesFoldersByStateMachineName){
+        var curStatesFolder = stateMachineCreatorGUIHandler.statesFoldersByStateMachineName[smName];
+        var curStateController = stateMachineCreatorGUIHandler.getStateControlerFromFolder(curStatesFolder);
+        curStateController.options(stateMachineCreatorGUIHandler.getStateNamesArrayForStateMachine(smName));
+        curStateController.listen();
+      }
+
       terminal.printInfo(Text.STATE_MACHINE_CREATED);
     },
     "Done": function(){
@@ -127,6 +135,7 @@ StateMachineCreatorGUIHandler.prototype.hide = function(){
   document.body.removeChild(this.mermaidContainer);
   delete this.mermaidContainer;
   delete this.paramsByStateMachineName;
+  delete this.statesFoldersByStateMachineName;
   delete this.visualisingStateMachineName;
 
   canvas.style.visibility = "";
@@ -278,16 +287,17 @@ StateMachineCreatorGUIHandler.prototype.addStateFolder = function(stateName, par
   folder.add(params, "Remove");
 }
 
-StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName, onStateMachineDestroyed){
+StateMachineCreatorGUIHandler.prototype.getStateControlerFromFolder = function(folder){
+  for (var i = 0; i < folder.__controllers.length; i ++){
+    var controller = folder.__controllers[i];
+    if (controller.property == "State"){
+      return controller;
+    }
+  }
+}
+
+StateMachineCreatorGUIHandler.prototype.getStateNamesArrayForStateMachine = function(stateMachineName){
   var preconfiguredStateMachine = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName];
-
-  var folderText = stateMachineName + " [Entry: " + preconfiguredStateMachine.entryStateName + "]";
-
-  var stateMachineFolder = guiHandler.datGuiStateMachineCreation.addFolder(folderText);
-
-  var transitionsInScene = decisionHandler.transitionsBySceneName[sceneHandler.getActiveSceneName()] || {};
-  var transitionNames = Object.keys(transitionsInScene);
-
   var statesInScene = decisionHandler.statesBySceneName[sceneHandler.getActiveSceneName()] || {};
   var stateMachinesInScene = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
   var stateNames = Object.keys(statesInScene);
@@ -301,6 +311,21 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
   }
 
   stateNames.splice(stateNames.indexOf(preconfiguredStateMachine.entryStateName), 1);
+
+  return stateNames;
+}
+
+StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMachineName, onStateMachineDestroyed){
+  var preconfiguredStateMachine = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName];
+
+  var folderText = stateMachineName + " [Entry: " + preconfiguredStateMachine.entryStateName + "]";
+
+  var stateMachineFolder = guiHandler.datGuiStateMachineCreation.addFolder(folderText);
+
+  var transitionsInScene = decisionHandler.transitionsBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var transitionNames = Object.keys(transitionsInScene);
+
+  var stateNames = this.getStateNamesArrayForStateMachine(stateMachineName);
 
   var transitionsFolder;
   var statesFolder;
@@ -366,7 +391,18 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
         stateMachineCreatorGUIHandler.onVisualisedStateMachineChanged(stateMachineName, false);
       }
       delete stateMachineCreatorGUIHandler.paramsByStateMachineName[stateMachineName];
+      delete stateMachineCreatorGUIHandler.statesFoldersByStateMachineName[stateMachineName];
       onStateMachineDestroyed(stateMachineName);
+
+      for (var smName in stateMachineCreatorGUIHandler.statesFoldersByStateMachineName){
+        var curStatesFolder = stateMachineCreatorGUIHandler.statesFoldersByStateMachineName[smName];
+        var curStateController = stateMachineCreatorGUIHandler.getStateControlerFromFolder(curStatesFolder);
+        var curStateNames = stateMachineCreatorGUIHandler.getStateNamesArrayForStateMachine(smName);
+        curStateController.object["State"] = curStateNames[0] || "";
+        curStateController.options(curStateNames);
+        curStateController.listen();
+      }
+
       terminal.printInfo(Text.STATE_MACHINE_DESTROYED);
     },
     "Visualise": false
@@ -392,7 +428,7 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
   }
 
   statesFolder = stateMachineFolder.addFolder("States");
-  statesFolder.add(params, "State", stateNames);
+  statesFolder.add(params, "State", stateNames).listen();
   statesFolder.add(params, "Add state");
 
   for (var i = 0; i < preconfiguredStateMachine.states.length; i ++){
@@ -400,4 +436,5 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
   }
 
   this.paramsByStateMachineName[stateMachineName] = params;
+  this.statesFoldersByStateMachineName[stateMachineName] = statesFolder;
 }
