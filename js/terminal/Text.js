@@ -651,6 +651,7 @@ var Text = function(){
   this.PROJECT_BUILDED = "Project builded. Deployment folder is: @@1";
   this.MARKED_POINTS = "Marked points";
   this.TREE_POINT = "|____ @@1: (@@2, @@3, @@4)";
+  this.STATE_CONTAINS_PARENT_STATE_MACHINE = "State contains parent state machine.";
   this.JUMP_IS_ACHIEVABLE_FOR_STEERABLE = "The jump is achievable for steerable [@@1].";
   this.JUMP_IS_UNACHIEVABLE_FOR_STEERABLE = "The jump is unachivable for steerable [@@1].";
   this.MARKED_POINTS_TOGGLED = "Marked points toggled.";

@@ -275,7 +275,7 @@ DecisionHandler.prototype.addStateToStateMachine = function(stateMachineName, st
 
   var result = this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()][stateMachineName].addState(stateName);
 
-  if (result){
+  if (result == true){
     stateParents[stateName] = stateMachineName;
     this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] = stateParents;
   }

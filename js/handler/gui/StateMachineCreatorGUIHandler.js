@@ -377,6 +377,11 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
         terminal.printError(Text.STATE_HAS_ANOTHER_PARENT);
         return;
       }
+      
+      if (result == -2){
+        terminal.printError(Text.STATE_CONTAINS_PARENT_STATE_MACHINE);
+        return;
+      }
 
       if (!result){
         terminal.printError(Text.STATE_MACHINE_ALREADY_HAS_THIS_STATE);
