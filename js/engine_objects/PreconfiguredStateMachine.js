@@ -66,7 +66,3 @@ PreconfiguredStateMachine.prototype.removeState = function(stateName){
   this.states.splice(this.states.indexOf(stateName), 1);
   return true;
 }
-
-PreconfiguredStateMachine.prototype.get = function(){
-
-}

@@ -28,6 +28,7 @@ DecisionHandler.prototype.reset = function(){
 
 DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
   this.constructedDecisionTrees = {};
+  this.constructedStateMachines = {};
   this.initialKnowledgeData = {};
 
   for (var sceneName in this.decisionTreesBySceneName){
@@ -52,10 +53,67 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
       knowledge.isDirty = true;
     }
   }
+
+  for (var sceneName in this.stateMachinesBySceneName){
+    this.constructedStateMachines[sceneName] = {};
+    var stateMachinesInScene = this.stateMachinesBySceneName[sceneName];
+    for (var smName in stateMachinesInScene){
+      var preconfiguredStateMachine = stateMachinesInScene[smName];
+      var stateMachine = new Ego.StateMachine(preconfiguredStateMachine.name, this.knowledgesBySceneName[preconfiguredStateMachine.sceneName][preconfiguredStateMachine.knowledgeName]);
+      this.constructedStateMachines[sceneName][smName] = stateMachine;
+    }
+  }
+
+  for (var sceneName in this.stateMachinesBySceneName){
+    var stateMachinesInScene = this.stateMachinesBySceneName[sceneName];
+    var statesInScene = this.statesBySceneName[sceneName] || {};
+    var constructedStateMachinesInScene = this.constructedStateMachines[sceneName];
+    for (var smName in stateMachinesInScene){
+      var preconfiguredStateMachine = stateMachinesInScene[smName];
+      var stateMachine = constructedStateMachinesInScene[smName];
+      for (var i = 0; i < preconfiguredStateMachine.states.length; i ++){
+        var curStateName = preconfiguredStateMachine.states[i];
+        var curState = statesInScene[curStateName] || constructedStateMachinesInScene[curStateName];
+        stateMachine.addState(curState);
+      }
+    }
+  }
+
+  var constructedTransitions = {};
+
+  for (var sceneName in this.transitionsBySceneName){
+    constructedTransitions[sceneName] = {};
+    var transitionsInScene = this.transitionsBySceneName[sceneName];
+    var constructedStateMachinesInScene = this.constructedStateMachines[sceneName] || {};
+    var statesInScene = this.statesBySceneName[sceneName] || {};
+    for (var transitionName in transitionsInScene){
+      var preconfiguredTransition = transitionsInScene[transitionName];
+      var source = constructedStateMachinesInScene[preconfiguredTransition.sourceStateName] || statesInScene[preconfiguredTransition.sourceStateName];
+      var target = constructedStateMachinesInScene[preconfiguredTransition.targetStateName] || statesInScene[preconfiguredTransition.targetStateName];
+      var decision = new PreconfiguredDecision(preconfiguredTransition.decisionName, preconfiguredTransition.sceneName).get();
+      constructedTransitions[sceneName][transitionName] = new Ego.Transition(source, target, decision._informationName, decision._informationType, decision._decisionMethod);
+    }
+  }
+
+  for (var sceneName in this.stateMachinesBySceneName){
+    var stateMachinesInScene = this.stateMachinesBySceneName[sceneName];
+    var constructedStateMachinesInScene = this.constructedStateMachines[sceneName];
+    var statesInScene = this.statesBySceneName[sceneName] || {};
+    for (var smName in stateMachinesInScene){
+      var preconfiguredStateMachine = stateMachinesInScene[smName];
+      var stateMachine = constructedStateMachinesInScene[smName];
+      stateMachine.setEntryState(constructedStateMachinesInScene[preconfiguredStateMachine.entryStateName] || statesInScene[preconfiguredStateMachine.entryStateName]);
+      for (var i = 0; i < preconfiguredStateMachine.transitions.length; i ++){
+        var transition = constructedTransitions[sceneName][preconfiguredStateMachine.transitions[i]];
+        stateMachine.addTransition(transition);
+      }
+    }
+  }
 }
 
 DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
   delete this.constructedDecisionTrees;
+  delete this.constructedStateMachines;
 
   for (var sceneName in this.knowledgesBySceneName){
     var knowledgesInScene = this.knowledgesBySceneName[sceneName];
@@ -173,7 +231,7 @@ DecisionHandler.prototype.import = function(exportObj){
       var exportObj = stateMachinesBySceneName[sceneName][stateMachineName];
       this.createStateMachine(stateMachineName, exportObj.knowledgeName, exportObj.entryStateName, sceneName);
       this.stateMachinesBySceneName[sceneName][stateMachineName].transitions = JSON.parse(JSON.stringify(exportObj.transitions));
-      this.stateMachinesBySceneName[sceneName][stateMachineName].scenes = JSON.parse(JSON.stringify(exportObj.states));
+      this.stateMachinesBySceneName[sceneName][stateMachineName].states = JSON.parse(JSON.stringify(exportObj.states));
     }
   }
 

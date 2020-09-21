@@ -13,7 +13,3 @@ PreconfiguredTransition.prototype.export = function(){
     decisionName: this.decisionName
   };
 }
-
-PreconfiguredTransition.prototype.get = function(){
-
-}
