@@ -401,6 +401,7 @@ DecisionTreeCreatorGUIHandler.prototype.addDecisionTreeFolder = function(decisio
       terminal.clear();
       decisionHandler.destroyDecisionTree(decisionTreeName);
       guiHandler.datGuiDecisionTreeCreation.removeFolder(decisionTreeFolder);
+      delete decisionTreeCreatorGUIHandler.decisionTreeParamsByDecisionTreeName[decisionTreeName];
       if (decisionTreeCreatorGUIHandler.visualisingDecisionTreeName == decisionTreeName){
         decisionTreeCreatorGUIHandler.onVisualisedDecitionTreeChanged(decisionTreeName, false);
       }
