@@ -172,6 +172,14 @@ DecisionCreatorGUIHandler.prototype.createDecisionFolder = function(decisionName
         }
       }
 
+      var transitionsInScene = decisionHandler.transitionsBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var transitionName in transitionsInScene){
+        if (transitionsInScene[transitionName].decisionName == decisionName){
+          terminal.printError(Text.DECISION_USED_IN_TRANSITION.replace(Text.PARAM1, transitionName));
+          return;
+        }
+      }
+
       decisionHandler.destroyDecision(decisionName);
       guiHandler.datGuiDecisionCreation.removeFolder(decisionFolder);
       terminal.printInfo(Text.DECISION_DESTROYED);

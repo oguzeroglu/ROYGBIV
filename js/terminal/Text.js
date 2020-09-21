@@ -883,6 +883,7 @@ var Text = function(){
   this.WORLD_LIMITS_MUST_BE_DIVISABLE_BY_BIN_SIZE = "World limits must be divisable by bin size.";
   this.GRID_SYSTEM_SIZES_MUST_BE_DIVISABLE_BY_BIN_SIZE = "Grid system sizes must be divisable by bin size.";
   this.DECISION_USED_IN_DECISION_TREE = "Decision used in a decision tree [@@1]. Cannot destroy.";
+  this.DECISION_USED_IN_TRANSITION = "Decision used in a transition [@@1]. Cannot destroy.";
   this.BIN_SIZE_SET = "Bin size set.";
   this.WORLD_LIMITS = "World limits";
   this.BIN_SIZE = "Bin size";
