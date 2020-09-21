@@ -93,6 +93,22 @@ KnowledgeCreatorGUIHandler.prototype.addKnowledgeFolder = function(knowledgeName
         }
       }
 
+      var decisionTreesInScene = decisionHandler.decisionTreesBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var dtName in decisionTreesInScene){
+        if (decisionTreesInScene[dtName].knowledgeName == knowledgeName){
+          terminal.printError(Text.KNOWLEDGE_USED_IN_DECISION_TREE_CANNOT_DESTROY.replace(Text.PARAM1, dtName));
+          return;
+        }
+      }
+
+      var stateMachinesInScene = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var smName in stateMachinesInScene){
+        if (stateMachinesInScene[smName].knowledgeName == knowledgeName){
+          terminal.printError(Text.KNOWLEDGE_USED_IN_STATE_MACHINE_CANNOT_DESTROY.replace(Text.PARAM1, smName));
+          return;
+        }
+      }
+
       decisionHandler.destroyKnowledge(knowledgeName);
       guiHandler.datGuiKnowledgeCreation.removeFolder(knowledgeFolder);
       terminal.printInfo(Text.KNOWLEDGE_DESTROYED);
