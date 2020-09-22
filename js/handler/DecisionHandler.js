@@ -30,6 +30,7 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
   this.constructedDecisionTrees = {};
   this.constructedStateMachines = {};
   this.initialKnowledgeData = {};
+  this.stateEntryCallbacks = {};
 
   for (var sceneName in this.decisionTreesBySceneName){
     this.constructedDecisionTrees[sceneName] = {};
@@ -56,11 +57,20 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
 
   for (var sceneName in this.stateMachinesBySceneName){
     this.constructedStateMachines[sceneName] = {};
+    this.stateEntryCallbacks[sceneName] = {};
     var stateMachinesInScene = this.stateMachinesBySceneName[sceneName];
     for (var smName in stateMachinesInScene){
       var preconfiguredStateMachine = stateMachinesInScene[smName];
       var stateMachine = new Ego.StateMachine(preconfiguredStateMachine.name, this.knowledgesBySceneName[preconfiguredStateMachine.sceneName][preconfiguredStateMachine.knowledgeName]);
+      stateMachine.registeredSceneName = sceneName;
       this.constructedStateMachines[sceneName][smName] = stateMachine;
+      this.stateEntryCallbacks[sceneName][smName] = {};
+      stateMachine.onStateChanged(function(newState){
+        var callback = decisionHandler.stateEntryCallbacks[this.registeredSceneName][this.getName()][newState.getName()];
+        if (callback){
+          callback();
+        }
+      });
     }
   }
 
@@ -115,6 +125,7 @@ DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
   delete this.constructedDecisionTrees;
   delete this.constructedStateMachines;
   delete this.activeStateMachineMap;
+  delete this.stateEntryCallbacks;
 
   for (var sceneName in this.knowledgesBySceneName){
     var knowledgesInScene = this.knowledgesBySceneName[sceneName];
@@ -330,6 +341,14 @@ DecisionHandler.prototype.export = function(){
   }
 
   return exportObj;
+}
+
+DecisionHandler.prototype.onStateEntry = function(stateMachine, stateName, callbackFunction){
+  this.stateEntryCallbacks[stateMachine.registeredSceneName][stateMachine.getName()][stateName] = callbackFunction;
+}
+
+DecisionHandler.prototype.removeStateEntryListener = function(stateMachine, stateName){
+  this.stateEntryCallbacks[stateMachine.registeredSceneName][stateMachine.getName()][stateName] = noop;
 }
 
 DecisionHandler.prototype.addStateToStateMachine = function(stateMachineName, stateName){

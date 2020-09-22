@@ -288,6 +288,8 @@ var Preconditions = function(){
   this.newValue = "newValue";
   this.decisionTree = "decisionTree";
   this.stateMachineName = "stateMachineName";
+  this.stateMachine = "stateMachine";
+  this.stateName = "stateName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -296,6 +298,40 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfStateMachineHasState = function(callerFunc, stateMachine, stateName){
+  var stateMachinesInScene = decisionHandler.constructedStateMachines[sceneHandler.getActiveSceneName()];
+  var statesInScene = decisionHandler.statesBySceneName[sceneHandler.getActiveSceneName()];
+  var state = null;
+
+  if (stateMachinesInScene){
+    state = stateMachinesInScene[stateName];
+  }
+
+  if (!state && statesInScene){
+    state = statesInScene[stateName];
+  }
+
+  if (!state){
+    this.throw(callerFunc, "State machine does not have such state.");
+  }
+
+  if (state.getParent() != stateMachine){
+    this.throw(callerFunc, "State machine does not have such state.");
+  }
+}
+
+Preconditions.prototype.checkIfStateMachineInActiveScene = function(callerFunc, stateMachine){
+  if (stateMachine.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "State machine is not inside the active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfStateMachine = function(callerFunc, stateMachine){
+  if (!(stateMachine instanceof Ego.StateMachine)){
+    this.throw(callerFunc, "Object is not a state machine.");
+  }
 }
 
 Preconditions.prototype.checkIfDecisionTreeInActiveScene = function(callerFunc, decisionTree){

@@ -323,7 +323,8 @@ var Roygbiv = function(){
     "getDecisionTree",
     "updateInformation",
     "makeDecision",
-    "getStateMachine"
+    "getStateMachine",
+    "onStateEntry"
   ];
 
   this.globals = new Object();
@@ -2741,6 +2742,26 @@ Roygbiv.prototype.removeSceneExitListener = function(sceneName){
   preConditions.checkIfSceneExists(ROYGBIV.removeSceneExitListener, sceneName);
 
   sceneHandler.scenes[sceneName].beforeExitCallback = noop;
+}
+
+// Sets a state change listener for given state machine and given state. The callback
+// function is executed without any parameters when the active state of given state machine
+// is changed to given state.
+Roygbiv.prototype.onStateEntry = function(stateMachine, stateName, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.onStateEntry, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfDefined(ROYGBIV.onStateEntry, preConditions.stateName, stateName);
+  preConditions.checkIfDefined(ROYGBIV.onStateEntry, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfStateMachine(ROYGBIV.onStateEntry, stateMachine);
+  preConditions.checkIfString(ROYGBIV.onStateEntry, preConditions.stateName, stateName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onStateEntry, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfStateMachineHasState(ROYGBIV.onStateEntry, stateMachine, stateName);
+  preConditions.checkIfStateMachineInActiveScene(ROYGBIV.onStateEntry, stateMachine);
+
+  decisionHandler.onStateEntry(stateMachine, stateName, callbackFunction);
 }
 
 // TEXT FUNCTIONS **************************************************************
