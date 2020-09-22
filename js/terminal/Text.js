@@ -1299,4 +1299,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETDECISIONTREE = "Returns a DecisionTree or 0 if DecisionTree of given name does not exist.";
   this.ROYGBIV_SCRIPTING_API_UPDATEINFORMATION = "Updates an information inside given knowledge.";
   this.ROYGBIV_SCRIPTING_API_MAKEDECISION = "Returns the decision result of given decision tree.";
+  this.ROYGBIV_SCRIPTING_API_GETSTATEMACHINE = "Returns a StateMachine or 0 if StateMachine of given name does not exist.";
 }

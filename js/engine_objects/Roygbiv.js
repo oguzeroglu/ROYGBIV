@@ -322,7 +322,8 @@ var Roygbiv = function(){
     "getKnowledge",
     "getDecisionTree",
     "updateInformation",
-    "makeDecision"
+    "makeDecision",
+    "getStateMachine"
   ];
 
   this.globals = new Object();
@@ -829,6 +830,18 @@ Roygbiv.prototype.getDecisionTree = function(decisionTreeName){
   var decisionTree = decisionHandler.getDecisionTree(decisionTreeName);
 
   return decisionTree || 0;
+}
+
+// Returns a StateMachine or 0 if StateMachine of given name does not exist.
+Roygbiv.prototype.getStateMachine = function(stateMachineName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getStateMachine, preConditions.stateMachineName, stateMachineName);
+
+  var stateMachine = decisionHandler.getStateMachine(stateMachineName);
+
+  return stateMachine || 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************

@@ -381,6 +381,17 @@ DecisionHandler.prototype.addTransitionToStateMachine = function(stateMachineNam
   return true;
 }
 
+DecisionHandler.prototype.getStateMachine = function(stateMachineName){
+
+  var stateMachinesInScene = this.constructedStateMachines[sceneHandler.getActiveSceneName()];
+
+  if (!stateMachinesInScene){
+    return false;
+  }
+
+  return stateMachinesInScene[stateMachineName] || false;
+}
+
 DecisionHandler.prototype.destroyStateMachine = function(stateMachineName){
   var stateParentsInScene = this.stateParentsBySceneName[sceneHandler.getActiveSceneName()] || {};
   var stateMachinesInScene = this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()];

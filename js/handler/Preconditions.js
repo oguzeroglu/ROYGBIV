@@ -287,6 +287,7 @@ var Preconditions = function(){
   this.informationName = "informationName";
   this.newValue = "newValue";
   this.decisionTree = "decisionTree";
+  this.stateMachineName = "stateMachineName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
