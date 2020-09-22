@@ -31,6 +31,7 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
   this.constructedStateMachines = {};
   this.initialKnowledgeData = {};
   this.stateEntryCallbacks = {};
+  this.activeStateMachineMap = new Map();
 
   for (var sceneName in this.decisionTreesBySceneName){
     this.constructedDecisionTrees[sceneName] = {};
@@ -150,6 +151,15 @@ DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
   }
 
   delete this.initialKnowledgeData;
+}
+
+DecisionHandler.prototype.activateStateMachine = function(stateMachine){
+  this.activeStateMachineMap.set(stateMachine.getName(), stateMachine);
+  stateMachine.isDirty = true;
+}
+
+DecisionHandler.prototype.deactivateStateMachine = function(stateMachine){
+  this.activeStateMachineMap.delete(stateMachine.getName());
 }
 
 DecisionHandler.prototype.import = function(exportObj){
@@ -810,6 +820,17 @@ DecisionHandler.prototype.getKnowledge = function(knowledgeName){
   return knowledgesInScene[knowledgeName] || false;
 }
 
+DecisionHandler.prototype.issueStateMachineUpdate = function(stateMachine){
+  var knowledge = stateMachine._knowledge;
+
+  if (!knowledge.isDirty && !stateMachine.isDirty){
+    return;
+  }
+
+  stateMachine.update();
+  stateMachine.isDirty = false;
+}
+
 DecisionHandler.prototype.tick = function(){
   var activeSceneName = sceneHandler.getActiveSceneName();
 
@@ -830,21 +851,7 @@ DecisionHandler.prototype.tick = function(){
     }
   }
 
-  var stateMachinesInScene = this.constructedStateMachines[activeSceneName];
-
-  if (stateMachinesInScene){
-    for (var smName in stateMachinesInScene){
-      var stateMachine = stateMachinesInScene[smName];
-      var knowledge = stateMachine._knowledge;
-
-      if (!knowledge.isDirty && !stateMachine.isDirty){
-        break;
-      }
-
-      stateMachine.update();
-      stateMachine.isDirty = false;
-    }
-  }
+  this.activeStateMachineMap.forEach(this.issueStateMachineUpdate);
 
   var knowledgesInScene = this.knowledgesBySceneName[activeSceneName];
 

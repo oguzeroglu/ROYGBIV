@@ -1303,4 +1303,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ONSTATEENTRY = "Sets a state change listener for given state machine and given state. The callback function is executed\nwithout any parameters when the active state of given state machine is changed to given state.";
   this.ROYGBIV_SCRIPTING_API_REMOVESTATEENTRYLISTENER = "Removes a state entry listener for given state machine.";
   this.ROYGBIV_SCRIPTING_API_RESETSTATEMACHINE = "Resets given state machine by setting the current state to the entry state.";
+  this.ROYGBIV_SCRIPTING_API_ACTIVATESTATEMACHINE = "Activates a state machine for updates. Note that state machines are deactivated by default.";
+  this.ROYGBIV_SCRIPTING_API_DEACTIVATESTATEMACHINE = "Deactivates a state machine for updates. Note that state machines are deactivated by default.";
 }

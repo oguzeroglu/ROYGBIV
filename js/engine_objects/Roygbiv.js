@@ -326,7 +326,9 @@ var Roygbiv = function(){
     "getStateMachine",
     "onStateEntry",
     "removeStateEntryListener",
-    "resetStateMachine"
+    "resetStateMachine",
+    "activateStateMachine",
+    "deactivateStateMachine"
   ];
 
   this.globals = new Object();
@@ -4228,6 +4230,32 @@ Roygbiv.prototype.resetStateMachine = function(stateMachine){
   preConditions.checkIfStateMachineInActiveScene(ROYGBIV.resetStateMachine, stateMachine);
 
   decisionHandler.resetStateMachine(stateMachine);
+}
+
+// Activates a state machine for updates. Note that state machines are deactivated by default.
+Roygbiv.prototype.activateStateMachine = function(stateMachine){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.activateStateMachine, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfStateMachine(ROYGBIV.activateStateMachine, stateMachine);
+  preConditions.checkIfStateMachineInActiveScene(ROYGBIV.activateStateMachine, stateMachine);
+
+  decisionHandler.activateStateMachine(stateMachine);
+}
+
+// Deactivates a state machine for updates. Note that state machines are deactivated by default.
+Roygbiv.prototype.deactivateStateMachine = function(stateMachine){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.deactivateStateMachine, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfStateMachine(ROYGBIV.deactivateStateMachine, stateMachine);
+  preConditions.checkIfStateMachineInActiveScene(ROYGBIV.deactivateStateMachine, stateMachine);
+
+  decisionHandler.deactivateStateMachine(stateMachine);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************
