@@ -114,6 +114,7 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
 DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
   delete this.constructedDecisionTrees;
   delete this.constructedStateMachines;
+  delete this.activeStateMachineMap;
 
   for (var sceneName in this.knowledgesBySceneName){
     var knowledgesInScene = this.knowledgesBySceneName[sceneName];
@@ -125,6 +126,14 @@ DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
       knowledge._vectorMap = JSON.parse(JSON.stringify(initialData.vector));
 
       delete knowledge.isDirty;
+    }
+  }
+
+  for (var sceneName in this.statesBySceneName){
+    var statesInScene = this.statesBySceneName[sceneName];
+    for (var stateName in statesInScene){
+      var state = statesInScene[stateName];
+      state.removeParent();
     }
   }
 
@@ -776,33 +785,46 @@ DecisionHandler.prototype.getKnowledge = function(knowledgeName){
   return knowledgesInScene[knowledgeName] || false;
 }
 
-DecisionHandler.prototype.makeDecisions = function(){
-  var decisionTreesInScene = this.constructedDecisionTrees[sceneHandler.getActiveSceneName()];
+DecisionHandler.prototype.tick = function(){
+  var activeSceneName = sceneHandler.getActiveSceneName();
 
-  if (!decisionTreesInScene){
-    return;
-  }
+  var decisionTreesInScene = this.constructedDecisionTrees[activeSceneName];
 
-  for (var dtName in decisionTreesInScene){
-    var decisionTree = decisionTreesInScene[dtName];
-    var knowledgeName = decisionTree.roygbivDecisionTree.knowledgeName;
-    var knowledge = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()][knowledgeName];
+  if (decisionTreesInScene){
+    for (var dtName in decisionTreesInScene){
+      var decisionTree = decisionTreesInScene[dtName];
+      var knowledgeName = decisionTree.roygbivDecisionTree.knowledgeName;
+      var knowledge = this.knowledgesBySceneName[activeSceneName][knowledgeName];
 
-    if (!knowledge.isDirty){
-      break;
+      if (!knowledge.isDirty){
+        break;
+      }
+
+      var result = decisionTree.makeDecision(knowledge);
+      decisionTree.resultCache = result;
     }
-
-    var result = decisionTree.makeDecision(knowledge);
-    decisionTree.resultCache = result;
   }
 
-  var knowledgesInScene = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()];
+  var stateMachinesInScene = this.constructedStateMachines[activeSceneName];
 
-  if (!knowledgesInScene){
-    return;
+  if (stateMachinesInScene){
+    for (var smName in stateMachinesInScene){
+      var stateMachine = stateMachinesInScene[smName];
+      var knowledge = stateMachine._knowledge;
+
+      if (!knowledge.isDirty){
+        break;
+      }
+
+      stateMachine.update();
+    }
   }
 
-  for (var knowledgeName in knowledgesInScene){
-    knowledgesInScene[knowledgeName].isDirty = false;
+  var knowledgesInScene = this.knowledgesBySceneName[activeSceneName];
+
+  if (knowledgesInScene){
+    for (var knowledgeName in knowledgesInScene){
+      knowledgesInScene[knowledgeName].isDirty = false;
+    }
   }
 }

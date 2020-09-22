@@ -24,7 +24,7 @@ var CPUOperationsHandler = function(){
     inputTextUpdate: 0,
     lightHandlerUpdate: 0,
     steeringHandlerUpdate: 0,
-    makeDecisions: 0
+    decisionHandlerUpdate: 0
   }
   this.scriptPerformances = {};
 }
@@ -67,13 +67,13 @@ CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
   }
 }
 
-CPUOperationsHandler.prototype.makeDecisions = function(){
+CPUOperationsHandler.prototype.updateDecisionHandler = function(){
   if (this.record){
     var s = performance.now();
-    decisionHandler.makeDecisions();
-    this.performanceLogs.makeDecisions = performance.now() - s;
+    decisionHandler.tick();
+    this.performanceLogs.decisionHandlerUpdate = performance.now() - s;
   }else{
-    decisionHandler.makeDecisions();
+    decisionHandler.tick();
   }
 }
 
