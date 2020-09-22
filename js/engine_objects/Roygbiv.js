@@ -325,7 +325,8 @@ var Roygbiv = function(){
     "makeDecision",
     "getStateMachine",
     "onStateEntry",
-    "removeStateEntryListener"
+    "removeStateEntryListener",
+    "resetStateMachine"
   ];
 
   this.globals = new Object();
@@ -4214,6 +4215,19 @@ Roygbiv.prototype.makeDecision = function(decisionTree){
   preConditions.checkIfDecisionTreeInActiveScene(ROYGBIV.makeDecision, decisionTree);
 
   return decisionTree.resultCache;
+}
+
+// Resets given state machine by setting the current state to the entry state.
+Roygbiv.prototype.resetStateMachine = function(stateMachine){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.resetStateMachine, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfStateMachine(ROYGBIV.resetStateMachine, stateMachine);
+  preConditions.checkIfStateMachineInActiveScene(ROYGBIV.resetStateMachine, stateMachine);
+
+  decisionHandler.resetStateMachine(stateMachine);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

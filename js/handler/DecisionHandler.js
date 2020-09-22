@@ -63,6 +63,7 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
       var preconfiguredStateMachine = stateMachinesInScene[smName];
       var stateMachine = new Ego.StateMachine(preconfiguredStateMachine.name, this.knowledgesBySceneName[preconfiguredStateMachine.sceneName][preconfiguredStateMachine.knowledgeName]);
       stateMachine.registeredSceneName = sceneName;
+      stateMachine.isDirty = false;
       this.constructedStateMachines[sceneName][smName] = stateMachine;
       this.stateEntryCallbacks[sceneName][smName] = {};
       stateMachine.onStateChanged(function(newState){
@@ -349,6 +350,11 @@ DecisionHandler.prototype.onStateEntry = function(stateMachine, stateName, callb
 
 DecisionHandler.prototype.removeStateEntryListener = function(stateMachine, stateName){
   this.stateEntryCallbacks[stateMachine.registeredSceneName][stateMachine.getName()][stateName] = noop;
+}
+
+DecisionHandler.prototype.resetStateMachine = function(stateMachine){
+  stateMachine.reset();
+  stateMachine.isDirty = true;
 }
 
 DecisionHandler.prototype.addStateToStateMachine = function(stateMachineName, stateName){
@@ -831,11 +837,12 @@ DecisionHandler.prototype.tick = function(){
       var stateMachine = stateMachinesInScene[smName];
       var knowledge = stateMachine._knowledge;
 
-      if (!knowledge.isDirty){
+      if (!knowledge.isDirty && !stateMachine.isDirty){
         break;
       }
 
       stateMachine.update();
+      stateMachine.isDirty = false;
     }
   }
 
