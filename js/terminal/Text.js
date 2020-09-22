@@ -1301,4 +1301,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_MAKEDECISION = "Returns the decision result of given decision tree.";
   this.ROYGBIV_SCRIPTING_API_GETSTATEMACHINE = "Returns a StateMachine or 0 if StateMachine of given name does not exist.";
   this.ROYGBIV_SCRIPTING_API_ONSTATEENTRY = "Sets a state change listener for given state machine and given state. The callback function is executed\nwithout any parameters when the active state of given state machine is changed to given state.";
+  this.ROYGBIV_SCRIPTING_API_REMOVESTATEENTRYLISTENER = "Removes a state entry listener for given state machine.";
 }

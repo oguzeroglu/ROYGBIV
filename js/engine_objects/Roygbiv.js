@@ -324,7 +324,8 @@ var Roygbiv = function(){
     "updateInformation",
     "makeDecision",
     "getStateMachine",
-    "onStateEntry"
+    "onStateEntry",
+    "removeStateEntryListener"
   ];
 
   this.globals = new Object();
@@ -2762,6 +2763,22 @@ Roygbiv.prototype.onStateEntry = function(stateMachine, stateName, callbackFunct
   preConditions.checkIfStateMachineInActiveScene(ROYGBIV.onStateEntry, stateMachine);
 
   decisionHandler.onStateEntry(stateMachine, stateName, callbackFunction);
+}
+
+// Removes a state entry listener for given state machine.
+Roygbiv.prototype.removeStateEntryListener = function(stateMachine, stateName){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removeStateEntryListener, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfDefined(ROYGBIV.removeStateEntryListener, preConditions.stateName, stateName);
+  preConditions.checkIfStateMachine(ROYGBIV.removeStateEntryListener, stateMachine);
+  preConditions.checkIfString(ROYGBIV.removeStateEntryListener, preConditions.stateName, stateName);
+  preConditions.checkIfStateMachineHasState(ROYGBIV.removeStateEntryListener, stateMachine, stateName);
+  preConditions.checkIfStateMachineInActiveScene(ROYGBIV.removeStateEntryListener, stateMachine);
+
+  decisionHandler.removeStateEntryListener(stateMachine, stateName);
 }
 
 // TEXT FUNCTIONS **************************************************************
