@@ -1305,4 +1305,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_RESETSTATEMACHINE = "Resets given state machine by setting the current state to the entry state.";
   this.ROYGBIV_SCRIPTING_API_ACTIVATESTATEMACHINE = "Activates a state machine for updates. Note that state machines are deactivated by default.";
   this.ROYGBIV_SCRIPTING_API_DEACTIVATESTATEMACHINE = "Deactivates a state machine for updates. Note that state machines are deactivated by default.";
+  this.ROYGBIV_SCRIPTING_API_RESETKNOWLEDGE = "Resets a knowledge setting each information to their initial value.";
 }

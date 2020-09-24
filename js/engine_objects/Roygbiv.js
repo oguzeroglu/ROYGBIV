@@ -328,7 +328,8 @@ var Roygbiv = function(){
     "removeStateEntryListener",
     "resetStateMachine",
     "activateStateMachine",
-    "deactivateStateMachine"
+    "deactivateStateMachine",
+    "resetKnowledge"
   ];
 
   this.globals = new Object();
@@ -4256,6 +4257,19 @@ Roygbiv.prototype.deactivateStateMachine = function(stateMachine){
   preConditions.checkIfStateMachineInActiveScene(ROYGBIV.deactivateStateMachine, stateMachine);
 
   decisionHandler.deactivateStateMachine(stateMachine);
+}
+
+// Resets a knowledge setting each information to their initial value.
+Roygbiv.prototype.resetKnowledge = function(knowledge){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.resetKnowledge, preConditions.knowledge, knowledge);
+  preConditions.checkIfKnowledge(ROYGBIV.resetKnowledge, knowledge);
+  preConditions.checkIfKnowledgeInsideActiveScene(ROYGBIV.resetKnowledge, knowledge);
+
+  decisionHandler.resetKnowledge(knowledge);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

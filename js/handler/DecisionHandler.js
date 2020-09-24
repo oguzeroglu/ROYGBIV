@@ -133,11 +133,7 @@ DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
     var knowledgesInScene = this.knowledgesBySceneName[sceneName];
     for (var knowledgeName in knowledgesInScene){
       var knowledge = knowledgesInScene[knowledgeName];
-      var initialData = this.initialKnowledgeData[sceneName][knowledgeName];
-      knowledge._booleanMap = JSON.parse(JSON.stringify(initialData.boolean));
-      knowledge._numericalMap = JSON.parse(JSON.stringify(initialData.numerical));
-      knowledge._vectorMap = JSON.parse(JSON.stringify(initialData.vector));
-
+      this.resetKnowledge(knowledge);
       delete knowledge.isDirty;
     }
   }
@@ -151,6 +147,15 @@ DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
   }
 
   delete this.initialKnowledgeData;
+}
+
+DecisionHandler.prototype.resetKnowledge = function(knowledge){
+  var initialData = this.initialKnowledgeData[knowledge.registeredSceneName][knowledge.roygbivName];
+  knowledge._booleanMap = JSON.parse(JSON.stringify(initialData.boolean));
+  knowledge._numericalMap = JSON.parse(JSON.stringify(initialData.numerical));
+  knowledge._vectorMap = JSON.parse(JSON.stringify(initialData.vector));
+
+  knowledge.isDirty = true;
 }
 
 DecisionHandler.prototype.activateStateMachine = function(stateMachine){
