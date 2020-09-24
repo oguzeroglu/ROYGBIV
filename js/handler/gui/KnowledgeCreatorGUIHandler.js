@@ -55,6 +55,8 @@ KnowledgeCreatorGUIHandler.prototype.show = function(){
 KnowledgeCreatorGUIHandler.prototype.addKnowledgeFolder = function(knowledgeName){
   var knowledgeFolder = guiHandler.datGuiKnowledgeCreation.addFolder(knowledgeName);
 
+  var informationsFolder;
+
   var informationCreationParams = {
     "Information Name": "",
     "Create Information": function(){
@@ -72,7 +74,7 @@ KnowledgeCreatorGUIHandler.prototype.addKnowledgeFolder = function(knowledgeName
         return;
       }
 
-      knowledgeCreatorGUIHandler.addInformationFolder(informationName, knowledgeName, knowledgeFolder);
+      knowledgeCreatorGUIHandler.addInformationFolder(informationName, knowledgeName, informationsFolder);
 
       terminal.printInfo(Text.INFORMATION_CREATED);
     }
@@ -115,14 +117,40 @@ KnowledgeCreatorGUIHandler.prototype.addKnowledgeFolder = function(knowledgeName
     }
   }, "Destroy");
 
+  var cloneFolder = knowledgeFolder.addFolder("Clone");
+  var cloneParams = {
+    "Name": "",
+    "Create clone": function(){
+      terminal.clear();
+      var cloneName = this["Name"];
+
+      if (!cloneName){
+        terminal.printError(Text.NAME_CANNOT_BE_EMPTY);
+        return;
+      }
+
+      if (!decisionHandler.cloneKnowledge(cloneName, knowledgeName)){
+        terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+        return;
+      }
+
+      knowledgeCreatorGUIHandler.addKnowledgeFolder(cloneName);
+      terminal.printInfo(Text.KNOWLEDGE_CLONED);
+    }
+  };
+  cloneFolder.add(cloneParams, "Name");
+  cloneFolder.add(cloneParams, "Create clone");
+
+  informationsFolder = knowledgeFolder.addFolder("Informations");
+
   var existingInformations = decisionHandler.getAllInformationsOfKnowledge(knowledgeName);
   for (var i = 0; i < existingInformations.length; i ++){
-    knowledgeCreatorGUIHandler.addInformationFolder(existingInformations[i].name, knowledgeName, knowledgeFolder);
+    knowledgeCreatorGUIHandler.addInformationFolder(existingInformations[i].name, knowledgeName, informationsFolder);
   }
 }
 
-KnowledgeCreatorGUIHandler.prototype.addInformationFolder = function(informationName, knowledgeName, knowledgeFolder){
-  var informationFolder = knowledgeFolder.addFolder(informationName);
+KnowledgeCreatorGUIHandler.prototype.addInformationFolder = function(informationName, knowledgeName, informationsFolder){
+  var informationFolder = informationsFolder.addFolder(informationName);
 
   var information = decisionHandler.getInformationFromKnowledge(knowledgeName, informationName);
 
@@ -140,7 +168,7 @@ KnowledgeCreatorGUIHandler.prototype.addInformationFolder = function(information
       }
 
       decisionHandler.removeInformationFromKnowledge(knowledgeName, informationName);
-      knowledgeFolder.removeFolder(informationFolder);
+      informationsFolder.removeFolder(informationFolder);
       terminal.printInfo(Text.INFORMATION_REMOVED);
     }
   };

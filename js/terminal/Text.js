@@ -546,6 +546,7 @@ var Text = function(){
   this.SKYBOX_EDITED = "Skybox edited.";
   this.KNOWLEDGE_CREATED = "Knowledge created.";
   this.KNOWLEDGE_DESTROYED = "Knowledge destroyed.";
+  this.KNOWLEDGE_CLONED = "Knowledge cloned.";
   this.INFORMATION_CREATED = "Information added to the knowledge.";
   this.INFORMATION_REMOVED = "Information removed from the knowledge.";
   this.INFORMATION_UPDATED = "Information updated.";

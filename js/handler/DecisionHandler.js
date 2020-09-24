@@ -805,6 +805,22 @@ DecisionHandler.prototype.updateInformation = function(knowledge, informationNam
   knowledge.isDirty = true;
 }
 
+DecisionHandler.prototype.cloneKnowledge = function(cloneName, refName){
+  if (this.informationTypesByKnowledgeName[cloneName]){
+    return false;
+  }
+
+  var knowledge = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()][refName];
+  var clone = knowledge.clone();
+
+  this.knowledgesBySceneName[sceneHandler.getActiveSceneName()][cloneName] = clone;
+  this.informationTypesByKnowledgeName[cloneName] = JSON.parse(JSON.stringify(this.informationTypesByKnowledgeName[refName]));
+
+  clone.roygbivName = cloneName;
+  clone.registeredSceneName = sceneHandler.getActiveSceneName();
+  return true;
+}
+
 DecisionHandler.prototype.createKnowledge = function(knowledgeName, overrideSceneName){
 
   var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
