@@ -407,6 +407,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
   this.scenes[this.getActiveSceneName()].loadLights();
   lightHandler.onAfterSceneChange();
   steeringHandler.onAfterSceneChange();
+  decisionHandler.onAfterSceneChange();
 
   if (mode == 0 && !isDeployment){
     $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");

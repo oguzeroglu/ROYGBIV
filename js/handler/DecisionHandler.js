@@ -149,6 +149,34 @@ DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
   delete this.initialKnowledgeData;
 }
 
+DecisionHandler.prototype.onAfterSceneChange = function(){
+  if (mode == 0){
+    return;
+  }
+
+  if (!this.initialKnowledgeData){
+    return;
+  }
+
+  var knowledgesInScene = this.knowledgesBySceneName[sceneHandler.getActiveSceneName()];
+
+  if (knowledgesInScene){
+    for (var knowledgeName in knowledgesInScene){
+      this.resetKnowledge(knowledgesInScene[knowledgeName]);
+    }
+  }
+
+  var constructedStateMachinesInScene = this.constructedStateMachines[sceneHandler.getActiveSceneName()];
+
+  if (constructedStateMachinesInScene){
+    for (var stateMachineName in constructedStateMachinesInScene){
+      this.resetStateMachine(constructedStateMachinesInScene[stateMachineName]);
+    }
+  }
+
+  this.activeStateMachineMap = new Map();
+}
+
 DecisionHandler.prototype.resetKnowledge = function(knowledge){
   var initialData = this.initialKnowledgeData[knowledge.registeredSceneName][knowledge.roygbivName];
   knowledge._booleanMap = JSON.parse(JSON.stringify(initialData.boolean));
