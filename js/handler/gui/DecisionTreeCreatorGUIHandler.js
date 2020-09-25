@@ -404,6 +404,15 @@ DecisionTreeCreatorGUIHandler.prototype.addDecisionTreeFolder = function(decisio
     "Visualise": false,
     "Destroy": function(){
       terminal.clear();
+
+      var clonedDecisionTreesInScene = decisionHandler.clonedDecisionTreesBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var cdtName in clonedDecisionTreesInScene){
+        if (clonedDecisionTreesInScene[cdtName].refName == decisionTreeName){
+          terminal.printError(Text.DECISION_TREE_HAS_A_CLONE_CANNOT_DESTROY.replace(Text.PARAM1, cdtName));
+          return;
+        }
+      }
+
       decisionHandler.destroyDecisionTree(decisionTreeName);
       guiHandler.datGuiDecisionTreeCreation.removeFolder(decisionTreeFolder);
       delete decisionTreeCreatorGUIHandler.decisionTreeParamsByDecisionTreeName[decisionTreeName];

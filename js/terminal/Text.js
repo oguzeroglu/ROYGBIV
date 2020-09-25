@@ -304,6 +304,7 @@ var Text = function(){
   this.KNOWLEDGE_USED_IN_DECISION_TREE_CANNOT_DESTROY = "Knowledge used in decision tree [@@1]. Cannot destroy."
   this.INFORMATION_USED_IN_DECISION_CANNOT_DESTROY = "Information used in decision @@1. Cannot destroy.";
   this.STATE_USED_IN_TRANSITION_CANNOT_DESTROY = "State used in transition @@1. Cannot destroy.";
+  this.DECISION_TREE_HAS_A_CLONE_CANNOT_DESTROY = "Decision tree has a clone [@@1]. Cannot destroy.";
   this.POSITION_X_MUST_BE_A_NUMBER = "PositionX must be a number.";
   this.POSITION_Y_MUST_BE_A_NUMBER = "PositionY must be a number.";
   this.POSITION_Z_MUST_BE_A_NUMBER = "PositionZ must be a number.";
