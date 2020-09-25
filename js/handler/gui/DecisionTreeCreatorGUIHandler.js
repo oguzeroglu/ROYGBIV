@@ -74,6 +74,11 @@ DecisionTreeCreatorGUIHandler.prototype.show = function(){
     var dtParams = this.addDecisionTreeFolder(dtName, pcdt.knowledgeName);
     this.decisionTreeParamsByDecisionTreeName[dtName] = dtParams;
   }
+
+  var clonedDecisionTreesInScene = decisionHandler.clonedDecisionTreesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  for (var dtName in clonedDecisionTreesInScene){
+    this.addClonedDecisionTreeFolder(dtName);
+  }
 }
 
 DecisionTreeCreatorGUIHandler.prototype.hide = function(){
@@ -429,9 +434,58 @@ DecisionTreeCreatorGUIHandler.prototype.addDecisionTreeFolder = function(decisio
   }).listen();
   decisionTreeFolder.add(params, "Destroy");
 
+  var knowledgesInScene = decisionHandler.knowledgesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var knowledgeNames = Object.keys(knowledgesInScene);
+  var cloneFolder = decisionTreeFolder.addFolder("Clone");
+  var cloneParams = {
+    "Name": "",
+    "Knowledge": knowledgeNames[0] || "",
+    "Create a clone": function(){
+      terminal.clear();
+
+      var cloneName = this["Name"];
+      var knowledgeName = this["Knowledge"];
+
+      if (!cloneName){
+        terminal.printError(Text.NAME_CANNOT_BE_EMPTY);
+        return;
+      }
+
+      if (!knowledgeName){
+        terminal.printError(Text.KNOWLEDGE_IS_REQUIRED_TO_CREATE_A_DECISION_TREE);
+        return;
+      }
+
+      if (!decisionHandler.cloneDecisionTree(cloneName, decisionTreeName, knowledgeName)){
+        terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+        return;
+      }
+
+      decisionTreeCreatorGUIHandler.addClonedDecisionTreeFolder(cloneName);
+      terminal.printInfo(Text.DECISION_TREE_CLONED);
+    }
+  };
+  cloneFolder.add(cloneParams, "Name");
+  cloneFolder.add(cloneParams, "Knowledge", knowledgeNames);
+  cloneFolder.add(cloneParams, "Create a clone");
+
   if (preconfiguredDecisionTree.hasRootDecision()){
     this.addDecisionFolder(decisionTreeName, decisionTreeFolder, preconfiguredDecisionTree.rootDecision);
   }
 
   return params;
+}
+
+DecisionTreeCreatorGUIHandler.prototype.addClonedDecisionTreeFolder = function(cloneName){
+  var clone = decisionHandler.clonedDecisionTreesBySceneName[sceneHandler.getActiveSceneName()][cloneName];
+  var folderText = cloneName + " (Clone of [" + clone.refName + "] having knowledge [" + clone.knowledgeName + "])";
+  var folder = guiHandler.datGuiDecisionTreeCreation.addFolder(folderText);
+  folder.add({
+    "Destroy": function(){
+      terminal.clear();
+      decisionHandler.destroyClonedDecisionTree(cloneName);
+      guiHandler.datGuiDecisionTreeCreation.removeFolder(folder);
+      terminal.printInfo(Text.DECISION_TREE_DESTROYED);
+    }
+  }, "Destroy");
 }

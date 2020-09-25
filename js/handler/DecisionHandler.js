@@ -24,6 +24,7 @@ DecisionHandler.prototype.reset = function(){
   this.transitionsBySceneName = {};
   this.stateMachinesBySceneName = {};
   this.stateParentsBySceneName = {};
+  this.clonedDecisionTreesBySceneName = {};
 }
 
 DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
@@ -38,6 +39,19 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
     var decisionTreesInScene = this.decisionTreesBySceneName[sceneName];
     for (var dtName in decisionTreesInScene){
       this.constructedDecisionTrees[sceneName][dtName] = decisionTreesInScene[dtName].get();
+    }
+  }
+
+  for (var sceneName in this.clonedDecisionTreesBySceneName){
+    var clonedDecisionTreesInScene = this.clonedDecisionTreesBySceneName[sceneName];
+    for (var dtName in clonedDecisionTreesInScene){
+      var cloneInfo = clonedDecisionTreesInScene[dtName];
+      var refDT = this.constructedDecisionTrees[sceneName][cloneInfo.refName];
+      var cloneDT = refDT.clone();
+      cloneDT.knowledgeName = cloneInfo.knowledgeName;
+      cloneDT.resultCache = null;
+      cloneDT.registeredSceneName = sceneName;
+      this.constructedDecisionTrees[sceneName][dtName] = cloneDT;
     }
   }
 
@@ -203,6 +217,7 @@ DecisionHandler.prototype.import = function(exportObj){
   var transitionsBySceneName = exportObj.transitionsBySceneName;
   var stateMachinesBySceneName = exportObj.stateMachinesBySceneName;
   var stateParentsBySceneName = exportObj.stateParentsBySceneName;
+  var clonedDecisionTreesBySceneName = exportObj.clonedDecisionTreesBySceneName;
 
   for (var sceneName in knowledgesBySceneName){
     this.knowledgesBySceneName[sceneName] = {};
@@ -300,6 +315,7 @@ DecisionHandler.prototype.import = function(exportObj){
   }
 
   this.stateParentsBySceneName = JSON.parse(JSON.stringify(stateParentsBySceneName));
+  this.clonedDecisionTreesBySceneName = JSON.parse(JSON.stringify(clonedDecisionTreesBySceneName));
 }
 
 DecisionHandler.prototype.export = function(){
@@ -310,7 +326,8 @@ DecisionHandler.prototype.export = function(){
     statesBySceneName: {},
     transitionsBySceneName: {},
     stateMachinesBySceneName: {},
-    stateParentsBySceneName: JSON.parse(JSON.stringify(this.stateParentsBySceneName))
+    stateParentsBySceneName: JSON.parse(JSON.stringify(this.stateParentsBySceneName)),
+    clonedDecisionTreesBySceneName: JSON.parse(JSON.stringify(this.clonedDecisionTreesBySceneName))
   };
 
   for (var sceneName in this.knowledgesBySceneName){
@@ -609,13 +626,32 @@ DecisionHandler.prototype.destroyDecisionTree = function(decisionTreeName){
   return false;
 }
 
+DecisionHandler.prototype.cloneDecisionTree = function(cloneName, refName, knowledgeName){
+  var decisionTreesInScene = this.decisionTreesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var clonedDecisionTreesInScene = this.clonedDecisionTreesBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  if (decisionTreesInScene[cloneName] || clonedDecisionTreesInScene[cloneName]){
+    return false;
+  }
+
+  clonedDecisionTreesInScene[cloneName] = {refName: refName, knowledgeName: knowledgeName};
+
+  this.clonedDecisionTreesBySceneName[sceneHandler.getActiveSceneName()] = clonedDecisionTreesInScene;
+  return true;
+}
+
+DecisionHandler.prototype.destroyClonedDecisionTree = function(cloneName){
+  delete this.clonedDecisionTreesBySceneName[sceneHandler.getActiveSceneName()][cloneName];
+}
+
 DecisionHandler.prototype.createDecisionTree = function(decisionTreeName, knowledgeName, overrideSceneName){
 
   var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
 
   var decisionTreesInScene = this.decisionTreesBySceneName[sceneName] || {};
+  var clonedDecisionTreesInScene = this.clonedDecisionTreesBySceneName[sceneName] || {};
 
-  if (decisionTreesInScene[decisionTreeName]){
+  if (decisionTreesInScene[decisionTreeName] || clonedDecisionTreesInScene[decisionTreeName]){
     return false;
   }
 
@@ -888,7 +924,7 @@ DecisionHandler.prototype.tick = function(){
   if (decisionTreesInScene){
     for (var dtName in decisionTreesInScene){
       var decisionTree = decisionTreesInScene[dtName];
-      var knowledgeName = decisionTree.roygbivDecisionTree.knowledgeName;
+      var knowledgeName = decisionTree.knowledgeName;
       var knowledge = this.knowledgesBySceneName[activeSceneName][knowledgeName];
 
       if (!knowledge.isDirty){

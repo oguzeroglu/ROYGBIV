@@ -809,6 +809,7 @@ var Text = function(){
   this.DECISION_TREE_DESTROYED = "Decision tree destroyed.";
   this.DECISION_UPDATED = "Decision updated.";
   this.DECISION_TREE_CREATED = "Decision tree created.";
+  this.DECISION_TREE_CLONED = "Decision tree cloned.";
   this.DECISION_TREE_ALREADY_HAS_A_ROOT_DECISION = "Decision tree already has a root decision.";
   this.ROOT_DECISION_SET = "Root decision set.";
   this.VISUALISING = "Visualising @@1.";
