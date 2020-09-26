@@ -318,7 +318,19 @@ var Roygbiv = function(){
     "getSteerableLookDirection",
     "setObjectRotationMode",
     "resetObjectRotation",
-    "resetRandomPathBehavior"
+    "resetRandomPathBehavior",
+    "getKnowledge",
+    "getDecisionTree",
+    "updateInformation",
+    "makeDecision",
+    "getStateMachine",
+    "onStateEntry",
+    "removeStateEntryListener",
+    "resetStateMachine",
+    "activateStateMachine",
+    "deactivateStateMachine",
+    "resetKnowledge",
+    "getChildStateMachine"
   ];
 
   this.globals = new Object();
@@ -801,6 +813,57 @@ Roygbiv.prototype.getJumpDescriptor = function(jdName){
     return jumpDescriptor;
   }
   return 0;
+}
+
+// Returns a Knowledge or 0 if Knowledge of given name does not exist.
+Roygbiv.prototype.getKnowledge = function(knowledgeName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getKnowledge, preConditions.knowledgeName, knowledgeName);
+
+  var knowledge = decisionHandler.getKnowledge(knowledgeName);
+
+  return knowledge || 0;
+}
+
+// Returns a DecisionTree or 0 if DecisionTree of given name does not exist.
+Roygbiv.prototype.getDecisionTree = function(decisionTreeName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getDecisionTree, preConditions.decisionTreeName, decisionTreeName);
+
+  var decisionTree = decisionHandler.getDecisionTree(decisionTreeName);
+
+  return decisionTree || 0;
+}
+
+// Returns a StateMachine or 0 if StateMachine of given name does not exist.
+Roygbiv.prototype.getStateMachine = function(stateMachineName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getStateMachine, preConditions.stateMachineName, stateMachineName);
+
+  var stateMachine = decisionHandler.getStateMachine(stateMachineName);
+
+  return stateMachine || 0;
+}
+
+// Returns a child state machine of given state machine or 0 if the child does not exist.
+// This API is esepcially useful for cloned state machines for accessing to their
+// children in order to add state change listeners to them.
+Roygbiv.prototype.getChildStateMachine = function(stateMachine, childStateMachineName){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.getChildStateMachine, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfDefined(ROYGBIV.getChildStateMachine, preConditions.childStateMachineName, childStateMachineName);
+  preConditions.checkIfStateMachine(ROYGBIV.getChildStateMachine, stateMachine);
+
+  return decisionHandler.getChildStateMachine(stateMachine, childStateMachineName) || 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -2702,6 +2765,42 @@ Roygbiv.prototype.removeSceneExitListener = function(sceneName){
   sceneHandler.scenes[sceneName].beforeExitCallback = noop;
 }
 
+// Sets a state change listener for given state machine and given state. The callback
+// function is executed without any parameters when the active state of given state machine
+// is changed to given state.
+Roygbiv.prototype.onStateEntry = function(stateMachine, stateName, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.onStateEntry, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfDefined(ROYGBIV.onStateEntry, preConditions.stateName, stateName);
+  preConditions.checkIfDefined(ROYGBIV.onStateEntry, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfStateMachine(ROYGBIV.onStateEntry, stateMachine);
+  preConditions.checkIfString(ROYGBIV.onStateEntry, preConditions.stateName, stateName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onStateEntry, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfStateMachineHasState(ROYGBIV.onStateEntry, stateMachine, stateName);
+  preConditions.checkIfStateMachineInActiveScene(ROYGBIV.onStateEntry, stateMachine);
+
+  decisionHandler.onStateEntry(stateMachine, stateName, callbackFunction);
+}
+
+// Removes a state entry listener for given state machine.
+Roygbiv.prototype.removeStateEntryListener = function(stateMachine, stateName){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removeStateEntryListener, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfDefined(ROYGBIV.removeStateEntryListener, preConditions.stateName, stateName);
+  preConditions.checkIfStateMachine(ROYGBIV.removeStateEntryListener, stateMachine);
+  preConditions.checkIfString(ROYGBIV.removeStateEntryListener, preConditions.stateName, stateName);
+  preConditions.checkIfStateMachineHasState(ROYGBIV.removeStateEntryListener, stateMachine, stateName);
+  preConditions.checkIfStateMachineInActiveScene(ROYGBIV.removeStateEntryListener, stateMachine);
+
+  decisionHandler.removeStateEntryListener(stateMachine, stateName);
+}
+
 // TEXT FUNCTIONS **************************************************************
 
 // Sets a text to a text object.
@@ -4105,6 +4204,88 @@ Roygbiv.prototype.resetRandomPathBehavior = function(object, behaviorName){
   preConditions.checkIfRandomPathOrBlendedOrPriorityBehavior(Roygbiv.resetRandomPathBehavior, object, behaviorName);
 
   steeringHandler.resetRandomPathBehavior(object, behaviorName);
+}
+
+// Updates an information inside given knowledge.
+Roygbiv.prototype.updateInformation = function(knowledge, informationName, newValue){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.updateInformation, preConditions.knowledge, knowledge);
+  preConditions.checkIfDefined(ROYGBIV.updateInformation, preConditions.informationName, informationName);
+  preConditions.checkIfDefined(ROYGBIV.updateInformation, preConditions.newValue, newValue);
+  preConditions.checkIfKnowledge(ROYGBIV.updateInformation, knowledge);
+  preConditions.checkIfKnowledgeHasInformation(ROYGBIV.updateInformation, knowledge, informationName);
+  preConditions.checkIfKnowledgeInsideActiveScene(ROYGBIV.updateInformation, knowledge);
+  preConditions.checkIfValueTypeSuitableForInformation(ROYGBIV.updateInformation, knowledge, informationName, newValue);
+
+  decisionHandler.updateInformation(knowledge, informationName, newValue);
+}
+
+// Returns the decision result of given decision tree.
+Roygbiv.prototype.makeDecision = function(decisionTree){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.makeDecision, preConditions.decisionTree, decisionTree);
+  preConditions.checkIfDecisionTree(ROYGBIV.makeDecision, decisionTree);
+  preConditions.checkIfDecisionTreeInActiveScene(ROYGBIV.makeDecision, decisionTree);
+
+  return decisionTree.resultCache;
+}
+
+// Resets given state machine by setting the current state to the entry state.
+Roygbiv.prototype.resetStateMachine = function(stateMachine){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.resetStateMachine, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfStateMachine(ROYGBIV.resetStateMachine, stateMachine);
+  preConditions.checkIfStateMachineInActiveScene(ROYGBIV.resetStateMachine, stateMachine);
+
+  decisionHandler.resetStateMachine(stateMachine);
+}
+
+// Activates a state machine for updates. Note that state machines are deactivated by default.
+Roygbiv.prototype.activateStateMachine = function(stateMachine){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.activateStateMachine, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfStateMachine(ROYGBIV.activateStateMachine, stateMachine);
+  preConditions.checkIfStateMachineInActiveScene(ROYGBIV.activateStateMachine, stateMachine);
+
+  decisionHandler.activateStateMachine(stateMachine);
+}
+
+// Deactivates a state machine for updates. Note that state machines are deactivated by default.
+Roygbiv.prototype.deactivateStateMachine = function(stateMachine){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.deactivateStateMachine, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfStateMachine(ROYGBIV.deactivateStateMachine, stateMachine);
+  preConditions.checkIfStateMachineInActiveScene(ROYGBIV.deactivateStateMachine, stateMachine);
+
+  decisionHandler.deactivateStateMachine(stateMachine);
+}
+
+// Resets a knowledge setting each information to their initial value.
+Roygbiv.prototype.resetKnowledge = function(knowledge){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.resetKnowledge, preConditions.knowledge, knowledge);
+  preConditions.checkIfKnowledge(ROYGBIV.resetKnowledge, knowledge);
+  preConditions.checkIfKnowledgeInsideActiveScene(ROYGBIV.resetKnowledge, knowledge);
+
+  decisionHandler.resetKnowledge(knowledge);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

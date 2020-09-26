@@ -6689,6 +6689,60 @@ function parse(input){
           }
           return true;
         break;
+        case 264: //knowledges
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          knowledgeCreatorGUIHandler.show();
+          return true;
+        break;
+        case 265: //decisions
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          decisionCreatorGUIHandler.show();
+          return true;
+        break;
+        case 266: //decisionTrees
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          decisionTreeCreatorGUIHandler.show();
+          return true;
+        break;
+        case 267: //states
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          stateCreatorGUIHandler.show();
+          return true;
+        break;
+        case 268: //transitions
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          transitionCreatorGUIHandler.show();
+          return true;
+        break;
+        case 269: //stateMachines
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          stateMachineCreatorGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){

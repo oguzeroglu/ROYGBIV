@@ -184,4 +184,6 @@ var State = function(projectName, author){
   this.serverWSURL = serverWSURL;
   // STEERING HANDLER **********************************************
   this.steeringHandler = steeringHandler.export();
+  // DECISION HANDLER **********************************************
+  this.decisionHandler = decisionHandler.export();
 }

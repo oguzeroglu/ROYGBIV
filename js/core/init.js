@@ -35,6 +35,8 @@ window.onload = function() {
   lightningHandler = new LightningHandler();
   // STEERING HANDLER
   steeringHandler = new SteeringHandler();
+  // DECISION HANDLER
+  decisionHandler = new DecisionHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
@@ -85,6 +87,12 @@ window.onload = function() {
     graphCreatorGUIHandler = new GraphCreatorGUIHandler();
     steeringBehaviorCreatorGUIHandler = new SteeringBehaviorCreatorGUIHandler();
     jumpDescriptorCreatorGUIHandler = new JumpDescriptorCreatorGUIHandler();
+    knowledgeCreatorGUIHandler = new KnowledgeCreatorGUIHandler();
+    decisionCreatorGUIHandler = new DecisionCreatorGUIHandler();
+    decisionTreeCreatorGUIHandler = new DecisionTreeCreatorGUIHandler();
+    stateCreatorGUIHandler = new StateCreatorGUIHandler();
+    transitionCreatorGUIHandler = new TransitionCreatorGUIHandler();
+    stateMachineCreatorGUIHandler = new StateMachineCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

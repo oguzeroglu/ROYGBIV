@@ -602,6 +602,9 @@ function readEngineScripts(projectName, author, noMobile){
       }else if (scriptPath.includes("ObjectExportImportHandler.js")){
         console.log("[*] Skipping ObjectExportImportHandler.");
         continue;
+      }else if (scriptPath.includes("mermaid.min.js")){
+        console.log("[*] Skipping mermaid.");
+        continue;
       }
       content += scriptContent +"\n";
     }

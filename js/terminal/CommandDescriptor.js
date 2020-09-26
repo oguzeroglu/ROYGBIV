@@ -264,7 +264,13 @@ var CommandDescriptor = function(){
       2, //excludeFromHideBehavior
       2, //newMass
       0, //printMasses
-      1 //destroyMass
+      1, //destroyMass
+      0, //knowledges
+      0, //decisions
+      0, //decisionTrees
+      0, //states
+      0, //transitions
+      0 //stateMachines
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -531,7 +537,13 @@ var CommandDescriptor = function(){
     "excludeFromHideBehavior id true/false",
     "newMass id height",
     "printMasses",
-    "destroyMass massID"
+    "destroyMass massID",
+    "knowledges",
+    "decisions",
+    "decisionTrees",
+    "states",
+    "transitions",
+    "stateMachines"
   ];
 
   this.commands = [
@@ -798,7 +810,13 @@ var CommandDescriptor = function(){
     "excludeFromHideBehavior",
     "newMass",
     "printMasses",
-    "destroyMass"
+    "destroyMass",
+    "knowledges",
+    "decisions",
+    "decisionTrees",
+    "states",
+    "transitions",
+    "stateMachines"
   ];
 
   this.commandInfo = [
@@ -995,7 +1013,7 @@ var CommandDescriptor = function(){
     "setEntryScene: Sets the entry scene.",
     "destroyScene: Destroys a scene.",
     "syncTextProperties: Sets the properties of targeText based on sourceText properties.",
-    "newLightning: Opents the Lightning editor GUI for lightning creation.",
+    "newLightning: Opens the Lightning editor GUI for lightning creation.",
     "editLightning: Opens the Lightning editor GUI to edit a lightning.",
     "destroyLightning: Destroys a Lightning.",
     "printLightnings: Prints a list of created lightnings.",
@@ -1014,7 +1032,7 @@ var CommandDescriptor = function(){
     "destroyContainer: Destroys a container.",
     "printContainers: Prints created containers.",
     "newVirtualKeyboard: Opens the virtual keyboard creation GUI.",
-    "editVirtualKeyboard: Opents GUI for virtual keyboard edition.",
+    "editVirtualKeyboard: Opens GUI for virtual keyboard edition.",
     "destroyVirtualKeyboard: Destroys a virtual keyboard.",
     "printVirtualKeyboards: Prints created virtual keyboards.",
     "syncSpriteSize: Makes the size of targetSprite same with sourceSprite",
@@ -1065,7 +1083,13 @@ var CommandDescriptor = function(){
     "excludeFromHideBehavior: Excludes/includes an AI entity from/to Hide behavior. Steerables cannot hide behind given entity if the entity is excluded.",
     "newMass: Creates a new physical mass without a graphical representation.",
     "printMasses: Prints a list of created masses.",
-    "destroyMass: Destroys a mass of given id."
+    "destroyMass: Destroys a mass of given id.",
+    "knowledges: Opens the knowledge editing GUI.",
+    "decisions: Opens the decision editing GUI.",
+    "decisionTrees: Opens the decision tree editing GUI.",
+    "states: Opens the state editing GUI.",
+    "transitions: Opens the transition editing GUI.",
+    "stateMachines: Opens the state machine editing GUI."
   ];
 
   this.keyboardInfo = [

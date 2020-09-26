@@ -154,14 +154,17 @@ var GUIHandler = function(){
     WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
     CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17,
     CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
-    JUMP_DESCRIPTOR_CREATION: 23
+    JUMP_DESCRIPTOR_CREATION: 23, KNOWLEDGE_CREATION: 24, DECISION_CREATION: 25, DECISION_TREE_CREATION: 26,
+    STATE_CREATION: 27, TRANSITION_CREATION: 28, STATE_MACHINE_CREATION: 29
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
     this.guiTypes.TEXTURE_PACK, this.guiTypes.SKYBOX_CREATION, this.guiTypes.FOG, this.guiTypes.FONT,
     this.guiTypes.CROSSHAIR_CREATION, this.guiTypes.SCRIPTS, this.guiTypes.ANIMATION_CREATION,
     this.guiTypes.LIGHTNING, this.guiTypes.VIRTUAL_KEYBOARD_CREATION, this.guiTypes.GRAPH_CREATOR,
-    this.guiTypes.STEERING_BEHAVIOR_CREATION, this.guiTypes.JUMP_DESCRIPTOR_CREATION
+    this.guiTypes.STEERING_BEHAVIOR_CREATION, this.guiTypes.JUMP_DESCRIPTOR_CREATION,
+    this.guiTypes.KNOWLEDGE_CREATION, this.guiTypes.DECISION_CREATION, this.guiTypes.DECISION_TREE_CREATION,
+    this.guiTypes.STATE_CREATION, this.guiTypes.TRANSITION_CREATION, this.guiTypes.STATE_MACHINE_CREATION
   ];
 }
 
@@ -240,6 +243,36 @@ GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
       break;
       case this.guiTypes.JUMP_DESCRIPTOR_CREATION:
         if (this.datGuiJumpDescriptorCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.KNOWLEDGE_CREATION:
+        if (this.datGuiKnowledgeCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.DECISION_CREATION:
+        if (this.datGuiDecisionCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.DECISION_TREE_CREATION:
+        if (this.datGuiDecisionTreeCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.STATE_CREATION:
+        if (this.datGuiStateCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.TRANSITION_CREATION:
+        if (this.datGuiTransitionCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.STATE_MACHINE_CREATION:
+        if (this.datGuiStateMachineCreation){
           return true;
         }
       break;
@@ -1131,6 +1164,42 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiJumpDescriptorCreation){
         this.destroyGUI(this.datGuiJumpDescriptorCreation);
         this.datGuiJumpDescriptorCreation = 0;
+      }
+    return;
+    case this.guiTypes.KNOWLEDGE_CREATION:
+      if (this.datGuiKnowledgeCreation){
+        this.destroyGUI(this.datGuiKnowledgeCreation);
+        this.datGuiKnowledgeCreation = 0;
+      }
+    return;
+    case this.guiTypes.DECISION_CREATION:
+      if (this.datGuiDecisionCreation){
+        this.destroyGUI(this.datGuiDecisionCreation);
+        this.datGuiDecisionCreation = 0;
+      }
+    return;
+    case this.guiTypes.DECISION_TREE_CREATION:
+      if (this.datGuiDecisionTreeCreation){
+        this.destroyGUI(this.datGuiDecisionTreeCreation);
+        this.datGuiDecisionTreeCreation = 0;
+      }
+    return;
+    case this.guiTypes.STATE_CREATION:
+      if (this.datGuiStateCreation){
+        this.destroyGUI(this.datGuiStateCreation);
+        this.datGuiStateCreation = 0;
+      }
+    return;
+    case this.guiTypes.TRANSITION_CREATION:
+      if (this.datGuiTransitionCreation){
+        this.destroyGUI(this.datGuiTransitionCreation);
+        this.datGuiTransitionCreation = 0;
+      }
+    return;
+    case this.guiTypes.STATE_MACHINE_CREATION:
+      if (this.datGuiStateMachineCreation){
+        this.destroyGUI(this.datGuiStateMachineCreation);
+        this.datGuiStateMachineCreation = 0;
       }
     return;
   }

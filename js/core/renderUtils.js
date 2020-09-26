@@ -28,6 +28,7 @@ function render(){
     cpuOperationsHandler.updateTrackingObjects();
     cpuOperationsHandler.updateDynamicObjects();
     cpuOperationsHandler.processCameraRotationBuffer();
+    cpuOperationsHandler.updateDecisionHandler();
     cpuOperationsHandler.runScripts();
     cpuOperationsHandler.updateParticleSystems();
     cpuOperationsHandler.updateObjectTrails();

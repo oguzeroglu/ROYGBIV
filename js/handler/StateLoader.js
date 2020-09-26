@@ -112,6 +112,7 @@ StateLoader.prototype.finalize = function(){
   if (!this.shouldFinalize()){
     return;
   }
+  
   this.importHandler.importParticleSystems(this.stateObj);
   this.importHandler.importAddedTexts(this.stateObj);
   this.importHandler.importAddedObjectGraphicsProperties();
@@ -124,6 +125,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importVirtualKeyboards(this.stateObj);
   this.importHandler.importScenes(this.stateObj);
   this.importHandler.importSteeringHandler(this.stateObj);
+  this.importHandler.importDecisionHandler(this.stateObj);
 
   this.closePhysicsWorkerIfNotUsed();
   this.closeRaycasterWorkerIfNotUsed();
@@ -351,6 +353,7 @@ StateLoader.prototype.resetProject = function(){
   animationHandler.reset();
   lightningHandler.reset();
   steeringHandler.reset();
+  decisionHandler.reset();
   fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;

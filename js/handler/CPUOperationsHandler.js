@@ -23,7 +23,8 @@ var CPUOperationsHandler = function(){
     activeVirtualKeyboardUpdate: 0,
     inputTextUpdate: 0,
     lightHandlerUpdate: 0,
-    steeringHandlerUpdate: 0
+    steeringHandlerUpdate: 0,
+    decisionHandlerUpdate: 0
   }
   this.scriptPerformances = {};
 }
@@ -63,6 +64,16 @@ CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
         console.log("%c   ["+pseudoAry2[i2].name+"] -> "+pseudoAry2[i2].value+" ms.", "background: black; color: lightcyan");
       }
     }
+  }
+}
+
+CPUOperationsHandler.prototype.updateDecisionHandler = function(){
+  if (this.record){
+    var s = performance.now();
+    decisionHandler.tick();
+    this.performanceLogs.decisionHandlerUpdate = performance.now() - s;
+  }else{
+    decisionHandler.tick();
   }
 }
 
