@@ -109,6 +109,11 @@ StateMachineCreatorGUIHandler.prototype.show = function(){
   for (var smName in stateMachinesInScene){
     this.addStateMachineFolder(smName, onStateMachineDestroyed);
   }
+
+  var clonedStateMachinesInScene = decisionHandler.clonedStateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  for (var smName in clonedStateMachinesInScene){
+    this.addClonedStateMachineFolder(smName);
+  }
 }
 
 StateMachineCreatorGUIHandler.prototype.createMermaidContainer = function(){
@@ -377,7 +382,7 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
         terminal.printError(Text.STATE_HAS_ANOTHER_PARENT);
         return;
       }
-      
+
       if (result == -2){
         terminal.printError(Text.STATE_CONTAINS_PARENT_STATE_MACHINE);
         return;
@@ -394,6 +399,15 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
     },
     "Destroy": function(){
       terminal.clear();
+
+      var clonedStateMachinesInScene = decisionHandler.clonedStateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var clonedSMName in clonedStateMachinesInScene){
+        if (clonedStateMachinesInScene[clonedSMName].refName == stateMachineName){
+          terminal.printError(Text.STATE_MACHINE_HAS_A_CLONE_CANNOT_DESTROY.replace(Text.PARAM1, clonedSMName));
+          return;
+        }
+      }
+
       if (!decisionHandler.destroyStateMachine(stateMachineName)){
         terminal.printError(Text.STATE_MACHINE_IS_ENTRY_STATE_CANNOT_DESTROY.replace(Text.PARAM1, decisionHandler.stateParentsBySceneName[sceneHandler.getActiveSceneName()][stateMachineName]))
         return;
@@ -431,6 +445,39 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
     }
   }).listen();
 
+  var knowledgeNames = Object.keys(decisionHandler.knowledgesBySceneName[sceneHandler.getActiveSceneName()] || {});
+  var cloneFolder = stateMachineFolder.addFolder("Clone");
+  var cloneParams = {
+    "Name": "",
+    "Knowledge": knowledgeNames[0] || "",
+    "Create a clone": function(){
+      terminal.clear();
+      var cloneName = this["Name"];
+      var knowledgeName = this["Knowledge"];
+
+      if (!cloneName){
+        terminal.printError(Text.NAME_CANNOT_BE_EMPTY);
+        return;
+      }
+
+      if (!knowledgeName){
+        terminal.printError(Text.KNOWLEDGE_IS_REQUIRED_TO_CREATE_A_STATE_MACHINE);
+        return;
+      }
+
+      if (!decisionHandler.cloneStateMachine(cloneName, stateMachineName, knowledgeName)){
+        terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+        return;
+      }
+
+      stateMachineCreatorGUIHandler.addClonedStateMachineFolder(cloneName);
+      terminal.printInfo(Text.STATE_MACHINE_CLONED);
+    }
+  };
+  cloneFolder.add(cloneParams, "Name");
+  cloneFolder.add(cloneParams, "Knowledge", knowledgeNames);
+  cloneFolder.add(cloneParams, "Create a clone");
+
   transitionsFolder = stateMachineFolder.addFolder("Transitions");
   transitionsFolder.add(params, "Transition", transitionNames);
   transitionsFolder.add(params, "Add transition");
@@ -449,4 +496,18 @@ StateMachineCreatorGUIHandler.prototype.addStateMachineFolder = function(stateMa
 
   this.paramsByStateMachineName[stateMachineName] = params;
   this.statesFoldersByStateMachineName[stateMachineName] = statesFolder;
+}
+
+StateMachineCreatorGUIHandler.prototype.addClonedStateMachineFolder = function(cloneName){
+  var clone = decisionHandler.clonedStateMachinesBySceneName[sceneHandler.getActiveSceneName()][cloneName];
+  var folderText = cloneName + " (Clone of [" + clone.refName + "] having knowledge [" + clone.knowledgeName + "])";
+  var cloneFolder = guiHandler.datGuiStateMachineCreation.addFolder(folderText);
+  cloneFolder.add({
+    "Destroy": function(){
+      terminal.clear();
+      decisionHandler.destroyClonedStateMachine(cloneName);
+      guiHandler.datGuiStateMachineCreation.removeFolder(cloneFolder);
+      terminal.printInfo(Text.STATE_MACHINE_DESTROYED);
+    }
+  }, "Destroy");
 }

@@ -25,6 +25,7 @@ DecisionHandler.prototype.reset = function(){
   this.stateMachinesBySceneName = {};
   this.stateParentsBySceneName = {};
   this.clonedDecisionTreesBySceneName = {};
+  this.clonedStateMachinesBySceneName = {};
 }
 
 DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
@@ -135,6 +136,24 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
       }
     }
   }
+
+  for (var sceneName in this.clonedStateMachinesBySceneName){
+    var clonedStateMachinesInScene = this.clonedStateMachinesBySceneName[sceneName];
+    for (var smName in clonedStateMachinesInScene){
+      var cloneInfo = clonedStateMachinesInScene[smName];
+      var stateMachine = this.constructedStateMachines[sceneName][cloneInfo.refName].clone(decisionHandler.knowledgesBySceneName[sceneName][cloneInfo.knowledgeName]);
+      stateMachine.registeredSceneName = sceneName;
+      stateMachine.isDirty = false;
+      this.constructedStateMachines[sceneName][smName] = stateMachine;
+      this.stateEntryCallbacks[sceneName][smName] = {};
+      stateMachine.onStateChanged(function(newState){
+        var callback = decisionHandler.stateEntryCallbacks[this.registeredSceneName][this.getName()][newState.getName()];
+        if (callback){
+          callback();
+        }
+      });
+    }
+  }
 }
 
 DecisionHandler.prototype.onSwitchFromPreviewToDesign = function(){
@@ -218,6 +237,7 @@ DecisionHandler.prototype.import = function(exportObj){
   var stateMachinesBySceneName = exportObj.stateMachinesBySceneName;
   var stateParentsBySceneName = exportObj.stateParentsBySceneName;
   var clonedDecisionTreesBySceneName = exportObj.clonedDecisionTreesBySceneName;
+  var clonedStateMachinesBySceneName = exportObj.clonedStateMachinesBySceneName;
 
   for (var sceneName in knowledgesBySceneName){
     this.knowledgesBySceneName[sceneName] = {};
@@ -316,6 +336,7 @@ DecisionHandler.prototype.import = function(exportObj){
 
   this.stateParentsBySceneName = JSON.parse(JSON.stringify(stateParentsBySceneName));
   this.clonedDecisionTreesBySceneName = JSON.parse(JSON.stringify(clonedDecisionTreesBySceneName));
+  this.clonedStateMachinesBySceneName = JSON.parse(JSON.stringify(clonedStateMachinesBySceneName));
 }
 
 DecisionHandler.prototype.export = function(){
@@ -327,7 +348,8 @@ DecisionHandler.prototype.export = function(){
     transitionsBySceneName: {},
     stateMachinesBySceneName: {},
     stateParentsBySceneName: JSON.parse(JSON.stringify(this.stateParentsBySceneName)),
-    clonedDecisionTreesBySceneName: JSON.parse(JSON.stringify(this.clonedDecisionTreesBySceneName))
+    clonedDecisionTreesBySceneName: JSON.parse(JSON.stringify(this.clonedDecisionTreesBySceneName)),
+    clonedStateMachinesBySceneName: JSON.parse(JSON.stringify(this.clonedStateMachinesBySceneName))
   };
 
   for (var sceneName in this.knowledgesBySceneName){
@@ -513,10 +535,28 @@ DecisionHandler.prototype.destroyStateMachine = function(stateMachineName){
   return true;
 }
 
+DecisionHandler.prototype.cloneStateMachine = function(cloneName, refName, knowledgeName){
+  var stateMachinesInScene = this.stateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
+  var clonedStateMachinesInScene = this.clonedStateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  if (stateMachinesInScene[cloneName] || clonedStateMachinesInScene[cloneName]){
+    return false;
+  }
+
+  clonedStateMachinesInScene[cloneName] = {refName: refName, knowledgeName: knowledgeName};
+  this.clonedStateMachinesBySceneName[sceneHandler.getActiveSceneName()] = clonedStateMachinesInScene;
+  return true;
+}
+
+DecisionHandler.prototype.destroyClonedStateMachine = function(cloneName){
+  delete this.clonedStateMachinesBySceneName[sceneHandler.getActiveSceneName()][cloneName];
+}
+
 DecisionHandler.prototype.createStateMachine = function(stateMachineName, knowledgeName, entryStateName, overrideSceneName){
   var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
 
   var stateMachinesInScene = this.stateMachinesBySceneName[sceneName] || {};
+  var clonedStateMachinesInScene = this.clonedStateMachinesBySceneName[sceneName] || {};
 
   var stateParents = this.stateParentsBySceneName[sceneName] || {};
 
@@ -524,7 +564,7 @@ DecisionHandler.prototype.createStateMachine = function(stateMachineName, knowle
     return -1;
   }
 
-  if (stateMachinesInScene[stateMachineName]){
+  if (stateMachinesInScene[stateMachineName] || clonedStateMachinesInScene[stateMachineName]){
     return -2;
   }
 

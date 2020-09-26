@@ -119,6 +119,14 @@ KnowledgeCreatorGUIHandler.prototype.addKnowledgeFolder = function(knowledgeName
         }
       }
 
+      var clonedStateMachinesInScene = decisionHandler.clonedStateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var smName in clonedStateMachinesInScene){
+        if (clonedStateMachinesInScene[smName].knowledgeName == knowledgeName){
+          terminal.printError(Text.KNOWLEDGE_USED_IN_STATE_MACHINE_CANNOT_DESTROY.replace(Text.PARAM1, smName));
+          return;
+        }
+      }
+
       decisionHandler.destroyKnowledge(knowledgeName);
       guiHandler.datGuiKnowledgeCreation.removeFolder(knowledgeFolder);
       terminal.printInfo(Text.KNOWLEDGE_DESTROYED);
