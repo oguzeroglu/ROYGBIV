@@ -153,20 +153,7 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
         }
       });
 
-      for (var stateID in stateMachine._statesByID){
-        var state = stateMachine._statesByID[stateID];
-        if (state instanceof Ego.StateMachine){
-          state.registeredSceneName = sceneName;
-          state.isDirty = false;
-          this.stateEntryCallbacks[sceneName][state.getID()] = {};
-          state.onStateChanged(function(newState){
-            var callback = decisionHandler.stateEntryCallbacks[this.registeredSceneName][this.getID()][newState.getName()];
-            if (callback){
-              callback();
-            }
-          });
-        }
-      }
+      this.prepareClonedSMChildren(stateMachine, sceneName);
     }
   }
 }
@@ -1010,4 +997,23 @@ DecisionHandler.prototype.getChildStateMachine = function(stateMachine, childNam
     }
   }
   return null;
+}
+
+DecisionHandler.prototype.prepareClonedSMChildren = function(stateMachine, sceneName){
+  for (var stateID in stateMachine._statesByID){
+    var state = stateMachine._statesByID[stateID];
+    if (state instanceof Ego.StateMachine){
+      state.registeredSceneName = sceneName;
+      state.isDirty = false;
+      this.stateEntryCallbacks[sceneName][state.getID()] = {};
+      state.onStateChanged(function(newState){
+        var callback = decisionHandler.stateEntryCallbacks[this.registeredSceneName][this.getID()][newState.getName()];
+        if (callback){
+          callback();
+        }
+      });
+      
+      this.prepareClonedSMChildren(state, sceneName);
+    }
+  }
 }
