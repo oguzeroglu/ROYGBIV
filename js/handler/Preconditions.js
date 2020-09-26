@@ -301,25 +301,14 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
 }
 
 Preconditions.prototype.checkIfStateMachineHasState = function(callerFunc, stateMachine, stateName){
-  var stateMachinesInScene = decisionHandler.constructedStateMachines[sceneHandler.getActiveSceneName()];
-  var statesInScene = decisionHandler.statesBySceneName[sceneHandler.getActiveSceneName()];
-  var state = null;
-
-  if (stateMachinesInScene){
-    state = stateMachinesInScene[stateName];
+  for (var stateID in stateMachine._statesByID){
+    var state = stateMachine._statesByID[stateID];
+    if (state.getName() == stateName){
+      return;
+    }
   }
 
-  if (!state && statesInScene){
-    state = statesInScene[stateName];
-  }
-
-  if (!state){
-    this.throw(callerFunc, "State machine does not have such state.");
-  }
-
-  if (state.getParent() != stateMachine){
-    this.throw(callerFunc, "State machine does not have such state.");
-  }
+  this.throw(callerFunc, "State machine does not have such state.");
 }
 
 Preconditions.prototype.checkIfStateMachineInActiveScene = function(callerFunc, stateMachine){
