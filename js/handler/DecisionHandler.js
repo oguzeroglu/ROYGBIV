@@ -81,9 +81,9 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
       stateMachine.registeredSceneName = sceneName;
       stateMachine.isDirty = false;
       this.constructedStateMachines[sceneName][smName] = stateMachine;
-      this.stateEntryCallbacks[sceneName][smName] = {};
+      this.stateEntryCallbacks[sceneName][stateMachine.getID()] = {};
       stateMachine.onStateChanged(function(newState){
-        var callback = decisionHandler.stateEntryCallbacks[this.registeredSceneName][this.getName()][newState.getName()];
+        var callback = decisionHandler.stateEntryCallbacks[this.registeredSceneName][this.getID()][newState.getName()];
         if (callback){
           callback();
         }
@@ -145,13 +145,28 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
       stateMachine.registeredSceneName = sceneName;
       stateMachine.isDirty = false;
       this.constructedStateMachines[sceneName][smName] = stateMachine;
-      this.stateEntryCallbacks[sceneName][smName] = {};
+      this.stateEntryCallbacks[sceneName][stateMachine.getID()] = {};
       stateMachine.onStateChanged(function(newState){
-        var callback = decisionHandler.stateEntryCallbacks[this.registeredSceneName][this.getName()][newState.getName()];
+        var callback = decisionHandler.stateEntryCallbacks[this.registeredSceneName][this.getID()][newState.getName()];
         if (callback){
           callback();
         }
       });
+
+      for (var stateID in stateMachine._statesByID){
+        var state = stateMachine._statesByID[stateID];
+        if (state instanceof Ego.StateMachine){
+          state.registeredSceneName = sceneName;
+          state.isDirty = false;
+          this.stateEntryCallbacks[sceneName][state.getID()] = {};
+          state.onStateChanged(function(newState){
+            var callback = decisionHandler.stateEntryCallbacks[this.registeredSceneName][this.getID()][newState.getName()];
+            if (callback){
+              callback();
+            }
+          });
+        }
+      }
     }
   }
 }
@@ -427,11 +442,11 @@ DecisionHandler.prototype.export = function(){
 }
 
 DecisionHandler.prototype.onStateEntry = function(stateMachine, stateName, callbackFunction){
-  this.stateEntryCallbacks[stateMachine.registeredSceneName][stateMachine.getName()][stateName] = callbackFunction;
+  this.stateEntryCallbacks[stateMachine.registeredSceneName][stateMachine.getID()][stateName] = callbackFunction;
 }
 
 DecisionHandler.prototype.removeStateEntryListener = function(stateMachine, stateName){
-  this.stateEntryCallbacks[stateMachine.registeredSceneName][stateMachine.getName()][stateName] = noop;
+  this.stateEntryCallbacks[stateMachine.registeredSceneName][stateMachine.getID()][stateName] = noop;
 }
 
 DecisionHandler.prototype.resetStateMachine = function(stateMachine){
@@ -985,4 +1000,14 @@ DecisionHandler.prototype.tick = function(){
       knowledgesInScene[knowledgeName].isDirty = false;
     }
   }
+}
+
+DecisionHandler.prototype.getChildStateMachine = function(stateMachine, childName){
+  for (var stateID in stateMachine._statesByID){
+    var state = stateMachine._statesByID[stateID];
+    if (state instanceof Ego.StateMachine && state.getName() == childName){
+      return state;
+    }
+  }
+  return null;
 }

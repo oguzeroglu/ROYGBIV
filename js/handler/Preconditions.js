@@ -290,6 +290,7 @@ var Preconditions = function(){
   this.stateMachineName = "stateMachineName";
   this.stateMachine = "stateMachine";
   this.stateName = "stateName";
+  this.childStateMachineName = "childStateMachineName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

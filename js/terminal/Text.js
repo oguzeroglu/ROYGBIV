@@ -1312,4 +1312,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ACTIVATESTATEMACHINE = "Activates a state machine for updates. Note that state machines are deactivated by default.";
   this.ROYGBIV_SCRIPTING_API_DEACTIVATESTATEMACHINE = "Deactivates a state machine for updates. Note that state machines are deactivated by default.";
   this.ROYGBIV_SCRIPTING_API_RESETKNOWLEDGE = "Resets a knowledge setting each information to their initial value.";
+  this.ROYGBIV_SCRIPTING_API_GETCHILDSTATEMACHINE = "Returns a child state machine of given state machine or 0 if the child does not exist. This API is esepcially useful for\ncloned state machines for accessing to their children in order to add state change listeners to them.";
 }

@@ -329,7 +329,8 @@ var Roygbiv = function(){
     "resetStateMachine",
     "activateStateMachine",
     "deactivateStateMachine",
-    "resetKnowledge"
+    "resetKnowledge",
+    "getChildStateMachine"
   ];
 
   this.globals = new Object();
@@ -848,6 +849,21 @@ Roygbiv.prototype.getStateMachine = function(stateMachineName){
   var stateMachine = decisionHandler.getStateMachine(stateMachineName);
 
   return stateMachine || 0;
+}
+
+// Returns a child state machine of given state machine or 0 if the child does not exist.
+// This API is esepcially useful for cloned state machines for accessing to their
+// children in order to add state change listeners to them.
+Roygbiv.prototype.getChildStateMachine = function(stateMachine, childStateMachineName){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.getChildStateMachine, preConditions.stateMachine, stateMachine);
+  preConditions.checkIfDefined(ROYGBIV.getChildStateMachine, preConditions.childStateMachineName, childStateMachineName);
+  preConditions.checkIfStateMachine(ROYGBIV.getChildStateMachine, stateMachine);
+
+  return decisionHandler.getChildStateMachine(stateMachine, childStateMachineName) || 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
