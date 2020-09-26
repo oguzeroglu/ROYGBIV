@@ -25,6 +25,23 @@ PreconfiguredStateMachine.prototype.removeTransition = function(transitionName){
   this.transitions.splice(this.transitions.indexOf(transitionName), 1);
 }
 
+PreconfiguredStateMachine.prototype.hasTransition = function(transitionName){
+  var result = this.transitions.indexOf(transitionName) >= 0;
+
+  if (!result){
+    var stateMachinesInScene = decisionHandler.stateMachinesBySceneName[this.sceneName] || {};
+    for (var i = 0; i < this.states.length; i ++){
+      var curStateName = this.states[i];
+      var curSM = stateMachinesInScene[curStateName];
+      if (curSM && curSM.hasTransition(transitionName)){
+        return true;
+      }
+    }
+  }
+
+  return result;
+}
+
 PreconfiguredStateMachine.prototype.hasState = function(stateName){
   var result = this.states.indexOf(stateName) >= 0;
 

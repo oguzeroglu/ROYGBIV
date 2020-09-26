@@ -774,6 +774,7 @@ var Text = function(){
   this.TRANSITION_DESTROYED = "Transition destroyed.";
   this.TRANSITION_REMOVED_FROM_SM = "Transition removed from state machine.";
   this.TRANSITION_ADDED = "Transition added.";
+  this.TRANSITION_USED_IN_STATE_MACHINE_CANNOT_DESTROY = "Transition used in state machine [@@1]. Cannot destroy.";
   this.THE_SOURCE_STATE_OF_TRANSITION_DIFFERENT_PARENT = "The source state of the transition does not belong to the state machine.";
   this.TRANSITION_WITH_SAME_SOURCE_TARGET_EXISTS = "A transition with same source and target already added to this state machine.";
   this.KNOWLEDGE_IS_REQUIRED_TO_CREATE_A_DECISION = "A knowledge is required to create a decision.";

@@ -99,6 +99,15 @@ TransitionCreatorGUIHandler.prototype.addTransitionFolder = function(transitionN
   transitionFolder.add({
     "Destroy": function(){
       terminal.clear();
+
+      var stateMachinesInScene = decisionHandler.stateMachinesBySceneName[sceneHandler.getActiveSceneName()] || {};
+      for (var smName in stateMachinesInScene){
+        if (stateMachinesInScene[smName].hasTransition(transitionName)){
+          terminal.printError(Text.TRANSITION_USED_IN_STATE_MACHINE_CANNOT_DESTROY.replace(Text.PARAM1, smName));
+          return;
+        }
+      }
+
       decisionHandler.destroyTransition(transitionName);
       guiHandler.datGuiTransitionCreation.removeFolder(transitionFolder);
       terminal.printInfo(Text.TRANSITION_DESTROYED);
