@@ -159,6 +159,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     var objectGroup = new ObjectGroup();
     objectGroup.isIntersectable = curExport.isIntersectable;
     objectGroup.isChangeable = curExport.isChangeable;
+    objectGroup.hiddenInDesignMode = curExport.hiddenInDesignMode;
     objectGroup.lastUpdatePosition = new THREE.Vector3();
     objectGroup.lastUpdateQuaternion = new THREE.Quaternion();
     objectGroup.boundingBoxes = [];
@@ -168,6 +169,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     objectGroup.center = new THREE.Vector3(curExport.center.x, curExport.center.y, curExport.center.z);
     objectGroup.childsByChildWorkerId = new Object();
     objectGroup.graphicsGroup.position.copy(objectGroup.center);
+
     for (var i = 0; i<curExport.childNames.length; i++){
       var childObj = addedObjects[curExport.childNames[i]];
       childObj.mesh.position.copy(childObj.positionWhenAttached);

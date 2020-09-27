@@ -40,6 +40,27 @@ var ObjectGroup = function(name, group){
   this.rotationMode = rotationModes.WORLD;
 }
 
+ObjectGroup.prototype.showInDesignMode = function(){
+  if (isDeployment){
+    return;
+  }
+  this.showVisually();
+  this.hiddenInDesignMode = false;
+  refreshRaycaster(Text.OBJECT_SHOWN);
+}
+
+ObjectGroup.prototype.hideInDesignMode = function(skipRaycasterRefresh){
+  if (isDeployment){
+    return;
+  }
+  this.hideVisually();
+  this.hiddenInDesignMode = true;
+
+  if (!skipRaycasterRefresh){
+    refreshRaycaster(Text.OBJECT_HIDDEN);
+  }
+}
+
 ObjectGroup.prototype.setRotationMode = function(rotationMode){
   this.rotationMode = rotationMode;
 }
@@ -2680,6 +2701,9 @@ ObjectGroup.prototype.exportLightweight = function(){
     exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
     exportObj.isPhysicsSimplified = true;
   }
+  if (this.hiddenInDesignMode){
+    exportObj.hiddenInDesignMode = true;
+  }
   return exportObj;
 }
 
@@ -2870,6 +2894,7 @@ ObjectGroup.prototype.export = function(){
   }
 
   exportObj.rotationMode = this.rotationMode;
+  exportObj.hiddenInDesignMode = !!this.hiddenInDesignMode;
 
   return exportObj;
 }

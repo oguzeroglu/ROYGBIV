@@ -723,7 +723,7 @@ function onRaycasterIntersection(){
              if (addedObject.clickCallbackFunction){
                addedObject.clickCallbackFunction(point.x, point.y, point.z);
              }
-           }else if (selectedGrid.destroyedObjectGroup && !(keyboardBuffer["Shift"])){
+           }else if (selectedGrid.destroyedObjectGroup && !(keyboardBuffer["Shift"]) && !objectGroups[selectedGrid.destroyedObjectGroup].hiddenInDesignMode){
              var objectGroup = objectGroups[selectedGrid.destroyedObjectGroup];
              terminal.clear();
              var point = intersectionPoint;

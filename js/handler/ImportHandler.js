@@ -1184,6 +1184,10 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     }
     objectGroupInstance.setAffectedByLight(curObjectGroupExport.affectedByLight);
     objectGroupInstance.usedAsAIEntity = curObjectGroupExport.usedAsAIEntity;
+
+    if (curObjectGroupExport.hiddenInDesignMode){
+      objectGroupInstance.hideInDesignMode(true);
+    }
   }
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){

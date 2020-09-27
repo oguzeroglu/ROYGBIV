@@ -67,6 +67,9 @@ RayCaster.prototype.refresh = function(){
     if (mode == 1 && !objectGroup.isIntersectable){
       continue;
     }
+    if (mode == 0 && objectGroup.hiddenInDesignMode){
+      continue;
+    }
     objectGroup.mesh.updateMatrix();
     objectGroup.mesh.updateMatrixWorld();
     if (!objectGroup.boundingBoxes){
