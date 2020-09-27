@@ -298,7 +298,11 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     }
     for (var objName in this.scenes[sceneName].addedObjects){
       var obj = this.scenes[sceneName].addedObjects[objName];
-      obj.showVisually();
+      if (!obj.hiddenInDesignMode){
+        obj.showVisually();
+      }else{
+        obj.hideInDesignMode();
+      }
     }
     for (var objName in this.scenes[sceneName].objectGroups){
       var obj = this.scenes[sceneName].objectGroups[objName];

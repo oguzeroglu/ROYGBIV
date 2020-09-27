@@ -771,6 +771,10 @@ ImportHandler.prototype.importAddedObjects = function(obj){
      }
 
      addedObjectInstance.usedAsAIEntity = curAddedObjectExport.usedAsAIEntity;
+
+     if (curAddedObjectExport.hiddenInDesignMode){
+       addedObjectInstance.hideInDesignMode(true);
+     }
   }
   for (var objName in addedObjects){
     if (addedObjects[objName].softCopyParentName){

@@ -97,6 +97,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     addedObject.isChangeable = curExport.isChangeable;
     addedObject.isIntersectable = curExport.isIntersectable;
     addedObject.parentBoundingBoxIndex = curExport.parentBoundingBoxIndex;
+    addedObject.hiddenInDesignMode = curExport.hiddenInDesignMode;
     addedObject.lastUpdatePosition = new THREE.Vector3();
     addedObject.lastUpdateQuaternion = new THREE.Quaternion();
     addedObject.reusableVec3 = new THREE.Vector3();

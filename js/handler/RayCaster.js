@@ -50,6 +50,9 @@ RayCaster.prototype.refresh = function(){
     if (mode == 1 && !addedObject.isIntersectable){
       continue;
     }
+    if (mode == 0 && addedObject.hiddenInDesignMode){
+      continue;
+    }
     addedObject.mesh.updateMatrix();
     addedObject.mesh.updateMatrixWorld();
     if (!addedObject.boundingBoxes){

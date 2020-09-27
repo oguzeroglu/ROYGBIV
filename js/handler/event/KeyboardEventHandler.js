@@ -147,9 +147,15 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
 KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
   selectionHandler.resetCurrentSelection();
   for (var objName in sceneHandler.getAddedObjects()){
+    if (addedObjects[objName].hiddenInDesignMode){
+      continue;
+    }
     addedObjects[objName].mesh.visible = false;
   }
   for (var objName in sceneHandler.getObjectGroups()){
+    if (objectGroups[objName].hiddenInDesignMode){
+      continue;
+    }
     objectGroups[objName].mesh.visible = false;
   }
   for (var textName in sceneHandler.getAddedTexts()){
@@ -172,9 +178,15 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
 
 KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
   for (var objName in sceneHandler.getAddedObjects()){
+    if (addedObjects[objName].hiddenInDesignMode){
+      continue;
+    }
     addedObjects[objName].mesh.visible = true;
   }
   for (var objName in sceneHandler.getObjectGroups()){
+    if (objectGroups[objName].hiddenInDesignMode){
+      continue;
+    }
     objectGroups[objName].mesh.visible = true;
   }
   for (var textName in sceneHandler.getAddedTexts()){

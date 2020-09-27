@@ -42,7 +42,8 @@ var GUIHandler = function(){
     "Max acceleration": "100",
     "Max speed": "100",
     "Jump speed": "500",
-    "Look speed": 0.1
+    "Look speed": 0.1,
+    "Hidden": false
   };
   this.textManipulationParameters = {
     "Text": "textName",
@@ -707,6 +708,11 @@ GUIHandler.prototype.afterObjectSelection = function(){
       obj.mesh.add(axesHelper);
     }
 
+    guiHandler.objectManipulationParameters["Hidden"] = false;
+    if (obj.hiddenInDesignMode){
+      guiHandler.objectManipulationParameters["Hidden"] = true;
+    }
+
     var rotationMode = obj.rotationMode;
     guiHandler.objectManipulationParameters["Rotation mode"] = rotationMode == rotationModes.LOCAL? "LOCAL": "WORLD";
 
@@ -1347,6 +1353,14 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
 
   guiHandler.omObjController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Object").listen();
   guiHandler.disableController(guiHandler.omObjController, true);
+
+  guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Hidden").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().hideInDesignMode();
+    }else{
+      selectionHandler.getSelectedObject().showInDesignMode();
+    }
+  }).listen();
 
   var rotationFolder = guiHandler.datGuiObjectManipulation.addFolder("Rotation");
   var physicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Physics");

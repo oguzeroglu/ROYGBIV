@@ -77,6 +77,27 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedObject.prototype.showInDesignMode = function(){
+  if (isDeployment){
+    return;
+  }
+  this.showVisually();
+  this.hiddenInDesignMode = false;
+  refreshRaycaster(Text.OBJECT_SHOWN);
+}
+
+AddedObject.prototype.hideInDesignMode = function(skipRaycasterRefresh){
+  if (isDeployment){
+    return;
+  }
+  this.hideVisually();
+  this.hiddenInDesignMode = true;
+
+  if (!skipRaycasterRefresh){
+    refreshRaycaster(Text.OBJECT_HIDDEN);
+  }
+}
+
 AddedObject.prototype.setRotationMode = function(rotationMode){
   this.rotationMode = rotationMode;
 }
@@ -693,6 +714,9 @@ AddedObject.prototype.exportLightweight = function(){
   if (this.noPhysicsContributionWhenGlued){
     exportObject.noPhysicsContributionWhenGlued = true;
   }
+  if (this.hiddenInDesignMode){
+    exportObject.hiddenInDesignMode = true;
+  }
   return exportObject;
 }
 
@@ -943,6 +967,7 @@ AddedObject.prototype.export = function(){
   }
 
   exportObject.rotationMode = this.rotationMode;
+  exportObject.hiddenInDesignMode = !!this.hiddenInDesignMode;
 
   return exportObject;
 }

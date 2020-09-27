@@ -705,7 +705,7 @@ function onRaycasterIntersection(){
        }
        if (selectedGrid){
          if (!selectedGrid.sliced){
-           if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["Shift"])){
+           if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["Shift"]) && !addedObjects[selectedGrid.destroyedAddedObject].hiddenInDesignMode){
              var addedObject = addedObjects[selectedGrid.destroyedAddedObject];
              terminal.clear();
              var point = intersectionPoint;
