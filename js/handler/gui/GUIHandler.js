@@ -85,7 +85,8 @@ var GUIHandler = function(){
     "Clickable": false,
     "Draggable": false,
     "Crop X": 0.01,
-    "Crop Y": 0.01
+    "Crop Y": 0.01,
+    "Hidden": false
   };
   this.containerManipulationParameters = {
     "Container": "containerName",
@@ -371,6 +372,7 @@ GUIHandler.prototype.afterSpriteSelection = function(){
     guiHandler.spriteManipulationParameters["Width %"] = (!(typeof curSelection.fixedWidth == UNDEFINED)) ? (curSelection.fixedWidth) : 50;
     guiHandler.spriteManipulationParameters["Height %"] = (!(typeof curSelection.fixedHeight == UNDEFINED)) ? (curSelection.fixedHeight) : 50;
     guiHandler.spriteManipulationParameters["Height fixed"] = !(typeof curSelection.fixedHeight == UNDEFINED);
+    guiHandler.spriteManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
     if (!curSelection.isTextured){
       guiHandler.disableController(guiHandler.spriteManipulationTextureController);
     }
@@ -2117,6 +2119,14 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
     smGUIFocused = true;
   });
   guiHandler.spriteManipulationSpriteNameController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Sprite").listen();
+
+  guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Hidden").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().hideInDesignMode();
+    }else{
+      selectionHandler.getSelectedObject().showInDesignMode();
+    }
+  }).listen();
 
   var graphicsFolder = guiHandler.datGuiSpriteManipulation.addFolder("Graphics");
   var marginFolder = guiHandler.datGuiSpriteManipulation.addFolder("Margin");

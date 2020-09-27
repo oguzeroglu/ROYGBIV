@@ -1339,6 +1339,9 @@ ImportHandler.prototype.importSprites = function(obj){
     if (!(typeof curExport.cropCoefficientY == UNDEFINED)){
       sprite.cropCoefficientY = curExport.cropCoefficientY;
     }
+    if (curExport.hiddenInDesignMode){
+      sprite.hideInDesignMode(true);
+    }
     for (var animationName in curExport.animations){
       var curAnimationExport = curExport.animations[animationName];
       sprite.addAnimation(new Animation(animationName, curAnimationExport.type, sprite, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));

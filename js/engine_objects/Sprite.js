@@ -26,6 +26,27 @@ var Sprite = function(name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+Sprite.prototype.showInDesignMode = function(){
+  if (isDeployment){
+    return;
+  }
+  this.showVisually();
+  this.hiddenInDesignMode = false;
+  refreshRaycaster(Text.SPRITE_SHOWN);
+}
+
+Sprite.prototype.hideInDesignMode = function(skipRaycasterRefresh){
+  if (isDeployment){
+    return;
+  }
+  this.hideVisually();
+  this.hiddenInDesignMode = true;
+
+  if (!skipRaycasterRefresh){
+    refreshRaycaster(Text.SPRITE_HIDDEN);
+  }
+}
+
 Sprite.prototype.onTextureAtlasRefreshed = function(){
   if (!this.isTextured){
     return;
@@ -241,7 +262,8 @@ Sprite.prototype.export = function(){
     originalHeight: this.originalHeight,
     originalWidthReference: this.originalWidthReference,
     originalHeightReference: this.originalHeightReference,
-    originalScreenResolution: this.originalScreenResolution
+    originalScreenResolution: this.originalScreenResolution,
+    hiddenInDesignMode: !!this.hiddenInDesignMode
   };
 }
 
@@ -275,7 +297,8 @@ Sprite.prototype.exportLightweight = function(){
       b: this.triangle2.b,
       c: this.triangle2.c
     },
-    clickable: this.isClickable
+    clickable: this.isClickable,
+    hiddenInDesignMode: !!this.hiddenInDesignMode
   };
 }
 

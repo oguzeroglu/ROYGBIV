@@ -53,6 +53,9 @@ ObjectPicker2D.prototype.refresh = function(){
     this.binHandler.insert(allTexts[textName]);
   }
   for (var spriteName in allSprites){
+    if (mode == 0 && allSprites[spriteName].hiddenInDesignMode){
+      continue;
+    }
     this.binHandler.insert(allSprites[spriteName]);
   }
   for (var containerName in allContainers){

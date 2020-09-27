@@ -238,6 +238,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     sprites[spriteName].triangle1.set(spriteExports[spriteName].triangle1.a, spriteExports[spriteName].triangle1.b, spriteExports[spriteName].triangle1.c);
     sprites[spriteName].triangle2.set(spriteExports[spriteName].triangle2.a, spriteExports[spriteName].triangle2.b, spriteExports[spriteName].triangle2.c);
     sprites[spriteName].isClickable = spriteExports[spriteName].clickable;
+    sprites[spriteName].hiddenInDesignMode = spriteExports[spriteName].hiddenInDesignMode;
     if (sprites[spriteName].isClickable){
       clickableSprites[spriteName] = sprites[spriteName];
     }

@@ -162,6 +162,9 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
     addedTexts[textName].hide();
   }
   for (var spriteName in sceneHandler.getSprites()){
+    if (sprites[spriteName].hiddenInDesignMode){
+      continue;
+    }
     sprites[spriteName].mesh.visible = false;
   }
   for (var containerName in sceneHandler.getContainers()){
@@ -193,6 +196,9 @@ KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
     addedTexts[textName].show();
   }
   for (var spriteName in sceneHandler.getSprites()){
+    if (sprites[spriteName].hiddenInDesignMode){
+      continue;
+    }
     sprites[spriteName].mesh.visible = true;
   }
   for (var containerName in sceneHandler.getContainers()){
