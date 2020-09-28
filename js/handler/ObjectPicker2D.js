@@ -50,6 +50,9 @@ ObjectPicker2D.prototype.refresh = function(){
   var allContainers = this.getContainers();
   var allVirtualKeyboards = this.getVirtualKeyboards();
   for (var textName in allTexts){
+    if (mode == 0 && allTexts[textName].hiddenInDesignMode){
+      continue;
+    }
     this.binHandler.insert(allTexts[textName]);
   }
   for (var spriteName in allSprites){

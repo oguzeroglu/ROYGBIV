@@ -64,7 +64,8 @@ var GUIHandler = function(){
     "Margin X": 50.0,
     "Margin Y": 50.0,
     "Max width%": 100,
-    "Max height%": 100
+    "Max height%": 100,
+    "Hidden": false
   };
   this.spriteManipulationParameters = {
     "Sprite": "spriteName",
@@ -493,6 +494,8 @@ GUIHandler.prototype.afterTextSelection = function(){
     }else{
       guiHandler.textManipulationParameters["Shader precision"] = "default";
     }
+
+    guiHandler.textManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
   }else{
     guiHandler.hide(guiHandler.guiTypes.TEXT);
   }
@@ -2308,6 +2311,14 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     addedText.setText(val);
     if (addedText.containerParent){
       addedText.containerParent.insertAddedText(addedText);
+    }
+  }).listen();
+
+  guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Hidden").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().hideInDesignMode();
+    }else{
+      selectionHandler.getSelectedObject().showInDesignMode();
     }
   }).listen();
 

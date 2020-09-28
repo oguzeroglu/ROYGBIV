@@ -88,6 +88,9 @@ RayCaster.prototype.refresh = function(){
     }
     for (var txtName in this.getAddedTexts()){
       var addedText = addedTexts[txtName];
+      if (mode == 0 && addedText.hiddenInDesignMode){
+        continue;
+      }
       if (!addedText.is2D){
         this.binHandler.insert(addedText.boundingBox, txtName);
       }

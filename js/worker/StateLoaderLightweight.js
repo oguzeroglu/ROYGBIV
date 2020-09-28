@@ -217,6 +217,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     addedText.lastUpdateCameraPosition = new THREE.Vector3();
     addedText.isClickable = curExport.isClickable;
     addedText.is2D = !!curExport.twoDimensionalSize;
+    addedText.hiddenInDesignMode = !!curExport.hiddenInDesignMode;
     if (!addedText.is2D){
       addedText.handleBoundingBox();
     }else{

@@ -741,7 +741,7 @@ function onRaycasterIntersection(){
              if (objectGroup.clickCallbackFunction){
                objectGroup.clickCallbackFunction(point.x, point.y, point.z);
              }
-           }else if (selectedGrid.createdAddedTextName && !(keyboardBuffer["Shift"])){
+           }else if (selectedGrid.createdAddedTextName && !(keyboardBuffer["Shift"]) && !addedTexts[selectedGrid.createdAddedTextName].hiddenInDesignMode){
               var addedText = addedTexts[selectedGrid.createdAddedTextName];
               if (!isDeployment && mode == 0){
                 terminal.clear();

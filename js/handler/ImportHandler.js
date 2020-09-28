@@ -968,6 +968,11 @@ ImportHandler.prototype.importAddedTexts = function(obj){
     }
     addedTexts[textName] = addedTextInstance;
     addedTextInstance.handleResize();
+
+    if (curTextExport.hiddenInDesignMode){
+      addedTextInstance.hideInDesignMode(true);
+    }
+
     if (addedTextInstance.is2D){
       addedTexts2D[addedTextInstance.name] = addedTextInstance;
     }

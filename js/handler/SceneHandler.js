@@ -314,7 +314,11 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     }
     for (var textName in this.scenes[sceneName].addedTexts){
       var text = this.scenes[sceneName].addedTexts[textName];
-      text.showVisually();
+      if (!text.hiddenInDesignMode){
+        text.showVisually();
+      }else{
+        text.hideInDesignMode();
+      }
     }
     for (var spriteName in this.scenes[sceneName].sprites){
       var sprite = this.scenes[sceneName].sprites[spriteName];

@@ -98,6 +98,27 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedText.prototype.showInDesignMode = function(){
+  if (isDeployment){
+    return;
+  }
+  this.showVisually();
+  this.hiddenInDesignMode = false;
+  refreshRaycaster(Text.TEXT_SHOWN);
+}
+
+AddedText.prototype.hideInDesignMode = function(skipRaycasterRefresh){
+  if (isDeployment){
+    return;
+  }
+  this.hideVisually();
+  this.hiddenInDesignMode = true;
+
+  if (!skipRaycasterRefresh){
+    refreshRaycaster(Text.TEXT_HIDDEN);
+  }
+}
+
 AddedText.prototype.isAnimationSuitable = function(animation){
   var action = animation.description.action;
 
@@ -345,6 +366,7 @@ AddedText.prototype.exportLightweight = function(){
   exportObj.position = this.mesh.position;
   exportObj.initPosition = this.position;
   exportObj.isClickable = this.isClickable;
+  exportObj.hiddenInDesignMode = !!this.hiddenInDesignMode;
   if (this.is2D){
     if (!this.twoDimensionalSize){
       this.handleResize();
@@ -375,6 +397,7 @@ AddedText.prototype.export = function(){
   exportObj.hasBackground = this.hasBackground;
   exportObj.refCharOffset = this.refCharOffset;
   exportObj.refLineOffset = this.refLineOffset;
+  exportObj.hiddenInDesignMode = !!this.hiddenInDesignMode;
   if (this.hasBackground){
     exportObj.backgroundColorR = this.material.uniforms.backgroundColor.value.r;
     exportObj.backgroundColorG = this.material.uniforms.backgroundColor.value.g;
@@ -786,6 +809,11 @@ AddedText.prototype.needsUpdate = function(){
     this.makeFirstUpdate = false;
     return true;
   }
+
+  if (mode == 0 && this.hiddenInDesignMode){
+    return false;
+  }
+
   return !(
     this.lastUpdateQuaternion.x == camera.quaternion.x &&
     this.lastUpdateQuaternion.y == camera.quaternion.y &&
