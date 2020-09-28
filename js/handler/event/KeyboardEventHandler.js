@@ -171,10 +171,10 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
     sprites[spriteName].mesh.visible = false;
   }
   for (var containerName in sceneHandler.getContainers()){
-    containers[containerName].rectangle.mesh.visible = false;
-    if (containers[containerName].hasBackground){
-      containers[containerName].backgroundSprite.mesh.visible = false;
+    if (containers[containerName].hiddenInDesignMode){
+      continue;
     }
+    containers[containerName].hideVisually();
   }
   for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
     virtualKeyboards[virtualKeyboardName].onShiftPress(true);
@@ -208,10 +208,10 @@ KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
     sprites[spriteName].mesh.visible = true;
   }
   for (var containerName in sceneHandler.getContainers()){
-    containers[containerName].rectangle.mesh.visible = true;
-    if (containers[containerName].hasBackground){
-      containers[containerName].backgroundSprite.mesh.visible = true;
+    if (containers[containerName].hiddenInDesignMode){
+      continue;
     }
+    containers[containerName].showVisually();
   }
   for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
     virtualKeyboards[virtualKeyboardName].onShiftPress(false);

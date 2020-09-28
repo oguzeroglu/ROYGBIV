@@ -334,6 +334,9 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       if (container.hasBackground){
         container.backgroundSprite.showVisually();
       }
+      if (container.hiddenInDesignMode){
+        container.hideInDesignMode();
+      }
     }
     for (var vkName in this.scenes[sceneName].virtualKeyboards){
       virtualKeyboards[vkName].resetColors();

@@ -106,7 +106,8 @@ var GUIHandler = function(){
     "BG color": "#ffffff",
     "BG alpha": 1,
     "Has BG texture": false,
-    "BG texture": ""
+    "BG texture": "",
+    "Hidden": false
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -312,6 +313,8 @@ GUIHandler.prototype.afterContainerSelection = function(){
     guiHandler.containerManipulationParameters["BG alpha"] = curSelection.hasBackground? curSelection.backgroundAlpha: 1,
     guiHandler.containerManipulationParameters["Has BG texture"] = !!curSelection.backgroundTextureName;
     guiHandler.containerManipulationParameters["BG texture"] = curSelection.hasBackground? curSelection.backgroundTextureName: "";
+    guiHandler.containerManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
+
     if (curSelection.alignedParent){
       var alignedLeft = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_LEFT);
       var alignedRight = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_RIGHT);
@@ -1977,6 +1980,14 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
   });
   guiHandler.containerManipulationNameController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Container").listen();
 
+  guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Hidden").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().hideInDesignMode();
+    }else{
+      selectionHandler.getSelectedObject().showInDesignMode();
+    }
+  }).listen();
+
   var positionFolder = guiHandler.datGuiContainerManipulation.addFolder("Position");
   var sizeFolder = guiHandler.datGuiContainerManipulation.addFolder("Size");
   var paddingFolder = guiHandler.datGuiContainerManipulation.addFolder("Padding");
@@ -2069,6 +2080,9 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
       var bgAlpha = guiHandler.containerManipulationParameters["BG alpha"];
       var bgTextureName = (guiHandler.containerManipulationParameters["Has BG texture"] && guiHandler.containerManipulationParameters["BG texture"])? guiHandler.containerManipulationParameters["BG texture"]: null;
       selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, bgTextureName);
+      if (selectionHandler.getSelectedObject().hiddenInDesignMode){
+        selectionHandler.getSelectedObject().hideVisually();
+      }
     }else{
       guiHandler.disableController(guiHandler.containerManipulationBackgroundColorController);
       guiHandler.disableController(guiHandler.containerManipulationBackgroundAlphaController);

@@ -271,6 +271,7 @@ StateLoaderLightweight.prototype.containerImportFunc = function(containerName, c
   container.rectangle = new Rectangle();
   container.rectangle.set(curExport.x, curExport.y, curExport.x2, curExport.y2, curExport.width, curExport.height);
   container.isClickable = curExport.isClickable;
+  container.hiddenInDesignMode = curExport.hiddenInDesignMode;
   return container;
 }
 

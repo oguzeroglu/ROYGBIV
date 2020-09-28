@@ -28,6 +28,10 @@ ObjectPicker2D.prototype.update = function(obj, forceUpdate){
   if (mode == 1 && obj.isContainer && !obj.isClickable){
     return;
   }
+  if (mode == 0 && obj.hiddenInDesignMode){
+    return;
+  }
+  
   if (forceUpdate){
     this.issueUpdate(obj, obj.name);
     return;
@@ -62,6 +66,9 @@ ObjectPicker2D.prototype.refresh = function(){
     this.binHandler.insert(allSprites[spriteName]);
   }
   for (var containerName in allContainers){
+    if (mode == 0 && allContainers[containerName].hiddenInDesignMode){
+      continue;
+    }
     this.binHandler.insert(allContainers[containerName]);
   }
   for (var virtualKeyboardName in allVirtualKeyboards){

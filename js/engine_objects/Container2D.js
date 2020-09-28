@@ -81,7 +81,8 @@ Container2D.prototype.exportLightweight = function(){
     y2: this.rectangle.finalY,
     width: this.rectangle.width,
     height: this.rectangle.height,
-    isClickable: !!this.isClickable
+    isClickable: !!this.isClickable,
+    hiddenInDesignMode: !!this.hiddenInDesignMode
   };
 }
 
@@ -255,7 +256,8 @@ Container2D.prototype.export = function(){
     isClickable: !!this.isClickable,
     hasBorder: !!this.hasBorder,
     borderColor: this.borderColor,
-    borderThickness: this.borderThickness
+    borderThickness: this.borderThickness,
+    hiddenInDesignMode: !!this.hiddenInDesignMode
   };
   if (this.sprite){
     exportObj.spriteName = this.sprite.name
@@ -293,6 +295,10 @@ Container2D.prototype.makeInvisible = function(){
 Container2D.prototype.makeVisible = function(){
   if (isDeployment && !this.hasBorder){
     return;
+  }
+  this.rectangle.mesh.visible = true;
+  if (this.hasBackground){
+    this.backgroundSprite.mesh.visible = true;
   }
   scene.add(this.rectangle.mesh);
 }
@@ -468,4 +474,39 @@ Container2D.prototype.insertSprite = function(sprite){
   sprite.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
   sprite.containerParent = this;
   this.sprite = sprite;
+}
+
+Container2D.prototype.showInDesignMode = function(){
+  if (isDeployment){
+    return;
+  }
+  this.showVisually();
+  this.hiddenInDesignMode = false;
+  refreshRaycaster(Text.CONTAINER_SHOWN);
+}
+
+Container2D.prototype.hideInDesignMode = function(skipRaycasterRefresh){
+  if (isDeployment){
+    return;
+  }
+  this.hideVisually();
+  this.hiddenInDesignMode = true;
+
+  if (!skipRaycasterRefresh){
+    refreshRaycaster(Text.CONTAINER_HIDDEN);
+  }
+}
+
+Container2D.prototype.hideVisually = function(){
+  this.rectangle.mesh.visible = false;
+  if (this.hasBackground){
+    this.backgroundSprite.mesh.visible = false;
+  }
+}
+
+Container2D.prototype.showVisually = function(){
+  this.rectangle.mesh.visible = true;
+  if (this.hasBackground){
+    this.backgroundSprite.mesh.visible = true;
+  }
 }
