@@ -26,6 +26,7 @@ var tmGUIFocused = false;
 var smGUIFocused = false;
 var cmGUIFocused = false;
 var acGUIFocused = false;
+var vkGUIFocused = false
 var lGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
@@ -131,6 +132,7 @@ var selectedObjectGroup = 0;
 var selectedAddedText = 0;
 var selectedSprite = 0;
 var selectedContainer = 0;
+var selectedVirtualKeyboard = 0;
 var planeWidthSegments = 10;
 var planeHeightSegments = 10;
 var boxWidthSegments = 10;

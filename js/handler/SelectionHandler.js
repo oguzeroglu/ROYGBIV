@@ -35,6 +35,9 @@ SelectionHandler.prototype.select = function(object){
       object.rectangle.mesh.material.uniforms.color.value.set("yellow");
     }
   }
+  if (object.isVirtualKeyboard){
+    selectedVirtualKeyboard = object;
+  }
   this.currentSelection = object;
 }
 
@@ -53,6 +56,9 @@ SelectionHandler.prototype.getSelectedObject = function(){
   }
   if (selectedContainer){
     return selectedContainer;
+  }
+  if (selectedVirtualKeyboard){
+    return selectedVirtualKeyboard;
   }
   return 0;
 }
@@ -85,6 +91,8 @@ SelectionHandler.prototype.resetCurrentSelection = function(){
     if (!this.currentSelection.hasBorder){
       this.currentSelection.rectangle.mesh.material.uniforms.color.value.set("lime");
     }
+  }else if (this.currentSelection.isVirtualKeyboard){
+    selectedVirtualKeyboard = 0;
   }
   this.currentSelection = 0;
   if (!isDeployment){

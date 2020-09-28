@@ -75,6 +75,7 @@ Container2D.prototype.setBorder = function(borderColor, thickness){
 
 Container2D.prototype.exportLightweight = function(){
   return {
+    name: this.name,
     x: this.rectangle.x,
     y: this.rectangle.y,
     x2: this.rectangle.finalX,

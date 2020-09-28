@@ -267,6 +267,7 @@ VirtualKeyboard.prototype.exportLightweight = function(){
   exportObj.keyContainers = new Object();
   for (var childContainerName in this.childContainersByContainerName){
     exportObj.keyContainers[childContainerName] = this.childContainersByContainerName[childContainerName].exportLightweight();
+    exportObj.keyContainers[childContainerName].isBackgroundContainer = (childContainerName == this.backgroundContainer.name);
   }
   return exportObj;
 }
@@ -344,12 +345,16 @@ VirtualKeyboard.prototype.onMouseMoveIntersection = function(childContainerName)
 }
 
 VirtualKeyboard.prototype.onMouseClickIntersection = function(childContainerName){
+  if (!isDeployment && mode == 0){
+    return;
+  }
   if (mode == 1 && activeVirtualKeyboard != this){
     return;
   }
   if (isMobile){
     this.onKeyInteractionWithKeyboard(this.childContainersByContainerName[childContainerName]);
   }
+
   var key = this.keysByContainerName[childContainerName];
   var now = performance.now();
   if (this.lastKey && this.lastKey == key && this.lastKeySelectionTime && (now - this.lastKeySelectionTime <= this.keyAddThrehsold)){
@@ -469,7 +474,13 @@ VirtualKeyboard.prototype.initializeKey = function(x, y, width, height, key){
 }
 
 VirtualKeyboard.prototype.initialize = function(){
-  this.backgroundContainer = new Container2D(null, this.positionXPercent, this.positionYPercent, this.totalWidthPercent, this.totalHeightPercent, this);
+  this.backgroundContainer = new Container2D(generateUUID(), this.positionXPercent, this.positionYPercent, this.totalWidthPercent, this.totalHeightPercent, this);
+
+  this.backgroundContainer.isBackgroundContainer = true;
+
+  this.childContainersByContainerName[this.backgroundContainer.name] = this.backgroundContainer;
+  childContainers[this.backgroundContainer.name] = this;
+
   if (this.hasBackground){
     this.backgroundContainer.setBackground(this.backgroundColor, this.backgroundAlpha, this.backgroundTextureName);
   }

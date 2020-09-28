@@ -109,6 +109,10 @@ var GUIHandler = function(){
     "BG texture": "",
     "Hidden": false
   };
+  this.virtualKeyboardManipulationParameters = {
+    "Virtual Keyboard": "virtualKeyboardName",
+    "Hidden": false
+  }
   this.bloomParameters = {
     "Threshold": 0.0,
     "Active": false,
@@ -159,7 +163,7 @@ var GUIHandler = function(){
     CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17,
     CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
     JUMP_DESCRIPTOR_CREATION: 23, KNOWLEDGE_CREATION: 24, DECISION_CREATION: 25, DECISION_TREE_CREATION: 26,
-    STATE_CREATION: 27, TRANSITION_CREATION: 28, STATE_MACHINE_CREATION: 29
+    STATE_CREATION: 27, TRANSITION_CREATION: 28, STATE_MACHINE_CREATION: 29, VIRTUAL_KEYBOARD: 30
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -346,6 +350,22 @@ GUIHandler.prototype.afterContainerSelection = function(){
     }
   }else{
     guiHandler.hide(guiHandler.guiTypes.CONTAINER);
+  }
+  guiHandler.afterVirtualKeyboardSelection();
+}
+
+GUIHandler.prototype.afterVirtualKeyboardSelection = function(){
+  if (mode != 0){
+    return;
+  }
+
+  var curSelection = selectionHandler.getSelectedObject();
+  if (curSelection && curSelection.isVirtualKeyboard){
+    guiHandler.show(guiHandler.guiTypes.VIRTUAL_KEYBOARD);
+    guiHandler.virtualKeyboardManipulationParameters["Virtual Keyboard"] = curSelection.name;
+    guiHandler.virtualKeyboardManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
+  }else{
+    guiHandler.hide(guiHandler.guiTypes.VIRTUAL_KEYBOARD);
   }
 }
 
@@ -1002,6 +1022,11 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeWorkerStatusGUI();
       }
     return;
+    case this.guiTypes.VIRTUAL_KEYBOARD:
+      if (!this.datGuiVirtualKeyboard){
+        this.initializeVirtualKeyboardGUI();
+      }
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -1214,6 +1239,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiStateMachineCreation){
         this.destroyGUI(this.datGuiStateMachineCreation);
         this.datGuiStateMachineCreation = 0;
+      }
+    return;
+    case this.guiTypes.VIRTUAL_KEYBOARD:
+      if (this.datGuiVirtualKeyboard){
+        this.destroyGUI(this.datGuiVirtualKeyboard);
+        this.datGuiVirtualKeyboard = 0;
       }
     return;
   }
@@ -1970,6 +2001,18 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
   guiHandler.omObjectTrailTimeController = motionBlurFolder.add(guiHandler.objectManipulationParameters, "mb time").min(1/15).max(OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT).step(1/60).onChange(function(val){
     selectionHandler.getSelectedObject().objectTrailConfigurations.time = val;
+  }).listen();
+}
+
+GUIHandler.prototype.initializeVirtualKeyboardGUI = function(){
+  guiHandler.datGuiVirtualKeyboard = new dat.GUI({hideable: false, width: 420});
+  guiHandler.datGuiVirtualKeyboard.domElement.addEventListener("mousedown", function(e){
+    vkGUIFocused = true;
+  });
+
+  guiHandler.datGuiVirtualKeyboard.add(guiHandler.virtualKeyboardManipulationParameters, "Virtual Keyboard").listen();
+  guiHandler.datGuiVirtualKeyboard.add(guiHandler.virtualKeyboardManipulationParameters, "Hidden").onChange(function(val){
+
   }).listen();
 }
 

@@ -260,6 +260,9 @@ StateLoaderLightweight.prototype.virtualKeyboardImportFunc = function(virtualKey
   virtualKeyboards[virtualKeyboardName] = new VirtualKeyboard(params);
   for (var containerName in curExport.keyContainers){
     var container = this.containerImportFunc(containerName, curExport.keyContainers[containerName]);
+    if (curExport.keyContainers[containerName].isBackgroundContainer){
+      container.isBackgroundContainer = true;
+    }
     childContainers[container.name] = virtualKeyboards[virtualKeyboardName];
     virtualKeyboards[virtualKeyboardName].childContainersByContainerName[containerName] = container;
     virtualKeyboards[virtualKeyboardName].keyContainers.push(container);

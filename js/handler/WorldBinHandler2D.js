@@ -54,6 +54,9 @@ WorldBinHandler2D.prototype.getBinIndex = function(float){
 WorldBinHandler2D.prototype.insertVirtualKeyboard = function(obj){
   for (var i = 0; i<obj.keyContainers.length; i++){
     var childObj = obj.keyContainers[i];
+    if (childObj.isBackgroundContainer && mode == 1){
+      continue;
+    }
     if (!childObj.binInfo2D){
       childObj.binInfo2D = new Map();
     }else if (childObj.binInfo2D.size > 0){

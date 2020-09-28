@@ -797,6 +797,13 @@ function onRaycasterIntersection(){
          object.onClickCallback();
        }
      }else if (object.isVirtualKeyboard){
+       if (mode == 0){
+         selectionHandler.resetCurrentSelection();
+       }
+       if (!isDeployment){
+         selectionHandler.select(object);
+         guiHandler.afterObjectSelection();
+       }
        object.onMouseClickIntersection(intersectionObject);
      }
   }else{
