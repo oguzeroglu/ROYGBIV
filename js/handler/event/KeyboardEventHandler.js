@@ -177,6 +177,9 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
     containers[containerName].hideVisually();
   }
   for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
+    if (virtualKeyboards[virtualKeyboardName].hiddenInDesignMode){
+      continue;
+    }
     virtualKeyboards[virtualKeyboardName].onShiftPress(true);
   }
   raycasterFactory.onShiftPress(true);
@@ -214,6 +217,9 @@ KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
     containers[containerName].showVisually();
   }
   for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
+    if (virtualKeyboards[virtualKeyboardName].hiddenInDesignMode){
+      continue;
+    }
     virtualKeyboards[virtualKeyboardName].onShiftPress(false);
   }
   raycasterFactory.onShiftPress(false);

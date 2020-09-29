@@ -258,6 +258,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
 StateLoaderLightweight.prototype.virtualKeyboardImportFunc = function(virtualKeyboardName, curExport){
   var params = curExport.parameters;
   virtualKeyboards[virtualKeyboardName] = new VirtualKeyboard(params);
+  virtualKeyboards[virtualKeyboardName].hiddenInDesignMode = !!curExport.hiddenInDesignMode;
   for (var containerName in curExport.keyContainers){
     var container = this.containerImportFunc(containerName, curExport.keyContainers[containerName]);
     if (curExport.keyContainers[containerName].isBackgroundContainer){

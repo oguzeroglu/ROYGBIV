@@ -258,12 +258,17 @@ VirtualKeyboard.prototype.showVisually = function(){
 }
 
 VirtualKeyboard.prototype.export = function(){
-  return this.parameters;
+  var exportObj = JSON.parse(JSON.stringify(this.parameters));
+
+  exportObj.hiddenInDesignMode = !!this.hiddenInDesignMode;
+
+  return exportObj;
 }
 
 VirtualKeyboard.prototype.exportLightweight = function(){
   var exportObj = new Object();
   exportObj.parameters = this.parameters;
+  exportObj.hiddenInDesignMode = !!this.hiddenInDesignMode;
   exportObj.keyContainers = new Object();
   for (var childContainerName in this.childContainersByContainerName){
     exportObj.keyContainers[childContainerName] = this.childContainersByContainerName[childContainerName].exportLightweight();
@@ -618,5 +623,26 @@ VirtualKeyboard.prototype.update = function(){
         }
       }
     }
+  }
+}
+
+VirtualKeyboard.prototype.showInDesignMode = function(){
+  if (isDeployment){
+    return;
+  }
+  this.showVisually();
+  this.hiddenInDesignMode = false;
+  refreshRaycaster(Text.VIRTUAL_KEYBOARD_SHOWN);
+}
+
+VirtualKeyboard.prototype.hideInDesignMode = function(skipRaycasterRefresh){
+  if (isDeployment){
+    return;
+  }
+  this.hideVisually();
+  this.hiddenInDesignMode = true;
+
+  if (!skipRaycasterRefresh){
+    refreshRaycaster(Text.VIRTUAL_KEYBOARD_HIDDEN);
   }
 }

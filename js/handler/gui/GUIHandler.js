@@ -2012,7 +2012,11 @@ GUIHandler.prototype.initializeVirtualKeyboardGUI = function(){
 
   guiHandler.datGuiVirtualKeyboard.add(guiHandler.virtualKeyboardManipulationParameters, "Virtual Keyboard").listen();
   guiHandler.datGuiVirtualKeyboard.add(guiHandler.virtualKeyboardManipulationParameters, "Hidden").onChange(function(val){
-
+    if (val){
+      selectionHandler.getSelectedObject().hideInDesignMode();
+    }else{
+      selectionHandler.getSelectedObject().showInDesignMode();
+    }
   }).listen();
 }
 

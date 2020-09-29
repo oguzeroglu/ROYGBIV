@@ -1270,6 +1270,9 @@ ImportHandler.prototype.importVirtualKeyboards = function(obj){
     var curExport = obj.virtualKeyboards[vkName];
     var virtualKeyboard = new VirtualKeyboard(curExport);
     virtualKeyboards[vkName] = virtualKeyboard;
+    if (curExport.hiddenInDesignMode){
+      virtualKeyboard.hideInDesignMode(true);
+    }
   }
 }
 

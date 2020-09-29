@@ -72,6 +72,9 @@ ObjectPicker2D.prototype.refresh = function(){
     this.binHandler.insert(allContainers[containerName]);
   }
   for (var virtualKeyboardName in allVirtualKeyboards){
+    if (mode == 0 && allVirtualKeyboards[virtualKeyboardName].hiddenInDesignMode){
+      continue;
+    }
     this.binHandler.insert(allVirtualKeyboards[virtualKeyboardName]);
   }
 }

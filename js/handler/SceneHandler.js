@@ -340,7 +340,12 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     }
     for (var vkName in this.scenes[sceneName].virtualKeyboards){
       virtualKeyboards[vkName].resetColors();
-      virtualKeyboards[vkName].showVisually();
+      
+      if (!virtualKeyboards[vkName].hiddenInDesignMode){
+        virtualKeyboards[vkName].showVisually();
+      }else{
+        virtualKeyboards[vkName].hideVisually();
+      }
     }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){
