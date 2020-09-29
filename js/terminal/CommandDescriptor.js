@@ -270,7 +270,8 @@ var CommandDescriptor = function(){
       0, //decisionTrees
       0, //states
       0, //transitions
-      0 //stateMachines
+      0, //stateMachines
+      1 //selectVirtualKeyboard
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -543,7 +544,8 @@ var CommandDescriptor = function(){
     "decisionTrees",
     "states",
     "transitions",
-    "stateMachines"
+    "stateMachines",
+    "selectVirtualKeyboard virtualKeyboardName"
   ];
 
   this.commands = [
@@ -816,7 +818,8 @@ var CommandDescriptor = function(){
     "decisionTrees",
     "states",
     "transitions",
-    "stateMachines"
+    "stateMachines",
+    "selectVirtualKeyboard"
   ];
 
   this.commandInfo = [
@@ -1089,7 +1092,8 @@ var CommandDescriptor = function(){
     "decisionTrees: Opens the decision tree editing GUI.",
     "states: Opens the state editing GUI.",
     "transitions: Opens the transition editing GUI.",
-    "stateMachines: Opens the state machine editing GUI."
+    "stateMachines: Opens the state machine editing GUI.",
+    "selectVirtualKeyboard: Selects a virtual keyboard."
   ];
 
   this.keyboardInfo = [
@@ -2031,6 +2035,11 @@ var CommandDescriptor = function(){
   this.destroyMass = new Object();
   this.destroyMass.types = [];
   this.destroyMass.types.push(this.MASS_ID); //massID
+
+  // selectVirtualKeyboard
+  this.selectVirtualKeyboard = new Object();
+  this.selectVirtualKeyboard.types = [];
+  this.selectVirtualKeyboard.types.push(this.VIRTUAL_KEYBOARD_NAME); //virtualKeyboardName
 };
 
 CommandDescriptor.prototype.test = function(){

@@ -6743,6 +6743,25 @@ function parse(input){
           stateMachineCreatorGUIHandler.show();
           return true;
         break;
+        case 270: //selectVirtualKeyboard
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var vkName = splitted[1];
+          if (!virtualKeyboards[vkName]){
+            terminal.printError(Text.NO_SUCH_VIRTUAL_KEYBOARD);
+            return true;
+          }
+          if (virtualKeyboards[vkName].registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.VIRTUAL_KEYBOARD_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          selectionHandler.select(virtualKeyboards[vkName]);
+          guiHandler.afterObjectSelection();
+          terminal.printInfo(Text.VIRTUAL_KEYBOARD_SELECTED);
+          return true;
+        break;
       }
       return true;
     }catch(err){
