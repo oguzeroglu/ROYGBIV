@@ -120,12 +120,14 @@ VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
       var params = virtualKeyboardCreatorGUIHandler.virtualKeyboard.parameters;
       var isCreation = !virtualKeyboards[name];
       var text = isCreation? Text.VIRTUAL_KEYBOARD_CREATED: Text.VIRTUAL_KEYBOARD_EDITED;
-      virtualKeyboardCreatorGUIHandler.onClose(text);
       if (virtualKeyboards[name]){
         virtualKeyboards[name].destroy();
       }
       virtualKeyboards[name] = new VirtualKeyboard(params);
       sceneHandler.onVirtualKeyboardCreation(virtualKeyboards[name]);
+      refreshRaycaster(text, false, function(){
+        virtualKeyboardCreatorGUIHandler.onClose(text);
+      });
     }
   }, "Done").listen();
   guiHandler.datGuiVirtualKeyboardCreation.add({

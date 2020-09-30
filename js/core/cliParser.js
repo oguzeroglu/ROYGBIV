@@ -6887,7 +6887,7 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
   return true;
 }
 
-function refreshRaycaster(messageOnFinished, noClear){
+function refreshRaycaster(messageOnFinished, noClear, callback){
   if (!isDeployment){
     if (physicsDebugMode){
       debugRenderer.refresh();
@@ -6902,6 +6902,10 @@ function refreshRaycaster(messageOnFinished, noClear){
       terminal.enable();
       if (mode == 0){
         guiHandler.afterObjectSelection();
+      }
+
+      if (callback){
+        callback();
       }
     }
   }
