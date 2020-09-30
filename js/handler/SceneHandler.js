@@ -301,7 +301,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       if (!obj.hiddenInDesignMode){
         obj.showVisually();
       }else{
-        obj.hideInDesignMode();
+        obj.hideInDesignMode(true);
       }
     }
     for (var objName in this.scenes[sceneName].objectGroups){
@@ -309,7 +309,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       if (!obj.hiddenInDesignMode){
         obj.showVisually();
       }else{
-        obj.hideInDesignMode();
+        obj.hideInDesignMode(true);
       }
     }
     for (var textName in this.scenes[sceneName].addedTexts){
@@ -317,7 +317,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       if (!text.hiddenInDesignMode){
         text.showVisually();
       }else{
-        text.hideInDesignMode();
+        text.hideInDesignMode(true);
       }
     }
     for (var spriteName in this.scenes[sceneName].sprites){
@@ -325,7 +325,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       if (!sprite.hiddenInDesignMode){
         sprite.showVisually();
       }else{
-        sprite.hideInDesignMode();
+        sprite.hideInDesignMode(true);
       }
     }
     for (var containerName in this.scenes[sceneName].containers){
@@ -335,12 +335,12 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
         container.backgroundSprite.showVisually();
       }
       if (container.hiddenInDesignMode){
-        container.hideInDesignMode();
+        container.hideInDesignMode(true);
       }
     }
     for (var vkName in this.scenes[sceneName].virtualKeyboards){
       virtualKeyboards[vkName].resetColors();
-      
+
       if (!virtualKeyboards[vkName].hiddenInDesignMode){
         virtualKeyboards[vkName].showVisually();
       }else{
