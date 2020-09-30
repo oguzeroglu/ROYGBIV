@@ -214,7 +214,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
 }
 
 RayCaster.prototype.hide = function(object){
-  if ((object.isAddedText && object.is2D) || (object.isSprite)){
+  if ((object.isAddedText && object.is2D) || (object.isSprite) || (object.isVirtualKeyboard)){
     this.hide2D(object);
     return;
   }
@@ -222,7 +222,7 @@ RayCaster.prototype.hide = function(object){
 }
 
 RayCaster.prototype.show = function(object){
-  if ((object.isAddedText && object.is2D) || (object.isSprite)){
+  if ((object.isAddedText && object.is2D) || (object.isSprite) || (object.isVirtualKeyboard)){
     this.show2D(object);
     return;
   }
@@ -260,3 +260,5 @@ RayCaster.prototype.getAddedTexts = function(){
   }
   return sceneHandler.getAddedTexts();
 }
+
+RayCaster.prototype.onActiveVirtualKeyboardChanged = noop;

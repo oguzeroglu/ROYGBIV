@@ -102,7 +102,13 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
     }
     if (!obj){
       var vk = childContainers[name];
+      if (mode == 1 && activeVirtualKeyboard != vk){
+        continue;
+      }
       if (vk){
+        if (vk.isHidden){
+          continue;
+        }
         obj = vk.childContainersByContainerName[name];
       }
     }

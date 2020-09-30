@@ -410,6 +410,14 @@ RaycasterWorker.prototype.set2DTextSizes = function(data){
   this.rayCaster.refresh2D();
 }
 
+RaycasterWorker.prototype.onActiveVirtualKeyboardChanged = function(vkName){
+  if (vkName == null){
+    activeVirtualKeyboard = 0;
+  }else{
+    activeVirtualKeyboard = virtualKeyboards[vkName];
+  }
+}
+
 // START
 raycasterFactory = new RaycasterFactory();
 var particleSystemGenerator = new ParticleSystemGenerator();
@@ -445,6 +453,8 @@ self.onmessage = function(msg){
     worker.onParticleSystemRemoveCollisionListener(msg.data.particleSystemRemoveCollisionListener);
   }else if (msg.data.refresh2D){
     worker.set2DTextSizes(msg.data);
+  }else if (msg.data.activeVirtualKeyboardChanged){
+    worker.onActiveVirtualKeyboardChanged(msg.data.activeVKName);
   }else{
     worker.update(msg.data);
     worker.transferableMessageBody = msg.data;

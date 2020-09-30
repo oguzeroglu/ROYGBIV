@@ -141,6 +141,8 @@ VirtualKeyboard.prototype.deactivate = function(){
   this.hideVisually();
   activeVirtualKeyboard = 0;
   this.text = "";
+
+  rayCaster.onActiveVirtualKeyboardChanged(true);
 }
 
 VirtualKeyboard.prototype.activate = function(){
@@ -155,6 +157,8 @@ VirtualKeyboard.prototype.activate = function(){
   this.showVisually();
   activeVirtualKeyboard = this;
   this.text = "";
+
+  rayCaster.onActiveVirtualKeyboardChanged();
 }
 
 VirtualKeyboard.prototype.onFlush = function(flushedText){
@@ -234,6 +238,10 @@ VirtualKeyboard.prototype.hideVisually = function(){
     this.textsByKey[key].hideVisually();
   }
   this.isHidden = true;
+
+  if (mode == 1 && activeVirtualKeyboard == this){
+    rayCaster.onActiveVirtualKeyboardChanged(true);
+  }
 }
 
 VirtualKeyboard.prototype.showVisually = function(){
@@ -255,6 +263,10 @@ VirtualKeyboard.prototype.showVisually = function(){
     this.textsByKey[key].showVisually();
   }
   this.isHidden = false;
+
+  if (mode == 1 && activeVirtualKeyboard == this){
+    rayCaster.onActiveVirtualKeyboardChanged();
+  }
 }
 
 VirtualKeyboard.prototype.export = function(){

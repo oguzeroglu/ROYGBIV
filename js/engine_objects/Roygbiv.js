@@ -3648,6 +3648,18 @@ Roygbiv.prototype.mapTextureToSprite = function(sprite, texturePackOrName){
   }
 }
 
+// Cancels sprite dragging if there is an active sprite dragging.
+Roygbiv.prototype.cancelSpriteDrag = function(){
+  if (mode == 0){
+    return;
+  }
+  if (draggingSprite){
+    draggingSprite.onDragStopped();
+    draggingSprite = false;
+  }
+  dragCandidate = false;
+}
+
 // CONTAINER FUNCTIONS *********************************************************
 
 // Hides the border of a container.
@@ -3789,18 +3801,6 @@ Roygbiv.prototype.deactivateVirtualKeyboard = function(virtualKeyboard){
   preConditions.checkIfVirtualKeyboard(ROYGBIV.deactivateVirtualKeyboard, virtualKeyboard);
   preConditions.checkIfVirtualKeyboardInsideActiveScene(ROYGBIV.deactivateVirtualKeyboard, virtualKeyboard);
   virtualKeyboard.deactivate();
-}
-
-// Cancels sprite dragging if there is an active sprite dragging.
-Roygbiv.prototype.cancelSpriteDrag = function(){
-  if (mode == 0){
-    return;
-  }
-  if (draggingSprite){
-    draggingSprite.onDragStopped();
-    draggingSprite = false;
-  }
-  dragCandidate = false;
 }
 
 // NETWORKING FUNCTIONS ********************************************************

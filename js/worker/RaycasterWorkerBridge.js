@@ -365,6 +365,14 @@ RaycasterWorkerBridge.prototype.update2D = noop;
 RaycasterWorkerBridge.prototype.hide2D = noop;
 RaycasterWorkerBridge.prototype.show2D = noop;
 
+RaycasterWorkerBridge.prototype.onActiveVirtualKeyboardChanged = function(isHidden){
+  if (mode != 1){
+    return;
+  }
+
+  this.worker.postMessage({activeVirtualKeyboardChanged: true, activeVKName: (!activeVirtualKeyboard || isHidden)? null: activeVirtualKeyboard.name});
+}
+
 RaycasterWorkerBridge.prototype.refresh2D = function(){
   var totalTextObj = (mode == 0)? sceneHandler.getAddedTexts2D(): sceneHandler.getClickableAddedTexts2D();
   var totalSpriteObj = (mode == 0)? sceneHandler.getSprites(): sceneHandler.getClickableSprites();
