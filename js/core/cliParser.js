@@ -4788,6 +4788,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SPRITE);
             return true;
           }
+          if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
           sprite.destroy();
           if (sprite.containerParent){
             sprite.containerParent.removeSprite();
@@ -4806,6 +4810,10 @@ function parse(input){
           var sprite = sprites[spriteName];
           if (!sprite){
             terminal.printError(Text.NO_SUCH_SPRITE);
+            return true;
+          }
+          if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
             return true;
           }
           selectionHandler.select(sprite);
