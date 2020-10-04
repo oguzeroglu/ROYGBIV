@@ -86,7 +86,7 @@ var RaycasterWorkerBridge = function(){
         var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)));
         if (insertObjectToBuffer){
           obj.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
-          intersectablesAry.push(rayCaster.idsByObjectNames[obj.name]);
+          intersectablesAry.push(-1);
           intersectablesAry.push(1);
           obj.mesh.updateMatrixWorld();
           for (var i = 0; i<obj.mesh.matrixWorld.elements.length; i++){
@@ -100,7 +100,7 @@ var RaycasterWorkerBridge = function(){
         var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)));
         if (insertObjectToBuffer){
           obj.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
-          intersectablesAry.push(rayCaster.idsByObjectNames[obj.name]);
+          intersectablesAry.push(-1);
           intersectablesAry.push(1);
           obj.mesh.updateMatrixWorld();
           for (var i = 0; i<obj.mesh.matrixWorld.elements.length; i++){
@@ -117,7 +117,7 @@ var RaycasterWorkerBridge = function(){
         if (insertTextToBuffer){
           text.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
           text.indexInTextScaleDescriptionArray = addedTextScaleDescriptionIndex;
-          intersectablesAry.push(rayCaster.idsByObjectNames[text.name]);
+          intersectablesAry.push(-1);
           intersectablesAry.push(1);
           addedTextScaleDescriptionArray.push(rayCaster.idsByObjectNames[text.name]);
           if (!text.is2D){
@@ -148,7 +148,7 @@ var RaycasterWorkerBridge = function(){
         var insertSpriteToBuffer = ((mode == 0) || (mode == 1 && sprite.isClickable));
         if (insertSpriteToBuffer){
           sprite.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
-          intersectablesAry.push(rayCaster.idsByObjectNames[sprite.name]);
+          intersectablesAry.push(-1);
           intersectablesAry.push(1);
           sprite.handleRectangle();
           intersectablesAry.push(sprite.rectangle.x);
@@ -187,7 +187,7 @@ var RaycasterWorkerBridge = function(){
         container.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
         var insertContainerToBuffer = ((mode == 0) || (mode == 1 && container.isClickable));
         if (insertContainerToBuffer){
-          intersectablesAry.push(rayCaster.idsByObjectNames[container.name]);
+          intersectablesAry.push(-1);
           intersectablesAry.push(1);
           container.handleRectangle();
           intersectablesAry.push(container.rectangle.x);
@@ -580,6 +580,9 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     obj.mesh.updateMatrixWorld();
   }
   var description = rayCaster.transferableMessageBody.intersectableObjDescription;
+
+  description[obj.indexInIntersectableObjDescriptionArray] = rayCaster.idsByObjectNames[obj.name];
+
   if (obj.isAddedText && obj.is2D){
     description[obj.indexInIntersectableObjDescriptionArray + 2] = obj.twoDimensionalSize.x;
     description[obj.indexInIntersectableObjDescriptionArray + 3] = obj.twoDimensionalSize.y;
