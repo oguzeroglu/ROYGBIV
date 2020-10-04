@@ -348,11 +348,12 @@ WorldBinHandler.prototype.insert = function(boundingBox, objName, parentName){
           this.bin.get(x).get(y).get(z).set(objName, true);
         }else{
           if (this.bin.get(x).get(y).get(z).has(parentName)){
-            continue;
+            this.bin.get(x).get(y).get(z).get(parentName).set(objName, true);
+          }else{
+            var newMap = new Map();
+            newMap.set(objName, true);
+            this.bin.get(x).get(y).get(z).set(parentName, newMap);
           }
-          var newMap = new Map();
-          newMap.set(objName, true);
-          this.bin.get(x).get(y).get(z).set(parentName, newMap);
         }
         var obj;
         if (!this.isAreaBinHandler){
