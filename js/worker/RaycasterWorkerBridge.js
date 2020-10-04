@@ -265,6 +265,7 @@ var RaycasterWorkerBridge = function(){
       rayCaster.hasOwnership = true;
       rayCaster.onReady();
     }else{
+      rayCaster.hasOwnership = true;
       rayCaster.transferableMessageBody= msg.data;
       rayCaster.transferableList[0] = rayCaster.transferableMessageBody.intersectableObjDescription.buffer;
       rayCaster.transferableList[1] = rayCaster.transferableMessageBody.intersectionTestDescription.buffer;
@@ -316,7 +317,6 @@ var RaycasterWorkerBridge = function(){
         particleSystem.fireCollisionCallback(reusableCollisionInfo);
         rayCaster.transferableMessageBody.particleSystemCollisionCallbackDescription[i] = -1;
       }
-      rayCaster.hasOwnership = true;
     }
   });
   this.onShiftPress = function(isPressed){
