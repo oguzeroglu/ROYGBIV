@@ -3262,6 +3262,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var isColorizable = this.isColorizable;
   var renderSide = this.renderSide;
   var blending = this.mesh.material.blending;
+  var bakedColors = this.bakedColors;
   var totalAlphaBeforeDetached = this.getOpacity();
   var totalAOIntensityBeforeDetached;
   var totalEmissiveIntensityBeforeDetached;
@@ -3451,6 +3452,11 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }
 
   newObjGroup.setRotationMode(this.rotationMode);
+
+  if (bakedColors){
+    this.bakeLights(bakedColors);
+    newObjGroup.bakeLights(bakedColors);
+  }
 
   return newObjGroup;
 }
