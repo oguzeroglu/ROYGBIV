@@ -144,15 +144,7 @@ Grid.prototype.export = function(){
 }
 
 Grid.prototype.getCoordInfo = function(){
-  if (this.axis == "XZ"){
-    return "X: "+this.centerX + " , " + "Z: "+this.centerZ;
-  }
-  if (this.axis == "XY"){
-    return "X: "+this.centerX + " , " + "Y: "+this.centerY;
-  }
-  if (this.axis == "YZ"){
-    return "Y: "+this.centerY + " , " + "Z: "+this.centerZ;
-  }
+  return "X: "+this.centerX + " , " + "Y: "+this.centerY + " , " + "Z: "+this.centerZ;
 }
 
 Grid.prototype.toggleSelect = function(sliced, printInfo, fromStateLoader, allAtOnce){
