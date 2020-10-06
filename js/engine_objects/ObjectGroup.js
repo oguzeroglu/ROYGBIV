@@ -446,8 +446,12 @@ ObjectGroup.prototype.setIntersectableStatus = function(val){
 ObjectGroup.prototype.setNoMass = function(val){
   if (!val){
     physicsWorld.addBody(this.physicsBody);
+    if (this.mass > 0){
+      this.isDynamicObject = true;
+    }
   }else{
     physicsWorld.remove(this.physicsBody);
+    this.isDynamicObject = false;
   }
   this.noMass = val;
 }

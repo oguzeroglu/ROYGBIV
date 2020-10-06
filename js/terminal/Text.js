@@ -264,6 +264,7 @@ var Text = function(){
   this.COMPRESSING_FONT = "Compressing font.";
   this.SCENE_CREATED = "Scene created.";
   this.NO_SUCH_SCENE = "No such scene.";
+  this.CANNOT_SET_MOTION_BLUR_ON_NON_DYNAMIC_CHANGEABLE_OBJECTS = "Cannot set motion blur on non dynamic and non changeable objects.";
   this.CANNOT_ALIGN_SAME_CONTAINER = "Parent and child containers cannot be the same.";
   this.CONTAINER_IS_NOT_ALIGNED = "Container is not aligned.";
   this.CONTAINER_UNALIGNED = "Container unaligned.";

@@ -1465,6 +1465,13 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
         selectionHandler.resetCurrentSelection();
       }
     }
+
+    if (!obj.isDynamicObject && !obj.isChangeable){
+      delete obj.objectTrailConfigurations;
+      guiHandler.objectManipulationParameters["Motion blur"] = false;
+      guiHandler.disableController(guiHandler.omObjectTrailAlphaController);
+      guiHandler.disableController(guiHandler.omObjectTrailTimeController);
+    }
   });
   guiHandler.omPhysicsSimplifiedController = physicsFolder.add(guiHandler.objectManipulationParameters, "Phy. simpl.").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
@@ -1542,6 +1549,14 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     if (physicsDebugMode){
       debugRenderer.refresh();
     }
+
+    if (!obj.isDynamicObject && !obj.isChangeable){
+      delete obj.objectTrailConfigurations;
+      guiHandler.objectManipulationParameters["Motion blur"] = false;
+      guiHandler.disableController(guiHandler.omObjectTrailAlphaController);
+      guiHandler.disableController(guiHandler.omObjectTrailTimeController);
+    }
+
     guiHandler.omMassController.updateDisplay();
   }).listen();
 
@@ -1564,6 +1579,13 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.enableController(guiHandler.omSteerableController);
     }else{
       guiHandler.disableController(guiHandler.omSteerableController);
+
+      if (!obj.isDynamicObject){
+        delete obj.objectTrailConfigurations;
+        guiHandler.objectManipulationParameters["Motion blur"] = false;
+        guiHandler.disableController(guiHandler.omObjectTrailAlphaController);
+        guiHandler.disableController(guiHandler.omObjectTrailTimeController);
+      }
     }
   }).listen();
   guiHandler.omIntersectableController = generalFolder.add(guiHandler.objectManipulationParameters, "Intersectable").onChange(function(val){
@@ -1987,6 +2009,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   // MOTION BLUR
   guiHandler.omHasObjectTrailController = motionBlurFolder.add(guiHandler.objectManipulationParameters, "Motion blur").onChange(function(val){
     if (val){
+      if (!selectionHandler.getSelectedObject().isChangeable && !selectionHandler.getSelectedObject().isDynamicObject){
+        terminal.clear();
+        terminal.printError(Text.CANNOT_SET_MOTION_BLUR_ON_NON_DYNAMIC_CHANGEABLE_OBJECTS);
+        guiHandler.objectManipulationParameters["Motion blur"] = false;
+        return;
+      }
       selectionHandler.getSelectedObject().objectTrailConfigurations = {alpha: guiHandler.objectManipulationParameters["mb alpha"], time: guiHandler.objectManipulationParameters["mb time"]};
       guiHandler.enableController(guiHandler.omObjectTrailAlphaController);
       guiHandler.enableController(guiHandler.omObjectTrailTimeController);

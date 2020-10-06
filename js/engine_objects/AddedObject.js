@@ -383,7 +383,11 @@ AddedObject.prototype.setIntersectableStatus = function(val){
 AddedObject.prototype.setNoMass = function(val){
   if (!val){
     physicsWorld.addBody(this.physicsBody);
+    if (this.mass > 0){
+      this.isDynamicObject = true;
+    }
   }else{
+    this.isDynamicObject = false;
     physicsWorld.remove(this.physicsBody);
   }
   this.noMass = val;
