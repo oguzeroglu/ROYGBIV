@@ -6776,6 +6776,11 @@ function parse(input){
             return true;
           }
 
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
           if (!obj){
             terminal.printError(Text.NO_SUCH_OBJECT);
@@ -6821,12 +6826,19 @@ function parse(input){
           }
 
           obj.bakeLights();
-          terminal.printInfo(Text.LIGHTS_BAKED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.LIGHTS_BAKED);
+          }
           return true;
         break;
         case 272: //unbakeStaticLights
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
 
@@ -6857,7 +6869,10 @@ function parse(input){
           }
 
           obj.unbakeLights();
-          terminal.printInfo(Text.LIGHTS_UNBAKED);
+
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.LIGHTS_UNBAKED);
+          }
           return true;
         break;
       }

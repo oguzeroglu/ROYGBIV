@@ -131,6 +131,10 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleNewMassCommand();
     }else if (this.splitted[0] == "destroymass"){
       this.handleDestroyMassCommand();
+    }else if (this.splitted[0] == "bakestaticlights"){
+      this.handleBakeStaticLightsCommand();
+    }else if (this.splitted[0] == "unbakestaticlights"){
+      this.handleUnbakeStaticLightsCommand();
     }
 
     if (jobHandlerRaycasterRefresh){
@@ -142,6 +146,56 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoconfigurearea"){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleUnbakeStaticLightsCommand = function(){
+  var objNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  for (var objName in sceneHandler.getAddedObjects()){
+    if (objName.startsWith(objNamePrefix)){
+      parseCommand("unbakeStaticLights " + objName);
+      ctr ++;
+    }
+  }
+
+  for (var objName in sceneHandler.getObjectGroups()){
+    if (objName.startsWith(objNamePrefix)){
+      parseCommand("unbakeStaticLights " + objName);
+      ctr ++;
+    }
+  }
+
+  if (ctr > 0){
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
+  }else{
+    terminal.printError(Text.NO_OBJECT_FOUND);
+  }
+}
+
+JobHandler.prototype.handleBakeStaticLightsCommand = function(){
+  var objNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  for (var objName in sceneHandler.getAddedObjects()){
+    if (objName.startsWith(objNamePrefix)){
+      parseCommand("bakeStaticLights " + objName);
+      ctr ++;
+    }
+  }
+
+  for (var objName in sceneHandler.getObjectGroups()){
+    if (objName.startsWith(objNamePrefix)){
+      parseCommand("bakeStaticLights " + objName);
+      ctr ++;
+    }
+  }
+
+  if (ctr > 0){
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
+  }else{
+    terminal.printError(Text.NO_OBJECT_FOUND);
   }
 }
 
