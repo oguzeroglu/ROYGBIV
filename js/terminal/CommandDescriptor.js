@@ -271,7 +271,9 @@ var CommandDescriptor = function(){
       0, //states
       0, //transitions
       0, //stateMachines
-      1 //selectVirtualKeyboard
+      1, //selectVirtualKeyboard
+      1, //bakeStaticLights
+      1 //unbakeStaticLights
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -545,7 +547,9 @@ var CommandDescriptor = function(){
     "states",
     "transitions",
     "stateMachines",
-    "selectVirtualKeyboard virtualKeyboardName"
+    "selectVirtualKeyboard virtualKeyboardName",
+    "bakeStaticLights objectName",
+    "unbakeStaticLights objectName"
   ];
 
   this.commands = [
@@ -819,7 +823,9 @@ var CommandDescriptor = function(){
     "states",
     "transitions",
     "stateMachines",
-    "selectVirtualKeyboard"
+    "selectVirtualKeyboard",
+    "bakeStaticLights",
+    "unbakeStaticLights"
   ];
 
   this.commandInfo = [
@@ -1093,7 +1099,9 @@ var CommandDescriptor = function(){
     "states: Opens the state editing GUI.",
     "transitions: Opens the transition editing GUI.",
     "stateMachines: Opens the state machine editing GUI.",
-    "selectVirtualKeyboard: Selects a virtual keyboard."
+    "selectVirtualKeyboard: Selects a virtual keyboard.",
+    "bakeStaticLights: Bakes static lights on given object and marks an object as unaffected by lights.",
+    "unbakeStaticLights: Unbakes static lights for given object which has baked static lights."
   ];
 
   this.keyboardInfo = [
@@ -2040,6 +2048,16 @@ var CommandDescriptor = function(){
   this.selectVirtualKeyboard = new Object();
   this.selectVirtualKeyboard.types = [];
   this.selectVirtualKeyboard.types.push(this.VIRTUAL_KEYBOARD_NAME); //virtualKeyboardName
+
+  // bakeStaticLights
+  this.bakeStaticLights = new Object();
+  this.bakeStaticLights.types = [];
+  this.bakeStaticLights.types.push(this.OBJECT_NAME); //objectName
+
+  // unbakeStaticLights
+  this.unbakeStaticLights = new Object();
+  this.unbakeStaticLights.types = [];
+  this.unbakeStaticLights.types.push(this.OBJECT_NAME); //objectName
 };
 
 CommandDescriptor.prototype.test = function(){

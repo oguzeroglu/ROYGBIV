@@ -1454,6 +1454,13 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   guiHandler.omMassController = physicsFolder.add(guiHandler.objectManipulationParameters, "Mass").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
+    if (!isNaN(val) && parseFloat(val) > 0){
+      if (obj.bakedColors){
+        terminal.printError(Text.OBJECT_HAS_BAKED_LIGHTS_CANNOT_MARK_AS_DYNAMIC);
+        guiHandler.objectManipulationParameters["Mass"] = 0;
+        return;
+      }
+    }
     parseCommand("setMass "+obj.name+" "+val);
     if (!isNaN(val) && parseFloat(val) > 0){
       guiHandler.disableController(guiHandler.omPhysicsSimplifiedController);
@@ -1464,6 +1471,13 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
         terminal.printInfo(Text.SWITCHED_TO_TRACK_POSITION);
         selectionHandler.resetCurrentSelection();
       }
+    }
+
+    if (!obj.isDynamicObject && !obj.isChangeable){
+      delete obj.objectTrailConfigurations;
+      guiHandler.objectManipulationParameters["Motion blur"] = false;
+      guiHandler.disableController(guiHandler.omObjectTrailAlphaController);
+      guiHandler.disableController(guiHandler.omObjectTrailTimeController);
     }
   });
   guiHandler.omPhysicsSimplifiedController = physicsFolder.add(guiHandler.objectManipulationParameters, "Phy. simpl.").onChange(function(val){
@@ -1542,12 +1556,26 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     if (physicsDebugMode){
       debugRenderer.refresh();
     }
+
+    if (!obj.isDynamicObject && !obj.isChangeable){
+      delete obj.objectTrailConfigurations;
+      guiHandler.objectManipulationParameters["Motion blur"] = false;
+      guiHandler.disableController(guiHandler.omObjectTrailAlphaController);
+      guiHandler.disableController(guiHandler.omObjectTrailTimeController);
+    }
+
     guiHandler.omMassController.updateDisplay();
   }).listen();
 
   // GENERAL
   guiHandler.omChangeableController = generalFolder.add(guiHandler.objectManipulationParameters, "Changeable").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
+    if (obj.bakedColors){
+      terminal.clear();
+      terminal.printError(Text.OBJECT_HAS_BAKED_LIGHTS_CANNOT_MARK_AS_CHANGEABLE);
+      guiHandler.objectManipulationParameters["Changeable"] = false;
+      return;
+    }
     if (obj.isFPSWeapon || !!obj.steerableInfo){
       guiHandler.objectManipulationParameters["Changeable"] = true;
       return;
@@ -1564,6 +1592,13 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.enableController(guiHandler.omSteerableController);
     }else{
       guiHandler.disableController(guiHandler.omSteerableController);
+
+      if (!obj.isDynamicObject){
+        delete obj.objectTrailConfigurations;
+        guiHandler.objectManipulationParameters["Motion blur"] = false;
+        guiHandler.disableController(guiHandler.omObjectTrailAlphaController);
+        guiHandler.disableController(guiHandler.omObjectTrailTimeController);
+      }
     }
   }).listen();
   guiHandler.omIntersectableController = generalFolder.add(guiHandler.objectManipulationParameters, "Intersectable").onChange(function(val){
@@ -1578,31 +1613,6 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.printInfo(Text.OBJECT_INTERSECTABLE);
     }else{
       terminal.printInfo(Text.OBJECT_UNINTERSECTABLE);
-    }
-  }).listen();
-  guiHandler.omColorizableController = generalFolder.add(guiHandler.objectManipulationParameters, "Colorizable").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    terminal.clear();
-    obj.isColorizable = val;
-    if (obj.isColorizable){
-      macroHandler.injectMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
-      obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "colorizable"));
-    }else{
-      delete obj.mesh.material.uniforms.forcedColor;
-      macroHandler.removeMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
-    }
-    obj.mesh.material.needsUpdate = true;
-  }).listen();
-  guiHandler.omAffectedByLightController = generalFolder.add(guiHandler.objectManipulationParameters, "Affected by light").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    terminal.clear();
-    obj.setAffectedByLight(val);
-    if (val){
-      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
-    }else{
-      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
     }
   }).listen();
   guiHandler.omFPSWeaponController = generalFolder.add(guiHandler.objectManipulationParameters, "FPS Weapon").onChange(function(val){
@@ -1732,6 +1742,31 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       obj.setBlending(SUBTRACTIVE_BLENDING);
     }else if (val == "Multiply"){
       obj.setBlending(MULTIPLY_BLENDING);
+    }
+  }).listen();
+  guiHandler.omColorizableController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Colorizable").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.isColorizable = val;
+    if (obj.isColorizable){
+      macroHandler.injectMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
+      obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
+      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "colorizable"));
+    }else{
+      delete obj.mesh.material.uniforms.forcedColor;
+      macroHandler.removeMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
+      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
+    }
+    obj.mesh.material.needsUpdate = true;
+  }).listen();
+  guiHandler.omAffectedByLightController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Affected by light").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.setAffectedByLight(val);
+    if (val){
+      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
+    }else{
+      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
     }
   }).listen();
 
@@ -1987,6 +2022,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   // MOTION BLUR
   guiHandler.omHasObjectTrailController = motionBlurFolder.add(guiHandler.objectManipulationParameters, "Motion blur").onChange(function(val){
     if (val){
+      if (!selectionHandler.getSelectedObject().isChangeable && !selectionHandler.getSelectedObject().isDynamicObject){
+        terminal.clear();
+        terminal.printError(Text.CANNOT_SET_MOTION_BLUR_ON_NON_DYNAMIC_CHANGEABLE_OBJECTS);
+        guiHandler.objectManipulationParameters["Motion blur"] = false;
+        return;
+      }
       selectionHandler.getSelectedObject().objectTrailConfigurations = {alpha: guiHandler.objectManipulationParameters["mb alpha"], time: guiHandler.objectManipulationParameters["mb time"]};
       guiHandler.enableController(guiHandler.omObjectTrailAlphaController);
       guiHandler.enableController(guiHandler.omObjectTrailTimeController);

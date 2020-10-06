@@ -1193,6 +1193,10 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (curObjectGroupExport.hiddenInDesignMode){
       objectGroupInstance.hideInDesignMode(true);
     }
+
+    if (curObjectGroupExport.bakedColors){
+      objectGroupInstance.bakeLights(curObjectGroupExport.bakedColors);
+    }
   }
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){

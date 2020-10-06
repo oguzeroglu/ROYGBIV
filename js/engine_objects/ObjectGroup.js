@@ -40,6 +40,32 @@ var ObjectGroup = function(name, group){
   this.rotationMode = rotationModes.WORLD;
 }
 
+ObjectGroup.prototype.unbakeLights = function(){
+  var colorsAttribute = this.mesh.geometry.attributes.color;
+  var existingColors = colorsAttribute.array;
+  for (var i = 0; i < existingColors.length; i ++){
+    existingColors[i] = this.originalColorsAry[i];
+  }
+
+  this.mesh.geometry.attributes.color.needsUpdate = true;
+  delete this.bakedColors;
+}
+
+ObjectGroup.prototype.bakeLights = function(overrideColors){
+  var newColors = overrideColors? overrideColors: lightHandler.bakeObjectLight(this, true);
+  var colorsAttribute = this.mesh.geometry.attributes.color;
+  var existingColors = colorsAttribute.array;
+
+  for (var i = 0; i < existingColors.length; i ++){
+    existingColors[i] = newColors[i];
+  }
+
+  this.mesh.geometry.attributes.color.needsUpdate = true;
+
+  this.bakedColors = newColors;
+  this.setAffectedByLight(false);
+}
+
 ObjectGroup.prototype.showInDesignMode = function(){
   if (isDeployment){
     return;
@@ -446,8 +472,12 @@ ObjectGroup.prototype.setIntersectableStatus = function(val){
 ObjectGroup.prototype.setNoMass = function(val){
   if (!val){
     physicsWorld.addBody(this.physicsBody);
+    if (this.mass > 0){
+      this.isDynamicObject = true;
+    }
   }else{
     physicsWorld.remove(this.physicsBody);
+    this.isDynamicObject = false;
   }
   this.noMass = val;
 }
@@ -2124,6 +2154,13 @@ ObjectGroup.prototype.merge = function(){
   this.geometry.addAttribute('normal', normalsBufferAttribute);
 
   pseudoGeometry = null;
+
+  if (!isDeployment){
+    this.originalColorsAry = [];
+    for (var i = 0; i < colorsBufferAttribute.array.length; i ++){
+      this.originalColorsAry.push(colorsBufferAttribute.array[i]);
+    }
+  }
 }
 
 ObjectGroup.prototype.glue = function(simplifiedChildrenPhysicsBodies){
@@ -2896,6 +2933,10 @@ ObjectGroup.prototype.export = function(){
   exportObj.rotationMode = this.rotationMode;
   exportObj.hiddenInDesignMode = !!this.hiddenInDesignMode;
 
+  if (this.bakedColors){
+    exportObj.bakedColors = this.bakedColors;
+  }
+
   return exportObj;
 }
 
@@ -3239,6 +3280,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var isColorizable = this.isColorizable;
   var renderSide = this.renderSide;
   var blending = this.mesh.material.blending;
+  var bakedColors = this.bakedColors;
   var totalAlphaBeforeDetached = this.getOpacity();
   var totalAOIntensityBeforeDetached;
   var totalEmissiveIntensityBeforeDetached;
@@ -3428,6 +3470,11 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }
 
   newObjGroup.setRotationMode(this.rotationMode);
+
+  if (bakedColors){
+    this.bakeLights(bakedColors);
+    newObjGroup.bakeLights(bakedColors);
+  }
 
   return newObjGroup;
 }
