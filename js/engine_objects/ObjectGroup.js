@@ -40,6 +40,21 @@ var ObjectGroup = function(name, group){
   this.rotationMode = rotationModes.WORLD;
 }
 
+ObjectGroup.prototype.bakeLights = function(overrideColors){
+  var newColors = overrideColors? overrideColors: lightHandler.bakeObjectLight(this, true);
+  var colorsAttribute = this.mesh.geometry.attributes.color;
+  var existingColors = colorsAttribute.array;
+
+  for (var i = 0; i < existingColors.length; i ++){
+    existingColors[i] = newColors[i];
+  }
+
+  this.mesh.geometry.attributes.color.needsUpdate = true;
+
+  this.bakedColors = newColors;
+  this.setAffectedByLight(false);
+}
+
 ObjectGroup.prototype.showInDesignMode = function(){
   if (isDeployment){
     return;
@@ -2899,6 +2914,10 @@ ObjectGroup.prototype.export = function(){
 
   exportObj.rotationMode = this.rotationMode;
   exportObj.hiddenInDesignMode = !!this.hiddenInDesignMode;
+
+  if (this.bakedColors){
+    exportObj.bakedColors = this.bakedColors;
+  }
 
   return exportObj;
 }

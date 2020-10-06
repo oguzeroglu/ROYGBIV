@@ -219,7 +219,7 @@ LightHandler.prototype.onSwitchFromDesignToPreview = function(){
   this.lightObjectAttachments = new Map();
 }
 
-LightHandler.prototype.bakeObjectLight = function(obj){
+LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
   var result = [];
 
   var normalAttrAry = obj.mesh.geometry.attributes.normal.array;
@@ -282,10 +282,14 @@ LightHandler.prototype.bakeObjectLight = function(obj){
     result.push(color.z * (ambient.z + diffuse.z));
   }
 
-  macroHandler.injectMacro("IS_LIGHT_BAKED", obj.mesh.material, true, false);
-  obj.mesh.material.needsUpdate = true;
-  obj.mesh.geometry.addAttribute("bakedColor", new THREE.BufferAttribute(new Float32Array(result), 3));
-  obj.mesh.geometry.attributes.bakedColor.needsUpdate = true;
+  if (!isDesignMode){
+    macroHandler.injectMacro("IS_LIGHT_BAKED", obj.mesh.material, true, false);
+    obj.mesh.material.needsUpdate = true;
+    obj.mesh.geometry.addAttribute("bakedColor", new THREE.BufferAttribute(new Float32Array(result), 3));
+    obj.mesh.geometry.attributes.bakedColor.needsUpdate = true;
+  }else{
+    return result;
+  }
 }
 
 LightHandler.prototype.unbakeLights = function(){
