@@ -1615,31 +1615,6 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.printInfo(Text.OBJECT_UNINTERSECTABLE);
     }
   }).listen();
-  guiHandler.omColorizableController = generalFolder.add(guiHandler.objectManipulationParameters, "Colorizable").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    terminal.clear();
-    obj.isColorizable = val;
-    if (obj.isColorizable){
-      macroHandler.injectMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
-      obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "colorizable"));
-    }else{
-      delete obj.mesh.material.uniforms.forcedColor;
-      macroHandler.removeMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
-    }
-    obj.mesh.material.needsUpdate = true;
-  }).listen();
-  guiHandler.omAffectedByLightController = generalFolder.add(guiHandler.objectManipulationParameters, "Affected by light").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    terminal.clear();
-    obj.setAffectedByLight(val);
-    if (val){
-      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
-    }else{
-      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
-    }
-  }).listen();
   guiHandler.omFPSWeaponController = generalFolder.add(guiHandler.objectManipulationParameters, "FPS Weapon").onChange(function(val){
     if (!!selectionHandler.getSelectedObject().steerableInfo || selectionHandler.getSelectedObject().usedAsAIEntity){
       guiHandler.objectManipulationParameters["FPS Weapon"] = false;
@@ -1767,6 +1742,31 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       obj.setBlending(SUBTRACTIVE_BLENDING);
     }else if (val == "Multiply"){
       obj.setBlending(MULTIPLY_BLENDING);
+    }
+  }).listen();
+  guiHandler.omColorizableController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Colorizable").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.isColorizable = val;
+    if (obj.isColorizable){
+      macroHandler.injectMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
+      obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
+      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "colorizable"));
+    }else{
+      delete obj.mesh.material.uniforms.forcedColor;
+      macroHandler.removeMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
+      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
+    }
+    obj.mesh.material.needsUpdate = true;
+  }).listen();
+  guiHandler.omAffectedByLightController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Affected by light").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.setAffectedByLight(val);
+    if (val){
+      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
+    }else{
+      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
     }
   }).listen();
 
