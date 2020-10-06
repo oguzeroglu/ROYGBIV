@@ -40,6 +40,17 @@ var ObjectGroup = function(name, group){
   this.rotationMode = rotationModes.WORLD;
 }
 
+ObjectGroup.prototype.unbakeLights = function(){
+  var colorsAttribute = this.mesh.geometry.attributes.color;
+  var existingColors = colorsAttribute.array;
+  for (var i = 0; i < existingColors.length; i ++){
+    existingColors[i] = this.originalColorsAry[i];
+  }
+
+  this.mesh.geometry.attributes.color.needsUpdate = true;
+  delete this.bakedColors;
+}
+
 ObjectGroup.prototype.bakeLights = function(overrideColors){
   var newColors = overrideColors? overrideColors: lightHandler.bakeObjectLight(this, true);
   var colorsAttribute = this.mesh.geometry.attributes.color;
@@ -2143,6 +2154,13 @@ ObjectGroup.prototype.merge = function(){
   this.geometry.addAttribute('normal', normalsBufferAttribute);
 
   pseudoGeometry = null;
+
+  if (!isDeployment){
+    this.originalColorsAry = [];
+    for (var i = 0; i < colorsBufferAttribute.array.length; i ++){
+      this.originalColorsAry.push(colorsBufferAttribute.array[i]);
+    }
+  }
 }
 
 ObjectGroup.prototype.glue = function(simplifiedChildrenPhysicsBodies){

@@ -6824,6 +6824,42 @@ function parse(input){
           terminal.printInfo(Text.LIGHTS_BAKED);
           return true;
         break;
+        case 272: //unbakeStaticLights
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (!obj.isObjectGroup){
+            terminal.printError(Text.ONLY_MERGED_OBJECTS_SUPPORT_THIS_COMMAND);
+            return true;
+          }
+          if (obj.isInstanced){
+            terminal.printError(Text.INSTANCED_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+            return true;
+          }
+          if (obj.isChangeable){
+            terminal.printError(Text.CHANGEABLE_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+            return true;
+          }
+          if (obj.isDynamicObject){
+            terminal.printError(Text.DYNAMIC_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+            return true;
+          }
+          if (!obj.bakedColors){
+            terminal.printError(Text.NO_LIGHTS_BAKED_FOR_GIVEN_OBJECT);
+            return true;
+          }
+
+          obj.unbakeLights();
+          terminal.printInfo(Text.LIGHTS_UNBAKED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

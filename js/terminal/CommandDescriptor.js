@@ -272,7 +272,8 @@ var CommandDescriptor = function(){
       0, //transitions
       0, //stateMachines
       1, //selectVirtualKeyboard
-      1 //bakeStaticLights
+      1, //bakeStaticLights
+      1 //unbakeStaticLights
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -547,7 +548,8 @@ var CommandDescriptor = function(){
     "transitions",
     "stateMachines",
     "selectVirtualKeyboard virtualKeyboardName",
-    "bakeStaticLights objectName"
+    "bakeStaticLights objectName",
+    "unbakeStaticLights objectName"
   ];
 
   this.commands = [
@@ -822,7 +824,8 @@ var CommandDescriptor = function(){
     "transitions",
     "stateMachines",
     "selectVirtualKeyboard",
-    "bakeStaticLights"
+    "bakeStaticLights",
+    "unbakeStaticLights"
   ];
 
   this.commandInfo = [
@@ -1097,7 +1100,8 @@ var CommandDescriptor = function(){
     "transitions: Opens the transition editing GUI.",
     "stateMachines: Opens the state machine editing GUI.",
     "selectVirtualKeyboard: Selects a virtual keyboard.",
-    "bakeStaticLights: Bakes static lights on given object and marks an object as unaffected by lights."
+    "bakeStaticLights: Bakes static lights on given object and marks an object as unaffected by lights.",
+    "unbakeStaticLights: Unbakes static lights for given object which has baked static lights."
   ];
 
   this.keyboardInfo = [
@@ -2049,6 +2053,11 @@ var CommandDescriptor = function(){
   this.bakeStaticLights = new Object();
   this.bakeStaticLights.types = [];
   this.bakeStaticLights.types.push(this.OBJECT_NAME); //objectName
+
+  // unbakeStaticLights
+  this.unbakeStaticLights = new Object();
+  this.unbakeStaticLights.types = [];
+  this.unbakeStaticLights.types.push(this.OBJECT_NAME); //objectName
 };
 
 CommandDescriptor.prototype.test = function(){
