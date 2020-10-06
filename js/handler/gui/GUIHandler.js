@@ -1454,6 +1454,13 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   guiHandler.omMassController = physicsFolder.add(guiHandler.objectManipulationParameters, "Mass").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
+    if (!isNaN(val) && parseFloat(val) > 0){
+      if (obj.bakedColors){
+        terminal.printError(Text.OBJECT_HAS_BAKED_LIGHTS_CANNOT_MARK_AS_DYNAMIC);
+        guiHandler.objectManipulationParameters["Mass"] = 0;
+        return;
+      }
+    }
     parseCommand("setMass "+obj.name+" "+val);
     if (!isNaN(val) && parseFloat(val) > 0){
       guiHandler.disableController(guiHandler.omPhysicsSimplifiedController);
@@ -1563,6 +1570,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   // GENERAL
   guiHandler.omChangeableController = generalFolder.add(guiHandler.objectManipulationParameters, "Changeable").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
+    if (obj.bakedColors){
+      terminal.clear();
+      terminal.printError(Text.OBJECT_HAS_BAKED_LIGHTS_CANNOT_MARK_AS_CHANGEABLE);
+      guiHandler.objectManipulationParameters["Changeable"] = false;
+      return;
+    }
     if (obj.isFPSWeapon || !!obj.steerableInfo){
       guiHandler.objectManipulationParameters["Changeable"] = true;
       return;

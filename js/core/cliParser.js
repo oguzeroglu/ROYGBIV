@@ -6770,6 +6770,60 @@ function parse(input){
           terminal.printInfo(Text.VIRTUAL_KEYBOARD_SELECTED);
           return true;
         break;
+        case 271: //bakeStaticLights
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (!obj.isObjectGroup){
+            terminal.printError(Text.ONLY_MERGED_OBJECTS_SUPPORT_THIS_COMMAND);
+            return true;
+          }
+          if (obj.isInstanced){
+            terminal.printError(Text.INSTANCED_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+            return true;
+          }
+          if (obj.isChangeable){
+            terminal.printError(Text.CHANGEABLE_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+            return true;
+          }
+          if (obj.isDynamicObject){
+            terminal.printError(Text.DYNAMIC_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+            return true;
+          }
+
+          var hasStaticLight = false;
+          for (var i = 0; i < MAX_STATIC_POINT_LIGHT_COUNT; i ++){
+            if (lightHandler.hasStaticPointLight(i)){
+              hasStaticLight = true;
+              break;
+            }
+          }
+          for (var i = 0; i < MAX_STATIC_DIFFUSE_LIGHT_COUNT; i ++){
+            if (lightHandler.hasStaticDiffuseLight(i)){
+              hasStaticLight = true;
+              break;
+            }
+          }
+          if (!hasStaticLight){
+            terminal.printError(Text.NO_STATIC_LIGHTS_IN_SCENE);
+            return true;
+          }
+          if (!obj.affectedByLight){
+            terminal.printError(Text.OBJECT_IS_NOT_MARKED_AS_AFFECTED_BY_LIGHT);
+            return true;
+          }
+
+          obj.bakeLights();
+          terminal.printInfo(Text.LIGHTS_BAKED);
+          return true;
+        break;
       }
       return true;
     }catch(err){
