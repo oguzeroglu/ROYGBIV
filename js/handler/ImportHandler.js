@@ -37,7 +37,6 @@ ImportHandler.prototype.importScenes = function(obj){
 }
 
 ImportHandler.prototype.importEngineVariables = function(obj){
-  NO_MOBILE = obj.noMobile;
   if (!(typeof obj.viewportMaxWidth == UNDEFINED)){
     viewportMaxWidth = obj.viewportMaxWidth;
   }

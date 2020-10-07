@@ -454,10 +454,6 @@ function startDeployment(){
   appendtoDeploymentConsole("by Oğuz Eroğlu - github.com/oguzeroglu");
   appendtoDeploymentConsole("");
   appendtoDeploymentConsole("");
-  if (NO_MOBILE && isMobile){
-    appendtoDeploymentConsole("[!] This application does not support mobile devices. Please run this with a non mobile device.");
-    return;
-  }
 
   var xobj = new XMLHttpRequest();
   xobj.overrideMimeType("application/json");

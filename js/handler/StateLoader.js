@@ -112,7 +112,7 @@ StateLoader.prototype.finalize = function(){
   if (!this.shouldFinalize()){
     return;
   }
-  
+
   this.importHandler.importParticleSystems(this.stateObj);
   this.importHandler.importAddedTexts(this.stateObj);
   this.importHandler.importAddedObjectGraphicsProperties();
@@ -355,7 +355,6 @@ StateLoader.prototype.resetProject = function(){
   steeringHandler.reset();
   decisionHandler.reset();
   fonts = new Object();
-  NO_MOBILE = false;
   fixedAspect = 0;
   roygbivAttributeCounter = 1;
   roygbivBufferAttributeCounter = 1;

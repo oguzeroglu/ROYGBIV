@@ -3483,30 +3483,7 @@ function parse(input){
           // DEPRECATED
         break;
         case 148: //noMobile
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var param = splitted[1].toLowerCase();
-          if (param == "on"){
-            if (NO_MOBILE){
-              terminal.printError(Text.ALREADY_FOR_MOBILE.replace(Text.PARAM1, "disabled"));
-              return true;
-            }
-            NO_MOBILE = true;
-            terminal.printInfo(Text.FOR_MOBILE.replace(Text.PARAM1, "disabled"));
-            return true;
-          }else if(param == "off"){
-            if (!NO_MOBILE){
-              terminal.printError(Text.ALREADY_FOR_MOBILE.replace(Text.PARAM1, "enabled"));
-              return true;
-            }
-            NO_MOBILE = false;
-            terminal.printInfo(Text.FOR_MOBILE.replace(Text.PARAM1, "enabled"));
-            return true;
-          }
-          terminal.printError(Text.PARAMETER_MUST_BE_ON_OFF);
-          return true;
+          // DEPRECATED
         break;
         case 149: //setMaxViewport
           if (mode != 0){

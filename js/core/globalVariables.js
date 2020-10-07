@@ -295,7 +295,6 @@ var isMobile = /Mobi|Android/i.test(navigator.userAgent);
 var WHITE_COLOR = new THREE.Color("white");
 var LIME_COLOR = new THREE.Color("lime");
 var ORANGE_COLOR = new THREE.Color("orange");
-var NO_MOBILE = false;
 var isPaused = false;
 var defaultFont;
 var fonts = new Object();
