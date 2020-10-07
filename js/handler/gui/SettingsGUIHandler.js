@@ -13,6 +13,8 @@ SettingsGUIHandler.prototype.show = function(){
   var websocketFolder = guiHandler.datGuiSettings.addFolder("WebSocket");
   var debugFolder = guiHandler.datGuiSettings.addFolder("Debug");
 
+  this.initializeDebugFolder(debugFolder);
+
   guiHandler.datGuiSettings.add({
     "Done": function(){
       terminal.clear();
@@ -20,4 +22,21 @@ SettingsGUIHandler.prototype.show = function(){
       terminal.printInfo(Text.SETTINGS_GUI_CLOSED);
     }
   }, "Done");
+}
+
+SettingsGUIHandler.prototype.initializeDebugFolder = function(parentFolder){
+  var params = {
+    "Physics": physicsDebugMode,
+    "AI": !!steeringHandler.debugHelper
+  };
+
+  parentFolder.add(params, "Physics").onChange(function(){
+    terminal.clear();
+    parseCommand("switchPhysicsDebugMode");
+  });
+
+  parentFolder.add(params, "AI").onChange(function(){
+    terminal.clear();
+    parseCommand("switchAIDebugMode");
+  });
 }
