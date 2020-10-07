@@ -1184,6 +1184,7 @@ var CommandDescriptor = function(){
     147, //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
     148, //noMobile -> Deprecated because the engine is good enough to deal with mobile devices at this point.
     149, //setMaxViewport -> Deprecated because the engine is responsive enough to deal with any viewport at this point.
+    150, //keepAspect -> Deprecated because the engine is responsive enough to deal with any viewport at this point.
     239, //newJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
     240, //destroyJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
     241 //printJumpDescriptors -> Deprecated due to architectural changes in JumpDescriptor creation process.
@@ -1598,11 +1599,6 @@ var CommandDescriptor = function(){
   this.build.types = [];
   this.build.types.push(this.UNKNOWN_INDICATOR); // projectName
   this.build.types.push(this.UNKNOWN_INDICATOR); // author
-
-  // keepAspect
-  this.keepAspect = new Object();
-  this.keepAspect.types = [];
-  this.keepAspect.types.push(this.UNKNOWN_INDICATOR); // ratio
 
   // newFont
   this.newFont = new Object();

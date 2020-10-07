@@ -253,23 +253,6 @@ function handleViewport(){
     cvz = cvz / screenResolution;
     cvw = cvw / screenResolution;
   }
-  if (mode == 1 && fixedAspect > 0){
-    var result = getMaxWidthHeightGivenAspect(canvas.width / screenResolution, canvas.height / screenResolution, fixedAspect);
-    var newViewportX = ((canvas.width / screenResolution) - result.width) / 2;
-    var newViewportY = ((canvas.height / screenResolution) - result.height) / 2;
-    var newViewportZ = result.width;
-    var newViewportW = result.height;
-    renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
-    renderer.setSize(newViewportZ, newViewportW);
-    currentViewport.startX = newViewportX;
-    currentViewport.startY = newViewportY;
-    currentViewport.width = newViewportZ;
-    currentViewport.height = newViewportW;
-    camera.oldAspect = camera.aspect;
-    camera.aspect = fixedAspect;
-    camera.updateProjectionMatrix();
-    return;
-  }
   var newViewportX = 0;
   var newViewportY = 0;
   var newViewportZ = canvas.width / screenResolution;

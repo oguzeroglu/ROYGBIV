@@ -3489,23 +3489,7 @@ function parse(input){
           // DEPRECATED
         break;
         case 150: //keepAspect
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var aspectFixed = parseFloat(splitted[1]);
-          if (isNaN(aspectFixed)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "ratio"));
-            return true;
-          }
-          if (aspectFixed <= 0){
-            fixedAspect = 0;
-            terminal.printInfo(Text.ASPECT_UNFIXED);
-            return true;
-          }
-          fixedAspect = aspectFixed;
-          terminal.printInfo(Text.ASPECT_FIXED.replace(Text.PARAM1, fixedAspect));
-          return true;
+          // DEPRECATED
         break;
         case 151: //newFont
           if (mode != 0){

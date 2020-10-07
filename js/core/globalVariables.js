@@ -58,7 +58,6 @@ var axesHelper = new THREE.AxesHelper(20000);
 var pointerLockRequested = false;
 var fullScreenRequested = false;
 var currentViewport = new Object();
-var fixedAspect = 0;
 
 var STEP = 1/60;
 

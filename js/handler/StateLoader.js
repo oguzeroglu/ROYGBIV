@@ -353,7 +353,6 @@ StateLoader.prototype.resetProject = function(){
   steeringHandler.reset();
   decisionHandler.reset();
   fonts = new Object();
-  fixedAspect = 0;
   roygbivAttributeCounter = 1;
   roygbivBufferAttributeCounter = 1;
   roygbivSkippedArrayBufferUpdates = 0;

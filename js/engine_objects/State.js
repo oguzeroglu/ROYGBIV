@@ -8,8 +8,6 @@ var State = function(projectName, author){
   }
   // DATE **********************************************************
   this.date = new Date();
-  // VIEWPORT ******************************************************
-  this.fixedAspect = fixedAspect;
   // WORKER STATUS ***********************************************
   this.RAYCASTER_WORKER_ON = RAYCASTER_WORKER_ON;
   this.PHYSICS_WORKER_ON = PHYSICS_WORKER_ON;
