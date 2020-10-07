@@ -163,7 +163,7 @@ var GUIHandler = function(){
     CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17,
     CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
     JUMP_DESCRIPTOR_CREATION: 23, KNOWLEDGE_CREATION: 24, DECISION_CREATION: 25, DECISION_TREE_CREATION: 26,
-    STATE_CREATION: 27, TRANSITION_CREATION: 28, STATE_MACHINE_CREATION: 29, VIRTUAL_KEYBOARD: 30
+    STATE_CREATION: 27, TRANSITION_CREATION: 28, STATE_MACHINE_CREATION: 29, VIRTUAL_KEYBOARD: 30, SETTINGS: 31
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -1245,6 +1245,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiVirtualKeyboard){
         this.destroyGUI(this.datGuiVirtualKeyboard);
         this.datGuiVirtualKeyboard = 0;
+      }
+    return;
+    case this.guiTypes.SETTINGS:
+      if (this.datGuiSettings){
+        this.destroyGUI(this.datGuiSettings);
+        this.datGuiSettings = 0;
       }
     return;
   }
