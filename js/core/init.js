@@ -274,20 +274,6 @@ function handleViewport(){
   var newViewportY = 0;
   var newViewportZ = canvas.width / screenResolution;
   var newViewportW = canvas.height / screenResolution;
-  if (viewportMaxWidth > 0){
-    if (cvz > viewportMaxWidth){
-      var diff = cvz - viewportMaxWidth;
-      newViewportX = diff/2;
-      newViewportZ = viewportMaxWidth;
-    }
-  }
-  if (viewportMaxHeight > 0){
-    if (cvw > viewportMaxHeight){
-      var diff = cvw - viewportMaxHeight;
-      newViewportY = diff/2;
-      newViewportW = viewportMaxHeight;
-    }
-  }
   renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
   currentViewport.startX = newViewportX;
   currentViewport.startY = newViewportY;

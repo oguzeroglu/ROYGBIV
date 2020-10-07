@@ -37,12 +37,6 @@ ImportHandler.prototype.importScenes = function(obj){
 }
 
 ImportHandler.prototype.importEngineVariables = function(obj){
-  if (!(typeof obj.viewportMaxWidth == UNDEFINED)){
-    viewportMaxWidth = obj.viewportMaxWidth;
-  }
-  if (!(typeof obj.viewportMaxHeight == UNDEFINED)){
-    viewportMaxHeight = obj.viewportMaxHeight;
-  }
   if (!(typeof obj.fixedAspect == UNDEFINED)){
     fixedAspect = obj.fixedAspect;
   }

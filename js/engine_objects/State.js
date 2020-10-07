@@ -9,8 +9,6 @@ var State = function(projectName, author){
   // DATE **********************************************************
   this.date = new Date();
   // VIEWPORT ******************************************************
-  this.viewportMaxWidth = viewportMaxWidth;
-  this.viewportMaxHeight = viewportMaxHeight;
   this.fixedAspect = fixedAspect;
   // WORKER STATUS ***********************************************
   this.RAYCASTER_WORKER_ON = RAYCASTER_WORKER_ON;

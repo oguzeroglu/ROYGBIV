@@ -57,8 +57,6 @@ var sceneBackgroundColor = 0x000000 ;
 var axesHelper = new THREE.AxesHelper(20000);
 var pointerLockRequested = false;
 var fullScreenRequested = false;
-var viewportMaxWidth = 0;
-var viewportMaxHeight = 0;
 var currentViewport = new Object();
 var fixedAspect = 0;
 
