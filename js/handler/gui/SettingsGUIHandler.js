@@ -13,6 +13,7 @@ SettingsGUIHandler.prototype.show = function(){
   var websocketFolder = guiHandler.datGuiSettings.addFolder("WebSocket");
   var debugFolder = guiHandler.datGuiSettings.addFolder("Debug");
 
+  this.initializeWorkerFolder(workerFolder);
   this.initializeDebugFolder(debugFolder);
 
   guiHandler.datGuiSettings.add({
@@ -22,6 +23,55 @@ SettingsGUIHandler.prototype.show = function(){
       terminal.printInfo(Text.SETTINGS_GUI_CLOSED);
     }
   }, "Done");
+}
+
+SettingsGUIHandler.prototype.initializeWorkerFolder = function(parentFolder){
+  var params = {
+    "Raycaster worker": RAYCASTER_WORKER_ON,
+    "Physics worker": PHYSICS_WORKER_ON,
+    "Lightning worker": LIGHTNING_WORKER_ON
+  };
+
+  parentFolder.add(params, "Raycaster worker").onChange(function(val){
+    RAYCASTER_WORKER_ON = val;
+    raycasterFactory.refresh();
+    rayCaster = raycasterFactory.get();
+
+    terminal.clear();
+    terminal.printInfo(val? Text.RAYCASTER_WORKER_TURNED_ON: Text.RAYCASTER_WORKER_TURNED_OFF);
+
+    if (val){
+      rayCaster.onReadyCallback = function(){};
+    }
+  });
+
+  parentFolder.add(params, "Physics worker").onChange(function(val){
+    PHYSICS_WORKER_ON = val;
+    physicsFactory.refresh();
+    physicsWorld = physicsFactory.get();
+
+    terminal.clear();
+    terminal.printInfo(val? Text.PHYSICS_WORKER_TURNED_ON: Text.PHYSICS_WORKER_TURNED_OFF);
+  });
+
+  parentFolder.add(params, "Lightning worker").onChange(function(val){
+    LIGHTNING_WORKER_ON = val
+    for (var lightningName in lightnings){
+      lightnings[lightningName].init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
+    }
+    if (LIGHTNING_WORKER_ON){
+      lightningHandler.reset();
+      for (var lightningName in lightnings){
+        lightningHandler.onLightningCreation(lightnings[lightningName]);
+        if (lightnings[lightningName].isCorrected){
+          lightningHandler.onSetCorrectionProperties(lightnings[lightningName]);
+        }
+      }
+    }
+
+    terminal.clear();
+    terminal.printInfo(val? Text.LIGHTNING_WORKER_TURNED_ON: Text.LIGHTNING_WORKER_TURNED_OFF);
+  });
 }
 
 SettingsGUIHandler.prototype.initializeDebugFolder = function(parentFolder){

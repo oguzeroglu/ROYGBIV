@@ -148,18 +148,9 @@ var GUIHandler = function(){
       terminal.enable();
     }
   };
-  this.workerStatusParameters = {
-    "Raycaster": "ON",
-    "Physics": "ON",
-    "Lightning": "ON",
-    "Done": function(){
-      terminal.clear();
-      parseCommand("workerConfigurations hide");
-    }
-  }
   this.guiTypes = {
     TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5,
-    WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
+    MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
     CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17,
     CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
     JUMP_DESCRIPTOR_CREATION: 23, KNOWLEDGE_CREATION: 24, DECISION_CREATION: 25, DECISION_TREE_CREATION: 26,
@@ -1017,11 +1008,6 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeShaderPrecisionGUI();
       }
     return;
-    case this.guiTypes.WORKER_STATUS:
-      if (!this.datGuiWorkerStatus){
-        this.initializeWorkerStatusGUI();
-      }
-    return;
     case this.guiTypes.VIRTUAL_KEYBOARD:
       if (!this.datGuiVirtualKeyboard){
         this.initializeVirtualKeyboardGUI();
@@ -1113,12 +1099,6 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiPSCreator){
         this.destroyGUI(this.datGuiPSCreator);
         this.datGuiPSCreator = 0;
-      }
-    return;
-    case this.guiTypes.WORKER_STATUS:
-      if (this.datGuiWorkerStatus){
-        this.destroyGUI(this.datGuiWorkerStatus);
-        this.datGuiWorkerStatus = 0;
       }
     return;
     case this.guiTypes.MUZZLE_FLASH:
@@ -1274,42 +1254,6 @@ GUIHandler.prototype.getPrecisionType = function(key){
     return shaderPrecisionHandler.precisionTypes.HIGH;
   }
   throw new Error("Unknown type.");
-}
-
-GUIHandler.prototype.initializeWorkerStatusGUI = function(){
-  if (!guiHandler.onOff){
-    guiHandler.onOff = ["ON", "OFF"];
-  }
-  guiHandler.workerStatusParameters["Raycaster"] = (RAYCASTER_WORKER_ON)? "ON": "OFF";
-  guiHandler.workerStatusParameters["Physics"] = (PHYSICS_WORKER_ON)? "ON": "OFF";
-  guiHandler.workerStatusParameters["Lightning"] = (LIGHTNING_WORKER_ON)? "ON": "OFF";
-  guiHandler.datGuiWorkerStatus = new dat.GUI({hideable: false, width: 420});
-  guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Raycaster", guiHandler.onOff).onChange(function(val){
-    RAYCASTER_WORKER_ON = (val == "ON");
-    raycasterFactory.refresh();
-    rayCaster = raycasterFactory.get();
-  }).listen();
-  guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Physics", guiHandler.onOff).onChange(function(val){
-    PHYSICS_WORKER_ON = (val == "ON");
-    physicsFactory.refresh();
-    physicsWorld = physicsFactory.get();
-  }).listen();
-  guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Lightning", guiHandler.onOff).onChange(function(val){
-    LIGHTNING_WORKER_ON = (val == "ON");
-    for (var lightningName in lightnings){
-      lightnings[lightningName].init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
-    }
-    if (LIGHTNING_WORKER_ON){
-      lightningHandler.reset();
-      for (var lightningName in lightnings){
-        lightningHandler.onLightningCreation(lightnings[lightningName]);
-        if (lightnings[lightningName].isCorrected){
-          lightningHandler.onSetCorrectionProperties(lightnings[lightningName]);
-        }
-      }
-    }
-  }).listen();
-  guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Done");
 }
 
 GUIHandler.prototype.initializeShaderPrecisionGUI = function(){

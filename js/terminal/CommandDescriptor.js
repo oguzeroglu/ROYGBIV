@@ -1185,6 +1185,7 @@ var CommandDescriptor = function(){
     148, //noMobile -> Deprecated because the engine is good enough to deal with mobile devices at this point.
     149, //setMaxViewport -> Deprecated because the engine is responsive enough to deal with any viewport at this point.
     150, //keepAspect -> Deprecated because the engine is responsive enough to deal with any viewport at this point.
+    172, //workerConfigurations -> Ported the functionality into Settings GUI.
     239, //newJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
     240, //destroyJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
     241 //printJumpDescriptors -> Deprecated due to architectural changes in JumpDescriptor creation process.
@@ -1684,11 +1685,6 @@ var CommandDescriptor = function(){
   this.destroyParticleSystemPool = new Object();
   this.destroyParticleSystemPool.types = [];
   this.destroyParticleSystemPool.types.push(this.PRECONFOGURED_PS_POOL_NAME); // poolName
-
-  // workerConfigurations
-  this.workerConfigurations = new Object();
-  this.workerConfigurations.types = [];
-  this.workerConfigurations.types.push(this.HIDE_SHOW); // show/hide
 
   // newMuzzleFlash
   this.newMuzzleFlash = new Object();
