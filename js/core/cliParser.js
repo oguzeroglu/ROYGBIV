@@ -2403,130 +2403,16 @@ function parse(input){
           return true;
         break;
         case 113: //setWorldLimits
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var minX = parseInt(splitted[1]);
-          var minY = parseInt(splitted[2]);
-          var minZ = parseInt(splitted[3]);
-          var maxX = parseInt(splitted[4]);
-          var maxY = parseInt(splitted[5]);
-          var maxZ = parseInt(splitted[6]);
-          if (isNaN(minX)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "minX"));
-            return true;
-          }
-          if (isNaN(minY)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "minY"));
-            return true;
-          }
-          if (isNaN(minZ)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "minZ"));
-            return true;
-          }
-          if (isNaN(maxX)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxX"));
-            return true;
-          }
-          if (isNaN(maxY)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxY"));
-            return true;
-          }
-          if (isNaN(maxZ)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxZ"));
-            return true;
-          }
-          if (maxX <= minX){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "maxX").replace(
-              Text.PARAM2, "minX"
-            ));
-            return true;
-          }
-          if (maxY <= minY){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "maxY").replace(
-              Text.PARAM2, "minY"
-            ));
-            return true;
-          }
-          if (maxZ <= minZ){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "maxZ").replace(
-              Text.PARAM2, "minZ"
-            ));
-            return true;
-          }
-          if ((minX % BIN_SIZE) || (minY % BIN_SIZE) || (minZ % BIN_SIZE) || (maxX % BIN_SIZE) || (maxY % BIN_SIZE) || (maxZ % BIN_SIZE)){
-            terminal.printError(Text.PARAMETERS_MUST_BE_DIVISABLE_BY.replace(Text.PARAM1, BIN_SIZE));
-            return true;
-          }
-          var lowerBound = new THREE.Vector3(minX, minY, minZ);
-          var upperBound = new THREE.Vector3(maxX, maxY, maxZ);
-          LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
-          sceneHandler.onWorldLimitsChange();
-          steeringHandler.resetWorld();
-          refreshRaycaster(Text.OCTREE_LIMIT_SET);
-          return true;
+          // DEPRECATED
         break;
         case 114: //setBinSize
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var binSize = parseInt(splitted[1]);
-          if (isNaN(binSize)){
-            terminal.printError(Text.BIN_SIZE_MUST_BE_A_NUMBER);
-            return true;
-          }
-          if (binSize <= 1){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(
-              Text.PARAM1, "Bin size"
-            ).replace(
-              Text.PARAM2, "1"
-            ));
-            return true;
-          }
-          var minX = LIMIT_BOUNDING_BOX.min.x;
-          var minY = LIMIT_BOUNDING_BOX.min.y;
-          var minZ = LIMIT_BOUNDING_BOX.min.z;
-          var maxX = LIMIT_BOUNDING_BOX.max.x;
-          var maxY = LIMIT_BOUNDING_BOX.max.y;
-          var maxZ = LIMIT_BOUNDING_BOX.max.z;
-          if ((minX % binSize) || (minY % binSize) || (minZ % binSize) || (maxX % binSize) || (maxY % binSize) || (maxZ % binSize)){
-            terminal.printError(Text.WORLD_LIMITS_MUST_BE_DIVISABLE_BY_BIN_SIZE);
-            return true;
-          }
-          BIN_SIZE = binSize;
-          sceneHandler.onBinSizeChange();
-          steeringHandler.resetWorld();
-          refreshRaycaster(Text.BIN_SIZE_SET);
-          return true;
+          // DEPRECATED
         break;
         case 115: //printWorldLimits
-          terminal.printHeader(Text.WORLD_LIMITS);
-          terminal.printInfo(Text.COORD_TREE.replace(
-            Text.PARAM1, Text.MIN
-          ).replace(
-            Text.PARAM2, LIMIT_BOUNDING_BOX.min.x
-          ).replace(
-            Text.PARAM3, LIMIT_BOUNDING_BOX.min.y
-          ).replace(
-            Text.PARAM4, LIMIT_BOUNDING_BOX.min.z
-          ), true);
-          terminal.printInfo(Text.COORD_TREE.replace(
-            Text.PARAM1, Text.MAX
-          ).replace(
-            Text.PARAM2, LIMIT_BOUNDING_BOX.max.x
-          ).replace(
-            Text.PARAM3, LIMIT_BOUNDING_BOX.max.y
-          ).replace(
-            Text.PARAM4, LIMIT_BOUNDING_BOX.max.z
-          ));
-          return true;
+          // DEPRECATED
         break;
         case 116: //printBinSize
-          terminal.printHeader(Text.BIN_SIZE);
-          terminal.printInfo(Text.TREE.replace(Text.PARAM1, BIN_SIZE));
-          return true;
+          // DEPRECATED
         break;
         case 117: //particleCollisionWorkerMode
           // DEPRECATED
@@ -3755,26 +3641,10 @@ function parse(input){
           return true;
         break;
         case 158: //setRayStep
-          if  (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-          }
-          var stepAmount = parseFloat(splitted[1]);
-          if (isNaN(stepAmount)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "stepAmount"));
-            return true;
-          }
-          if (stepAmount <= 0){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "stepAmount").replace(Text.PARAM2, "0"));
-            return true;
-          }
-          RAYCASTER_STEP_AMOUNT = stepAmount;
-          refreshRaycaster(Text.RAYCASTER_STEP_AMOUNT_SET_TO.replace(Text.PARAM1, RAYCASTER_STEP_AMOUNT));
-          return true;
+          // DEPRECATED
         break;
         case 159: //printRayStep
-          terminal.printHeader(Text.RAYCASTER_STEP_AMOUNT);
-          terminal.printInfo(Text.TREE.replace(Text.PARAM1, RAYCASTER_STEP_AMOUNT));
-          return true;
+          // DEPRECATED
         break;
         case 160: //simplifyPhysics
           if (mode != 0){

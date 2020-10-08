@@ -1170,6 +1170,10 @@ var CommandDescriptor = function(){
     107, //rescaleTexture -> Deprecated due to lack of usecases.
     108, //rescaleTexturePack -> Deprecated due to lack of usecases.
     109, //destroyImage -> Deprecated as uploadImage is also deprecated.
+    113, //setWorldLimits -> Ported the functionality into Settings GUI.
+    114, //setBinSize -> Ported the functionality into Settings GUI.
+    115, //printWorldLimits -> Ported the functionality into Settings GUI.
+    116, //printBinSize -> Ported the functionality into Settings GUI.
     117, //particleCollisionWorkerMode  -> Workers will be re-implemented.
     118, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
     119, //particleSystemCollisionWorkerMode -> Workers will be re-implemented.
@@ -1185,6 +1189,8 @@ var CommandDescriptor = function(){
     148, //noMobile -> Deprecated because the engine is good enough to deal with mobile devices at this point.
     149, //setMaxViewport -> Deprecated because the engine is responsive enough to deal with any viewport at this point.
     150, //keepAspect -> Deprecated because the engine is responsive enough to deal with any viewport at this point.
+    158, //setRayStep -> Ported the functionality into Settings GUI.
+    159, //printRayStep -> Ported the functionality into Settings GUI.
     172, //workerConfigurations -> Ported the functionality into Settings GUI.
     239, //newJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
     240, //destroyJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
@@ -1483,21 +1489,6 @@ var CommandDescriptor = function(){
   this.setBlending.types.push(this.OBJECT_NAME); //objectName
   this.setBlending.types.push(this.BLENDING_MODE); //mode
 
-  // setWorldLimits
-  this.setWorldLimits = new Object();
-  this.setWorldLimits.types = [];
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //minX
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //minY
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //minZ
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //maxX
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //maxY
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //maxZ
-
-  // setBinSize
-  this.setBinSize = new Object();
-  this.setBinSize.types = [];
-  this.setBinSize.types.push(this.UNKNOWN_INDICATOR); //size
-
   // newSphere
   this.newSphere = new Object();
   this.newSphere.types = [];
@@ -1630,11 +1621,6 @@ var CommandDescriptor = function(){
   this.destroyText = new Object();
   this.destroyText.types = [];
   this.destroyText.types.push(this.TEXT_NAME); // textName
-
-  // setRayStep
-  this.setRayStep = new Object();
-  this.setRayStep.types = [];
-  this.setRayStep.types.push(this.UNKNOWN_INDICATOR); // stepAmount
 
   // simplifyPhysics
   this.simplifyPhysics = new Object();
