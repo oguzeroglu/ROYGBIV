@@ -5,7 +5,7 @@ var SettingsGUIHandler = function(){
 SettingsGUIHandler.prototype.show = function(){
   terminal.clear();
   terminal.printInfo(Text.SHOWING_SETTINGS);
-  guiHandler.datGuiSettings = new dat.GUI({hideable: false});
+  guiHandler.datGuiSettings = new dat.GUI({hideable: false, width: 450});
 
   var raycasterFolder = guiHandler.datGuiSettings.addFolder("Raycaster");
   var graphicsFolder = guiHandler.datGuiSettings.addFolder("Graphics");
@@ -30,7 +30,8 @@ SettingsGUIHandler.prototype.show = function(){
 SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
   var params = {
     "Resolution": "" + screenResolution,
-    "Use original resolution": useOriginalResolution
+    "Use original resolution": useOriginalResolution,
+    "Accepted texture size": "" + ACCEPTED_TEXTURE_SIZE
   };
 
   var resolutionController = parentFolder.add(params, "Resolution").onFinishChange(function(val){
@@ -74,6 +75,33 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
   if (useOriginalResolution){
     guiHandler.disableController(resolutionController);
   }
+
+  parentFolder.add(params, "Accepted texture size").onFinishChange(function(val){
+    terminal.clear();
+    if (Object.keys(texturePacks).length){
+      terminal.printError(Text.CANNOT_SET_TEXTURE_SIZE_AFTER);
+      return;
+    }
+    var textureSize = parseInt(val);
+    if (isNaN(textureSize)){
+      terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "textureSize"));
+      return;
+    }
+    if (textureSize <= 0){
+      terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "textureSize").replace(Text.PARAM2, "0"));
+      return;
+    }
+    if ((Math.log(textureSize)/Math.log(2)) % 1 != 0){
+      terminal.printError(Text.IS_NOT_POWER_OF_TWO.replace(Text.PARAM1, "textureSize"));
+      return;
+    }
+    if (textureSize > MAX_TEXTURE_SIZE){
+      terminal.printError(Text.MUST_BE_LESS_THAN.replace(Text.PARAM1, "textureSize").replace(Text.PARAM2, MAX_TEXTURE_SIZE));
+      return;
+    }
+    ACCEPTED_TEXTURE_SIZE = textureSize;
+    terminal.printInfo(Text.ACCEPTED_TEXTURE_SIZE_SET);
+  });
 }
 
 SettingsGUIHandler.prototype.initializeRaycasterFolder = function(parentFolder){

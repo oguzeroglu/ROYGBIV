@@ -1193,6 +1193,8 @@ var CommandDescriptor = function(){
     158, //setRayStep -> Ported the functionality into Settings GUI.
     159, //printRayStep -> Ported the functionality into Settings GUI.
     172, //workerConfigurations -> Ported the functionality into Settings GUI.
+    232, //setAcceptedTextureSize -> Ported the functionality into Settings GUI.
+    233, //printAcceptedTextureSize -> Ported the functionality into Settings GUI.
     239, //newJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
     240, //destroyJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
     241 //printJumpDescriptors -> Deprecated due to architectural changes in JumpDescriptor creation process.
@@ -1888,11 +1890,6 @@ var CommandDescriptor = function(){
   this.syncAnimations.types = [];
   this.syncAnimations.types.push(this.OBJECT_TEXT_SPRITE_NAME); //sourceName
   this.syncAnimations.types.push(this.OBJECT_TEXT_SPRITE_NAME); //targetName
-
-  // setAcceptedTextureSize
-  this.setAcceptedTextureSize = new Object();
-  this.setAcceptedTextureSize.types = [];
-  this.setAcceptedTextureSize.types.push(this.UNKNOWN_INDICATOR); //textureSize
 
   // newAIObstacle
   this.newAIObstacle = new Object();
