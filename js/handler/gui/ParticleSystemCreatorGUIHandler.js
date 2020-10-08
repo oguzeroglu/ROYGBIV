@@ -19,6 +19,10 @@ var ParticleSystemCreatorGUIHandler = function(){
   }
   this.initCommonParameters();
   this.buttonsParam = {
+    "Export": function(){
+      terminal.clear();
+      save(objectExportImportHandler.exportParticleSystem(particleSystemCreatorGUIHandler.preConfiguredParticleSystem) ,"particle_system_export_" + particleSystemCreatorGUIHandler.preConfiguredParticleSystem.name);
+    },
     "Cancel": function(){
       activeControl = new FreeControls({});
       guiHandler.hideAll();
@@ -144,14 +148,14 @@ ParticleSystemCreatorGUIHandler.prototype.update = function(){
 
 ParticleSystemCreatorGUIHandler.prototype.addCommonControllers = function(){
   var blendingTypes = ["NO_BLENDING", "NORMAL_BLENDING", "ADDITIVE_BLENDING", "SUBTRACTIVE_BLENDING", "MULTIPLY_BLENDING"];
-  this.maxPSTimeController = guiHandler.datGuiPSCreator.add(this.maxPSTimeParam, "Max time").min(0.001).max(DEFAULT_MAX_PS_TIME).step(0.01).onChange(function(val){
+  guiHandler.datGuiPSCreator.add(this.maxPSTimeParam, "Max time").min(0.001).max(DEFAULT_MAX_PS_TIME).step(0.01).onChange(function(val){
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setMaxPSTime(val);
     particleSystemCreatorGUIHandler.particleSystem.maxPSTime = val;
   }).listen();
-  this.collidableController = guiHandler.datGuiPSCreator.add(this.collidableParam, "Collidable").onChange(function(val){
+  guiHandler.datGuiPSCreator.add(this.collidableParam, "Collidable").onChange(function(val){
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(val);
   }).listen();
-  this.blendingController = guiHandler.datGuiPSCreator.add(this.blendingParam, "Blending", blendingTypes).onChange(function(val){
+  guiHandler.datGuiPSCreator.add(this.blendingParam, "Blending", blendingTypes).onChange(function(val){
     var intVal;
     switch (val){
       case "NO_BLENDING": intVal = NO_BLENDING; break;
@@ -162,15 +166,16 @@ ParticleSystemCreatorGUIHandler.prototype.addCommonControllers = function(){
     }
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setBlending(intVal, val);
   }).listen();
-  this.excludeFromMergeController = guiHandler.datGuiPSCreator.add(this.excludeFromMergeParam, "No merge").onChange(function(val){
+  guiHandler.datGuiPSCreator.add(this.excludeFromMergeParam, "No merge").onChange(function(val){
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setExcludeFromMergeStatus(val);
   }).listen();
-  this.scaleController = guiHandler.datGuiPSCreator.add(this.scaleParam, "Scale").min(0.01).max(10).step(0.01).onChange(function(val){
+  guiHandler.datGuiPSCreator.add(this.scaleParam, "Scale").min(0.01).max(10).step(0.01).onChange(function(val){
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setScale(val);
     particleSystemCreatorGUIHandler.particleSystem.mesh.scale.set(val, val, val);
   }).listen();
-  this.cancelController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Cancel");
-  this.doneController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Done");
+  guiHandler.datGuiPSCreator.add(this.buttonsParam, "Export");
+  guiHandler.datGuiPSCreator.add(this.buttonsParam, "Cancel");
+  guiHandler.datGuiPSCreator.add(this.buttonsParam, "Done");
 }
 
 ParticleSystemCreatorGUIHandler.prototype.addTypeController = function(type){
