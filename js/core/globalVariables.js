@@ -237,6 +237,7 @@ var ASTC_SUPPORTED;
 var S3TC_SUPPORTED;
 var PVRTC_SUPPORTED;
 var INSTANCING_SUPPORTED;
+var INSTANCING_DISABLED = false;
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
 var jobHandlerRaycasterRefresh = false;

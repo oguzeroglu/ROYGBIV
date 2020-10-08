@@ -12,6 +12,8 @@ var State = function(projectName, author){
   this.RAYCASTER_WORKER_ON = RAYCASTER_WORKER_ON;
   this.PHYSICS_WORKER_ON = PHYSICS_WORKER_ON;
   this.LIGHTNING_WORKER_ON = LIGHTNING_WORKER_ON;
+  // INSTANCING ****************************************************
+  this.INSTANCING_DISABLED = INSTANCING_DISABLED;
   // PS REF HEIGHT *************************************************
   this.particleSystemRefHeight = particleSystemRefHeight;
   // TEXTURE ATLAS *************************************************

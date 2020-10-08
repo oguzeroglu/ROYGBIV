@@ -85,7 +85,8 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
   var params = {
     "Resolution": "" + screenResolution,
     "Use original resolution": useOriginalResolution,
-    "Accepted texture size": "" + ACCEPTED_TEXTURE_SIZE
+    "Accepted texture size": "" + ACCEPTED_TEXTURE_SIZE,
+    "Disable instancing": INSTANCING_DISABLED
   };
 
   var resolutionController = parentFolder.add(params, "Resolution").onFinishChange(function(val){
@@ -156,6 +157,19 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     ACCEPTED_TEXTURE_SIZE = textureSize;
     terminal.printInfo(Text.ACCEPTED_TEXTURE_SIZE_SET);
   });
+
+  parentFolder.add(params, "Disable instancing").onChange(function(val){
+    terminal.clear();
+
+    if (Object.keys(objectGroups).length > 0){
+      params["Disable instancing"] = INSTANCING_DISABLED;
+      terminal.printError(Text.THERE_ARE_OBJECT_GROUPS_CANNOT_PERFORM_THIS_OPERATION);
+      return;
+    }
+
+    INSTANCING_DISABLED = val;
+    terminal.printInfo(val? Text.INSTANCING_DISABLED: Text.INSTANCING_ENABLED);
+  }).listen();
 
   var shaderPrecisionFolder = parentFolder.addFolder("Shader precision");
 

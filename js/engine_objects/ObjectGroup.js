@@ -1278,7 +1278,7 @@ ObjectGroup.prototype.merge = function(){
 
   this.handleTextures();
 
-  if (this.areGeometriesIdentical() && INSTANCING_SUPPORTED){
+  if (this.areGeometriesIdentical() && INSTANCING_SUPPORTED && !INSTANCING_DISABLED){
     this.mergeInstanced();
     return;
   }

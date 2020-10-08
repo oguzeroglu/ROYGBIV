@@ -376,6 +376,7 @@ StateLoader.prototype.resetProject = function(){
   masses = new Object();
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;
+  INSTANCING_DISABLED = false;
   if (!isDeployment){
     selectionHandler.resetCurrentSelection();
   }
