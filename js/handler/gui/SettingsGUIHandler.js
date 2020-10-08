@@ -16,6 +16,7 @@ SettingsGUIHandler.prototype.show = function(){
   this.initializeRaycasterFolder(raycasterFolder);
   this.initializeGraphicsFolder(graphicsFolder);
   this.initializeWorkerFolder(workerFolder);
+  this.initializeWebSocketFolder(websocketFolder);
   this.initializeDebugFolder(debugFolder);
 
   guiHandler.datGuiSettings.add({
@@ -27,17 +28,57 @@ SettingsGUIHandler.prototype.show = function(){
   }, "Done");
 }
 
-SettingsGUIHandler.prototype.getPrecisionType = function(key){
-  if (key == "low"){
-    return shaderPrecisionHandler.precisionTypes.LOW;
-  }
-  if (key == "medium"){
-    return shaderPrecisionHandler.precisionTypes.MEDIUM;
-  }
-  if (key == "high"){
-    return shaderPrecisionHandler.precisionTypes.HIGH;
-  }
-  throw new Error("Unknown type.");
+SettingsGUIHandler.prototype.initializeWebSocketFolder = function(parentFolder){
+  var params = {
+    "Protocol definition file": protocolDefinitionFileName || "",
+    "WS server URL": serverWSURL || ""
+  };
+
+  parentFolder.add(params, "Protocol definition file").onFinishChange(function(val){
+    terminal.clear();
+    var fileName = val;
+
+    if (!fileName){
+      protocolDefinitionFileName = 0;
+      terminal.printInfo(Text.PROTOCOL_DEFINITION_FILE_RESET);
+      return;
+    }
+
+    terminal.printInfo(Text.LOADING);
+    canvas.style.visibility = "hidden";
+    terminal.disable();
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/checkProtocolDefinitionFile", true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onreadystatechange = function(){
+      canvas.style.visibility = "";
+      if (xhr.readyState == 4 && xhr.status == 200){
+        var resp = JSON.parse(xhr.responseText);
+        terminal.clear();
+        terminal.enable();
+        if (resp.error){
+          terminal.printError(Text.PROTOCOL_DEFINITION_FILE_DOES_NOT_EXIST.replace(Text.PARAM1, "/protocol_definitions/"+this.fileName));
+        }else{
+          protocolDefinitionFileName = this.fileName;
+          terminal.printInfo(Text.PROTOCOL_DEFINITION_FILE_SET);
+        }
+      }
+    }.bind({fileName: fileName})
+    xhr.send(JSON.stringify({fileName: fileName}));
+  });
+
+  parentFolder.add(params, "WS server URL").onFinishChange(function(val){
+    terminal.clear();
+    if (!val){
+      serverWSURL = 0;
+      terminal.printInfo(Text.SERVER_WS_URL_RESET);
+      return;
+    }
+
+    serverWSURL = val;
+    terminal.printInfo(Text.SERVER_WS_URL_SET);
+  });
 }
 
 SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
@@ -424,4 +465,17 @@ SettingsGUIHandler.prototype.initializeDebugFolder = function(parentFolder){
     terminal.clear();
     parseCommand("switchAIDebugMode");
   });
+}
+
+SettingsGUIHandler.prototype.getPrecisionType = function(key){
+  if (key == "low"){
+    return shaderPrecisionHandler.precisionTypes.LOW;
+  }
+  if (key == "medium"){
+    return shaderPrecisionHandler.precisionTypes.MEDIUM;
+  }
+  if (key == "high"){
+    return shaderPrecisionHandler.precisionTypes.HIGH;
+  }
+  throw new Error("Unknown type.");
 }

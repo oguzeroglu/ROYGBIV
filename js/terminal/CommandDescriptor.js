@@ -1194,6 +1194,12 @@ var CommandDescriptor = function(){
     159, //printRayStep -> Ported the functionality into Settings GUI.
     163, //shaderPrecision -> Ported the functionality into Settings GUI.
     172, //workerConfigurations -> Ported the functionality into Settings GUI.
+    219, //setProtocolDefinition -> Ported the functionality into Settings GUI.
+    220, //resetProtocolDefinition -> Ported the functionality into Settings GUI.
+    221, //printProtocolDefinition -> Ported the functionality into Settings GUI.
+    222, //setWSServerURL -> Ported the functionality into Settings GUI.
+    223, //resetWSServerURL -> Ported the functionality into Settings GUI.
+    224, //printWSServerURL -> Ported the functionality into Settings GUI.
     232, //setAcceptedTextureSize -> Ported the functionality into Settings GUI.
     233, //printAcceptedTextureSize -> Ported the functionality into Settings GUI.
     239, //newJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
@@ -1842,16 +1848,6 @@ var CommandDescriptor = function(){
   this.destroyDynamicTextureFolder = new Object();
   this.destroyDynamicTextureFolder.types = [];
   this.destroyDynamicTextureFolder.types.push(this.DYNAMIC_TEXTURE_FOLDER_NAME); //dynamicTextureFolderName
-
-  // setProtocolDefinition
-  this.setProtocolDefinition = new Object();
-  this.setProtocolDefinition.types = [];
-  this.setProtocolDefinition.types.push(this.UNKNOWN_INDICATOR); //protocolDefinitionFileName
-
-  // setWSServerURL
-  this.setWSServerURL = new Object();
-  this.setWSServerURL.types = [];
-  this.setWSServerURL.types.push(this.UNKNOWN_INDICATOR); //serverURL
 
   // exportObject
   this.exportObject = new Object();

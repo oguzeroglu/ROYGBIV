@@ -4985,75 +4985,22 @@ function parse(input){
           return true;
         break;
         case 219: //setProtocolDefinition
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var fileName = splitted[1];
-          terminal.printInfo(Text.LOADING);
-          canvas.style.visibility = "hidden";
-          terminal.disable();
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", "/checkProtocolDefinitionFile", true);
-          xhr.setRequestHeader("Content-type", "application/json");
-          xhr.onreadystatechange = function(){
-            canvas.style.visibility = "";
-            if (xhr.readyState == 4 && xhr.status == 200){
-              var resp = JSON.parse(xhr.responseText);
-              terminal.clear();
-              terminal.enable();
-              if (resp.error){
-                terminal.printError(Text.PROTOCOL_DEFINITION_FILE_DOES_NOT_EXIST.replace(Text.PARAM1, "/protocol_definitions/"+this.fileName));
-              }else{
-                protocolDefinitionFileName = this.fileName;
-                terminal.printInfo(Text.PROTOCOL_DEFINITION_FILE_SET);
-              }
-            }
-          }.bind({fileName: fileName})
-          xhr.send(JSON.stringify({fileName: fileName}));
+          // DEPRECATED
         break;
         case 220: //resetProtocolDefinition
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          protocolDefinitionFileName = 0;
-          terminal.printInfo(Text.PROTOCOL_DEFINITION_FILE_RESET);
-          return true;
+          // DEPRECATED
         break;
         case 221: //printProtocolDefinition
-          if (!protocolDefinitionFileName){
-            terminal.printError(Text.PROTOCOL_DEFINITION_FILE_IS_NOT_SET);
-            return true;
-          }
-          terminal.printInfo(Text.PROTOCOL_DEFINITION_WILL_BE_LOADED_FROM.replace(Text.PARAM1, "/protocol_definitions/"+protocolDefinitionFileName));
-          return true;
+          // DEPRECATED
         break;
         case 222: //setWSServerURL
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          serverWSURL = splitted[1];
-          terminal.printInfo(Text.SERVER_WS_URL_SET);
-          return true;
+          // DEPRECATED
         break;
         case 223: //resetWSServerURL
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          serverWSURL = 0;
-          terminal.printInfo(Text.SERVER_WS_URL_RESET);
-          return true;
+          // DEPRECATED
         break;
         case 224: //printWSServerURL
-          if (serverWSURL){
-            terminal.printInfo(Text.SERVER_WS_URL_IS.replace(Text.PARAM1, serverWSURL));
-          }else{
-            terminal.printError(Text.SERVER_WS_URL_IS_NOT_SET);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 225: //exportObject
           if (mode != 0){
