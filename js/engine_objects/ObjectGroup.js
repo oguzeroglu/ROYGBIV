@@ -198,8 +198,8 @@ ObjectGroup.prototype.onTextureAtlasRefreshed = function(){
   this.refreshTextureRange({checker: "hasDisplacementMap", attrName: "displacementUV", tpInfoName: "height"});
 }
 
-ObjectGroup.prototype.updateWorldInverseTranspose = function(){
-  var val = this.mesh.material.uniforms.worldInverseTranspose.value;
+ObjectGroup.prototype.updateWorldInverseTranspose = function(overrideMatrix){
+  var val = overrideMatrix? overrideMatrix: this.mesh.material.uniforms.worldInverseTranspose.value;
   val.getInverse(this.mesh.matrixWorld).transpose();
   this.matrixCache.copy(this.mesh.matrixWorld);
 }
