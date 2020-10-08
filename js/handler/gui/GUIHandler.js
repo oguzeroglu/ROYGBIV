@@ -4,6 +4,7 @@ var GUIHandler = function(){
     "Rotate x": "0",
     "Rotate y": "0",
     "Rotate z": "0",
+    "Position": "0,0,0",
     "Rotation mode": rotationModes.WORLD,
     "Mass": 0.0,
     "Phy. simpl.": false,
@@ -517,6 +518,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
       guiHandler.objectManipulationParameters["Rotate x"] = "0";
       guiHandler.objectManipulationParameters["Rotate y"] = "0";
       guiHandler.objectManipulationParameters["Rotate z"] = "0";
+      guiHandler.objectManipulationParameters["Position"] = obj.mesh.position.x + "," + obj.mesh.position.y + "," + obj.mesh.position.z;
       guiHandler.objectManipulationParameters["Opacity"] = obj.getOpacity();
       if (obj.metaData.isSlippery){
         guiHandler.objectManipulationParameters["Slippery"] = true;
@@ -1250,7 +1252,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
 
   guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Export");
 
-  var rotationFolder = guiHandler.datGuiObjectManipulation.addFolder("Rotation");
+  var transformationFolder = guiHandler.datGuiObjectManipulation.addFolder("Transformation");
   var physicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Physics");
   var generalFolder = guiHandler.datGuiObjectManipulation.addFolder("General");
   var graphicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Graphics");
@@ -1258,8 +1260,8 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   var aiFolder = guiHandler.datGuiObjectManipulation.addFolder("AI");
   var motionBlurFolder = guiHandler.datGuiObjectManipulation.addFolder("Motion Blur");
 
-  // ROTATION
-  guiHandler.omRotationXController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate x").onFinishChange(function(val){
+  // TRANSFORMATION
+  guiHandler.omRotationXController = transformationFolder.add(guiHandler.objectManipulationParameters, "Rotate x").onFinishChange(function(val){
     var parsed = guiHandler.getNumericValue(val);
     if (parsed === null){
       terminal.clear();
@@ -1268,7 +1270,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     guiHandler.omGUIRotateEvent("x", parsed);
   });
-  guiHandler.omRotationYController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate y").onFinishChange(function(val){
+  guiHandler.omRotationYController = transformationFolder.add(guiHandler.objectManipulationParameters, "Rotate y").onFinishChange(function(val){
     var parsed = guiHandler.getNumericValue(val);
     if (parsed === null){
       terminal.clear();
@@ -1277,7 +1279,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     guiHandler.omGUIRotateEvent("y", parsed);
   });
-  guiHandler.omRotationZController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate z").onFinishChange(function(val){
+  guiHandler.omRotationZController = transformationFolder.add(guiHandler.objectManipulationParameters, "Rotate z").onFinishChange(function(val){
     var parsed = guiHandler.getNumericValue(val);
     if (parsed === null){
       terminal.clear();
@@ -1286,7 +1288,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     guiHandler.omGUIRotateEvent("z", parsed);
   });
-  guiHandler.omRotationModeController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotation mode", Object.keys(rotationModes)).onChange(function(val){
+  guiHandler.omRotationModeController = transformationFolder.add(guiHandler.objectManipulationParameters, "Rotation mode", Object.keys(rotationModes)).onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
 
     if (obj.pivotObject){
@@ -1297,6 +1299,16 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
 
     obj.setRotationMode(rotationModes[val]);
+  }).listen();
+  transformationFolder.add(guiHandler.objectManipulationParameters, "Position").onFinishChange(function(val){
+    terminal.clear();
+    var splitted = val.split(",");
+    if (splitted.length != 3){
+      terminal.printError(Text.INVALID_VECTOR_VALUE);
+      return;
+    }
+
+    parseCommand("setObjectPosition " + selectionHandler.getSelectedObject().name + " " + splitted[0].trim() + " " + splitted[1].trim() + " " + splitted[2].trim());
   }).listen();
 
   // PHYSICS
