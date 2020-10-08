@@ -1184,6 +1184,7 @@ var CommandDescriptor = function(){
     125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
     128, //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
+    134, //setResolution -> Ported the functionality into Settings GUI.
     146, //skyboxConfigurations -> Deprecated due to architectural changes in Skybox creation process.
     147, //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
     148, //noMobile -> Deprecated because the engine is good enough to deal with mobile devices at this point.
@@ -1523,11 +1524,6 @@ var CommandDescriptor = function(){
   this.areaConfigurations = new Object();
   this.areaConfigurations.types = [];
   this.areaConfigurations.types.push(this.HIDE_SHOW); // show/hide
-
-  // setResolution
-  this.setResolution = new Object();
-  this.setResolution.types = [];
-  this.setResolution.types.push(this.RESOLUTION_PARAM); // resolution
 
   // configureArea
   this.configureArea = new Object();

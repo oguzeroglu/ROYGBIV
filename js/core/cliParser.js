@@ -2772,30 +2772,7 @@ function parse(input){
           terminal.printInfo(Text.OK);
         break;
         case 134: //setResolution
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var resolutionParam = parseFloat(splitted[1]);
-          if (splitted[1] == "ORIGINAL_RESOLUTION"){
-            resolutionParam = window.devicePixelRatio;
-            useOriginalResolution = true;
-          }else{
-            useOriginalResolution = false;
-          }
-          if (isNaN(resolutionParam)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "resolution"));
-            return true;
-          }
-          if ((resolutionParam <= 0 || resolutionParam > 1) && !(splitted[1] == "ORIGINAL_RESOLUTION")){
-            terminal.printError(Text.RESOLUTION_MUST_BE_BETWEEN);
-            return true;
-          }
-          screenResolution = resolutionParam;
-          renderer.setPixelRatio(screenResolution);
-          resizeEventHandler.onResize();
-          refreshRaycaster(Text.RESOLUTION_SET);
-          return true;
+          // DEPRECATED
         break;
         case 135: //configureArea
           if (mode != 0){

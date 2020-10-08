@@ -14,6 +14,7 @@ SettingsGUIHandler.prototype.show = function(){
   var debugFolder = guiHandler.datGuiSettings.addFolder("Debug");
 
   this.initializeRaycasterFolder(raycasterFolder);
+  this.initializeGraphicsFolder(graphicsFolder);
   this.initializeWorkerFolder(workerFolder);
   this.initializeDebugFolder(debugFolder);
 
@@ -24,6 +25,55 @@ SettingsGUIHandler.prototype.show = function(){
       terminal.printInfo(Text.SETTINGS_GUI_CLOSED);
     }
   }, "Done");
+}
+
+SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
+  var params = {
+    "Resolution": "" + screenResolution,
+    "Use original resolution": useOriginalResolution
+  };
+
+  var resolutionController = parentFolder.add(params, "Resolution").onFinishChange(function(val){
+    terminal.clear();
+    var resolutionParam = parseFloat(val);
+    useOriginalResolution = false;
+    if (isNaN(resolutionParam)){
+      terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "resolution"));
+      return true;
+    }
+    if ((resolutionParam <= 0 || resolutionParam > 1)){
+      terminal.printError(Text.RESOLUTION_MUST_BE_BETWEEN);
+      return true;
+    }
+    screenResolution = resolutionParam;
+    renderer.setPixelRatio(screenResolution);
+    resizeEventHandler.onResize();
+    refreshRaycaster(Text.RESOLUTION_SET);
+  }).listen();
+
+  parentFolder.add(params, "Use original resolution").onChange(function(val){
+    terminal.clear();
+    var resolutionParam;
+    if (val){
+      resolutionParam = window.devicePixelRatio;
+      useOriginalResolution = true;
+      guiHandler.disableController(resolutionController);
+    }else{
+      resolutionParam = 1;
+      useOriginalResolution = false;
+      params["Resolution"] = "1";
+      guiHandler.enableController(resolutionController);
+    }
+
+    screenResolution = resolutionParam;
+    renderer.setPixelRatio(screenResolution);
+    resizeEventHandler.onResize();
+    refreshRaycaster(Text.RESOLUTION_SET);
+  });
+
+  if (useOriginalResolution){
+    guiHandler.disableController(resolutionController);
+  }
 }
 
 SettingsGUIHandler.prototype.initializeRaycasterFolder = function(parentFolder){
