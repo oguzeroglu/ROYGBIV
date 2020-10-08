@@ -6528,6 +6528,20 @@ function parse(input){
           }
           return true;
         break;
+        case 273: //settings
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          if (guiHandler.datGuiSettings){
+            terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
+            return true;
+          }
+
+          settingsGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){

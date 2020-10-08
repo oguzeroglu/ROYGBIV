@@ -273,7 +273,8 @@ var CommandDescriptor = function(){
       0, //stateMachines
       1, //selectVirtualKeyboard
       1, //bakeStaticLights
-      1 //unbakeStaticLights
+      1, //unbakeStaticLights
+      0 //settings
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -549,7 +550,8 @@ var CommandDescriptor = function(){
     "stateMachines",
     "selectVirtualKeyboard virtualKeyboardName",
     "bakeStaticLights objectName",
-    "unbakeStaticLights objectName"
+    "unbakeStaticLights objectName",
+    "settings"
   ];
 
   this.commands = [
@@ -825,7 +827,8 @@ var CommandDescriptor = function(){
     "stateMachines",
     "selectVirtualKeyboard",
     "bakeStaticLights",
-    "unbakeStaticLights"
+    "unbakeStaticLights",
+    "settings"
   ];
 
   this.commandInfo = [
@@ -1101,7 +1104,8 @@ var CommandDescriptor = function(){
     "stateMachines: Opens the state machine editing GUI.",
     "selectVirtualKeyboard: Selects a virtual keyboard.",
     "bakeStaticLights: Bakes static lights on given object and marks an object as unaffected by lights.",
-    "unbakeStaticLights: Unbakes static lights for given object which has baked static lights."
+    "unbakeStaticLights: Unbakes static lights for given object which has baked static lights.",
+    "settings: Shows the project settings GUI."
   ];
 
   this.keyboardInfo = [
