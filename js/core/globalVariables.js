@@ -57,10 +57,7 @@ var sceneBackgroundColor = 0x000000 ;
 var axesHelper = new THREE.AxesHelper(20000);
 var pointerLockRequested = false;
 var fullScreenRequested = false;
-var viewportMaxWidth = 0;
-var viewportMaxHeight = 0;
 var currentViewport = new Object();
-var fixedAspect = 0;
 
 var STEP = 1/60;
 
@@ -295,7 +292,6 @@ var isMobile = /Mobi|Android/i.test(navigator.userAgent);
 var WHITE_COLOR = new THREE.Color("white");
 var LIME_COLOR = new THREE.Color("lime");
 var ORANGE_COLOR = new THREE.Color("orange");
-var NO_MOBILE = false;
 var isPaused = false;
 var defaultFont;
 var fonts = new Object();
@@ -358,6 +354,7 @@ var decisionTreeCreatorGUIHandler;
 var stateCreatorGUIHandler;
 var transitionCreatorGUIHandler;
 var stateMachineCreatorGUIHandler;
+var settingsGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;

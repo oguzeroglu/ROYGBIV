@@ -1170,6 +1170,10 @@ var CommandDescriptor = function(){
     107, //rescaleTexture -> Deprecated due to lack of usecases.
     108, //rescaleTexturePack -> Deprecated due to lack of usecases.
     109, //destroyImage -> Deprecated as uploadImage is also deprecated.
+    113, //setWorldLimits -> Ported the functionality into Settings GUI.
+    114, //setBinSize -> Ported the functionality into Settings GUI.
+    115, //printWorldLimits -> Ported the functionality into Settings GUI.
+    116, //printBinSize -> Ported the functionality into Settings GUI.
     117, //particleCollisionWorkerMode  -> Workers will be re-implemented.
     118, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
     119, //particleSystemCollisionWorkerMode -> Workers will be re-implemented.
@@ -1180,8 +1184,24 @@ var CommandDescriptor = function(){
     125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
     128, //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
+    134, //setResolution -> Ported the functionality into Settings GUI.
     146, //skyboxConfigurations -> Deprecated due to architectural changes in Skybox creation process.
     147, //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
+    148, //noMobile -> Deprecated because the engine is good enough to deal with mobile devices at this point.
+    149, //setMaxViewport -> Deprecated because the engine is responsive enough to deal with any viewport at this point.
+    150, //keepAspect -> Deprecated because the engine is responsive enough to deal with any viewport at this point.
+    158, //setRayStep -> Ported the functionality into Settings GUI.
+    159, //printRayStep -> Ported the functionality into Settings GUI.
+    163, //shaderPrecision -> Ported the functionality into Settings GUI.
+    172, //workerConfigurations -> Ported the functionality into Settings GUI.
+    219, //setProtocolDefinition -> Ported the functionality into Settings GUI.
+    220, //resetProtocolDefinition -> Ported the functionality into Settings GUI.
+    221, //printProtocolDefinition -> Ported the functionality into Settings GUI.
+    222, //setWSServerURL -> Ported the functionality into Settings GUI.
+    223, //resetWSServerURL -> Ported the functionality into Settings GUI.
+    224, //printWSServerURL -> Ported the functionality into Settings GUI.
+    232, //setAcceptedTextureSize -> Ported the functionality into Settings GUI.
+    233, //printAcceptedTextureSize -> Ported the functionality into Settings GUI.
     239, //newJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
     240, //destroyJumpDescriptor -> Deprecated due to architectural changes in JumpDescriptor creation process.
     241 //printJumpDescriptors -> Deprecated due to architectural changes in JumpDescriptor creation process.
@@ -1479,21 +1499,6 @@ var CommandDescriptor = function(){
   this.setBlending.types.push(this.OBJECT_NAME); //objectName
   this.setBlending.types.push(this.BLENDING_MODE); //mode
 
-  // setWorldLimits
-  this.setWorldLimits = new Object();
-  this.setWorldLimits.types = [];
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //minX
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //minY
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //minZ
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //maxX
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //maxY
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //maxZ
-
-  // setBinSize
-  this.setBinSize = new Object();
-  this.setBinSize.types = [];
-  this.setBinSize.types.push(this.UNKNOWN_INDICATOR); //size
-
   // newSphere
   this.newSphere = new Object();
   this.newSphere.types = [];
@@ -1528,11 +1533,6 @@ var CommandDescriptor = function(){
   this.areaConfigurations = new Object();
   this.areaConfigurations.types = [];
   this.areaConfigurations.types.push(this.HIDE_SHOW); // show/hide
-
-  // setResolution
-  this.setResolution = new Object();
-  this.setResolution.types = [];
-  this.setResolution.types.push(this.RESOLUTION_PARAM); // resolution
 
   // configureArea
   this.configureArea = new Object();
@@ -1597,22 +1597,6 @@ var CommandDescriptor = function(){
   this.build.types.push(this.UNKNOWN_INDICATOR); // projectName
   this.build.types.push(this.UNKNOWN_INDICATOR); // author
 
-  // noMobile
-  this.noMobile = new Object();
-  this.noMobile.types = [];
-  this.noMobile.types.push(this.STATE_ON_OFF); // on/off
-
-  // setMaxViewport
-  this.setMaxViewport = new Object();
-  this.setMaxViewport.types = [];
-  this.setMaxViewport.types.push(this.UNKNOWN_INDICATOR); // widthInPx
-  this.setMaxViewport.types.push(this.UNKNOWN_INDICATOR); // heightInPx
-
-  // keepAspect
-  this.keepAspect = new Object();
-  this.keepAspect.types = [];
-  this.keepAspect.types.push(this.UNKNOWN_INDICATOR); // ratio
-
   // newFont
   this.newFont = new Object();
   this.newFont.types = [];
@@ -1643,11 +1627,6 @@ var CommandDescriptor = function(){
   this.destroyText.types = [];
   this.destroyText.types.push(this.TEXT_NAME); // textName
 
-  // setRayStep
-  this.setRayStep = new Object();
-  this.setRayStep.types = [];
-  this.setRayStep.types.push(this.UNKNOWN_INDICATOR); // stepAmount
-
   // simplifyPhysics
   this.simplifyPhysics = new Object();
   this.simplifyPhysics.types = [];
@@ -1665,11 +1644,6 @@ var CommandDescriptor = function(){
   this.fpsWeaponAlignment = new Object();
   this.fpsWeaponAlignment.types = [];
   this.fpsWeaponAlignment.types.push(this.FPS_WEAPON); // objName
-
-  // shaderPrecision
-  this.shaderPrecision = new Object();
-  this.shaderPrecision.types = [];
-  this.shaderPrecision.types.push(this.HIDE_SHOW); // show/hide
 
   // newParticleSystem
   this.newParticleSystem = new Object();
@@ -1697,11 +1671,6 @@ var CommandDescriptor = function(){
   this.destroyParticleSystemPool = new Object();
   this.destroyParticleSystemPool.types = [];
   this.destroyParticleSystemPool.types.push(this.PRECONFOGURED_PS_POOL_NAME); // poolName
-
-  // workerConfigurations
-  this.workerConfigurations = new Object();
-  this.workerConfigurations.types = [];
-  this.workerConfigurations.types.push(this.HIDE_SHOW); // show/hide
 
   // newMuzzleFlash
   this.newMuzzleFlash = new Object();
@@ -1880,16 +1849,6 @@ var CommandDescriptor = function(){
   this.destroyDynamicTextureFolder.types = [];
   this.destroyDynamicTextureFolder.types.push(this.DYNAMIC_TEXTURE_FOLDER_NAME); //dynamicTextureFolderName
 
-  // setProtocolDefinition
-  this.setProtocolDefinition = new Object();
-  this.setProtocolDefinition.types = [];
-  this.setProtocolDefinition.types.push(this.UNKNOWN_INDICATOR); //protocolDefinitionFileName
-
-  // setWSServerURL
-  this.setWSServerURL = new Object();
-  this.setWSServerURL.types = [];
-  this.setWSServerURL.types.push(this.UNKNOWN_INDICATOR); //serverURL
-
   // exportObject
   this.exportObject = new Object();
   this.exportObject.types = [];
@@ -1923,11 +1882,6 @@ var CommandDescriptor = function(){
   this.syncAnimations.types = [];
   this.syncAnimations.types.push(this.OBJECT_TEXT_SPRITE_NAME); //sourceName
   this.syncAnimations.types.push(this.OBJECT_TEXT_SPRITE_NAME); //targetName
-
-  // setAcceptedTextureSize
-  this.setAcceptedTextureSize = new Object();
-  this.setAcceptedTextureSize.types = [];
-  this.setAcceptedTextureSize.types.push(this.UNKNOWN_INDICATOR); //textureSize
 
   // newAIObstacle
   this.newAIObstacle = new Object();

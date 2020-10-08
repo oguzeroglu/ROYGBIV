@@ -1150,7 +1150,7 @@ function parse(input){
           // DEPRECATED
         break;
         case 55: //newLambertMaterial
-          //DEPRECATED
+          // DEPRECATED
         break;
         case 56: //newTexturePack
           if (mode != 0){
@@ -2403,130 +2403,16 @@ function parse(input){
           return true;
         break;
         case 113: //setWorldLimits
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var minX = parseInt(splitted[1]);
-          var minY = parseInt(splitted[2]);
-          var minZ = parseInt(splitted[3]);
-          var maxX = parseInt(splitted[4]);
-          var maxY = parseInt(splitted[5]);
-          var maxZ = parseInt(splitted[6]);
-          if (isNaN(minX)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "minX"));
-            return true;
-          }
-          if (isNaN(minY)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "minY"));
-            return true;
-          }
-          if (isNaN(minZ)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "minZ"));
-            return true;
-          }
-          if (isNaN(maxX)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxX"));
-            return true;
-          }
-          if (isNaN(maxY)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxY"));
-            return true;
-          }
-          if (isNaN(maxZ)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxZ"));
-            return true;
-          }
-          if (maxX <= minX){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "maxX").replace(
-              Text.PARAM2, "minX"
-            ));
-            return true;
-          }
-          if (maxY <= minY){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "maxY").replace(
-              Text.PARAM2, "minY"
-            ));
-            return true;
-          }
-          if (maxZ <= minZ){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "maxZ").replace(
-              Text.PARAM2, "minZ"
-            ));
-            return true;
-          }
-          if ((minX % BIN_SIZE) || (minY % BIN_SIZE) || (minZ % BIN_SIZE) || (maxX % BIN_SIZE) || (maxY % BIN_SIZE) || (maxZ % BIN_SIZE)){
-            terminal.printError(Text.PARAMETERS_MUST_BE_DIVISABLE_BY.replace(Text.PARAM1, BIN_SIZE));
-            return true;
-          }
-          var lowerBound = new THREE.Vector3(minX, minY, minZ);
-          var upperBound = new THREE.Vector3(maxX, maxY, maxZ);
-          LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
-          sceneHandler.onWorldLimitsChange();
-          steeringHandler.resetWorld();
-          refreshRaycaster(Text.OCTREE_LIMIT_SET);
-          return true;
+          // DEPRECATED
         break;
         case 114: //setBinSize
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var binSize = parseInt(splitted[1]);
-          if (isNaN(binSize)){
-            terminal.printError(Text.BIN_SIZE_MUST_BE_A_NUMBER);
-            return true;
-          }
-          if (binSize <= 1){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(
-              Text.PARAM1, "Bin size"
-            ).replace(
-              Text.PARAM2, "1"
-            ));
-            return true;
-          }
-          var minX = LIMIT_BOUNDING_BOX.min.x;
-          var minY = LIMIT_BOUNDING_BOX.min.y;
-          var minZ = LIMIT_BOUNDING_BOX.min.z;
-          var maxX = LIMIT_BOUNDING_BOX.max.x;
-          var maxY = LIMIT_BOUNDING_BOX.max.y;
-          var maxZ = LIMIT_BOUNDING_BOX.max.z;
-          if ((minX % binSize) || (minY % binSize) || (minZ % binSize) || (maxX % binSize) || (maxY % binSize) || (maxZ % binSize)){
-            terminal.printError(Text.WORLD_LIMITS_MUST_BE_DIVISABLE_BY_BIN_SIZE);
-            return true;
-          }
-          BIN_SIZE = binSize;
-          sceneHandler.onBinSizeChange();
-          steeringHandler.resetWorld();
-          refreshRaycaster(Text.BIN_SIZE_SET);
-          return true;
+          // DEPRECATED
         break;
         case 115: //printWorldLimits
-          terminal.printHeader(Text.WORLD_LIMITS);
-          terminal.printInfo(Text.COORD_TREE.replace(
-            Text.PARAM1, Text.MIN
-          ).replace(
-            Text.PARAM2, LIMIT_BOUNDING_BOX.min.x
-          ).replace(
-            Text.PARAM3, LIMIT_BOUNDING_BOX.min.y
-          ).replace(
-            Text.PARAM4, LIMIT_BOUNDING_BOX.min.z
-          ), true);
-          terminal.printInfo(Text.COORD_TREE.replace(
-            Text.PARAM1, Text.MAX
-          ).replace(
-            Text.PARAM2, LIMIT_BOUNDING_BOX.max.x
-          ).replace(
-            Text.PARAM3, LIMIT_BOUNDING_BOX.max.y
-          ).replace(
-            Text.PARAM4, LIMIT_BOUNDING_BOX.max.z
-          ));
-          return true;
+          // DEPRECATED
         break;
         case 116: //printBinSize
-          terminal.printHeader(Text.BIN_SIZE);
-          terminal.printInfo(Text.TREE.replace(Text.PARAM1, BIN_SIZE));
-          return true;
+          // DEPRECATED
         break;
         case 117: //particleCollisionWorkerMode
           // DEPRECATED
@@ -2886,30 +2772,7 @@ function parse(input){
           terminal.printInfo(Text.OK);
         break;
         case 134: //setResolution
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var resolutionParam = parseFloat(splitted[1]);
-          if (splitted[1] == "ORIGINAL_RESOLUTION"){
-            resolutionParam = window.devicePixelRatio;
-            useOriginalResolution = true;
-          }else{
-            useOriginalResolution = false;
-          }
-          if (isNaN(resolutionParam)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "resolution"));
-            return true;
-          }
-          if ((resolutionParam <= 0 || resolutionParam > 1) && !(splitted[1] == "ORIGINAL_RESOLUTION")){
-            terminal.printError(Text.RESOLUTION_MUST_BE_BETWEEN);
-            return true;
-          }
-          screenResolution = resolutionParam;
-          renderer.setPixelRatio(screenResolution);
-          resizeEventHandler.onResize();
-          refreshRaycaster(Text.RESOLUTION_SET);
-          return true;
+          // DEPRECATED
         break;
         case 135: //configureArea
           if (mode != 0){
@@ -3483,77 +3346,13 @@ function parse(input){
           // DEPRECATED
         break;
         case 148: //noMobile
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var param = splitted[1].toLowerCase();
-          if (param == "on"){
-            if (NO_MOBILE){
-              terminal.printError(Text.ALREADY_FOR_MOBILE.replace(Text.PARAM1, "disabled"));
-              return true;
-            }
-            NO_MOBILE = true;
-            terminal.printInfo(Text.FOR_MOBILE.replace(Text.PARAM1, "disabled"));
-            return true;
-          }else if(param == "off"){
-            if (!NO_MOBILE){
-              terminal.printError(Text.ALREADY_FOR_MOBILE.replace(Text.PARAM1, "enabled"));
-              return true;
-            }
-            NO_MOBILE = false;
-            terminal.printInfo(Text.FOR_MOBILE.replace(Text.PARAM1, "enabled"));
-            return true;
-          }
-          terminal.printError(Text.PARAMETER_MUST_BE_ON_OFF);
-          return true;
+          // DEPRECATED
         break;
         case 149: //setMaxViewport
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var width = parseFloat(splitted[1]);
-          var height = parseFloat(splitted[2]);
-          if (isNaN(width)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "width"));
-            return true;
-          }
-          if (isNaN(height)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
-            return true;
-          }
-          if (width <= 0){
-            viewportMaxWidth = 0;
-          }else{
-            viewportMaxWidth = width;
-          }
-          if (height <= 0){
-            viewportMaxHeight = 0;
-          }else{
-            viewportMaxHeight = height;
-          }
-          terminal.printInfo(Text.MAX_VIEWPORT_SET);
-          return true;
+          // DEPRECATED
         break;
         case 150: //keepAspect
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var aspectFixed = parseFloat(splitted[1]);
-          if (isNaN(aspectFixed)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "ratio"));
-            return true;
-          }
-          if (aspectFixed <= 0){
-            fixedAspect = 0;
-            terminal.printInfo(Text.ASPECT_UNFIXED);
-            return true;
-          }
-          fixedAspect = aspectFixed;
-          terminal.printInfo(Text.ASPECT_FIXED.replace(Text.PARAM1, fixedAspect));
-          return true;
+          // DEPRECATED
         break;
         case 151: //newFont
           if (mode != 0){
@@ -3819,26 +3618,10 @@ function parse(input){
           return true;
         break;
         case 158: //setRayStep
-          if  (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-          }
-          var stepAmount = parseFloat(splitted[1]);
-          if (isNaN(stepAmount)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "stepAmount"));
-            return true;
-          }
-          if (stepAmount <= 0){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "stepAmount").replace(Text.PARAM2, "0"));
-            return true;
-          }
-          RAYCASTER_STEP_AMOUNT = stepAmount;
-          refreshRaycaster(Text.RAYCASTER_STEP_AMOUNT_SET_TO.replace(Text.PARAM1, RAYCASTER_STEP_AMOUNT));
-          return true;
+          // DEPRECATED
         break;
         case 159: //printRayStep
-          terminal.printHeader(Text.RAYCASTER_STEP_AMOUNT);
-          terminal.printInfo(Text.TREE.replace(Text.PARAM1, RAYCASTER_STEP_AMOUNT));
-          return true;
+          // DEPRECATED
         break;
         case 160: //simplifyPhysics
           if (mode != 0){
@@ -3977,31 +3760,7 @@ function parse(input){
           return true;
         break;
         case 163: //shaderPrecision
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var param = splitted[1].toLowerCase();
-          if (param != "show" && param != "hide"){
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-            return true;
-          }
-          if (param == "show"){
-            if (guiHandler.datGuiShaderPrecision){
-              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
-              return true;
-            }
-            guiHandler.show(guiHandler.guiTypes.SHADER_PRECISION);
-            terminal.printInfo(Text.GUI_OPENED);
-          }else{
-            if (!guiHandler.datGuiShaderPrecision){
-              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
-              return true;
-            }
-            guiHandler.hide(guiHandler.guiTypes.SHADER_PRECISION);
-            terminal.printInfo(Text.GUI_CLOSED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 164: //newParticleSystem
           if (mode != 0){
@@ -4184,31 +3943,7 @@ function parse(input){
           return true;
         break;
         case 172: //workerConfigurations
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var workerConfigurationsStatus = splitted[1].toLowerCase();
-          if (workerConfigurationsStatus != "show" && workerConfigurationsStatus != "hide"){
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-            return true;
-          }
-          if (workerConfigurationsStatus == "show"){
-            if (guiHandler.datGuiWorkerStatus){
-              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
-              return true;
-            }
-            guiHandler.show(guiHandler.guiTypes.WORKER_STATUS);
-            terminal.printInfo(Text.GUI_OPENED);
-          }else{
-            if (!guiHandler.datGuiWorkerStatus){
-              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
-              return true;
-            }
-            guiHandler.hide(guiHandler.guiTypes.WORKER_STATUS);
-            terminal.printInfo(Text.GUI_CLOSED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 173: //newMuzzleFlash
           if (mode != 0){
@@ -5250,75 +4985,22 @@ function parse(input){
           return true;
         break;
         case 219: //setProtocolDefinition
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var fileName = splitted[1];
-          terminal.printInfo(Text.LOADING);
-          canvas.style.visibility = "hidden";
-          terminal.disable();
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", "/checkProtocolDefinitionFile", true);
-          xhr.setRequestHeader("Content-type", "application/json");
-          xhr.onreadystatechange = function(){
-            canvas.style.visibility = "";
-            if (xhr.readyState == 4 && xhr.status == 200){
-              var resp = JSON.parse(xhr.responseText);
-              terminal.clear();
-              terminal.enable();
-              if (resp.error){
-                terminal.printError(Text.PROTOCOL_DEFINITION_FILE_DOES_NOT_EXIST.replace(Text.PARAM1, "/protocol_definitions/"+this.fileName));
-              }else{
-                protocolDefinitionFileName = this.fileName;
-                terminal.printInfo(Text.PROTOCOL_DEFINITION_FILE_SET);
-              }
-            }
-          }.bind({fileName: fileName})
-          xhr.send(JSON.stringify({fileName: fileName}));
+          // DEPRECATED
         break;
         case 220: //resetProtocolDefinition
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          protocolDefinitionFileName = 0;
-          terminal.printInfo(Text.PROTOCOL_DEFINITION_FILE_RESET);
-          return true;
+          // DEPRECATED
         break;
         case 221: //printProtocolDefinition
-          if (!protocolDefinitionFileName){
-            terminal.printError(Text.PROTOCOL_DEFINITION_FILE_IS_NOT_SET);
-            return true;
-          }
-          terminal.printInfo(Text.PROTOCOL_DEFINITION_WILL_BE_LOADED_FROM.replace(Text.PARAM1, "/protocol_definitions/"+protocolDefinitionFileName));
-          return true;
+          // DEPRECATED
         break;
         case 222: //setWSServerURL
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          serverWSURL = splitted[1];
-          terminal.printInfo(Text.SERVER_WS_URL_SET);
-          return true;
+          // DEPRECATED
         break;
         case 223: //resetWSServerURL
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          serverWSURL = 0;
-          terminal.printInfo(Text.SERVER_WS_URL_RESET);
-          return true;
+          // DEPRECATED
         break;
         case 224: //printWSServerURL
-          if (serverWSURL){
-            terminal.printInfo(Text.SERVER_WS_URL_IS.replace(Text.PARAM1, serverWSURL));
-          }else{
-            terminal.printError(Text.SERVER_WS_URL_IS_NOT_SET);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 225: //exportObject
           if (mode != 0){
@@ -5547,39 +5229,10 @@ function parse(input){
           return true;
         break;
         case 232: //setAcceptedTextureSize
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (Object.keys(texturePacks).length){
-            terminal.printError(Text.CANNOT_SET_TEXTURE_SIZE_AFTER);
-            return true;
-          }
-          var textureSize = parseInt(splitted[1]);
-          if (isNaN(textureSize)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "textureSize"));
-            return true;
-          }
-          if (textureSize <= 0){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "textureSize").replace(Text.PARAM2, "0"));
-            return true;
-          }
-          if ((Math.log(textureSize)/Math.log(2)) % 1 != 0){
-            terminal.printError(Text.IS_NOT_POWER_OF_TWO.replace(Text.PARAM1, "textureSize"));
-            return true;
-          }
-          if (textureSize > MAX_TEXTURE_SIZE){
-            terminal.printError(Text.MUST_BE_LESS_THAN.replace(Text.PARAM1, "textureSize").replace(Text.PARAM2, MAX_TEXTURE_SIZE));
-            return true;
-          }
-          ACCEPTED_TEXTURE_SIZE = textureSize;
-          terminal.printInfo(Text.ACCEPTED_TEXTURE_SIZE_SET);
-          return true;
+          // DEPRECATED
         break;
         case 233: //printAcceptedTextureSize
-          terminal.printHeader(Text.ACCEPTED_TEXTURE_SIZE);
-          terminal.printInfo(Text.TREE.replace(Text.PARAM1, ACCEPTED_TEXTURE_SIZE));
-          return true;
+          // DEPRECATED
         break;
         case 234: //switchAIDebugMode
           var res = steeringHandler.switchDebugMode();

@@ -93,6 +93,7 @@ window.onload = function() {
     stateCreatorGUIHandler = new StateCreatorGUIHandler();
     transitionCreatorGUIHandler = new TransitionCreatorGUIHandler();
     stateMachineCreatorGUIHandler = new StateMachineCreatorGUIHandler();
+    settingsGUIHandler = new SettingsGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
@@ -253,41 +254,10 @@ function handleViewport(){
     cvz = cvz / screenResolution;
     cvw = cvw / screenResolution;
   }
-  if (mode == 1 && fixedAspect > 0){
-    var result = getMaxWidthHeightGivenAspect(canvas.width / screenResolution, canvas.height / screenResolution, fixedAspect);
-    var newViewportX = ((canvas.width / screenResolution) - result.width) / 2;
-    var newViewportY = ((canvas.height / screenResolution) - result.height) / 2;
-    var newViewportZ = result.width;
-    var newViewportW = result.height;
-    renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
-    renderer.setSize(newViewportZ, newViewportW);
-    currentViewport.startX = newViewportX;
-    currentViewport.startY = newViewportY;
-    currentViewport.width = newViewportZ;
-    currentViewport.height = newViewportW;
-    camera.oldAspect = camera.aspect;
-    camera.aspect = fixedAspect;
-    camera.updateProjectionMatrix();
-    return;
-  }
   var newViewportX = 0;
   var newViewportY = 0;
   var newViewportZ = canvas.width / screenResolution;
   var newViewportW = canvas.height / screenResolution;
-  if (viewportMaxWidth > 0){
-    if (cvz > viewportMaxWidth){
-      var diff = cvz - viewportMaxWidth;
-      newViewportX = diff/2;
-      newViewportZ = viewportMaxWidth;
-    }
-  }
-  if (viewportMaxHeight > 0){
-    if (cvw > viewportMaxHeight){
-      var diff = cvw - viewportMaxHeight;
-      newViewportY = diff/2;
-      newViewportW = viewportMaxHeight;
-    }
-  }
   renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
   currentViewport.startX = newViewportX;
   currentViewport.startY = newViewportY;
@@ -454,10 +424,6 @@ function startDeployment(){
   appendtoDeploymentConsole("by Oğuz Eroğlu - github.com/oguzeroglu");
   appendtoDeploymentConsole("");
   appendtoDeploymentConsole("");
-  if (NO_MOBILE && isMobile){
-    appendtoDeploymentConsole("[!] This application does not support mobile devices. Please run this with a non mobile device.");
-    return;
-  }
 
   var xobj = new XMLHttpRequest();
   xobj.overrideMimeType("application/json");

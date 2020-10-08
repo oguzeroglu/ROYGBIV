@@ -112,7 +112,7 @@ StateLoader.prototype.finalize = function(){
   if (!this.shouldFinalize()){
     return;
   }
-  
+
   this.importHandler.importParticleSystems(this.stateObj);
   this.importHandler.importAddedTexts(this.stateObj);
   this.importHandler.importAddedObjectGraphicsProperties();
@@ -271,8 +271,6 @@ StateLoader.prototype.resetProject = function(){
   maxInactiveTime = 0;
   inactiveCounter = 0;
   isScreenVisible = true;
-  viewportMaxWidth = 0;
-  viewportMaxHeight = 0;
   currentViewport = new Object();
   keyboardBuffer = new Object();
   gridSystems = new Object();
@@ -355,8 +353,6 @@ StateLoader.prototype.resetProject = function(){
   steeringHandler.reset();
   decisionHandler.reset();
   fonts = new Object();
-  NO_MOBILE = false;
-  fixedAspect = 0;
   roygbivAttributeCounter = 1;
   roygbivBufferAttributeCounter = 1;
   roygbivSkippedArrayBufferUpdates = 0;

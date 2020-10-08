@@ -6,13 +6,8 @@ var State = function(projectName, author){
   if (!(typeof author == UNDEFINED)){
     this.author = author;
   }
-  this.noMobile = NO_MOBILE;
   // DATE **********************************************************
   this.date = new Date();
-  // VIEWPORT ******************************************************
-  this.viewportMaxWidth = viewportMaxWidth;
-  this.viewportMaxHeight = viewportMaxHeight;
-  this.fixedAspect = fixedAspect;
   // WORKER STATUS ***********************************************
   this.RAYCASTER_WORKER_ON = RAYCASTER_WORKER_ON;
   this.PHYSICS_WORKER_ON = PHYSICS_WORKER_ON;

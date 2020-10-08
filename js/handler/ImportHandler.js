@@ -37,16 +37,6 @@ ImportHandler.prototype.importScenes = function(obj){
 }
 
 ImportHandler.prototype.importEngineVariables = function(obj){
-  NO_MOBILE = obj.noMobile;
-  if (!(typeof obj.viewportMaxWidth == UNDEFINED)){
-    viewportMaxWidth = obj.viewportMaxWidth;
-  }
-  if (!(typeof obj.viewportMaxHeight == UNDEFINED)){
-    viewportMaxHeight = obj.viewportMaxHeight;
-  }
-  if (!(typeof obj.fixedAspect == UNDEFINED)){
-    fixedAspect = obj.fixedAspect;
-  }
   RAYCASTER_WORKER_ON = (!(typeof obj.RAYCASTER_WORKER_ON == UNDEFINED))? obj.RAYCASTER_WORKER_ON: true;
   PHYSICS_WORKER_ON = (!(typeof obj.PHYSICS_WORKER_ON == UNDEFINED))? obj.PHYSICS_WORKER_ON: true;
   LIGHTNING_WORKER_ON = (!(typeof obj.LIGHTNING_WORKER_ON == UNDEFINED))? obj.LIGHTNING_WORKER_ON: true;
