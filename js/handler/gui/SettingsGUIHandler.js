@@ -27,6 +27,19 @@ SettingsGUIHandler.prototype.show = function(){
   }, "Done");
 }
 
+SettingsGUIHandler.prototype.getPrecisionType = function(key){
+  if (key == "low"){
+    return shaderPrecisionHandler.precisionTypes.LOW;
+  }
+  if (key == "medium"){
+    return shaderPrecisionHandler.precisionTypes.MEDIUM;
+  }
+  if (key == "high"){
+    return shaderPrecisionHandler.precisionTypes.HIGH;
+  }
+  throw new Error("Unknown type.");
+}
+
 SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
   var params = {
     "Resolution": "" + screenResolution,
@@ -102,6 +115,74 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     ACCEPTED_TEXTURE_SIZE = textureSize;
     terminal.printInfo(Text.ACCEPTED_TEXTURE_SIZE_SET);
   });
+
+  var shaderPrecisionFolder = parentFolder.addFolder("Shader precision");
+
+  var shaderPrecisionParameters = {
+    "Crosshair": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.CROSSHAIR),
+    "Basic material": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.BASIC_MATERIAL),
+    "Instanced basic material": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.INSTANCED_BASIC_MATERIAL),
+    "Merged basic material": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.MERGED_BASIC_MATERIAL),
+    "Object trail": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.OBJECT_TRAIL),
+    "Particle": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.PARTICLE),
+    "Skybox": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SKYBOX),
+    "Text": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.TEXT),
+    "Lightning": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.LIGHTNING),
+    "Sprite": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SPRITE)
+  };
+
+  var precisionAry = ["low", "medium", "high"];
+
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Crosshair", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.CROSSHAIR, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Basic material", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.BASIC_MATERIAL, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Instanced basic material", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.INSTANCED_BASIC_MATERIAL, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Merged basic material", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.MERGED_BASIC_MATERIAL, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Object trail", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.OBJECT_TRAIL, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Particle", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.PARTICLE, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Skybox", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.SKYBOX, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Text", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.TEXT, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Lightning", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.LIGHTNING, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Sprite", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.SPRITE, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
 }
 
 SettingsGUIHandler.prototype.initializeRaycasterFolder = function(parentFolder){

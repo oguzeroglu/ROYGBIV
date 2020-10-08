@@ -1192,6 +1192,7 @@ var CommandDescriptor = function(){
     150, //keepAspect -> Deprecated because the engine is responsive enough to deal with any viewport at this point.
     158, //setRayStep -> Ported the functionality into Settings GUI.
     159, //printRayStep -> Ported the functionality into Settings GUI.
+    163, //shaderPrecision -> Ported the functionality into Settings GUI.
     172, //workerConfigurations -> Ported the functionality into Settings GUI.
     232, //setAcceptedTextureSize -> Ported the functionality into Settings GUI.
     233, //printAcceptedTextureSize -> Ported the functionality into Settings GUI.
@@ -1637,11 +1638,6 @@ var CommandDescriptor = function(){
   this.fpsWeaponAlignment = new Object();
   this.fpsWeaponAlignment.types = [];
   this.fpsWeaponAlignment.types.push(this.FPS_WEAPON); // objName
-
-  // shaderPrecision
-  this.shaderPrecision = new Object();
-  this.shaderPrecision.types = [];
-  this.shaderPrecision.types.push(this.HIDE_SHOW); // show/hide
 
   // newParticleSystem
   this.newParticleSystem = new Object();

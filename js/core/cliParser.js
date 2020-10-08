@@ -3760,31 +3760,7 @@ function parse(input){
           return true;
         break;
         case 163: //shaderPrecision
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var param = splitted[1].toLowerCase();
-          if (param != "show" && param != "hide"){
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-            return true;
-          }
-          if (param == "show"){
-            if (guiHandler.datGuiShaderPrecision){
-              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
-              return true;
-            }
-            guiHandler.show(guiHandler.guiTypes.SHADER_PRECISION);
-            terminal.printInfo(Text.GUI_OPENED);
-          }else{
-            if (!guiHandler.datGuiShaderPrecision){
-              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
-              return true;
-            }
-            guiHandler.hide(guiHandler.guiTypes.SHADER_PRECISION);
-            terminal.printInfo(Text.GUI_CLOSED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 164: //newParticleSystem
           if (mode != 0){

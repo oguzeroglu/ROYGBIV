@@ -130,26 +130,8 @@ var GUIHandler = function(){
       parseCommand("postProcessing bloom hide");
     }
   };
-  this.shaderPrecisionParameters = {
-    "Crosshair": "low",
-    "Basic material": "low",
-    "Instanced basic material": "low",
-    "Merged basic material": "low",
-    "Object trail": "low",
-    "Particle": "low",
-    "Skybox": "low",
-    "Text": "low",
-    "Lightning": "low",
-    "Sprite": "low",
-    "Done": function(){
-      guiHandler.hide(guiHandler.guiTypes.SHADER_PRECISION);
-      terminal.clear();
-      terminal.printInfo(Text.DONE);
-      terminal.enable();
-    }
-  };
   this.guiTypes = {
-    TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5,
+    TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, PARTICLE_SYSTEM: 5,
     MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
     CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17,
     CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
@@ -1003,11 +985,6 @@ GUIHandler.prototype.show = function(guiType){
         postProcessiongConfigurationsVisibility.bloom = true;
       }
     return;
-    case this.guiTypes.SHADER_PRECISION:
-      if (!this.datGuiShaderPrecision){
-        this.initializeShaderPrecisionGUI();
-      }
-    return;
     case this.guiTypes.VIRTUAL_KEYBOARD:
       if (!this.datGuiVirtualKeyboard){
         this.initializeVirtualKeyboardGUI();
@@ -1088,12 +1065,6 @@ GUIHandler.prototype.hide = function(guiType){
         this.datGuiFPSWeaponAlignment = 0;
       }
       fpsWeaponGUIHandler.onHidden();
-    return;
-    case this.guiTypes.SHADER_PRECISION:
-      if (this.datGuiShaderPrecision){
-        this.destroyGUI(this.datGuiShaderPrecision);
-        this.datGuiShaderPrecision = 0;
-      }
     return;
     case this.guiTypes.PARTICLE_SYSTEM:
       if (this.datGuiPSCreator){
@@ -1241,84 +1212,6 @@ GUIHandler.prototype.hideAll = function(){
   for (var key in this.guiTypes){
     this.hide(this.guiTypes[key]);
   }
-}
-
-GUIHandler.prototype.getPrecisionType = function(key){
-  if (key == "low"){
-    return shaderPrecisionHandler.precisionTypes.LOW;
-  }
-  if (key == "medium"){
-    return shaderPrecisionHandler.precisionTypes.MEDIUM;
-  }
-  if (key == "high"){
-    return shaderPrecisionHandler.precisionTypes.HIGH;
-  }
-  throw new Error("Unknown type.");
-}
-
-GUIHandler.prototype.initializeShaderPrecisionGUI = function(){
-  guiHandler.datGuiShaderPrecision = new dat.GUI({hideable: false, width: 420});
-  guiHandler.shaderPrecisionParameters["Crosshair"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.CROSSHAIR);
-  guiHandler.shaderPrecisionParameters["Basic material"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.BASIC_MATERIAL);
-  guiHandler.shaderPrecisionParameters["Instanced basic material"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.INSTANCED_BASIC_MATERIAL);
-  guiHandler.shaderPrecisionParameters["Merged basic material"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.MERGED_BASIC_MATERIAL);
-  guiHandler.shaderPrecisionParameters["Object trail"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.OBJECT_TRAIL);
-  guiHandler.shaderPrecisionParameters["Particle"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.PARTICLE);
-  guiHandler.shaderPrecisionParameters["Skybox"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SKYBOX);
-  guiHandler.shaderPrecisionParameters["Text"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.TEXT);
-  guiHandler.shaderPrecisionParameters["Lightning"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.LIGHTNING);
-  guiHandler.shaderPrecisionParameters["Sprite"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SPRITE);
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Crosshair", ["low", "medium", "high"]).onChange(function(val){
-    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.CROSSHAIR, guiHandler.getPrecisionType(val));
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Basic material", ["low", "medium", "high"]).onChange(function(val){
-    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.BASIC_MATERIAL, guiHandler.getPrecisionType(val));
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Instanced basic material", ["low", "medium", "high"]).onChange(function(val){
-    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.INSTANCED_BASIC_MATERIAL, guiHandler.getPrecisionType(val));
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Merged basic material", ["low", "medium", "high"]).onChange(function(val){
-    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.MERGED_BASIC_MATERIAL, guiHandler.getPrecisionType(val));
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Object trail", ["low", "medium", "high"]).onChange(function(val){
-    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.OBJECT_TRAIL, guiHandler.getPrecisionType(val));
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Particle", ["low", "medium", "high"]).onChange(function(val){
-    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.PARTICLE, guiHandler.getPrecisionType(val));
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Skybox", ["low", "medium", "high"]).onChange(function(val){
-    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.SKYBOX, guiHandler.getPrecisionType(val));
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Text", ["low", "medium", "high"]).onChange(function(val){
-    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.TEXT, guiHandler.getPrecisionType(val));
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Lightning", ["low", "medium", "high"]).onChange(function(val){
-    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.LIGHTNING, guiHandler.getPrecisionType(val));
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Sprite", ["low", "medium", "high"]).onChange(function(val){
-    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.SPRITE, guiHandler.getPrecisionType(val));
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Done");
 }
 
 GUIHandler.prototype.getNumericValue = function(expression){
