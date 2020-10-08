@@ -43,7 +43,11 @@ var GUIHandler = function(){
     "Max speed": "100",
     "Jump speed": "500",
     "Look speed": 0.1,
-    "Hidden": false
+    "Hidden": false,
+    "Export": function(){
+      terminal.clear();
+      parseCommand("exportObject " + selectionHandler.getSelectedObject().name);
+    }
   };
   this.textManipulationParameters = {
     "Text": "textName",
@@ -1243,6 +1247,8 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       selectionHandler.getSelectedObject().showInDesignMode();
     }
   }).listen();
+
+  guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Export");
 
   var rotationFolder = guiHandler.datGuiObjectManipulation.addFolder("Rotation");
   var physicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Physics");
