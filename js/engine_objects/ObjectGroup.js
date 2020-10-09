@@ -935,14 +935,6 @@ ObjectGroup.prototype.handleTextures = function(){
   this.hasTexture = this.hasDiffuse || this.hasEmissive || this.hasAlpha || this.hasAO || this.hasDisplacement;
 }
 
-ObjectGroup.prototype.push = function(array, value, index, isIndexed){
-  if (!isIndexed){
-    array.push(value);
-  }else{
-    array[index] = value;
-  }
-}
-
 ObjectGroup.prototype.isAttributeRepeating = function(attribute){
   var itemSize = attribute.itemSize;
   var firstItem;
@@ -1288,15 +1280,10 @@ ObjectGroup.prototype.merge = function(){
   this.geometry = new THREE.BufferGeometry();
   var pseudoGeometry = new THREE.Geometry();
 
-  var isIndexed = true;
-
   var miMap = new Object();
   var mi = 0;
   for (var childName in this.group){
     var childObj = this.group[childName];
-    if (childObj.type == "box" || childObj.type == "sphere" || childObj.type == "cylinder"){
-      isIndexed = false;
-    }
     var childGeom = childObj.getNormalGeometry();
     miMap[mi] = childObj.name;
     for (var i = 0; i<childGeom.faces.length; i++){
@@ -1307,30 +1294,8 @@ ObjectGroup.prototype.merge = function(){
     pseudoGeometry.merge(childGeom, childObj.mesh.matrix);
   }
 
-  this.isIndexed = isIndexed;
-
   var max = 0;
-  var indexCache;
   var faces = pseudoGeometry.faces;
-  var indexCache;
-  if (isIndexed){
-    indexCache = new Object();
-    for (var i = 0; i<faces.length; i++){
-      var face = faces[i];
-      var a = face.a;
-      var b = face.b;
-      var c = face.c;
-      if (a > max){
-        max = a;
-      }
-      if (b > max){
-        max = b;
-      }
-      if (c > max){
-        max = c;
-      }
-    }
-  }
 
   var indices = [];
   var vertices = pseudoGeometry.vertices;
@@ -1412,33 +1377,6 @@ ObjectGroup.prototype.merge = function(){
     var b = face.b;
     var c = face.c;
 
-    var aSkipped = false;
-    var bSkipped = false;
-    var cSkipped = false;
-    if (isIndexed){
-      indices.push(a);
-      indices.push(b);
-      indices.push(c);
-      if (indexCache[a]){
-        aSkipped = true;
-        this.skippedVertexCount ++;
-      }else{
-        indexCache[a] = true;
-      }
-      if (indexCache[b]){
-        bSkipped = true;
-        this.skippedVertexCount ++;
-      }else{
-        indexCache[b] = true;
-      }
-      if (indexCache[c]){
-        cSkipped = true;
-        this.skippedVertexCount ++;
-      }else{
-        indexCache[c] = true;
-      }
-    }
-
     var vertex1 = vertices[a];
     var vertex2 = vertices[b];
     var vertex3 = vertices[c];
@@ -1454,334 +1392,271 @@ ObjectGroup.prototype.merge = function(){
     var mirrorTInfo = addedObject.hasMirrorT()? 100: -100;
 
     // POSITIONS
-    if (!aSkipped){
-      this.push(positions, vertex1.x, (3*a), isIndexed);
-      this.push(positions, vertex1.y, ((3*a) + 1), isIndexed);
-      this.push(positions, vertex1.z, ((3*a) + 2), isIndexed);
-    }
-    if (!bSkipped){
-      this.push(positions, vertex2.x, (3*b), isIndexed);
-      this.push(positions, vertex2.y, ((3*b) + 1), isIndexed);
-      this.push(positions, vertex2.z, ((3*b) + 2), isIndexed);
-    }
-    if (!cSkipped){
-      this.push(positions, vertex3.x, (3*c), isIndexed);
-      this.push(positions, vertex3.y, ((3*c) + 1), isIndexed);
-      this.push(positions, vertex3.z, ((3*c) + 2), isIndexed);
-    }
-    if (!aSkipped){
-      this.push(normals, vertexNormal1.x, (3*a), isIndexed);
-      this.push(normals, vertexNormal1.y, ((3*a) + 1), isIndexed);
-      this.push(normals, vertexNormal1.z, ((3*a) + 2), isIndexed);
-    }
-    if (!bSkipped){
-      this.push(normals, vertexNormal2.x, (3*b), isIndexed);
-      this.push(normals, vertexNormal2.y, ((3*b) + 1), isIndexed);
-      this.push(normals, vertexNormal2.z, ((3*b) + 2), isIndexed);
-    }
-    if (!cSkipped){
-      this.push(normals, vertexNormal3.x, (3*c), isIndexed);
-      this.push(normals, vertexNormal3.y, ((3*c) + 1), isIndexed);
-      this.push(normals, vertexNormal3.z, ((3*c) + 2), isIndexed);
-    }
+    this.push(positions, vertex1.x);
+    this.push(positions, vertex1.y);
+    this.push(positions, vertex1.z);
+
+    this.push(positions, vertex2.x);
+    this.push(positions, vertex2.y);
+    this.push(positions, vertex2.z);
+
+    this.push(positions, vertex3.x);
+    this.push(positions, vertex3.y);
+    this.push(positions, vertex3.z);
+
+    this.push(normals, vertexNormal1.x);
+    this.push(normals, vertexNormal1.y);
+    this.push(normals, vertexNormal1.z);
+
+    this.push(normals, vertexNormal2.x);
+    this.push(normals, vertexNormal2.y);
+    this.push(normals, vertexNormal2.z);
+
+    this.push(normals, vertexNormal3.x);
+    this.push(normals, vertexNormal3.y);
+    this.push(normals, vertexNormal3.z);
+
     // COLORS
-    if (!aSkipped){
-      this.push(colors, color.r, (3*a), isIndexed);
-      this.push(colors, color.g, ((3*a) + 1), isIndexed);
-      this.push(colors, color.b, ((3*a) + 2), isIndexed);
-    }
-    if (!bSkipped){
-      this.push(colors, color.r, (3*b), isIndexed);
-      this.push(colors, color.g, ((3*b) + 1), isIndexed);
-      this.push(colors, color.b, ((3*b) + 2), isIndexed);
-    }
-    if (!cSkipped){
-      this.push(colors, color.r, (3*c), isIndexed);
-      this.push(colors, color.g, ((3*c) + 1), isIndexed);
-      this.push(colors, color.b, ((3*c) + 2), isIndexed);
-    }
+    this.push(colors, color.r);
+    this.push(colors, color.g);
+    this.push(colors, color.b);
+
+    this.push(colors, color.r);
+    this.push(colors, color.g);
+    this.push(colors, color.b);
+
+    this.push(colors, color.r);
+    this.push(colors, color.g);
+    this.push(colors, color.b);
+
     // UV
     if (this.hasTexture){
-      if (!aSkipped){
-        this.push(uvs, uv1.x, (2*a), isIndexed);
-        this.push(uvs, uv1.y, ((2*a) + 1), isIndexed);
-        this.push(textureMirrorInfos, mirrorSInfo, (2*a), isIndexed);
-        this.push(textureMirrorInfos, mirrorTInfo, ((2*a) + 1), isIndexed);
-      }
-      if (!bSkipped){
-        this.push(uvs, uv2.x, (2*b), isIndexed);
-        this.push(uvs, uv2.y, ((2*b) + 1), isIndexed);
-        this.push(textureMirrorInfos, mirrorSInfo, (2*b), isIndexed);
-        this.push(textureMirrorInfos, mirrorTInfo, ((2*b) + 1), isIndexed);
-      }
-      if (!cSkipped){
-        this.push(uvs, uv3.x, (2*c), isIndexed);
-        this.push(uvs, uv3.y, ((2*c) + 1), isIndexed);
-        this.push(textureMirrorInfos, mirrorSInfo, (2*c), isIndexed);
-        this.push(textureMirrorInfos, mirrorTInfo, ((2*c) + 1), isIndexed);
-      }
+      this.push(uvs, uv1.x);
+      this.push(uvs, uv1.y);
+      this.push(textureMirrorInfos, mirrorSInfo);
+      this.push(textureMirrorInfos, mirrorTInfo);
+
+      this.push(uvs, uv2.x);
+      this.push(uvs, uv2.y);
+      this.push(textureMirrorInfos, mirrorSInfo);
+      this.push(textureMirrorInfos, mirrorTInfo);
+
+      this.push(uvs, uv3.x);
+      this.push(uvs, uv3.y);
+      this.push(textureMirrorInfos, mirrorSInfo);
+      this.push(textureMirrorInfos, mirrorTInfo);
     }
     // DIFFUSE UVS
     if (this.hasTexture){
-      if (!aSkipped){
-        if (addedObject.hasDiffuseMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.diffuse.texturePack, "diffuse");
-          this.push(diffuseUVs, ranges.startU, ((2*a)), isIndexed);
-          this.push(diffuseUVs, ranges.startV, ((2*a) + 1), isIndexed);
-          this.push(diffuseUVs, ranges.endU, ((2*a) + 2), isIndexed);
-          this.push(diffuseUVs, ranges.endV, ((2*a) + 3), isIndexed);
+      if (addedObject.hasDiffuseMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.diffuse.texturePack, "diffuse");
+        this.push(diffuseUVs, ranges.startU);
+        this.push(diffuseUVs, ranges.startV);
+        this.push(diffuseUVs, ranges.endU);
+        this.push(diffuseUVs, ranges.endV);
 
-          this.push(this.uvRangeMap, addedObject, ((2*a)), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*a) + 1), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*a) + 2), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*a) + 3), isIndexed);
-        }else{
-          this.push(diffuseUVs, 0, ((2*a)), isIndexed);
-          this.push(diffuseUVs, 0, ((2*a) + 1), isIndexed);
-          this.push(diffuseUVs, 0, ((2*a) + 2), isIndexed);
-          this.push(diffuseUVs, 0, ((2*a) + 3), isIndexed);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+      }else{
+        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, 0);
 
-          this.push(this.uvRangeMap, addedObject, ((2*a)), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*a) + 1), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*a) + 2), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*a) + 3), isIndexed);
-        }
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
       }
-      if (!bSkipped){
-        if (addedObject.hasDiffuseMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.diffuse.texturePack, "diffuse");
-          this.push(diffuseUVs, ranges.startU, ((2*b)), isIndexed);
-          this.push(diffuseUVs, ranges.startV, ((2*b) + 1), isIndexed);
-          this.push(diffuseUVs, ranges.endU, ((2*b) + 2), isIndexed);
-          this.push(diffuseUVs, ranges.endV, ((2*b) + 3), isIndexed);
 
-          this.push(this.uvRangeMap, addedObject, ((2*b)), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*b) + 1), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*b) + 2), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*b) + 3), isIndexed);
-        }else{
-          this.push(diffuseUVs, 0, ((2*b)), isIndexed);
-          this.push(diffuseUVs, 0, ((2*b) + 1), isIndexed);
-          this.push(diffuseUVs, 0, ((2*b) + 2), isIndexed);
-          this.push(diffuseUVs, 0, ((2*b) + 3), isIndexed);
+      if (addedObject.hasDiffuseMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.diffuse.texturePack, "diffuse");
+        this.push(diffuseUVs, ranges.startU);
+        this.push(diffuseUVs, ranges.startV);
+        this.push(diffuseUVs, ranges.endU);
+        this.push(diffuseUVs, ranges.endV);
 
-          this.push(this.uvRangeMap, addedObject, ((2*b)), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*b) + 1), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*b) + 2), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*b) + 3), isIndexed);
-        }
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+      }else{
+        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, 0);
+
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
       }
-      if (!cSkipped){
-        if (addedObject.hasDiffuseMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.diffuse.texturePack, "diffuse");
-          this.push(diffuseUVs, ranges.startU, ((2*c)), isIndexed);
-          this.push(diffuseUVs, ranges.startV, ((2*c) + 1), isIndexed);
-          this.push(diffuseUVs, ranges.endU, ((2*c) + 2), isIndexed);
-          this.push(diffuseUVs, ranges.endV, ((2*c) + 3), isIndexed);
 
-          this.push(this.uvRangeMap, addedObject, ((2*c)), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*c) + 1), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*c) + 2), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*c) + 3), isIndexed);
-        }else{
-          this.push(diffuseUVs, 0, ((2*c)), isIndexed);
-          this.push(diffuseUVs, 0, ((2*c) + 1), isIndexed);
-          this.push(diffuseUVs, 0, ((2*c) + 2), isIndexed);
-          this.push(diffuseUVs, 0, ((2*c) + 3), isIndexed);
+      if (addedObject.hasDiffuseMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.diffuse.texturePack, "diffuse");
+        this.push(diffuseUVs, ranges.startU);
+        this.push(diffuseUVs, ranges.startV);
+        this.push(diffuseUVs, ranges.endU);
+        this.push(diffuseUVs, ranges.endV);
 
-          this.push(this.uvRangeMap, addedObject, ((2*c)), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*c) + 1), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*c) + 2), isIndexed);
-          this.push(this.uvRangeMap, addedObject, ((2*c) + 3), isIndexed);
-        }
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+      }else{
+        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, 0);
+
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
+        this.push(this.uvRangeMap, addedObject);
       }
     }
     // ALPHA UVS
     if (this.hasAlpha){
-      if (!aSkipped){
-        if (addedObject.hasAlphaMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.alpha.texturePack, "alpha");
-          this.push(alphaUVs, ranges.startU, ((2*a)), isIndexed);
-          this.push(alphaUVs, ranges.startV, ((2*a) + 1), isIndexed);
-          this.push(alphaUVs, ranges.endU, ((2*a) + 2), isIndexed);
-          this.push(alphaUVs, ranges.endV, ((2*a) + 3), isIndexed);
-        }else{
-          this.push(alphaUVs, 0, ((2*a)), isIndexed);
-          this.push(alphaUVs, 0, ((2*a) + 1), isIndexed);
-          this.push(alphaUVs, 0, ((2*a) + 2), isIndexed);
-          this.push(alphaUVs, 0, ((2*a) + 3), isIndexed);
-        }
+      if (addedObject.hasAlphaMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.alpha.texturePack, "alpha");
+        this.push(alphaUVs, ranges.startU);
+        this.push(alphaUVs, ranges.startV);
+        this.push(alphaUVs, ranges.endU);
+        this.push(alphaUVs, ranges.endV);
+      }else{
+        this.push(alphaUVs, 0);
+        this.push(alphaUVs, 0);
+        this.push(alphaUVs, 0);
+        this.push(alphaUVs, 0);
       }
-      if (!bSkipped){
-        if (addedObject.hasAlphaMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.alpha.texturePack, "alpha");
-          this.push(alphaUVs, ranges.startU, ((2*b)), isIndexed);
-          this.push(alphaUVs, ranges.startV, ((2*b) + 1), isIndexed);
-          this.push(alphaUVs, ranges.endU, ((2*b) + 2), isIndexed);
-          this.push(alphaUVs, ranges.endV, ((2*b) + 3), isIndexed);
-        }else{
-          this.push(alphaUVs, 0, ((2*b)), isIndexed);
-          this.push(alphaUVs, 0, ((2*b) + 1), isIndexed);
-          this.push(alphaUVs, 0, ((2*b) + 2), isIndexed);
-          this.push(alphaUVs, 0, ((2*b) + 3), isIndexed);
-        }
+
+      if (addedObject.hasAlphaMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.alpha.texturePack, "alpha");
+        this.push(alphaUVs, ranges.startU);
+        this.push(alphaUVs, ranges.startV);
+        this.push(alphaUVs, ranges.endU);
+        this.push(alphaUVs, ranges.endV);
+      }else{
+        this.push(alphaUVs, 0);
+        this.push(alphaUVs, 0);
+        this.push(alphaUVs, 0);
+        this.push(alphaUVs, 0);
       }
-      if (!cSkipped){
-        if (addedObject.hasAlphaMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.alpha.texturePack, "alpha");
-          this.push(alphaUVs, ranges.startU, ((2*c)), isIndexed);
-          this.push(alphaUVs, ranges.startV, ((2*c) + 1), isIndexed);
-          this.push(alphaUVs, ranges.endU, ((2*c) + 2), isIndexed);
-          this.push(alphaUVs, ranges.endV, ((2*c) + 3), isIndexed);
-        }else{
-          this.push(alphaUVs, 0, ((2*c)), isIndexed);
-          this.push(alphaUVs, 0, ((2*c) + 1), isIndexed);
-          this.push(alphaUVs, 0, ((2*c) + 2), isIndexed);
-          this.push(alphaUVs, 0, ((2*c) + 3), isIndexed);
-        }
+
+      if (addedObject.hasAlphaMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.alpha.texturePack, "alpha");
+        this.push(alphaUVs, ranges.startU);
+        this.push(alphaUVs, ranges.startV);
+        this.push(alphaUVs, ranges.endU);
+        this.push(alphaUVs, ranges.endV);
+      }else{
+        this.push(alphaUVs, 0);
+        this.push(alphaUVs, 0);
+        this.push(alphaUVs, 0);
+        this.push(alphaUVs, 0);
       }
     }
     // DISPLACEMENT INFOS
     if (this.hasDisplacement){
-      if (!aSkipped){
-        if (addedObject.hasDisplacementMap()){
-          this.push(
-            displacementInfos,
-            addedObject.getDisplacementScale(),
-            (2*a),
-            isIndexed
-          );
-          this.push(
-            displacementInfos,
-            addedObject.getDisplacementBias(),
-            ((2*a) + 1),
-            isIndexed
-          );
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.height.texturePack, "height");
-          this.push(displacementUVs, ranges.startU, ((2*a)), isIndexed);
-          this.push(displacementUVs, ranges.startV, ((2*a) + 1), isIndexed);
-          this.push(displacementUVs, ranges.endU, ((2*a) + 2), isIndexed);
-          this.push(displacementUVs, ranges.endV, ((2*a) + 3), isIndexed);
-        }else{
-          this.push(displacementInfos, -100, (2*a), isIndexed);
-          this.push(displacementInfos, -100, ((2*a) + 1), isIndexed);
-          this.push(displacementUVs, 0, ((2*a)), isIndexed);
-          this.push(displacementUVs, 0, ((2*a) + 1), isIndexed);
-          this.push(displacementUVs, 0, ((2*a) + 2), isIndexed);
-          this.push(displacementUVs, 0, ((2*a) + 3), isIndexed);
-        }
+      if (addedObject.hasDisplacementMap()){
+        this.push(displacementInfos, addedObject.getDisplacementScale());
+        this.push(displacementInfos, addedObject.getDisplacementBias());
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.height.texturePack, "height");
+        this.push(displacementUVs, ranges.startU);
+        this.push(displacementUVs, ranges.startV);
+        this.push(displacementUVs, ranges.endU);
+        this.push(displacementUVs, ranges.endV);
+      }else{
+        this.push(displacementInfos, -100);
+        this.push(displacementInfos, -100);
+        this.push(displacementUVs, 0);
+        this.push(displacementUVs, 0);
+        this.push(displacementUVs, 0);
+        this.push(displacementUVs, 0);
       }
-      if (!bSkipped){
-        if (addedObject.hasDisplacementMap()){
-          this.push(
-            displacementInfos,
-            addedObject.getDisplacementScale(),
-            (2*b),
-            isIndexed
-          );
-          this.push(
-            displacementInfos,
-            addedObject.getDisplacementBias(),
-            ((2*b) + 1),
-            isIndexed
-          );
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.height.texturePack, "height");
-          this.push(displacementUVs, ranges.startU, ((2*b)), isIndexed);
-          this.push(displacementUVs, ranges.startV, ((2*b) + 1), isIndexed);
-          this.push(displacementUVs, ranges.endU, ((2*b) + 2), isIndexed);
-          this.push(displacementUVs, ranges.endV, ((2*b) + 3), isIndexed);
-        }else{
-          this.push(displacementInfos, -100, (2*b), isIndexed);
-          this.push(displacementInfos, -100, ((2*b) + 1), isIndexed);
-          this.push(displacementUVs, 0, ((2*b)), isIndexed);
-          this.push(displacementUVs, 0, ((2*b) + 1), isIndexed);
-          this.push(displacementUVs, 0, ((2*b) + 2), isIndexed);
-          this.push(displacementUVs, 0, ((2*b) + 3), isIndexed);
-        }
+
+      if (addedObject.hasDisplacementMap()){
+        this.push(displacementInfos, addedObject.getDisplacementScale());
+        this.push(displacementInfos, addedObject.getDisplacementBias());
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.height.texturePack, "height");
+        this.push(displacementUVs, ranges.startU);
+        this.push(displacementUVs, ranges.startV);
+        this.push(displacementUVs, ranges.endU);
+        this.push(displacementUVs, ranges.endV);
+      }else{
+        this.push(displacementInfos, -100);
+        this.push(displacementInfos, -100);
+        this.push(displacementUVs, 0);
+        this.push(displacementUVs, 0);
+        this.push(displacementUVs, 0);
+        this.push(displacementUVs, 0);
       }
-      if (!cSkipped){
-        if (addedObject.hasDisplacementMap()){
-          this.push(
-            displacementInfos,
-            addedObject.getDisplacementScale(),
-            (2*c),
-            isIndexed
-          );
-          this.push(
-            displacementInfos,
-            addedObject.getDisplacementBias(),
-            ((2*c) + 1),
-            isIndexed
-          );
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.height.texturePack, "height");
-          this.push(displacementUVs, ranges.startU, ((2*c)), isIndexed);
-          this.push(displacementUVs, ranges.startV, ((2*c) + 1), isIndexed);
-          this.push(displacementUVs, ranges.endU, ((2*c) + 2), isIndexed);
-          this.push(displacementUVs, ranges.endV, ((2*c) + 3), isIndexed);
-        }else{
-          this.push(displacementInfos, -100, (2*c), isIndexed);
-          this.push(displacementInfos, -100, ((2*c) + 1), isIndexed);
-          this.push(displacementUVs, 0, ((2*c)), isIndexed);
-          this.push(displacementUVs, 0, ((2*c) + 1), isIndexed);
-          this.push(displacementUVs, 0, ((2*c) + 2), isIndexed);
-          this.push(displacementUVs, 0, ((2*c) + 3), isIndexed);
-        }
+
+      if (addedObject.hasDisplacementMap()){
+        this.push(displacementInfos, addedObject.getDisplacementScale());
+        this.push(displacementInfos, addedObject.getDisplacementBias());
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.height.texturePack, "height");
+        this.push(displacementUVs, ranges.startU);
+        this.push(displacementUVs, ranges.startV);
+        this.push(displacementUVs, ranges.endU);
+        this.push(displacementUVs, ranges.endV);
+      }else{
+        this.push(displacementInfos, -100);
+        this.push(displacementInfos, -100);
+        this.push(displacementUVs, 0);
+        this.push(displacementUVs, 0);
+        this.push(displacementUVs, 0);
+        this.push(displacementUVs, 0);
       }
     }
     // ALPHA
     var alpha = addedObject.mesh.material.uniforms.alpha.value;
-    if (!aSkipped){
-      this.push(alphas, alpha, a, isIndexed);
-    }
-    if (!bSkipped){
-      this.push(alphas, alpha, b, isIndexed);
-    }
-    if (!cSkipped){
-      this.push(alphas, alpha, c, isIndexed);
-    }
+
+    this.push(alphas, alpha, a);
+    this.push(alphas, alpha, b);
+    this.push(alphas, alpha, c);
+
     // EMISSIVE UVS
     if (this.hasEmissive){
-      if (!aSkipped){
-        if (addedObject.hasEmissiveMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.emissive.texturePack, "emissive");
-          this.push(emissiveUVs, ranges.startU, ((2*a)), isIndexed);
-          this.push(emissiveUVs, ranges.startV, ((2*a) + 1), isIndexed);
-          this.push(emissiveUVs, ranges.endU, ((2*a) + 2), isIndexed);
-          this.push(emissiveUVs, ranges.endV, ((2*a) + 3), isIndexed);
-        }else{
-          this.push(emissiveUVs, 0, ((2*a)), isIndexed);
-          this.push(emissiveUVs, 0, ((2*a) + 1), isIndexed);
-          this.push(emissiveUVs, 0, ((2*a) + 2), isIndexed);
-          this.push(emissiveUVs, 0, ((2*a) + 3), isIndexed);
-        }
+      if (addedObject.hasEmissiveMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.emissive.texturePack, "emissive");
+        this.push(emissiveUVs, ranges.startU);
+        this.push(emissiveUVs, ranges.startV);
+        this.push(emissiveUVs, ranges.endU);
+        this.push(emissiveUVs, ranges.endV);
+      }else{
+        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, 0);
       }
-      if (!bSkipped){
-        if (addedObject.hasEmissiveMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.emissive.texturePack, "emissive");
-          this.push(emissiveUVs, ranges.startU, ((2*b)), isIndexed);
-          this.push(emissiveUVs, ranges.startV, ((2*b) + 1), isIndexed);
-          this.push(emissiveUVs, ranges.endU, ((2*b) + 2), isIndexed);
-          this.push(emissiveUVs, ranges.endV, ((2*b) + 3), isIndexed);
-        }else{
-          this.push(emissiveUVs, 0, ((2*b)), isIndexed);
-          this.push(emissiveUVs, 0, ((2*b) + 1), isIndexed);
-          this.push(emissiveUVs, 0, ((2*b) + 2), isIndexed);
-          this.push(emissiveUVs, 0, ((2*b) + 3), isIndexed);
-        }
+
+      if (addedObject.hasEmissiveMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.emissive.texturePack, "emissive");
+        this.push(emissiveUVs, ranges.startU);
+        this.push(emissiveUVs, ranges.startV);
+        this.push(emissiveUVs, ranges.endU);
+        this.push(emissiveUVs, ranges.endV);
+      }else{
+        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, 0);
       }
-      if (!cSkipped){
-        if (addedObject.hasEmissiveMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.emissive.texturePack, "emissive");
-          this.push(emissiveUVs, ranges.startU, ((2*c)), isIndexed);
-          this.push(emissiveUVs, ranges.startV, ((2*c) + 1), isIndexed);
-          this.push(emissiveUVs, ranges.endU, ((2*c) + 2), isIndexed);
-          this.push(emissiveUVs, ranges.endV, ((2*c) + 3), isIndexed);
-        }else{
-          this.push(emissiveUVs, 0, ((2*c)), isIndexed);
-          this.push(emissiveUVs, 0, ((2*c) + 1), isIndexed);
-          this.push(emissiveUVs, 0, ((2*c) + 2), isIndexed);
-          this.push(emissiveUVs, 0, ((2*c) + 3), isIndexed);
-        }
+
+      if (addedObject.hasEmissiveMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.emissive.texturePack, "emissive");
+        this.push(emissiveUVs, ranges.startU);
+        this.push(emissiveUVs, ranges.startV);
+        this.push(emissiveUVs, ranges.endU);
+        this.push(emissiveUVs, ranges.endV);
+      }else{
+        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, 0);
       }
     }
     // EMISSIVE INTENSITY AND EMISSIVE COLOR
@@ -1792,80 +1667,69 @@ ObjectGroup.prototype.merge = function(){
       }else{
         emissiveIntensity = 0;
       }
-      if (!aSkipped){
-        this.push(emissiveIntensities, emissiveIntensity, a, isIndexed);
-      }
-      if (!bSkipped){
-        this.push(emissiveIntensities, emissiveIntensity, b, isIndexed);
-      }
-      if (!cSkipped){
-        this.push(emissiveIntensities, emissiveIntensity, c, isIndexed);
-      }
+
+      this.push(emissiveIntensities, emissiveIntensity, a);
+      this.push(emissiveIntensities, emissiveIntensity, b);
+      this.push(emissiveIntensities, emissiveIntensity, c);
+
       var emissiveColor;
       if (addedObject.hasEmissiveMap()){
         emissiveColor = addedObject.getEmissiveColor();
       }else{
         emissiveColor = WHITE_COLOR;
       }
-      if (!aSkipped){
-        this.push(emissiveColors, emissiveColor.r, (3*a), isIndexed);
-        this.push(emissiveColors, emissiveColor.g, ((3*a) + 1), isIndexed);
-        this.push(emissiveColors, emissiveColor.b, ((3*a) + 2), isIndexed);
-      }
-      if (!bSkipped){
-        this.push(emissiveColors, emissiveColor.r, (3*b), isIndexed);
-        this.push(emissiveColors, emissiveColor.g, ((3*b) + 1), isIndexed);
-        this.push(emissiveColors, emissiveColor.b, ((3*b) + 2), isIndexed);
-      }
-      if (!cSkipped){
-        this.push(emissiveColors, emissiveColor.r, (3*c), isIndexed);
-        this.push(emissiveColors, emissiveColor.g, ((3*c) + 1), isIndexed);
-        this.push(emissiveColors, emissiveColor.b, ((3*c) + 2), isIndexed);
-      }
+
+      this.push(emissiveColors, emissiveColor.r);
+      this.push(emissiveColors, emissiveColor.g);
+      this.push(emissiveColors, emissiveColor.b);
+
+      this.push(emissiveColors, emissiveColor.r);
+      this.push(emissiveColors, emissiveColor.g);
+      this.push(emissiveColors, emissiveColor.b);
+
+      this.push(emissiveColors, emissiveColor.r);
+      this.push(emissiveColors, emissiveColor.g);
+      this.push(emissiveColors, emissiveColor.b);
     }
     // AO UVS
     if (this.hasAO){
-      if (!aSkipped){
-        if (addedObject.hasAOMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.ao.texturePack, "ao");
-          this.push(aoUVs, ranges.startU, ((2*a)), isIndexed);
-          this.push(aoUVs, ranges.startV, ((2*a) + 1), isIndexed);
-          this.push(aoUVs, ranges.endU, ((2*a) + 2), isIndexed);
-          this.push(aoUVs, ranges.endV, ((2*a) + 3), isIndexed);
-        }else{
-          this.push(aoUVs, 0, ((2*a)), isIndexed);
-          this.push(aoUVs, 0, ((2*a) + 1), isIndexed);
-          this.push(aoUVs, 0, ((2*a) + 2), isIndexed);
-          this.push(aoUVs, 0, ((2*a) + 3), isIndexed);
-        }
+      if (addedObject.hasAOMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.ao.texturePack, "ao");
+        this.push(aoUVs, ranges.startU);
+        this.push(aoUVs, ranges.startV);
+        this.push(aoUVs, ranges.endU);
+        this.push(aoUVs, ranges.endV);
+      }else{
+        this.push(aoUVs, 0);
+        this.push(aoUVs, 0);
+        this.push(aoUVs, 0);
+        this.push(aoUVs, 0);
       }
-      if (!bSkipped){
-        if (addedObject.hasAOMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.ao.texturePack, "ao");
-          this.push(aoUVs, ranges.startU, ((2*b)), isIndexed);
-          this.push(aoUVs, ranges.startV, ((2*b) + 1), isIndexed);
-          this.push(aoUVs, ranges.endU, ((2*b) + 2), isIndexed);
-          this.push(aoUVs, ranges.endV, ((2*b) + 3), isIndexed);
-        }else{
-          this.push(aoUVs, 0, ((2*b)), isIndexed);
-          this.push(aoUVs, 0, ((2*b) + 1), isIndexed);
-          this.push(aoUVs, 0, ((2*b) + 2), isIndexed);
-          this.push(aoUVs, 0, ((2*b) + 3), isIndexed);
-        }
+
+      if (addedObject.hasAOMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.ao.texturePack, "ao");
+        this.push(aoUVs, ranges.startU);
+        this.push(aoUVs, ranges.startV);
+        this.push(aoUVs, ranges.endU);
+        this.push(aoUVs, ranges.endV);
+      }else{
+        this.push(aoUVs, 0);
+        this.push(aoUVs, 0);
+        this.push(aoUVs, 0);
+        this.push(aoUVs, 0);
       }
-      if (!cSkipped){
-        if (addedObject.hasAOMap()){
-          var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.ao.texturePack, "ao");
-          this.push(aoUVs, ranges.startU, ((2*c)), isIndexed);
-          this.push(aoUVs, ranges.startV, ((2*c) + 1), isIndexed);
-          this.push(aoUVs, ranges.endU, ((2*c) + 2), isIndexed);
-          this.push(aoUVs, ranges.endV, ((2*c) + 3), isIndexed);
-        }else{
-          this.push(aoUVs, 0, ((2*c)), isIndexed);
-          this.push(aoUVs, 0, ((2*c) + 1), isIndexed);
-          this.push(aoUVs, 0, ((2*c) + 2), isIndexed);
-          this.push(aoUVs, 0, ((2*c) + 3), isIndexed);
-        }
+
+      if (addedObject.hasAOMap()){
+        var ranges = textureAtlasHandler.getRangesForTexturePack(addedObject.tpInfo.ao.texturePack, "ao");
+        this.push(aoUVs, ranges.startU);
+        this.push(aoUVs, ranges.startV);
+        this.push(aoUVs, ranges.endU);
+        this.push(aoUVs, ranges.endV);
+      }else{
+        this.push(aoUVs, 0);
+        this.push(aoUVs, 0);
+        this.push(aoUVs, 0);
+        this.push(aoUVs, 0);
       }
     }
     // AO INTENSITY
@@ -1876,186 +1740,175 @@ ObjectGroup.prototype.merge = function(){
       }else{
         aoIntensity = 0;
       }
-      if (!aSkipped){
-        this.push(aoIntensities, aoIntensity, a, isIndexed);
-      }
-      if (!bSkipped){
-        this.push(aoIntensities, aoIntensity, b, isIndexed);
-      }
-      if (!cSkipped){
-        this.push(aoIntensities, aoIntensity, c, isIndexed);
-      }
+
+      this.push(aoIntensities, aoIntensity, a);
+      this.push(aoIntensities, aoIntensity, b);
+      this.push(aoIntensities, aoIntensity, c);
     }
     // TEXTURE INFOS AND TEXTURE MATRIX INFOS
     if (this.hasTexture){
-      if (!aSkipped){
-        if (addedObject.hasDiffuseMap()){
-          this.push(textureInfos, 10, (4*a), isIndexed);
-        }else{
-          this.push(textureInfos, -10, (4*a), isIndexed);
-        }
-        if (addedObject.hasEmissiveMap()){
-          this.push(textureInfos, 10, ((4*a) + 1), isIndexed);
-        }else{
-          this.push(textureInfos, -10, ((4*a) + 1), isIndexed);
-        }
-        if (addedObject.hasAlphaMap()){
-          this.push(textureInfos, 10, ((4*a) + 2), isIndexed);
-        }else{
-          this.push(textureInfos, -10, ((4*a) + 2), isIndexed);
-        }
-        if (addedObject.hasAOMap()){
-          this.push(textureInfos, 10, ((4*a) + 3), isIndexed);
-        }else{
-          this.push(textureInfos, -10, ((4*a) + 3), isIndexed);
-        }
+      if (addedObject.hasDiffuseMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
       }
-      if (!bSkipped){
-        if (addedObject.hasDiffuseMap()){
-          this.push(textureInfos, 10, (4*b), isIndexed);
-        }else{
-          this.push(textureInfos, -10, (4*b), isIndexed);
-        }
-        if (addedObject.hasEmissiveMap()){
-          this.push(textureInfos, 10, ((4*b) + 1), isIndexed);
-        }else{
-          this.push(textureInfos, -10, ((4*b) + 1), isIndexed);
-        }
-        if (addedObject.hasAlphaMap()){
-          this.push(textureInfos, 10, ((4*b) + 2), isIndexed);
-        }else{
-          this.push(textureInfos, -10, ((4*b) + 2), isIndexed);
-        }
-        if (addedObject.hasAOMap()){
-          this.push(textureInfos, 10, ((4*b) + 3), isIndexed);
-        }else{
-          this.push(textureInfos, -10, ((4*b) + 3), isIndexed);
-        }
+      if (addedObject.hasEmissiveMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
       }
-      if (!cSkipped){
-        if (addedObject.hasDiffuseMap()){
-          this.push(textureInfos, 10, (4*c), isIndexed);
-        }else{
-          this.push(textureInfos, -10, (4*c), isIndexed);
-        }
-        if (addedObject.hasEmissiveMap()){
-          this.push(textureInfos, 10, ((4*c) + 1), isIndexed);
-        }else{
-          this.push(textureInfos, -10, ((4*c) + 1), isIndexed);
-        }
-        if (addedObject.hasAlphaMap()){
-          this.push(textureInfos, 10, ((4*c) + 2), isIndexed);
-        }else{
-          this.push(textureInfos, -10, ((4*c) + 2), isIndexed);
-        }
-        if (addedObject.hasAOMap()){
-          this.push(textureInfos, 10, ((4*c) + 3), isIndexed);
-        }else{
-          this.push(textureInfos, -10, ((4*c) + 3), isIndexed);
-        }
+      if (addedObject.hasAlphaMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
       }
-      if (!aSkipped){
-        if (addedObject.hasTexture()){
-          this.push(textureMatrixInfos, addedObject.getTextureOffsetX(), (4*a), isIndexed);
-          this.push(textureMatrixInfos, addedObject.getTextureOffsetY(), ((4*a) + 1), isIndexed);
-          this.push(textureMatrixInfos, addedObject.getTextureRepeatX(), ((4*a) + 2), isIndexed);
-          this.push(textureMatrixInfos, addedObject.getTextureRepeatY(), ((4*a) + 3), isIndexed);
+      if (addedObject.hasAOMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
+      }
 
-          if (this.hasDisplacement){
-            if (addedObject.customDisplacementTextureMatrixInfo){
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX, (4*a), isIndexed);
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY, ((4*a) + 1), isIndexed);
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU, ((4*a) + 2), isIndexed);
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV, ((4*a) + 3), isIndexed);
-            }else{
-              this.push(displacementTextureMatrixInfos, -100, (4*a), isIndexed);
-              this.push(displacementTextureMatrixInfos, -100, ((4*a) + 1), isIndexed);
-              this.push(displacementTextureMatrixInfos, -100, ((4*a) + 2), isIndexed);
-              this.push(displacementTextureMatrixInfos, -100, ((4*a) + 3), isIndexed);
-            }
-          }
-        }else{
-          this.push(textureMatrixInfos, 0, (4*a), isIndexed);
-          this.push(textureMatrixInfos, 0, ((4*a) + 1), isIndexed);
-          this.push(textureMatrixInfos, 0, ((4*a) + 2), isIndexed);
-          this.push(textureMatrixInfos, 0, ((4*a) + 3), isIndexed);
+      if (addedObject.hasDiffuseMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
+      }
+      if (addedObject.hasEmissiveMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
+      }
+      if (addedObject.hasAlphaMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
+      }
+      if (addedObject.hasAOMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
+      }
 
-          if (this.hasDisplacement){
-            this.push(displacementTextureMatrixInfos, -100, (4*a), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*a) + 1), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*a) + 2), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*a) + 3), isIndexed);
+      if (addedObject.hasDiffuseMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
+      }
+      if (addedObject.hasEmissiveMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
+      }
+      if (addedObject.hasAlphaMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
+      }
+      if (addedObject.hasAOMap()){
+        this.push(textureInfos, 10);
+      }else{
+        this.push(textureInfos, -10);
+      }
+
+      if (addedObject.hasTexture()){
+        this.push(textureMatrixInfos, addedObject.getTextureOffsetX());
+        this.push(textureMatrixInfos, addedObject.getTextureOffsetY());
+        this.push(textureMatrixInfos, addedObject.getTextureRepeatX());
+        this.push(textureMatrixInfos, addedObject.getTextureRepeatY());
+
+        if (this.hasDisplacement){
+          if (addedObject.customDisplacementTextureMatrixInfo){
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX);
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY);
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU);
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV);
+          }else{
+            this.push(displacementTextureMatrixInfos, -100);
+            this.push(displacementTextureMatrixInfos, -100);
+            this.push(displacementTextureMatrixInfos, -100);
+            this.push(displacementTextureMatrixInfos, -100);
           }
         }
-      }
-      if (!bSkipped){
-        if (addedObject.hasTexture()){
-          this.push(textureMatrixInfos, addedObject.getTextureOffsetX(), (4*b), isIndexed);
-          this.push(textureMatrixInfos, addedObject.getTextureOffsetY(), ((4*b) + 1), isIndexed);
-          this.push(textureMatrixInfos, addedObject.getTextureRepeatX(), ((4*b) + 2), isIndexed);
-          this.push(textureMatrixInfos, addedObject.getTextureRepeatY(), ((4*b) + 3), isIndexed);
+      }else{
+        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, 0);
 
-          if (this.hasDisplacement){
-            if (addedObject.customDisplacementTextureMatrixInfo){
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX, (4*b), isIndexed);
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY, ((4*b) + 1), isIndexed);
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU, ((4*b) + 2), isIndexed);
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV, ((4*b) + 3), isIndexed);
-            }else{
-              this.push(displacementTextureMatrixInfos, -100, (4*b), isIndexed);
-              this.push(displacementTextureMatrixInfos, -100, ((4*b) + 1), isIndexed);
-              this.push(displacementTextureMatrixInfos, -100, ((4*b) + 2), isIndexed);
-              this.push(displacementTextureMatrixInfos, -100, ((4*b) + 3), isIndexed);
-            }
-          }
-        }else{
-          this.push(textureMatrixInfos, 0, (4*b), isIndexed);
-          this.push(textureMatrixInfos, 0, ((4*b) + 1), isIndexed);
-          this.push(textureMatrixInfos, 0, ((4*b) + 2), isIndexed);
-          this.push(textureMatrixInfos, 0, ((4*b) + 3), isIndexed);
-
-          if (this.hasDisplacement){
-            this.push(displacementTextureMatrixInfos, -100, (4*b), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*b) + 1), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*b) + 2), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*b) + 3), isIndexed);
-          }
+        if (this.hasDisplacement){
+          this.push(displacementTextureMatrixInfos, -100);
+          this.push(displacementTextureMatrixInfos, -100);
+          this.push(displacementTextureMatrixInfos, -100);
+          this.push(displacementTextureMatrixInfos, -100);
         }
       }
-      if (!cSkipped){
-        if (addedObject.hasTexture()){
-          this.push(textureMatrixInfos, addedObject.getTextureOffsetX(), (4*c), isIndexed);
-          this.push(textureMatrixInfos, addedObject.getTextureOffsetY(), ((4*c) + 1), isIndexed);
-          this.push(textureMatrixInfos, addedObject.getTextureRepeatX(), ((4*c) + 2), isIndexed);
-          this.push(textureMatrixInfos, addedObject.getTextureRepeatY(), ((4*c) + 3), isIndexed);
 
-          if (this.hasDisplacement){
-            if (addedObject.customDisplacementTextureMatrixInfo){
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX, (4*c), isIndexed);
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY, ((4*c) + 1), isIndexed);
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU, ((4*c) + 2), isIndexed);
-              this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV, ((4*c) + 3), isIndexed);
-            }else{
-              this.push(displacementTextureMatrixInfos, -100, (4*c), isIndexed);
-              this.push(displacementTextureMatrixInfos, -100, ((4*c) + 1), isIndexed);
-              this.push(displacementTextureMatrixInfos, -100, ((4*c) + 2), isIndexed);
-              this.push(displacementTextureMatrixInfos, -100, ((4*c) + 3), isIndexed);
-            }
-          }
-        }else{
-          this.push(textureMatrixInfos, 0, (4*c), isIndexed);
-          this.push(textureMatrixInfos, 0, ((4*c) + 1), isIndexed);
-          this.push(textureMatrixInfos, 0, ((4*c) + 2), isIndexed);
-          this.push(textureMatrixInfos, 0, ((4*c) + 3), isIndexed);
+      if (addedObject.hasTexture()){
+        this.push(textureMatrixInfos, addedObject.getTextureOffsetX());
+        this.push(textureMatrixInfos, addedObject.getTextureOffsetY());
+        this.push(textureMatrixInfos, addedObject.getTextureRepeatX());
+        this.push(textureMatrixInfos, addedObject.getTextureRepeatY());
 
-          if (this.hasDisplacement){
-            this.push(displacementTextureMatrixInfos, -100, (4*c), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*c) + 1), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*c) + 2), isIndexed);
-            this.push(displacementTextureMatrixInfos, -100, ((4*c) + 3), isIndexed);
+        if (this.hasDisplacement){
+          if (addedObject.customDisplacementTextureMatrixInfo){
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX);
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY);
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU);
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV);
+          }else{
+            this.push(displacementTextureMatrixInfos, -100);
+            this.push(displacementTextureMatrixInfos, -100);
+            this.push(displacementTextureMatrixInfos, -100);
+            this.push(displacementTextureMatrixInfos, -100);
           }
         }
+      }else{
+        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, 0);
+
+        if (this.hasDisplacement){
+          this.push(displacementTextureMatrixInfos, -100);
+          this.push(displacementTextureMatrixInfos, -100);
+          this.push(displacementTextureMatrixInfos, -100);
+          this.push(displacementTextureMatrixInfos, -100);
+        }
       }
+
+      if (addedObject.hasTexture()){
+        this.push(textureMatrixInfos, addedObject.getTextureOffsetX());
+        this.push(textureMatrixInfos, addedObject.getTextureOffsetY());
+        this.push(textureMatrixInfos, addedObject.getTextureRepeatX());
+        this.push(textureMatrixInfos, addedObject.getTextureRepeatY());
+
+        if (this.hasDisplacement){
+          if (addedObject.customDisplacementTextureMatrixInfo){
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetX);
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.offsetY);
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatU);
+            this.push(displacementTextureMatrixInfos, addedObject.customDisplacementTextureMatrixInfo.repeatV);
+          }else{
+            this.push(displacementTextureMatrixInfos, -100);
+            this.push(displacementTextureMatrixInfos, -100);
+            this.push(displacementTextureMatrixInfos, -100);
+            this.push(displacementTextureMatrixInfos, -100);
+          }
+        }
+      }else{
+        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, 0);
+
+        if (this.hasDisplacement){
+          this.push(displacementTextureMatrixInfos, -100);
+          this.push(displacementTextureMatrixInfos, -100);
+          this.push(displacementTextureMatrixInfos, -100);
+          this.push(displacementTextureMatrixInfos, -100);
+        }
+      }
+
     }
   }
 
@@ -2140,13 +1993,6 @@ ObjectGroup.prototype.merge = function(){
   colorsBufferAttribute.setDynamic(false);
   alphasBufferAttribute.setDynamic(false);
   normalsBufferAttribute.setDynamic(false);
-
-  if (isIndexed){
-    var indicesTypedArray = new Uint16Array(indices);
-    var indicesBufferAttribute = new THREE.BufferAttribute(indicesTypedArray, 1);
-    indicesBufferAttribute.setDynamic(false);
-    this.geometry.setIndex(indicesBufferAttribute);
-  }
 
   this.geometry.addAttribute('position', positionsBufferAttribute);
   this.geometry.addAttribute('color', colorsBufferAttribute);
@@ -3585,4 +3431,9 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
     physicsSimplificationObject3DContainerPosition: this.physicsSimplificationObject3DContainer.position,
     physicsSimplificationObject3DContainerQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3DContainer.quaternion)
   };
+}
+
+ObjectGroup.prototype.push = function(ary, val){
+  // Indexing is deprecated so this method now only pushes to an array
+  ary.push(val);
 }
