@@ -86,8 +86,6 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo, shadowIntensi
 
   var firstLocal = positionsConstructed[firstIndex].clone();
   var lastLocal = positionsConstructed[lastIndex].clone();
-  var firstWorld = firstLocal.applyMatrix4(obj.mesh.matrixWorld);
-  var lastWorld = lastLocal.applyMatrix4(obj.mesh.matrixWorld);
 
   var shadowCanvas = this.getCanvasFromQuality(quality);
   var ctx = shadowCanvas.getContext('2d');
@@ -108,12 +106,18 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo, shadowIntensi
 
   for (var i1 = 0; i1 < 1; i1 += 1 / shadowCanvas.width){
     for (var i2 = 0; i2 < 1; i2 += 1 / shadowCanvas.height){
-      var curX = firstWorld.clone().lerp(lastWorld, i1).x;
-      var curZ = firstWorld.clone().lerp(lastWorld, i2).z;
+      var curLocalX = firstLocal.clone().lerp(lastLocal, i1).x;
+      var curLocalY = firstLocal.clone().lerp(lastLocal, i2).y;
+
+      var curWorldPosition = new THREE.Vector3(curLocalX, curLocalY, 0).applyMatrix4(obj.mesh.matrixWorld);
+
+      var curX = curWorldPosition.x;
+      var curY = curWorldPosition.y;
+      var curZ = curWorldPosition.z;
 
       if (lightInfo.type == "point"){
         var fromVector = lightPos;
-        var directionVector = new THREE.Vector3(curX - lightPos.x, obj.mesh.position.y - lightPos.y, curZ - lightPos.z).normalize();
+        var directionVector = new THREE.Vector3(curX - lightPos.x, curY - lightPos.y, curZ - lightPos.z).normalize();
         this.rayCaster.findIntersections(fromVector, directionVector, false, function(x, y, z, objName){
           if (objName == obj.name || !objName){
             pixels[pixelIndex ++] = 255;
@@ -141,4 +145,6 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo, shadowIntensi
   tmpCtx.translate(shadowCanvas.width / 2, shadowCanvas.height / 2);
   tmpCtx.rotate(-Math.PI/2);
   tmpCtx.drawImage(shadowCanvas, -shadowCanvas.width / 2, -shadowCanvas.width / 2);
+
+  debugCanvas(tmpCanvas);
 }
