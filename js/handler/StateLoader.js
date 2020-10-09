@@ -316,6 +316,7 @@ StateLoader.prototype.resetProject = function(){
   currentMouseOverObjectName = 0;
   raycasterFactory.reset();
   physicsFactory.reset();
+  shadowBaker.reset();
   rayCaster = raycasterFactory.get();
   physicsWorld = physicsFactory.get();
   anchorGrid = 0;

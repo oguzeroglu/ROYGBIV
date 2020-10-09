@@ -39,6 +39,9 @@ window.onload = function() {
   decisionHandler = new DecisionHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
+  // SHADOW BAKER
+  shadowBaker = new ShadowBaker();
+  
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
   cliDivheader = document.getElementById("cliDivheader");

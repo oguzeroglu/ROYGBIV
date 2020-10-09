@@ -252,6 +252,7 @@ var areasVisible = true;
 var areaConfigurationsVisible = false;
 var areaConfigurationsHandler;
 var textureAtlasHandler;
+var shadowBaker;
 var markedPointsVisible = true;
 var frustum = new THREE.Frustum();
 var SIDE_BOTH = "Both";
