@@ -4,33 +4,45 @@ var ShadowBaker = function(){
     "MEDIUM": "MEDIUM",
     "LOW": "LOW"
   };
+
+  this.reset();
 }
 
 ShadowBaker.prototype.reset = function(){
+  this.texturesByObjName = {};
+  this.shadowIntensitiesByObjName = {};
+  this.textureSizesByObjName = {};
+}
 
+ShadowBaker.prototype.getSizeFromQuality = function(quality){
+  if (quality == this.qualities.HIGH){
+    return 512;
+  }else if (quality == this.qualities.MEDIUM){
+    return 256;
+  }else{
+    return 128;
+  }
 }
 
 ShadowBaker.prototype.getCanvasFromQuality = function(quality){
   var shadowCanvas = document.createElement("canvas");
 
-  if (quality == this.qualities.HIGH){
-    shadowCanvas.width = 512;
-    shadowCanvas.height = 512;
-  }else if (quality == this.qualities.MEDIUM){
-    shadowCanvas.width = 256;
-    shadowCanvas.height = 256;
-  }else{
-    shadowCanvas.width = 128;
-    shadowCanvas.height = 128;
-  }
+  var size = this.getSizeFromQuality(quality);
+  shadowCanvas.width = size;
+  shadowCanvas.height = size;
 
   return shadowCanvas;
 }
 
 ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, shadowIntensity, quality){
+  terminal.clear();
+  terminal.disable();
   if (!this.isSupported(obj)){
+    terminal.printError(Text.OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING);
     return false;
   }
+
+  terminal.printInfo(Text.BAKING_SHADOW);
 
   var oldBinSize = BIN_SIZE;
   var oldRaycasterStep = RAYCASTER_STEP_AMOUNT;
@@ -47,6 +59,61 @@ ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, shadowIntensity, qua
 
   BIN_SIZE = oldBinSize;
   RAYCASTER_STEP_AMOUNT = oldRaycasterStep;
+
+  delete this.rayCaster;
+
+  this.refreshTextures(function(){
+    terminal.enable();
+    terminal.printInfo(Text.SHADOW_BAKED);
+  }, function(){
+    terminal.enable();
+    terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+  });
+}
+
+ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
+  var textureMerger = new TextureMerger(this.texturesByObjName);
+  var texturesByObjName = this.texturesByObjName;
+  var shadowIntensitiesByObjName = this.shadowIntensitiesByObjName;
+  var textureSizesByObjName = this.textureSizesByObjName;
+  this.compressTexture(textureMerger.mergedTexture.image.toDataURL(), function(atlas){
+    var shadowMapUniform = new THREE.Uniform(atlas.diffuseTexture);
+
+    for (var objName in texturesByObjName){
+      var obj = addedObjects[objName];
+      var material = obj.mesh.material;
+      var uniforms = material.uniforms;
+      if (uniforms.shadowMap){
+        delete uniforms.shadowMap;
+        var shadowIntensityMacroVal = macroHandler.getMacroValue("SHADOW_INTENSITY", material, false);
+        var shadowMapStartUVal = macroHandler.getMacroValue("SHADOW_MAP_START_U", material, false);
+        var shadowMapStartVVal = macroHandler.getMacroValue("SHADOW_MAP_START_V", material, false);
+        var shadowMapEndUVal = macroHandler.getMacroValue("SHADOW_MAP_END_U", material, false);
+        var shadowMapEndVVal = macroHandler.getMacroValue("SHADOW_MAP_END_V", material, false);
+        var shadowMapSizeVal = macroHandler.getMacroValue("SHADOW_MAP_SIZE", material, false);
+        macroHandler.removeMacro("HAS_SHADOW_MAP", material, true, true);
+        macroHandler.removeMacro("SHADOW_INTENSITY " + shadowIntensityMacroVal, material, false, true);
+        macroHandler.removeMacro("SHADOW_MAP_START_U " + shadowMapStartUVal, material, false, true);
+        macroHandler.removeMacro("SHADOW_MAP_END_U " + shadowMapEndUVal, material, false, true);
+        macroHandler.removeMacro("SHADOW_MAP_START_V " + shadowMapStartVVal, material, false, true);
+        macroHandler.removeMacro("SHADOW_MAP_END_V " + shadowMapEndVVal, material, false, true);
+        macroHandler.removeMacro("SHADOW_MAP_SIZE " + shadowMapSizeVal, material, false, true);
+      }
+      var range = textureMerger.ranges[objName];
+      uniforms.shadowMap = shadowMapUniform;
+      macroHandler.injectMacro("HAS_SHADOW_MAP", material, true, true);
+      macroHandler.injectMacro("SHADOW_INTENSITY " + shadowIntensitiesByObjName[objName], material, false, true);
+      macroHandler.injectMacro("SHADOW_MAP_START_U " + range.startU, material, false, true);
+      macroHandler.injectMacro("SHADOW_MAP_START_V " + range.startV, material, false, true);
+      macroHandler.injectMacro("SHADOW_MAP_END_U " + range.endU, material, false, true);
+      macroHandler.injectMacro("SHADOW_MAP_END_V " + range.endV, material, false, true);
+      macroHandler.injectMacro("SHADOW_MAP_SIZE " + textureSizesByObjName[objName], material, false, true);
+      material.uniformsNeedUpdate = true;
+    }
+    onSuccess();
+  }, function(){
+    onErr();
+  });
 }
 
 ShadowBaker.prototype.isSupported = function(obj){
@@ -165,5 +232,31 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo, shadowIntensi
   tmpCtx.rotate(-Math.PI/2);
   tmpCtx.drawImage(shadowCanvas, -shadowCanvas.width / 2, -shadowCanvas.width / 2);
 
-  debugCanvas(tmpCanvas);
+  this.texturesByObjName[obj.name] = new THREE.CanvasTexture(tmpCanvas);
+  this.shadowIntensitiesByObjName[obj.name] = shadowIntensity;
+  this.textureSizesByObjName[obj.name] = this.getSizeFromQuality(quality);
+}
+
+ShadowBaker.prototype.compressTexture = function(base64Data, readyCallback, errorCallback){
+  var postRequest = new XMLHttpRequest();
+  var data = JSON.stringify({image: base64Data});
+  postRequest.open("POST", "/compressShadowAtlas", true);
+  postRequest.setRequestHeader('Content-Type', 'application/json');
+  postRequest.onreadystatechange = function(err){
+    if (postRequest.readyState == 4 && postRequest.status == 200){
+      var resp = JSON.parse(postRequest.responseText);
+      if (resp.error){
+        errorCallback();
+      }else{
+        var atlas = new TexturePack(null, null, {isShadowAtlas: true});
+        atlas.loadTextures(false, function(){
+          readyCallback(atlas);
+        });
+      }
+    }
+  }
+  postRequest.onerror = function(){
+    errorCallback();
+  }
+  postRequest.send(data);
 }

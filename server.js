@@ -230,16 +230,68 @@ app.post("/compressTextureAtlas", async function(req, res){
       var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true, false, true);
       if (result == "UNSUCC"){
         res.send(JSON.stringify({error: true}));
-        handleAtlasBackup(true, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup);
+        handleAtlasBackup(true, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup, false);
         return;
       }
     }
-    handleAtlasBackup(false, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup);
+    handleAtlasBackup(false, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup, false);
     res.send(JSON.stringify({error: false}));
   }catch (err){
     console.log(err);
     res.send(JSON.stringify({error: true}));
-    handleAtlasBackup(true, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup);
+    handleAtlasBackup(true, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup, false);
+  }
+});
+
+app.post("/compressShadowAtlas", async function(req, res){
+  console.log("[*] Compressing texture atlas.");
+  var hasPNGBackup = false;
+  var hasASTCBackup = false;
+  var hasPVRTCBackup = false;
+  var hasS3TCBackup = false;
+  if (fs.existsSync("./texture_atlas/shadowAtlas.png")){
+    console.log("[*] Backing up PNG shadow atlas.");
+    fs.renameSync("./texture_atlas/shadowAtlas.png", "./texture_atlas/shadowAtlas-backup.png");
+    hasPNGBackup = true;
+  }
+  if (fs.existsSync("./texture_atlas/shadowAtlas-astc.ktx")){
+    console.log("[*] Backing up ASTC shadow atlas.");
+    fs.renameSync("./texture_atlas/shadowAtlas-astc.ktx", "./texture_atlas/shadowAtlas-astc-backup.ktx");
+    hasASTCBackup = true;
+  }
+  if (fs.existsSync("./texture_atlas/shadowAtlas-pvrtc.ktx")){
+    console.log("[*] Backing up PVRTC shadow atlas.");
+    fs.renameSync("./texture_atlas/shadowAtlas-pvrtc.ktx", "./texture_atlas/shadowAtlas-pvrtc-backup.ktx");
+    hasPVRTCBackup = true;
+  }
+  if (fs.existsSync("./texture_atlas/shadowAtlas-s3tc.ktx")){
+    console.log("[*] Backing up S3TC shadow atlas.");
+    fs.renameSync("./texture_atlas/shadowAtlas-s3tc.ktx", "./texture_atlas/shadowAtlas-s3tc-backup.ktx");
+    hasS3TCBackup = true;
+  }
+  try{
+    var base64Data = req.body.image.replace(/^data:image\/png;base64,/, "");
+    fs.writeFileSync("./texture_atlas/shadowAtlas.png", base64Data, "base64");
+    console.log("[*] PNG saved to disk.");
+    res.setHeader('Content-Type', 'application/json');
+    var compressInfo = [];
+    compressInfo.push(["astc", "shadowAtlas", "./texture_atlas"]);
+    compressInfo.push(["pvrtc", "shadowAtlas", "./texture_atlas"]);
+    compressInfo.push(["s3tc", "shadowAtlas", "./texture_atlas"]);
+    for (var i = 0; i<compressInfo.length; i++){
+      var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true, false, true);
+      if (result == "UNSUCC"){
+        res.send(JSON.stringify({error: true}));
+        handleAtlasBackup(true, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup, true);
+        return;
+      }
+    }
+    handleAtlasBackup(false, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup, true);
+    res.send(JSON.stringify({error: false}));
+  }catch (err){
+    console.log(err);
+    res.send(JSON.stringify({error: true}));
+    handleAtlasBackup(true, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup, true);
   }
 });
 
@@ -304,18 +356,19 @@ function handleBackup(restore, filePath, backupFilePath){
   }
 }
 
-function handleAtlasBackup(restore, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup){
+function handleAtlasBackup(restore, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup, isShadow){
+  var fileName = isShadow? "shadowAtlas": "textureAtlas";
   if (hasPNGBackup){
-    handleBackup(restore, "./texture_atlas/textureAtlas.png", "./texture_atlas/textureAtlas-backup.png");
+    handleBackup(restore, "./texture_atlas/" + fileName + ".png", "./texture_atlas/" + fileName + "-backup.png");
   }
   if (hasASTCBackup){
-    handleBackup(restore, "./texture_atlas/textureAtlas-astc.ktx", "./texture_atlas/textureAtlas-astc-backup.ktx");
+    handleBackup(restore, "./texture_atlas/" + fileName + "-astc.ktx", "./texture_atlas/" + fileName + "-astc-backup.ktx");
   }
   if (hasPVRTCBackup){
-    handleBackup(restore, "./texture_atlas/textureAtlas-pvrtc.ktx", "./texture_atlas/textureAtlas-pvrtc-backup.ktx");
+    handleBackup(restore, "./texture_atlas/" + fileName + "-pvrtc.ktx", "./texture_atlas/" + fileName + "-pvrtc-backup.ktx");
   }
   if (hasS3TCBackup){
-    handleBackup(restore, "./texture_atlas/textureAtlas-s3tc.ktx", "./texture_atlas/textureAtlas-s3tc-backup.ktx");
+    handleBackup(restore, "./texture_atlas/" + fileName + "-s3tc.ktx", "./texture_atlas/" + fileName + "-s3tc-backup.ktx");
   }
 }
 

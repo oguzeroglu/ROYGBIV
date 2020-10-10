@@ -10,6 +10,11 @@ varying vec3 vColor;
 
 #define INSERTION
 
+#ifdef HAS_SHADOW_MAP
+  varying vec2 vShadowMapUV;
+  uniform sampler2D shadowMap;
+#endif
+
 #ifdef HAS_TEXTURE
   uniform sampler2D texture;
   varying vec2 vUV;
@@ -88,6 +93,19 @@ varying vec3 vColor;
   }
 #endif
 
+#ifdef HAS_SHADOW_MAP
+  vec2 uvAffineTransformationShadow(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    return vec2(coordX, coordY);
+  }
+  vec4 fixShadowTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(SHADOW_MAP_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
+#endif
+
 void main(){
 
   #ifdef HAS_FORCED_COLOR
@@ -128,6 +146,12 @@ void main(){
     #endif
   #else
     gl_FragColor = vec4(vColor, alpha);
+  #endif
+
+  #ifdef HAS_SHADOW_MAP
+    vec4 shadowUVFixed = fixShadowTextureBleeding(vec4(float(SHADOW_MAP_START_U), float(SHADOW_MAP_START_V), float(SHADOW_MAP_END_U), float(SHADOW_MAP_END_V)));
+    float shadowCoef = (texture2D(shadowMap, uvAffineTransformationShadow(vShadowMapUV, shadowUVFixed.x, shadowUVFixed.y, shadowUVFixed.z, shadowUVFixed.w)).r - 1.0) * float(SHADOW_INTENSITY) + 1.0;
+    gl_FragColor.rgb *= shadowCoef;
   #endif
 
   #ifdef HAS_FOG
