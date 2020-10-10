@@ -98,10 +98,14 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo, shadowIntensi
   var iterCount = 0;
 
   var lightPos;
+  var lightDirNegative;
   var objPos = obj.mesh.position;
   if (lightInfo.type == "point"){
     var light = lightHandler.staticPointLightsBySlotId[lightInfo.slotID];
     lightPos = new THREE.Vector3(light.positionX, light.positionY, light.positionZ);
+  }else{
+    var light = lightHandler.staticDiffuseLightsBySlotId[lightInfo.slotID];
+    lightDirNegative = new THREE.Vector3(light.directionX, light.directionY, light.directionZ).negate().normalize();
   }
 
   for (var i1 = 0; i1 < 1; i1 += 1 / shadowCanvas.width){
@@ -131,6 +135,21 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo, shadowIntensi
 
           pixels[pixelIndex ++] = 255;
         }, null, null, true);
+      }else{
+        var fromVector = new THREE.Vector3(curX, curY, curZ);
+        this.rayCaster.findIntersections(fromVector, lightDirNegative, false, function(x, y, z, objName){
+          if (!objName){
+            pixels[pixelIndex ++] = 255;
+            pixels[pixelIndex ++] = 255;
+            pixels[pixelIndex ++] = 255;
+          }else{
+            pixels[pixelIndex ++] = 0;
+            pixels[pixelIndex ++] = 0;
+            pixels[pixelIndex ++] = 0;
+          }
+
+          pixels[pixelIndex ++] = 255;
+        });
       }
     }
   }
