@@ -390,6 +390,15 @@ LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
         terminal.printInfo(Text.LIGHT_ADDED);
       }
     }.bind({slotID: i, config: config})).listen();
+    subFolder.add({
+      "Sync with camera position": function(){
+        var cameraPosition = camera.position;
+        this.config["Position"] = cameraPosition.x + "," + cameraPosition.y + "," + cameraPosition.z;
+        if (lightHandler.hasStaticPointLight(this.slotID)){
+          lightHandler.editStaticPointLight(this.slotID, cameraPosition, new THREE.Color(this.config["Color"]), this.config["Strength"]);
+        }
+      }.bind({slotID: i, config: config})
+    }, "Sync with camera position");
   }
 }
 
