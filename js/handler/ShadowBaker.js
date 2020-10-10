@@ -64,9 +64,11 @@ ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, shadowIntensity, qua
 
   this.refreshTextures(function(){
     terminal.enable();
+    terminal.clear();
     terminal.printInfo(Text.SHADOW_BAKED);
   }, function(){
     terminal.enable();
+    terminal.clear();
     terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
   });
 }
