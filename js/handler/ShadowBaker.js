@@ -41,7 +41,7 @@ ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, shadowIntensity, qua
   this.rayCaster = new RayCaster();
   this.rayCaster.refresh();
 
-  if (obj.isAddedObject && obj.type == "surface"){
+  if (obj.isAddedObject && (obj.type == "surface" || obj.type == "ramp")){
     this.bakeSurfaceShadow(obj, lightInfo, shadowIntensity, quality);
   }
 
@@ -50,7 +50,7 @@ ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, shadowIntensity, qua
 }
 
 ShadowBaker.prototype.isSupported = function(obj){
-  if (obj.isAddedObject && obj.type == "surface"){
+  if (obj.isAddedObject && (obj.type == "surface" || obj.type == "ramp")){
     return true;
   }
 
