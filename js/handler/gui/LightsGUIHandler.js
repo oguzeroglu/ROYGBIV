@@ -321,6 +321,16 @@ LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
         terminal.printInfo(Text.LIGHT_ADDED);
       }
     }.bind({slotID: i, config: config})).listen();
+    subFolder.add({
+      "Sync with camera direction": function(){
+        var cameraDirection = new THREE.Vector3();
+        camera.getWorldDirection(cameraDirection);
+        this.config["Direction"] = cameraDirection.x + "," + cameraDirection.y + "," + cameraDirection.z;
+        if (lightHandler.hasStaticDiffuseLight(this.slotID)){
+          lightHandler.editStaticDiffuseLight(this.slotID, cameraDirection, new THREE.Color(this.config["Color"]), this.config["Strength"]);
+        }
+      }.bind({slotID: i, config: config})
+    }, "Sync with camera direction");
   }
 
   for (var i = 1; i <= MAX_STATIC_DIFFUSE_LIGHT_COUNT; i ++){
@@ -391,7 +401,7 @@ LightsGUIHandler.prototype.hide = function(){
 }
 
 LightsGUIHandler.prototype.show = function(){
-  guiHandler.datGuiLights = new dat.GUI({hideable: false});
+  guiHandler.datGuiLights = new dat.GUI({hideable: false, width: 500});
   guiHandler.datGuiLights.domElement.addEventListener("mousedown", function(e){
     lGUIFocused = true;
   });
