@@ -73,7 +73,56 @@ ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, shadowIntensity, qua
   });
 }
 
+ShadowBaker.prototype.unbakeShadow = function(obj){
+  delete this.texturesByObjName[obj.name];
+  delete this.shadowIntensitiesByObjName[obj.name];
+  delete this.textureSizesByObjName[obj.name];
+  this.unbakeFromShader(obj.mesh.material);
+
+  terminal.clear();
+  terminal.disable();
+  terminal.printInfo(Text.UNBAKING_SHADOW);
+
+  this.refreshTextures(function(){
+    terminal.enable();
+    terminal.clear();
+    terminal.printInfo(Text.SHADOW_UNBAKED);
+  }, function(){
+    terminal.enable();
+    terminal.clear();
+    terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+  });
+}
+
+ShadowBaker.prototype.unbakeFromShader = function(material){
+  var uniforms = material.uniforms;
+  if (!uniforms.shadowMap){
+    return;
+  }
+
+  delete uniforms.shadowMap;
+  var shadowIntensityMacroVal = macroHandler.getMacroValue("SHADOW_INTENSITY", material, false);
+  var shadowMapStartUVal = macroHandler.getMacroValue("SHADOW_MAP_START_U", material, false);
+  var shadowMapStartVVal = macroHandler.getMacroValue("SHADOW_MAP_START_V", material, false);
+  var shadowMapEndUVal = macroHandler.getMacroValue("SHADOW_MAP_END_U", material, false);
+  var shadowMapEndVVal = macroHandler.getMacroValue("SHADOW_MAP_END_V", material, false);
+  var shadowMapSizeVal = macroHandler.getMacroValue("SHADOW_MAP_SIZE", material, false);
+  macroHandler.removeMacro("HAS_SHADOW_MAP", material, true, true);
+  macroHandler.removeMacro("SHADOW_INTENSITY " + shadowIntensityMacroVal, material, false, true);
+  macroHandler.removeMacro("SHADOW_MAP_START_U " + shadowMapStartUVal, material, false, true);
+  macroHandler.removeMacro("SHADOW_MAP_END_U " + shadowMapEndUVal, material, false, true);
+  macroHandler.removeMacro("SHADOW_MAP_START_V " + shadowMapStartVVal, material, false, true);
+  macroHandler.removeMacro("SHADOW_MAP_END_V " + shadowMapEndVVal, material, false, true);
+  macroHandler.removeMacro("SHADOW_MAP_SIZE " + shadowMapSizeVal, material, false, true);
+
+  material.uniformsNeedUpdate = true;
+}
+
 ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
+  if (Object.keys(this.texturesByObjName).length == 0){
+    onSuccess();
+    return;
+  }
   var textureMerger = new TextureMerger(this.texturesByObjName);
   var texturesByObjName = this.texturesByObjName;
   var shadowIntensitiesByObjName = this.shadowIntensitiesByObjName;
@@ -85,22 +134,7 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
       var obj = addedObjects[objName];
       var material = obj.mesh.material;
       var uniforms = material.uniforms;
-      if (uniforms.shadowMap){
-        delete uniforms.shadowMap;
-        var shadowIntensityMacroVal = macroHandler.getMacroValue("SHADOW_INTENSITY", material, false);
-        var shadowMapStartUVal = macroHandler.getMacroValue("SHADOW_MAP_START_U", material, false);
-        var shadowMapStartVVal = macroHandler.getMacroValue("SHADOW_MAP_START_V", material, false);
-        var shadowMapEndUVal = macroHandler.getMacroValue("SHADOW_MAP_END_U", material, false);
-        var shadowMapEndVVal = macroHandler.getMacroValue("SHADOW_MAP_END_V", material, false);
-        var shadowMapSizeVal = macroHandler.getMacroValue("SHADOW_MAP_SIZE", material, false);
-        macroHandler.removeMacro("HAS_SHADOW_MAP", material, true, true);
-        macroHandler.removeMacro("SHADOW_INTENSITY " + shadowIntensityMacroVal, material, false, true);
-        macroHandler.removeMacro("SHADOW_MAP_START_U " + shadowMapStartUVal, material, false, true);
-        macroHandler.removeMacro("SHADOW_MAP_END_U " + shadowMapEndUVal, material, false, true);
-        macroHandler.removeMacro("SHADOW_MAP_START_V " + shadowMapStartVVal, material, false, true);
-        macroHandler.removeMacro("SHADOW_MAP_END_V " + shadowMapEndVVal, material, false, true);
-        macroHandler.removeMacro("SHADOW_MAP_SIZE " + shadowMapSizeVal, material, false, true);
-      }
+      shadowBaker.unbakeFromShader(material);
       var range = textureMerger.ranges[objName];
       uniforms.shadowMap = shadowMapUniform;
       macroHandler.injectMacro("HAS_SHADOW_MAP", material, true, true);
