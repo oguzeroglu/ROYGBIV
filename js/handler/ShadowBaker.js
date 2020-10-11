@@ -2,7 +2,9 @@ var ShadowBaker = function(){
   this.qualities = {
     "HIGH": "HIGH",
     "MEDIUM": "MEDIUM",
-    "LOW": "LOW"
+    "LOW": "LOW",
+    "LOWER": "LOWER",
+    "LOWEST": "LOWEST"
   };
 
   this.reset();
@@ -19,8 +21,12 @@ ShadowBaker.prototype.getSizeFromQuality = function(quality){
     return 512;
   }else if (quality == this.qualities.MEDIUM){
     return 256;
-  }else{
+  }else if (quality == this.qualities.LOW){
     return 128;
+  }else if (quality == this.qualities.LOWER){
+    return 64;
+  }else if (quality == this.qualities.LOWEST){
+    return 32;
   }
 }
 
