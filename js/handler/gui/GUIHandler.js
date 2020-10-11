@@ -1321,6 +1321,11 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
         guiHandler.objectManipulationParameters["Mass"] = 0;
         return;
       }
+      if (!!obj.mesh.material.uniforms.shadowMap){
+        terminal.printError(Text.OBJECT_HAS_BAKED_SHADOW_CANNOT_MARK_AS_DYNAMIC);
+        guiHandler.objectManipulationParameters["Mass"] = 0;
+        return;
+      }
     }
     parseCommand("setMass "+obj.name+" "+val);
     if (!isNaN(val) && parseFloat(val) > 0){
@@ -1434,6 +1439,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     if (obj.bakedColors){
       terminal.clear();
       terminal.printError(Text.OBJECT_HAS_BAKED_LIGHTS_CANNOT_MARK_AS_CHANGEABLE);
+      guiHandler.objectManipulationParameters["Changeable"] = false;
+      return;
+    }
+    if (!!obj.mesh.material.uniforms.shadowMap){
+      terminal.clear();
+      terminal.printError(Text.OBJECT_HAS_BAKED_SHADOW_CANNOT_MARK_AS_CHANGEABLE);
       guiHandler.objectManipulationParameters["Changeable"] = false;
       return;
     }
