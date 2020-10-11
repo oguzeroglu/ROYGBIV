@@ -40,15 +40,56 @@ ShadowBaker.prototype.getCanvasFromQuality = function(quality){
   return shadowCanvas;
 }
 
-ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, shadowIntensity, quality){
+ShadowBaker.prototype.batchUnbake = function(objAry){
   terminal.clear();
   terminal.disable();
+  terminal.printInfo(Text.UNBAKING_SHADOW);
+
+  setTimeout(function(){
+    for (var i = 0 ; i < objAry.length; i ++){
+      shadowBaker.unbakeShadow(objAry[i], true);
+    }
+    
+    shadowBaker.refreshTextures(function(){
+      terminal.enable();
+      terminal.clear();
+      terminal.printInfo(Text.SHADOW_UNBAKED);
+    }, function(){
+      terminal.enable();
+      terminal.clear();
+      terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+    });
+  }, 500);
+}
+
+ShadowBaker.prototype.batchBake = function(objAry, lightInfo, shadowIntensity, quality){
+  terminal.clear();
+  terminal.disable();
+  terminal.printInfo(Text.BAKING_SHADOW);
+
+  // delayed execution in order to put the text on terminal
+  setTimeout(function(){
+    for (var i = 0; i < objAry.length; i ++){
+      shadowBaker.bakeShadow(objAry[i], lightInfo, shadowIntensity, quality, true);
+    }
+
+    shadowBaker.refreshTextures(function(){
+      terminal.enable();
+      terminal.clear();
+      terminal.printInfo(Text.SHADOW_BAKED);
+    }, function(){
+      terminal.enable();
+      terminal.clear();
+      terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+    });
+  }, 500);
+}
+
+ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, shadowIntensity, quality, skipRefresh){
   if (!this.isSupported(obj)){
     terminal.printError(Text.OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING);
     return false;
   }
-
-  terminal.printInfo(Text.BAKING_SHADOW);
 
   var oldBinSize = BIN_SIZE;
   var oldRaycasterStep = RAYCASTER_STEP_AMOUNT;
@@ -68,36 +109,37 @@ ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, shadowIntensity, qua
 
   delete this.rayCaster;
 
-  this.refreshTextures(function(){
-    terminal.enable();
-    terminal.clear();
-    terminal.printInfo(Text.SHADOW_BAKED);
-  }, function(){
-    terminal.enable();
-    terminal.clear();
-    terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
-  });
+  if (!skipRefresh){
+    this.refreshTextures(function(){
+      terminal.enable();
+      terminal.clear();
+      terminal.printInfo(Text.SHADOW_BAKED);
+    }, function(){
+      terminal.enable();
+      terminal.clear();
+      terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+    });
+  }
 }
 
-ShadowBaker.prototype.unbakeShadow = function(obj){
+
+ShadowBaker.prototype.unbakeShadow = function(obj, skipRefresh){
   delete this.texturesByObjName[obj.name];
   delete this.shadowIntensitiesByObjName[obj.name];
   delete this.textureSizesByObjName[obj.name];
   this.unbakeFromShader(obj.mesh.material);
 
-  terminal.clear();
-  terminal.disable();
-  terminal.printInfo(Text.UNBAKING_SHADOW);
-
-  this.refreshTextures(function(){
-    terminal.enable();
-    terminal.clear();
-    terminal.printInfo(Text.SHADOW_UNBAKED);
-  }, function(){
-    terminal.enable();
-    terminal.clear();
-    terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
-  });
+  if (!skipRefresh){
+    this.refreshTextures(function(){
+      terminal.enable();
+      terminal.clear();
+      terminal.printInfo(Text.SHADOW_UNBAKED);
+    }, function(){
+      terminal.enable();
+      terminal.clear();
+      terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+    });
+  }
 }
 
 ShadowBaker.prototype.unbakeFromShader = function(material){
