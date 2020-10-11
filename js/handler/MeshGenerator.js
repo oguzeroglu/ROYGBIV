@@ -140,6 +140,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
 
 MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup){
   var hasTexture = objectGroup.hasTexture;
+  var hasShadowMap = objectGroup.hasShadowMap;
 
   var uniforms = {
     projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
@@ -159,6 +160,9 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   }
   if (objectGroup.hasDisplacementMap()){
     uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
+  }
+  if (hasShadowMap){
+    uniforms.shadowMap = shadowBaker.shadowMapUniform;
   }
 
   var material = new THREE.RawShaderMaterial({

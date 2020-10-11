@@ -39,8 +39,10 @@ varying float vAlpha;
   attribute vec4 alphaUV;
   varying vec4 vAlphaUV;
 #endif
-#ifdef HAS_TEXTURE
+#if defined(HAS_TEXTURE) || defined(HAS_SHADOW_MAP)
   attribute vec2 uv;
+#endif
+#ifdef HAS_TEXTURE
   attribute vec4 textureInfo;
   attribute vec4 textureMatrixInfo;
   attribute vec2 textureMirrorInfo;
@@ -76,6 +78,12 @@ varying float vAlpha;
 
 #ifdef IS_LIGHT_BAKED
   attribute vec3 bakedColor;
+#endif
+
+#ifdef HAS_SHADOW_MAP
+  attribute vec4 shadowMapUV;
+  varying vec4 vShadowMapUV;
+  varying vec2 vUV2;
 #endif
 
 vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
@@ -932,6 +940,10 @@ void main(){
       float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
       transformedPosition += objNormal * (texture2D(texture, calculatedDisplacementUV).r * totalDisplacementScale + totalDisplacementBias);
     }
+  #endif
+  #ifdef HAS_SHADOW_MAP
+    vShadowMapUV = shadowMapUV;
+    vUV2 = uv;
   #endif
   gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);
 }

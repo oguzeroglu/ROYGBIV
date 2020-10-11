@@ -53,6 +53,12 @@ varying vec3 vColor;
   uniform vec4 forcedColor;
 #endif
 
+#ifdef HAS_SHADOW_MAP
+  varying vec4 vShadowMapUV;
+  varying vec2 vUV2;
+  uniform sampler2D shadowMap;
+#endif
+
 #ifdef HAS_TEXTURE
 
   float flipNumber(float num, float min, float max){
@@ -108,6 +114,19 @@ varying vec3 vColor;
   }
 #endif
 
+#ifdef HAS_SHADOW_MAP
+  vec2 uvAffineTransformationShadow(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    return vec2(coordX, coordY);
+  }
+  vec4 fixShadowTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(SHADOW_MAP_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
+#endif
+
 void main(){
 
   #ifdef HAS_FORCED_COLOR
@@ -153,6 +172,13 @@ void main(){
       gl_FragColor.rgb += totalEmissiveRadiance;
     }
   #endif
+
+  #ifdef HAS_SHADOW_MAP
+    vec4 shadowUVFixed = fixShadowTextureBleeding(vShadowMapUV);
+    float shadowCoef = (texture2D(shadowMap, uvAffineTransformationShadow(vUV2, shadowUVFixed.x, shadowUVFixed.y, shadowUVFixed.z, shadowUVFixed.w)).r - 1.0) * float(SHADOW_INTENSITY) + 1.0;
+    gl_FragColor.rgb *= shadowCoef;
+  #endif
+
   #ifdef HAS_FOG
     #ifdef HAS_SKYBOX_FOG
       vec3 coord = normalize(vWorldPosition - cameraPosition);
