@@ -262,7 +262,6 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo, shadowIntensi
   tmpCanvas.width = shadowCanvas.width;
   tmpCanvas.height = shadowCanvas.height;
   var tmpCtx = tmpCanvas.getContext('2d');
-  tmpCtx.filter = 'blur(5px)';
   tmpCtx.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height);
   tmpCtx.translate(shadowCanvas.width / 2, shadowCanvas.height / 2);
   tmpCtx.rotate(-Math.PI/2);
