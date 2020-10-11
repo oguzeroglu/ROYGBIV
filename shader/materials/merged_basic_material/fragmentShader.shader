@@ -174,9 +174,11 @@ void main(){
   #endif
 
   #ifdef HAS_SHADOW_MAP
-    vec4 shadowUVFixed = fixShadowTextureBleeding(vShadowMapUV);
-    float shadowCoef = (texture2D(shadowMap, uvAffineTransformationShadow(vUV2, shadowUVFixed.x, shadowUVFixed.y, shadowUVFixed.z, shadowUVFixed.w)).r - 1.0) * float(SHADOW_INTENSITY) + 1.0;
-    gl_FragColor.rgb *= shadowCoef;
+    if (vShadowMapUV[0] >= 0.0 && vShadowMapUV[1] >= 0.0 && vShadowMapUV[2] >= 0.0 && vShadowMapUV[3] >= 0.0){
+      vec4 shadowUVFixed = fixShadowTextureBleeding(vShadowMapUV);
+      float shadowCoef = (texture2D(shadowMap, uvAffineTransformationShadow(vUV2, shadowUVFixed.x, shadowUVFixed.y, shadowUVFixed.z, shadowUVFixed.w)).r - 1.0) * float(SHADOW_INTENSITY) + 1.0;
+      gl_FragColor.rgb *= shadowCoef;
+    }
   #endif
 
   #ifdef HAS_FOG

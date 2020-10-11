@@ -1620,6 +1620,16 @@ ObjectGroup.prototype.merge = function(){
         this.push(shadowMapUVs, -100);
         this.push(shadowMapUVs, -100);
         this.push(shadowMapUVs, -100);
+
+        this.push(shadowMapUVs, -100);
+        this.push(shadowMapUVs, -100);
+        this.push(shadowMapUVs, -100);
+        this.push(shadowMapUVs, -100);
+
+        this.push(shadowMapUVs, -100);
+        this.push(shadowMapUVs, -100);
+        this.push(shadowMapUVs, -100);
+        this.push(shadowMapUVs, -100);
       }
     }
     // ALPHA
