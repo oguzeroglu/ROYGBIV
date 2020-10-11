@@ -934,6 +934,21 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Masses in the scene]: ";
 			break;
+			case commandDescriptor.LIGHT_NAME:
+				var lightNames = [];
+				for (var i = 0; i < 5; i ++){
+					lightNames.push("diffuse" + (i + 1));
+					lightNames.push("point" + (i + 1));
+				}
+
+				for (var i = 0; i < lightNames.length; i ++){
+					var lightName = lightNames[i];
+					if (lightName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(lightName);
+					}
+				}
+				helpString = "[Static lights in the scene]: ";
+			break;
 		}
 
 		//  **********************************************************

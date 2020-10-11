@@ -6542,6 +6542,68 @@ function parse(input){
           settingsGUIHandler.show();
           return true;
         break;
+        case 274: //bakeShadow
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+          var lightName = splitted[2].toLowerCase();
+
+          var lightNames = [];
+          for (var i = 0; i < 5; i ++){
+            lightNames.push("diffuse" + (i + 1));
+            lightNames.push("point" + (i + 1));
+          }
+
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+
+          if (obj.isChangeable){
+            terminal.printError(Text.CHANGEABLE_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+            return true;
+          }
+
+          if (obj.isDynamicObject){
+            terminal.printError(Text.DYNAMIC_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+            return true;
+          }
+
+          if (lightNames.indexOf(lightName) < 0){
+            terminal.printError(Text.NO_SUCH_LIGHT);
+            return true;
+          }
+
+          var lightSlotID = parseInt(lightName[lightName.length - 1]);
+          var lightInfo;
+          if (lightName.startsWith("diffuse")){
+            if (!lightHandler.hasStaticDiffuseLight(lightSlotID)){
+              terminal.printError(Text.LIGHT_NOT_ACTIVE);
+              return true;
+            }
+            lightInfo = {type: "diffuse", slotID: lightSlotID};
+          }else{
+            if (!lightHandler.hasStaticPointLight(lightSlotID)){
+              terminal.printError(Text.LIGHT_NOT_ACTIVE);
+              return true;
+            }
+            lightInfo = {type: "point", slotID: lightSlotID};
+          }
+
+          terminal.clear();
+          terminal.disable();
+          terminal.printInfo(Text.BAKING_SHADOW);
+
+          shadowBaker.bakeShadow(obj, lightInfo);
+          return true;
+        break;
       }
       return true;
     }catch(err){
