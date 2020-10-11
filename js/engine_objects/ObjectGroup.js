@@ -1009,6 +1009,8 @@ ObjectGroup.prototype.mergeInstanced = function(){
 
   var diffuseUVs = [], emissiveUVs = [], alphaUVs = [], aoUVs = [], displacementUVs = [];
 
+  var shadowMapUVs = [];
+
   var textureMirrorInfos = [];
 
   var count = 0;
@@ -1164,6 +1166,20 @@ ObjectGroup.prototype.mergeInstanced = function(){
         displacementInfos.push(-100);
       }
     }
+    if (this.hasShadowMap){
+      if (shadowBaker.texturesByObjName[obj.name]){
+        var range = shadowBaker.textureRangesByObjectName[obj.name];
+        shadowMapUVs.push(range.startU);
+        shadowMapUVs.push(range.startV);
+        shadowMapUVs.push(range.endU);
+        shadowMapUVs.push(range.endV);
+      }else{
+        shadowMapUVs.push(-100);
+        shadowMapUVs.push(-100);
+        shadowMapUVs.push(-100);
+        shadowMapUVs.push(-100);
+      }
+    }
     count ++;
   }
 
@@ -1189,6 +1205,9 @@ ObjectGroup.prototype.mergeInstanced = function(){
   var aoIntensityBufferAttribute;
   var displacementInfoBufferAttribute;
   var textureMirrorInfoBufferAttribute
+  if (this.hasTexture || this.hasShadowMap){
+    this.geometry.addAttribute("uv", refGeometry.attributes.uv);
+  }
   if (this.hasTexture){
     textureInfoBufferAttribute = new THREE.InstancedBufferAttribute(new Int16Array(textureInfos), 4);
     textureMatrixInfosBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(textureMatrixInfos), 4);
@@ -1198,7 +1217,6 @@ ObjectGroup.prototype.mergeInstanced = function(){
     textureMirrorInfoBufferAttribute.setDynamic(false);
     this.geometry.addAttribute("textureInfo", textureInfoBufferAttribute);
     this.geometry.addAttribute("textureMatrixInfo", textureMatrixInfosBufferAttribute);
-    this.geometry.addAttribute("uv", refGeometry.attributes.uv);
     this.geometry.addAttribute("textureMirrorInfo", textureMirrorInfoBufferAttribute);
 
     var diffuseUVsBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(diffuseUVs), 4);
@@ -1254,6 +1272,12 @@ ObjectGroup.prototype.mergeInstanced = function(){
     var alphaUVsBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(alphaUVs), 4);
     alphaUVsBufferAttribute.setDynamic(false);
     this.geometry.addAttribute("alphaUV", alphaUVsBufferAttribute);
+  }
+
+  if (this.hasShadowMap){
+    var shadowUVsBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(shadowMapUVs), 4);
+    shadowUVsBufferAttribute.setDynamic(false);
+    this.geometry.addAttribute("shadowMapUV", shadowUVsBufferAttribute);
   }
 
   positionOffsetBufferAttribute.setDynamic(false);

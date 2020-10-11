@@ -61,8 +61,10 @@ varying float vAlpha;
 
   varying float vAOIntensity;
 #endif
-#ifdef HAS_TEXTURE
+#if defined(HAS_TEXTURE) || defined(HAS_SHADOW_MAP)
   attribute vec2 uv;
+#endif
+#ifdef HAS_TEXTURE
   attribute vec4 textureInfo;
 
   attribute vec4 textureMatrixInfo;
@@ -124,6 +126,12 @@ varying float vAlpha;
 #ifdef AFFECTED_BY_LIGHT
   uniform mat4 worldInverseTranspose;
   uniform mat4 dynamicLightsMatrix;
+#endif
+
+#ifdef HAS_SHADOW_MAP
+  attribute vec4 shadowMapUV;
+  varying vec4 vShadowMapUV;
+  varying vec2 vUV2;
 #endif
 
 vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
@@ -1074,6 +1082,11 @@ void main(){
     #endif
   #else
     vColor = color;
+  #endif
+
+  #ifdef HAS_SHADOW_MAP
+    vShadowMapUV = shadowMapUV;
+    vUV2 = uv;
   #endif
 
   #ifdef HAS_SKYBOX_FOG

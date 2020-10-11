@@ -124,6 +124,9 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
   if (objectGroup.hasDisplacementMap() && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
+  if (objectGroup.hasShadowMap){
+    uniforms.shadowMap = shadowBaker.shadowMapUniform;
+  }
   var material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.instancedBasicMaterialVertexShader,
     fragmentShader: ShaderContent.instancedBasicMaterialFragmentShader,

@@ -74,6 +74,12 @@ varying vec3 vColor;
   uniform vec4 forcedColor;
 #endif
 
+#ifdef HAS_SHADOW_MAP
+  varying vec4 vShadowMapUV;
+  varying vec2 vUV2;
+  uniform sampler2D shadowMap;
+#endif
+
 #ifdef HAS_TEXTURE
 
   float flipNumber(float num, float min, float max){
@@ -125,6 +131,19 @@ varying vec3 vColor;
 
   vec4 fixTextureBleeding(vec4 uvCoordinates){
     float offset = 0.5 / float(TEXTURE_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
+#endif
+
+#ifdef HAS_SHADOW_MAP
+  vec2 uvAffineTransformationShadow(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    return vec2(coordX, coordY);
+  }
+  vec4 fixShadowTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(SHADOW_MAP_SIZE);
     return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
   }
 #endif
@@ -190,6 +209,14 @@ void main(){
       vec3 totalEmissiveRadiance = vec3(ei, ei, ei) * vEmissiveColor * totalEmissiveColor;
       totalEmissiveRadiance *= eColor.rgb;
       gl_FragColor.rgb += totalEmissiveRadiance;
+    }
+  #endif
+
+  #ifdef HAS_SHADOW_MAP
+    if (vShadowMapUV[0] >= 0.0 && vShadowMapUV[1] >= 0.0 && vShadowMapUV[2] >= 0.0 && vShadowMapUV[3] >= 0.0){
+      vec4 shadowUVFixed = fixShadowTextureBleeding(vShadowMapUV);
+      float shadowCoef = (texture2D(shadowMap, uvAffineTransformationShadow(vUV2, shadowUVFixed.x, shadowUVFixed.y, shadowUVFixed.z, shadowUVFixed.w)).r - 1.0) * float(SHADOW_INTENSITY) + 1.0;
+      gl_FragColor.rgb *= shadowCoef;
     }
   #endif
 
