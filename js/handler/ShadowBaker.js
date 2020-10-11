@@ -68,22 +68,19 @@ ShadowBaker.prototype.batchBake = function(objAry, lightInfo){
   terminal.disable();
   terminal.printInfo(Text.BAKING_SHADOW);
 
-  // delayed execution in order to put the text on terminal
-  setTimeout(function(){
-    for (var i = 0; i < objAry.length; i ++){
-      shadowBaker.bakeShadow(objAry[i], lightInfo, true);
-    }
+  for (var i = 0; i < objAry.length; i ++){
+    shadowBaker.bakeShadow(objAry[i], lightInfo, true);
+  }
 
-    shadowBaker.refreshTextures(function(){
-      terminal.enable();
-      terminal.clear();
-      terminal.printInfo(Text.SHADOW_BAKED);
-    }, function(){
-      terminal.enable();
-      terminal.clear();
-      terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
-    });
-  }, 500);
+  shadowBaker.refreshTextures(function(){
+    terminal.enable();
+    terminal.clear();
+    terminal.printInfo(Text.SHADOW_BAKED);
+  }, function(){
+    terminal.enable();
+    terminal.clear();
+    terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+  });
 }
 
 ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, skipRefresh){

@@ -6547,33 +6547,61 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+
+          var objectNamesArray = splitted[1].split(",");
+          for (var i = 0; i<objectNamesArray.length; i++){
+            if (!(objectNamesArray[i].indexOf("*") == -1)){
+              var tmpPrefix = objectNamesArray[i].split("*")[0];
+              for (var addedObjName in sceneHandler.getAddedObjects()){
+                if (addedObjName.startsWith(tmpPrefix)){
+                  objectNamesArray.push(addedObjName);
+                }
+              }
+              for (var objGroupName in sceneHandler.getObjectGroups()){
+                if (objGroupName.startsWith(tmpPrefix)){
+                  objectNamesArray.push(objGroupName);
+                }
+              }
+            }
+          }
+          objectNamesArray = objectNamesArray.filter(function(item, pos) {
+            return (objectNamesArray.indexOf(item) == pos && (item.indexOf("*") == -1));
+          });
+
+          var objAry = [];
+          for (var i = 0; i < objectNamesArray.length; i ++){
+            var obj = addedObjects[objectNamesArray[i]] || objectGroups[objectNamesArray[i]];
+            if (!obj){
+              terminal.printError(Text.OBJECT_NR_DOES_NOT_EXIST.replace(Text.PARAM1, i + 1));
+              return true;
+            }
+            if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NR_X_NOT_IN_SCENE.replace(Text.PARAM1, i + 1));
+              return true;
+            }
+            if (obj.isChangeable){
+              terminal.printError(Text.CHANGEABLE_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+              return true;
+            }
+
+            if (obj.isDynamicObject){
+              terminal.printError(Text.DYNAMIC_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+              return true;
+            }
+            objAry.push(obj);
+          }
+
+          if (objAry.length == 0){
+            terminal.printError(Text.NO_OBJECT_FOUND);
+            return true;
+          }
+
           var lightName = splitted[2].toLowerCase();
 
           var lightNames = [];
           for (var i = 0; i < 5; i ++){
             lightNames.push("diffuse" + (i + 1));
             lightNames.push("point" + (i + 1));
-          }
-
-          if (!obj){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
-            return true;
-          }
-
-          if (obj.isChangeable){
-            terminal.printError(Text.CHANGEABLE_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
-            return true;
-          }
-
-          if (obj.isDynamicObject){
-            terminal.printError(Text.DYNAMIC_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
-            return true;
           }
 
           if (lightNames.indexOf(lightName) < 0){
@@ -6597,11 +6625,7 @@ function parse(input){
             lightInfo = {type: "point", slotID: lightSlotID};
           }
 
-          terminal.clear();
-          terminal.disable();
-          terminal.printInfo(Text.BAKING_SHADOW);
-
-          shadowBaker.bakeShadow(obj, lightInfo);
+          shadowBaker.batchBake(objAry, lightInfo);
           return true;
         break;
       }
