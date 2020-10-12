@@ -241,6 +241,7 @@ var INSTANCING_DISABLED = false;
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
 var jobHandlerRaycasterRefresh = false;
+var jobHandlerShadowBakerRefresh = false;
 var geometryCache = new Object();
 var physicsShapeCache = new Object();
 var MAX_TEXTURE_COUNT = 8;

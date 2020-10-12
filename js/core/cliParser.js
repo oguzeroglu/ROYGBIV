@@ -587,6 +587,14 @@ function parse(input){
             sceneHandler.onObjectGroupDeletion(objectGroup);
             delete objectGroups[objectName];
           }
+
+          delete shadowBaker.texturesByObjName[objectName];
+          if (objectGroup && !!objectGroup.mesh.material.uniforms.shadowMap){
+            for (var childName in objectGroup.group){
+              delete shadowBaker.texturesByObjName[childName];
+            }
+          }
+
           for (var lightningName in lightnings){
             if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == objectName){
               lightnings[lightningName].detachFromFPSWeapon();
@@ -595,10 +603,32 @@ function parse(input){
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
+
+          var obj = object || objectGroup;
+          var hasShadowMap = !!obj.mesh.material.uniforms.shadowMap;
+
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_DESTROYED);
+            var obj = object || objectGroup;
+            if (hasShadowMap){
+              terminal.clear();
+              terminal.disable();
+              terminal.printInfo(Text.BAKING_SHADOW);
+              shadowBaker.refreshTextures(function(){
+                terminal.enable();
+                terminal.clear();
+                terminal.printInfo(Text.SHADOW_BAKED);
+              }, function(){
+                terminal.enable();
+                terminal.clear();
+                terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+              });
+            }
           }else{
             jobHandlerRaycasterRefresh = true;
+            if (hasShadowMap){
+              jobHandlerShadowBakerRefresh = true;
+            }
           }
           return true;
         break;
