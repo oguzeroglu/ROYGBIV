@@ -1205,9 +1205,10 @@ ObjectGroup.prototype.mergeInstanced = function(){
   var aoIntensityBufferAttribute;
   var displacementInfoBufferAttribute;
   var textureMirrorInfoBufferAttribute
-  if (this.hasTexture || this.hasShadowMap){
-    this.geometry.addAttribute("uv", refGeometry.attributes.uv);
-  }
+
+  // We always insert UVs because one may bake shadows later on.
+  this.geometry.addAttribute("uv", refGeometry.attributes.uv);
+
   if (this.hasTexture){
     textureInfoBufferAttribute = new THREE.InstancedBufferAttribute(new Int16Array(textureInfos), 4);
     textureMatrixInfosBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(textureMatrixInfos), 4);
@@ -1323,7 +1324,7 @@ ObjectGroup.prototype.merge = function(){
   }
 
   if (!isDeployment){
-    this.childObjectNameByShadowMapUVCoords = new Object();
+    this.faceNames = [];
   }
 
   var max = 0;
@@ -1347,13 +1348,14 @@ ObjectGroup.prototype.merge = function(){
   colors = [];
   alphas = [];
   normals = [];
+  uvs = [];
+
   if (this.hasDisplacement){
     displacementInfos = [];
     displacementUVs = [];
     displacementTextureMatrixInfos = [];
   }
   if (this.hasTexture){
-    uvs = [];
     textureInfos = [];
     textureMatrixInfos = [];
     diffuseUVs = [];
@@ -1373,11 +1375,10 @@ ObjectGroup.prototype.merge = function(){
     alphaUVs = [];
   }
   if (this.hasShadowMap){
-    if (!uvs){
-      uvs = [];
-    }
     shadowMapUVs = [];
   }
+
+  this.faceLength = faces.length;
 
   for (var i = 0; i<faces.length; i++){
     var face = faces[i];
@@ -1385,6 +1386,10 @@ ObjectGroup.prototype.merge = function(){
     var a = face.a;
     var b = face.b;
     var c = face.c;
+
+    if (!isDeployment){
+      this.faceNames.push(addedObject.name);
+    }
 
     var vertex1 = vertices[a];
     var vertex2 = vertices[b];
@@ -1439,16 +1444,14 @@ ObjectGroup.prototype.merge = function(){
     this.push(colors, color.b);
 
     // UV
-    if (this.hasTexture || this.hasShadowMap){
-      this.push(uvs, uv1.x);
-      this.push(uvs, uv1.y);
+    // We always insert UVs because one may bake shadows later on.
+    this.push(uvs, uv1.x);
+    this.push(uvs, uv1.y);
+    this.push(uvs, uv2.x);
+    this.push(uvs, uv2.y);
+    this.push(uvs, uv3.x);
+    this.push(uvs, uv3.y);
 
-      this.push(uvs, uv2.x);
-      this.push(uvs, uv2.y);
-
-      this.push(uvs, uv3.x);
-      this.push(uvs, uv3.y);
-    }
     if (this.hasTexture){
       this.push(textureMirrorInfos, mirrorSInfo);
       this.push(textureMirrorInfos, mirrorTInfo);
@@ -1626,10 +1629,6 @@ ObjectGroup.prototype.merge = function(){
     }
     // SHADOW MAP UVS
     if (this.hasShadowMap){
-      if (!isDeployment){
-        this.childObjectNameByShadowMapUVCoords[shadowMapUVs.length] = addedObject.name;
-      }
-      
       if (shadowBaker.texturesByObjName[addedObject.name]){
         var range = shadowBaker.textureRangesByObjectName[addedObject.name];
 
@@ -1667,9 +1666,9 @@ ObjectGroup.prototype.merge = function(){
     // ALPHA
     var alpha = addedObject.mesh.material.uniforms.alpha.value;
 
-    this.push(alphas, alpha, a);
-    this.push(alphas, alpha, b);
-    this.push(alphas, alpha, c);
+    this.push(alphas, alpha);
+    this.push(alphas, alpha);
+    this.push(alphas, alpha);
 
     // EMISSIVE UVS
     if (this.hasEmissive){
@@ -1794,9 +1793,9 @@ ObjectGroup.prototype.merge = function(){
         aoIntensity = 0;
       }
 
-      this.push(aoIntensities, aoIntensity, a);
-      this.push(aoIntensities, aoIntensity, b);
-      this.push(aoIntensities, aoIntensity, c);
+      this.push(aoIntensities, aoIntensity);
+      this.push(aoIntensities, aoIntensity);
+      this.push(aoIntensities, aoIntensity);
     }
     // TEXTURE INFOS AND TEXTURE MATRIX INFOS
     if (this.hasTexture){
@@ -1969,6 +1968,7 @@ ObjectGroup.prototype.merge = function(){
   var colorsTypedArray = new Float32Array(colors);
   var alphasTypedArray = new Float32Array(alphas);
   var normalsTypedArray = new Float32Array(normals);
+  var uvsTypedArray = new Float32Array(uvs);
 
   if (this.hasDisplacement){
     var displacementInfosTypedArray = new Float32Array(displacementInfos);
@@ -1984,12 +1984,7 @@ ObjectGroup.prototype.merge = function(){
     this.geometry.addAttribute("displacementUV", displacementUVsBufferAttribute);
     this.geometry.addAttribute("displacementTextureMatrixInfo", displacementTextureMatrixInfosBufferAttribute);
   }
-  if (this.hasTexture || this.hasShadowMap){
-    var uvsTypedArray = new Float32Array(uvs);
-    var uvsBufferAttribute = new THREE.BufferAttribute(uvsTypedArray, 2);
-    uvsBufferAttribute.setDynamic(false);
-    this.geometry.addAttribute('uv', uvsBufferAttribute);
-  }
+
   if (this.hasTexture){
     var textureInfosTypedArray = new Int8Array(textureInfos);
     var textureMatrixInfosTypedArray = new Float32Array(textureMatrixInfos);
@@ -2049,16 +2044,19 @@ ObjectGroup.prototype.merge = function(){
   var colorsBufferAttribute = new THREE.BufferAttribute(colorsTypedArray, 3);
   var alphasBufferAttribute = new THREE.BufferAttribute(alphasTypedArray, 1);
   var normalsBufferAttribute = new THREE.BufferAttribute(normalsTypedArray, 3);
+  var uvsBufferAttribute = new THREE.BufferAttribute(uvsTypedArray, 2);
 
   positionsBufferAttribute.setDynamic(false);
   colorsBufferAttribute.setDynamic(false);
   alphasBufferAttribute.setDynamic(false);
   normalsBufferAttribute.setDynamic(false);
+  uvsBufferAttribute.setDynamic(false);
 
   this.geometry.addAttribute('position', positionsBufferAttribute);
   this.geometry.addAttribute('color', colorsBufferAttribute);
   this.geometry.addAttribute('alpha', alphasBufferAttribute);
   this.geometry.addAttribute('normal', normalsBufferAttribute);
+  this.geometry.addAttribute('uv', uvsBufferAttribute);
 
   pseudoGeometry = null;
 

@@ -5,6 +5,7 @@ attribute float alpha;
 attribute vec3 color;
 attribute vec3 position;
 attribute vec3 normal;
+attribute vec2 uv;
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
@@ -38,9 +39,6 @@ varying float vAlpha;
 #ifdef HAS_ALPHA
   attribute vec4 alphaUV;
   varying vec4 vAlphaUV;
-#endif
-#if defined(HAS_TEXTURE) || defined(HAS_SHADOW_MAP)
-  attribute vec2 uv;
 #endif
 #ifdef HAS_TEXTURE
   attribute vec4 textureInfo;

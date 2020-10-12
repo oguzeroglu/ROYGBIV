@@ -385,7 +385,6 @@ Roygbiv.prototype.getChildObject = function(objectGroup, childObjectName){
   return 0;
 }
 
-// getRandomColor
 //  Returns the HTML name of a random color.
 Roygbiv.prototype.getRandomColor = function(){
   if (mode == 0){
@@ -394,7 +393,6 @@ Roygbiv.prototype.getRandomColor = function(){
   return ColorNames.generateRandomColor();
 }
 
-// getPosition
 //  Returns the (x, y, z) coordinates of an object, glued object or a particle system.
 //  If a specific axis is specified, only the position on the specified axis is returned.
 //  Note that axis should be one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.

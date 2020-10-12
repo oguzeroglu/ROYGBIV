@@ -100,6 +100,21 @@ ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, skipRefresh){
     this.bakeSurfaceShadow(obj, lightInfo);
   }
 
+  if (obj.isObjectGroup){
+    var hasBakedShadow = false;
+    for (var childName in obj.group){
+      var childObj = obj.group[childName];
+      if (this.isSupported(childObj)){
+        this.bakeShadow(childObj, lightInfo, skipRefresh);
+        hasBakedShadow = true;
+      }else{
+        terminal.printError(Text.CHILD_OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING);
+      }
+    }
+
+    obj.hasShadowMap = hasBakedShadow;
+  }
+
   BIN_SIZE = oldBinSize;
   RAYCASTER_STEP_AMOUNT = oldRaycasterStep;
 
@@ -182,6 +197,7 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
           }
         }
       }
+
       var material = obj.mesh.material;
       var uniforms = material.uniforms;
       shadowBaker.unbakeFromShader(material);
@@ -202,41 +218,53 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
 
     for (var objName in objectGroups){
       var objectGroup = objectGroups[objName];
-      if (!objectGroup.mesh.material.uniforms.shadowMap){
+      if (!objectGroup.hasShadowMap){
         continue;
+      }
+
+      shadowBaker.unbakeFromShader(objectGroup.mesh.material);
+      macroHandler.injectMacro("HAS_SHADOW_MAP", objectGroup.mesh.material, true, true);
+      macroHandler.injectMacro("SHADOW_INTENSITY " + shadowBaker.intensity, objectGroup.mesh.material, false, true);
+      macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.getSizeFromQuality(shadowBaker.quality), objectGroup.mesh.material, false, true);
+
+      if (!objectGroup.isInstanced){
+        objectGroup.mesh.geometry.removeAttribute("shadowMapUV");
+        var ary = [];
+
+        for (var i = 0; i < objectGroup.faceNames.length; i ++){
+          var childName = objectGroup.faceNames[i];
+          var range = shadowBaker.textureRangesByObjectName[childName] || {startU: -100, startV: -100, endU: -100, endV: -100};
+          for (var i2 = 0; i2 < 3; i2 ++){
+            ary.push(range.startU);
+            ary.push(range.startV);
+            ary.push(range.endU);
+            ary.push(range.endV);
+          }
+        }
+
+        var shadowMapUVsAry = new Float32Array(ary);
+        var shadowMapUVsBufferAttribute = new THREE.BufferAttribute(shadowMapUVsAry, 4);
+        shadowMapUVsBufferAttribute.setDynamic(false);
+        objectGroup.mesh.geometry.addAttribute("shadowMapUV", shadowMapUVsBufferAttribute);
+      }else{
+        objectGroup.mesh.geometry.removeAttribute("shadowMapUV");
+        var ary = [];
+        var index = 0;
+        for (var childName in objectGroup.group){
+          var range = shadowBaker.textureRangesByObjectName[childName] || {startU: -100, startV: -100, endU: -100, endV: -100};
+          ary.push(range.startU);
+          ary.push(range.startV);
+          ary.push(range.endU);
+          ary.push(range.endV);
+        }
+
+        var shadowUVsBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(ary), 4);
+        shadowUVsBufferAttribute.setDynamic(false);
+        objectGroup.geometry.addAttribute("shadowMapUV", shadowUVsBufferAttribute);
       }
 
       objectGroup.mesh.material.uniforms.shadowMap = shadowMapUniform;
       objectGroup.mesh.material.uniformsNeedUpdate = true;
-
-      if (!objectGroup.isInstanced){
-        var ary = objectGroup.mesh.geometry.attributes.shadowMapUV.array;
-        objectGroup.mesh.geometry.attributes.shadowMapUV.updateRange.set(0, ary.length);
-        objectGroup.mesh.geometry.attributes.shadowMapUV.needsUpdate = true;
-        for (var shadowUVIndex in objectGroup.childObjectNameByShadowMapUVCoords){
-          var childName = objectGroup.childObjectNameByShadowMapUVCoords[shadowUVIndex];
-          var range = shadowBaker.textureRangesByObjectName[childName] || {startU: -100, startV: -100, endU: -100, endV: -100};
-          var parsed = parseInt(shadowUVIndex);
-          for (var i = 0; i < 3; i ++){
-            ary[parsed ++] = range.startU;
-            ary[parsed ++] = range.startV;
-            ary[parsed ++] = range.endU;
-            ary[parsed ++] = range.endV;
-          }
-        }
-      }else{
-        var ary = objectGroup.mesh.geometry.attributes.shadowMapUV.array;
-        objectGroup.mesh.geometry.attributes.shadowMapUV.updateRange.set(0, ary.length);
-        objectGroup.mesh.geometry.attributes.shadowMapUV.needsUpdate = true;
-        var index = 0;
-        for (var childName in objectGroup.group){
-          var range = shadowBaker.textureRangesByObjectName[childName] || {startU: -100, startV: -100, endU: -100, endV: -100};
-          ary[index ++] = range.startU;
-          ary[index ++] = range.startV;
-          ary[index ++] = range.endU;
-          ary[index ++] = range.endV;
-        }
-      }
     }
 
     onSuccess();
@@ -247,6 +275,10 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
 
 ShadowBaker.prototype.isSupported = function(obj){
   if (obj.isAddedObject && (obj.type == "surface" || obj.type == "ramp")){
+    return true;
+  }
+
+  if (obj.isObjectGroup){
     return true;
   }
 
@@ -278,7 +310,18 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo){
     positionsConstructed.push(position);
   }
 
-  obj.mesh.updateMatrixWorld(true);
+  var childMesh;
+  if (obj.parentObjectName){
+    var parentObject = objectGroups[obj.parentObjectName];
+    parentObject.graphicsGroup.position.copy(parentObject.mesh.position);
+    parentObject.graphicsGroup.quaternion.copy(parentObject.mesh.quaternion);
+    parentObject.graphicsGroup.updateMatrix();
+    parentObject.graphicsGroup.updateMatrixWorld(true);
+    childMesh = parentObject.graphicsGroup.children[obj.indexInParent];
+    childMesh.updateMatrixWorld(true);
+  }else{
+    obj.mesh.updateMatrixWorld(true);
+  }
 
   var firstLocal = positionsConstructed[firstIndex].clone();
   var lastLocal = positionsConstructed[lastIndex].clone();
@@ -309,15 +352,19 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo){
       var curLocalX = firstLocal.clone().lerp(lastLocal, i1).x;
       var curLocalY = firstLocal.clone().lerp(lastLocal, i2).y;
 
-      var curWorldPosition = new THREE.Vector3(curLocalX, curLocalY, 0).applyMatrix4(obj.mesh.matrixWorld);
+      var matrixWorld = obj.mesh.matrixWorld;
+      if (childMesh){
+        matrixWorld = childMesh.matrixWorld;
+      }
+      var curWorldPosition = new THREE.Vector3(curLocalX, curLocalY, 0).applyMatrix4(matrixWorld);
 
       var curX = curWorldPosition.x;
       var curY = curWorldPosition.y;
       var curZ = curWorldPosition.z;
 
       if (lightInfo.type == "point"){
-        var fromVector = lightPos;
-        var directionVector = new THREE.Vector3(curX - lightPos.x, curY - lightPos.y, curZ - lightPos.z).normalize();
+        var fromVector = curWorldPosition;
+        var directionVector = new THREE.Vector3(lightPos.x - curX, lightPos.y - curY, lightPos.z - curZ).normalize();
         this.rayCaster.findIntersections(fromVector, directionVector, false, function(x, y, z, objName){
           if (objName == obj.name || !objName){
             pixels[pixelIndex ++] = 255;

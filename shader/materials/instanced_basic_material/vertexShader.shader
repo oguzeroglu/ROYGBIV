@@ -7,6 +7,7 @@ attribute vec3 color;
 
 attribute vec3 position;
 attribute vec3 normal;
+attribute vec2 uv;
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
@@ -61,9 +62,7 @@ varying float vAlpha;
 
   varying float vAOIntensity;
 #endif
-#if defined(HAS_TEXTURE) || defined(HAS_SHADOW_MAP)
-  attribute vec2 uv;
-#endif
+
 #ifdef HAS_TEXTURE
   attribute vec4 textureInfo;
 

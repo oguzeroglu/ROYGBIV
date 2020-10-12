@@ -401,6 +401,7 @@ var Text = function(){
   this.WALL_COLLECTION_CREATED = "Wall collection created.";
   this.MASS_CREATED = "Mass created.";
   this.OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING = "Object type not supported for shadow baking.";
+  this.CHILD_OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING = "Child object type not supported for shadow baking.";
   this.BAKING_SHADOW = "Baking shadow.";
   this.UNBAKING_SHADOW = "Unbaking shadow.";
   this.SHADOW_BAKED = "Shadow baked.";
