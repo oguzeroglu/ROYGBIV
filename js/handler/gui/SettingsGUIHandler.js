@@ -86,7 +86,8 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     "Resolution": "" + screenResolution,
     "Use original resolution": useOriginalResolution,
     "Accepted texture size": "" + ACCEPTED_TEXTURE_SIZE,
-    "Disable instancing": INSTANCING_DISABLED
+    "Disable instancing": INSTANCING_DISABLED,
+    "Shadow quality": shadowBaker.quality
   };
 
   var resolutionController = parentFolder.add(params, "Resolution").onFinishChange(function(val){
@@ -169,6 +170,16 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
 
     INSTANCING_DISABLED = val;
     terminal.printInfo(val? Text.INSTANCING_DISABLED: Text.INSTANCING_ENABLED);
+  }).listen();
+
+  parentFolder.add(params, "Shadow quality", Object.keys(shadowBaker.qualities)).onChange(function(val){
+    if (Object.keys(shadowBaker.texturesByObjName).length > 0){
+      terminal.clear();
+      terminal.printError(Text.PROJECT_HAS_BAKED_SHADOWS_CANNOT_CHANGE_QUALITY);
+      params["Shadow quality"] = shadowBaker.quality;
+      return;
+    }
+    shadowBaker.quality = val;
   }).listen();
 
   var shaderPrecisionFolder = parentFolder.addFolder("Shader precision");
