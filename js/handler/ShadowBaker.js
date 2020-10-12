@@ -174,6 +174,14 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
 
     for (var objName in texturesByObjName){
       var obj = addedObjects[objName];
+      if (!obj){
+        for (var objGroupName in objectGroups){
+          obj = objectGroups[objGroupName].group[objName];
+          if (obj){
+            break;
+          }
+        }
+      }
       var material = obj.mesh.material;
       var uniforms = material.uniforms;
       shadowBaker.unbakeFromShader(material);
@@ -191,6 +199,46 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
       macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.getSizeFromQuality(shadowBaker.quality), material, false, true);
       material.uniformsNeedUpdate = true;
     }
+
+    for (var objName in objectGroups){
+      var objectGroup = objectGroups[objName];
+      if (!objectGroup.mesh.material.uniforms.shadowMap){
+        continue;
+      }
+
+      objectGroup.mesh.material.uniforms.shadowMap = shadowMapUniform;
+      objectGroup.mesh.material.uniformsNeedUpdate = true;
+
+      if (!objectGroup.isInstanced){
+        var ary = objectGroup.mesh.geometry.attributes.shadowMapUV.array;
+        objectGroup.mesh.geometry.attributes.shadowMapUV.updateRange.set(0, ary.length);
+        objectGroup.mesh.geometry.attributes.shadowMapUV.needsUpdate = true;
+        for (var shadowUVIndex in objectGroup.childObjectNameByShadowMapUVCoords){
+          var childName = objectGroup.childObjectNameByShadowMapUVCoords[shadowUVIndex];
+          var range = shadowBaker.textureRangesByObjectName[childName] || {startU: -100, startV: -100, endU: -100, endV: -100};
+          var parsed = parseInt(shadowUVIndex);
+          for (var i = 0; i < 3; i ++){
+            ary[parsed ++] = range.startU;
+            ary[parsed ++] = range.startV;
+            ary[parsed ++] = range.endU;
+            ary[parsed ++] = range.endV;
+          }
+        }
+      }else{
+        var ary = objectGroup.mesh.geometry.attributes.shadowMapUV.array;
+        objectGroup.mesh.geometry.attributes.shadowMapUV.updateRange.set(0, ary.length);
+        objectGroup.mesh.geometry.attributes.shadowMapUV.needsUpdate = true;
+        var index = 0;
+        for (var childName in objectGroup.group){
+          var range = shadowBaker.textureRangesByObjectName[childName] || {startU: -100, startV: -100, endU: -100, endV: -100};
+          ary[index ++] = range.startU;
+          ary[index ++] = range.startV;
+          ary[index ++] = range.endU;
+          ary[index ++] = range.endV;
+        }
+      }
+    }
+
     onSuccess();
   }, function(){
     onErr();

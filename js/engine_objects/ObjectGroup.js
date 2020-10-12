@@ -1322,6 +1322,10 @@ ObjectGroup.prototype.merge = function(){
     pseudoGeometry.merge(childGeom, childObj.mesh.matrix);
   }
 
+  if (!isDeployment){
+    this.childObjectNameByShadowMapUVCoords = new Object();
+  }
+
   var max = 0;
   var faces = pseudoGeometry.faces;
 
@@ -1622,6 +1626,10 @@ ObjectGroup.prototype.merge = function(){
     }
     // SHADOW MAP UVS
     if (this.hasShadowMap){
+      if (!isDeployment){
+        this.childObjectNameByShadowMapUVCoords[shadowMapUVs.length] = addedObject.name;
+      }
+      
       if (shadowBaker.texturesByObjName[addedObject.name]){
         var range = shadowBaker.textureRangesByObjectName[addedObject.name];
 
