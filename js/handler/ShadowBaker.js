@@ -433,3 +433,38 @@ ShadowBaker.prototype.compressTexture = function(base64Data, readyCallback, erro
   }
   postRequest.send(data);
 }
+
+ShadowBaker.prototype.updateIntensity = function(newIntensity){
+  this.intensity = newIntensity;
+
+  for (var objName in this.texturesByObjName){
+    var obj = addedObjects[objName];
+    if (!obj){
+      for (var objGroupName in objectGroups){
+        obj = objectGroups[objGroupName].group[objName];
+        if (obj){
+          break;
+        }
+      }
+    }
+
+    var material = obj.mesh.material;
+    var shadowIntensityMacroVal = macroHandler.getMacroValue("SHADOW_INTENSITY", material, false);
+    macroHandler.removeMacro("SHADOW_INTENSITY " + shadowIntensityMacroVal, material, false, true);
+    macroHandler.injectMacro("SHADOW_INTENSITY " + newIntensity, material, false, true);
+    material.needsUpdate = true;
+  }
+
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+    if (!obj.hasShadowMap){
+      continue;
+    }
+
+    var material = obj.mesh.material;
+    var shadowIntensityMacroVal = macroHandler.getMacroValue("SHADOW_INTENSITY", material, false);
+    macroHandler.removeMacro("SHADOW_INTENSITY " + shadowIntensityMacroVal, material, false, true);
+    macroHandler.injectMacro("SHADOW_INTENSITY " + newIntensity, material, false, true);
+    material.needsUpdate = true;
+  }
+}
