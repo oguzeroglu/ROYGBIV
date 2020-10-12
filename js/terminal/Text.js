@@ -325,6 +325,7 @@ var Text = function(){
   this.MUZZLEFLASH_CREATED = "Muzzle flash created.";
   this.MUZZLEFLASH_EDITED = "Muzzle flash edited.";
   this.OBJECT_MARKED_AS = "Object marked as @@1.";
+  this.OBJECT_NR_X_DOES_NOT_HAVE_SHADOW_MAP = "Object nr @@1 does not have baked shadow.";
   this.SPRITE_CREATED = "Sprite created.";
   this.CONTAINER_ALIGNED = "Container aligned.";
   this.PARENT_CONTAINER_DOES_NOT_EXIST = "Parent container does not exist.";

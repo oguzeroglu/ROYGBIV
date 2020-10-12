@@ -275,7 +275,8 @@ var CommandDescriptor = function(){
       1, //bakeStaticLights
       1, //unbakeStaticLights
       0, //settings
-      2 //bakeShadow
+      2, //bakeShadow
+      1 //unbakeShadow
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -553,7 +554,8 @@ var CommandDescriptor = function(){
     "bakeStaticLights objectName",
     "unbakeStaticLights objectName",
     "settings",
-    "bakeShadow objectName[1],objectName[2],...objectName[n] lightName"
+    "bakeShadow objectName[1],objectName[2],...objectName[n] lightName",
+    "unbakeShadow objectName[1],objectName[2],...objectName[n]"
   ];
 
   this.commands = [
@@ -831,7 +833,8 @@ var CommandDescriptor = function(){
     "bakeStaticLights",
     "unbakeStaticLights",
     "settings",
-    "bakeShadow"
+    "bakeShadow",
+    "unbakeShadow"
   ];
 
   this.commandInfo = [
@@ -1109,7 +1112,8 @@ var CommandDescriptor = function(){
     "bakeStaticLights: Bakes static lights on given object and marks an object as unaffected by lights.",
     "unbakeStaticLights: Unbakes static lights for given object which has baked static lights.",
     "settings: Shows the project settings GUI.",
-    "bakeShadow: Bakes shadows from given light on given objects."
+    "bakeShadow: Bakes shadows from given light on given objects.",
+    "unbakeShadow: Unbakes shadows on given objects."
   ];
 
   this.keyboardInfo = [
@@ -2027,6 +2031,11 @@ var CommandDescriptor = function(){
   this.bakeShadow.types = [];
   this.bakeShadow.types.push(this.ANY_OBJECT); //objectName[1],objectName[2],...objectName[n]
   this.bakeShadow.types.push(this.LIGHT_NAME); //lightName
+
+  // unbakeShadow
+  this.unbakeShadow = new Object();
+  this.unbakeShadow.types = [];
+  this.unbakeShadow.types.push(this.ANY_OBJECT); //objectName[1],objectName[2],...objectName[n]
 };
 
 CommandDescriptor.prototype.test = function(){

@@ -46,21 +46,19 @@ ShadowBaker.prototype.batchUnbake = function(objAry){
   terminal.disable();
   terminal.printInfo(Text.UNBAKING_SHADOW);
 
-  setTimeout(function(){
-    for (var i = 0 ; i < objAry.length; i ++){
-      shadowBaker.unbakeShadow(objAry[i], true);
-    }
+  for (var i = 0 ; i < objAry.length; i ++){
+    shadowBaker.unbakeShadow(objAry[i], true);
+  }
 
-    shadowBaker.refreshTextures(function(){
-      terminal.enable();
-      terminal.clear();
-      terminal.printInfo(Text.SHADOW_UNBAKED);
-    }, function(){
-      terminal.enable();
-      terminal.clear();
-      terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
-    });
-  }, 500);
+  shadowBaker.refreshTextures(function(){
+    terminal.enable();
+    terminal.clear();
+    terminal.printInfo(Text.SHADOW_UNBAKED);
+  }, function(){
+    terminal.enable();
+    terminal.clear();
+    terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+  });
 }
 
 ShadowBaker.prototype.batchBake = function(objAry, lightInfo){
