@@ -60,9 +60,9 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
 
     var textureMerger = new TextureMerger();
     textureMerger.ranges = JSON.parse(JSON.stringify(this.textureRangesByObjectName));
-    textureAtlasHandler.atlas = new TexturePack(null, null, {isShadowAtlas: true});
-    textureAtlasHandler.atlas.loadTextures(false, function(){
-      var shadowMapUniform = new THREE.Uniform(textureAtlasHandler.atlas.diffuseTexture);
+    var atlas = new TexturePack(null, null, {isShadowAtlas: true});
+    atlas.loadTextures(false, function(){
+      var shadowMapUniform = new THREE.Uniform(atlas.diffuseTexture);
       shadowBaker.shadowMapUniform = shadowMapUniform;
       for (var objName in shadowBaker.textureRangesByObjectName){
         var obj = addedObjects[objName];
