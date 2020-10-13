@@ -10,7 +10,17 @@ var ShadowBaker = function(){
   this.reset();
 }
 
+ShadowBaker.prototype.export = function(){
+  var exportObj = {
+    quality: this.quality,
+    intensity: this.intensity
+  };
+
+  return exportObj;
+}
+
 ShadowBaker.prototype.reset = function(){
+  this.canvasTexturesByDataURL = {};
   this.texturesByObjName = {};
   this.textureRangesByObjectName = {};
   this.quality = this.qualities.LOW;
@@ -142,6 +152,21 @@ ShadowBaker.prototype.unbakeShadow = function(obj, skipRefresh){
       this.unbakeShadow(obj.group[childName], skipRefresh);
     }
     obj.mesh.geometry.removeAttribute("shadowMapUV");
+  }
+
+  for (var dataURL in this.canvasTexturesByDataURL){
+    var canvasTexture = this.canvasTexturesByDataURL[dataURL];
+    var isUsed = false;
+    for (var objName in this.texturesByObjName){
+      if (this.texturesByObjName[objName] == canvasTexture){
+        isUsed = true;
+        break;
+      }
+    }
+
+    if (!isUsed){
+      delete this.canvasTexturesByDataURL[dataURL];
+    }
   }
 
   if (!skipRefresh){
@@ -414,7 +439,15 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo){
   tmpCtx.rotate(-Math.PI/2);
   tmpCtx.drawImage(shadowCanvas, -shadowCanvas.width / 2, -shadowCanvas.width / 2);
 
-  this.texturesByObjName[obj.name] = new THREE.CanvasTexture(tmpCanvas);
+  var dataURL = tmpCanvas.toDataURL();
+  var canvasTexture = this.canvasTexturesByDataURL[dataURL];
+
+  if (!canvasTexture){
+    canvasTexture = new THREE.CanvasTexture(tmpCanvas);
+    this.canvasTexturesByDataURL[dataURL] = canvasTexture;
+  }
+
+  this.texturesByObjName[obj.name] = canvasTexture;
 }
 
 ShadowBaker.prototype.compressTexture = function(base64Data, readyCallback, errorCallback){
