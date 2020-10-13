@@ -245,6 +245,8 @@ ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, skipRefresh){
 
 ShadowBaker.prototype.unbakeShadow = function(obj, skipRefresh){
   delete this.texturesByObjName[obj.name];
+  delete this.textureRangesByObjectName[obj.name];
+
   this.unbakeFromShader(obj.mesh.material);
 
   if (obj.isObjectGroup){
@@ -496,16 +498,25 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo){
 
       if (lightInfo.type == "point"){
         var fromVector = curWorldPosition;
-        var directionVector = new THREE.Vector3(lightPos.x - curX, lightPos.y - curY, lightPos.z - curZ).normalize();
+        var toLight = new THREE.Vector3(lightPos.x - curX, lightPos.y - curY, lightPos.z - curZ);
+        var distanceToLight = toLight.length();
+        var directionVector = toLight.normalize();
         this.rayCaster.findIntersections(fromVector, directionVector, false, function(x, y, z, objName){
           if (objName == obj.name || !objName){
             pixels[pixelIndex ++] = 255;
             pixels[pixelIndex ++] = 255;
             pixels[pixelIndex ++] = 255;
           }else{
-            pixels[pixelIndex ++] = 0;
-            pixels[pixelIndex ++] = 0;
-            pixels[pixelIndex ++] = 0;
+            var toIntersection = new THREE.Vector3(x - curX, y - curY, z - curZ);
+            if (toIntersection.length() > distanceToLight){
+              pixels[pixelIndex ++] = 255;
+              pixels[pixelIndex ++] = 255;
+              pixels[pixelIndex ++] = 255;
+            }else{
+              pixels[pixelIndex ++] = 0;
+              pixels[pixelIndex ++] = 0;
+              pixels[pixelIndex ++] = 0;
+            }
           }
 
           pixels[pixelIndex ++] = 255;
