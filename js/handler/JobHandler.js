@@ -9,6 +9,7 @@ JobHandler.prototype.handle = function(previewModeCommand){
   }
   jobHandlerWorking = true;
   jobHandlerRaycasterRefresh = false;
+  jobHandlerShadowBakerRefresh = false;
   jobHandlerInternalCounter = 0;
   jobHandlerInternalMaxExecutionCount = 0;
   this.splitted[0] = this.splitted[0].toLowerCase();
@@ -139,6 +140,20 @@ JobHandler.prototype.handle = function(previewModeCommand){
 
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
+    }
+    if (jobHandlerShadowBakerRefresh){
+      terminal.clear();
+      terminal.disable();
+      terminal.printInfo(Text.BAKING_SHADOW);
+      shadowBaker.refreshTextures(function(){
+        terminal.enable();
+        terminal.clear();
+        terminal.printInfo(Text.SHADOW_BAKED);
+      }, function(){
+        terminal.enable();
+        terminal.clear();
+        terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+      });
     }
   }catch (err){
     console.error(err);

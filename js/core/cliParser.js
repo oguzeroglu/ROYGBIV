@@ -587,6 +587,14 @@ function parse(input){
             sceneHandler.onObjectGroupDeletion(objectGroup);
             delete objectGroups[objectName];
           }
+
+          delete shadowBaker.texturesByObjName[objectName];
+          if (objectGroup && !!objectGroup.mesh.material.uniforms.shadowMap){
+            for (var childName in objectGroup.group){
+              delete shadowBaker.texturesByObjName[childName];
+            }
+          }
+
           for (var lightningName in lightnings){
             if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == objectName){
               lightnings[lightningName].detachFromFPSWeapon();
@@ -595,10 +603,32 @@ function parse(input){
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
+
+          var obj = object || objectGroup;
+          var hasShadowMap = !!obj.mesh.material.uniforms.shadowMap;
+
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_DESTROYED);
+            var obj = object || objectGroup;
+            if (hasShadowMap){
+              terminal.clear();
+              terminal.disable();
+              terminal.printInfo(Text.BAKING_SHADOW);
+              shadowBaker.refreshTextures(function(){
+                terminal.enable();
+                terminal.clear();
+                terminal.printInfo(Text.SHADOW_BAKED);
+              }, function(){
+                terminal.enable();
+                terminal.clear();
+                terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
+              });
+            }
           }else{
             jobHandlerRaycasterRefresh = true;
+            if (hasShadowMap){
+              jobHandlerShadowBakerRefresh = true;
+            }
           }
           return true;
         break;
@@ -1659,7 +1689,7 @@ function parse(input){
                   var stateLoader = new StateLoader(loadedState);
                   var result = stateLoader.load();
                   if (result){
-                    if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
+                    if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasShadows){
                       terminal.printInfo(Text.LOADING_PROJECT);
                       canvas.style.visibility = "hidden";
                       terminal.disable();
@@ -6540,6 +6570,153 @@ function parse(input){
           }
 
           settingsGUIHandler.show();
+          return true;
+        break;
+        case 274: //bakeShadow
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var objectNamesArray = splitted[1].split(",");
+          for (var i = 0; i<objectNamesArray.length; i++){
+            if (!(objectNamesArray[i].indexOf("*") == -1)){
+              var tmpPrefix = objectNamesArray[i].split("*")[0];
+              for (var addedObjName in sceneHandler.getAddedObjects()){
+                if (addedObjName.startsWith(tmpPrefix)){
+                  objectNamesArray.push(addedObjName);
+                }
+              }
+              for (var objGroupName in sceneHandler.getObjectGroups()){
+                if (objGroupName.startsWith(tmpPrefix)){
+                  objectNamesArray.push(objGroupName);
+                }
+              }
+            }
+          }
+          objectNamesArray = objectNamesArray.filter(function(item, pos) {
+            return (objectNamesArray.indexOf(item) == pos && (item.indexOf("*") == -1));
+          });
+
+          var objAry = [];
+          for (var i = 0; i < objectNamesArray.length; i ++){
+            var obj = addedObjects[objectNamesArray[i]] || objectGroups[objectNamesArray[i]];
+            if (!obj){
+              terminal.printError(Text.OBJECT_NR_DOES_NOT_EXIST.replace(Text.PARAM1, i + 1));
+              return true;
+            }
+            if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NR_X_NOT_IN_SCENE.replace(Text.PARAM1, i + 1));
+              return true;
+            }
+            if (obj.isChangeable){
+              terminal.printError(Text.CHANGEABLE_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+              return true;
+            }
+
+            if (obj.isDynamicObject){
+              terminal.printError(Text.DYNAMIC_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+              return true;
+            }
+            objAry.push(obj);
+          }
+
+          if (objAry.length == 0){
+            terminal.printError(Text.NO_OBJECT_FOUND);
+            return true;
+          }
+
+          var lightName = splitted[2].toLowerCase();
+
+          var lightNames = [];
+          for (var i = 0; i < 5; i ++){
+            lightNames.push("diffuse" + (i + 1));
+            lightNames.push("point" + (i + 1));
+          }
+
+          if (lightNames.indexOf(lightName) < 0){
+            terminal.printError(Text.NO_SUCH_LIGHT);
+            return true;
+          }
+
+          var lightSlotID = parseInt(lightName[lightName.length - 1]);
+          var lightInfo;
+          if (lightName.startsWith("diffuse")){
+            if (!lightHandler.hasStaticDiffuseLight(lightSlotID)){
+              terminal.printError(Text.LIGHT_NOT_ACTIVE);
+              return true;
+            }
+            lightInfo = {type: "diffuse", slotID: lightSlotID};
+          }else{
+            if (!lightHandler.hasStaticPointLight(lightSlotID)){
+              terminal.printError(Text.LIGHT_NOT_ACTIVE);
+              return true;
+            }
+            lightInfo = {type: "point", slotID: lightSlotID};
+          }
+
+          shadowBaker.batchBake(objAry, lightInfo);
+          return true;
+        break;
+        case 275: //unbakeShadow
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var objectNamesArray = splitted[1].split(",");
+          for (var i = 0; i<objectNamesArray.length; i++){
+            if (!(objectNamesArray[i].indexOf("*") == -1)){
+              var tmpPrefix = objectNamesArray[i].split("*")[0];
+              for (var addedObjName in sceneHandler.getAddedObjects()){
+                if (addedObjName.startsWith(tmpPrefix)){
+                  objectNamesArray.push(addedObjName);
+                }
+              }
+              for (var objGroupName in sceneHandler.getObjectGroups()){
+                if (objGroupName.startsWith(tmpPrefix)){
+                  objectNamesArray.push(objGroupName);
+                }
+              }
+            }
+          }
+          objectNamesArray = objectNamesArray.filter(function(item, pos) {
+            return (objectNamesArray.indexOf(item) == pos && (item.indexOf("*") == -1));
+          });
+
+          var objAry = [];
+          for (var i = 0; i < objectNamesArray.length; i ++){
+            var obj = addedObjects[objectNamesArray[i]] || objectGroups[objectNamesArray[i]];
+            if (!obj){
+              terminal.printError(Text.OBJECT_NR_DOES_NOT_EXIST.replace(Text.PARAM1, i + 1));
+              return true;
+            }
+            if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NR_X_NOT_IN_SCENE.replace(Text.PARAM1, i + 1));
+              return true;
+            }
+            if (obj.isChangeable){
+              terminal.printError(Text.CHANGEABLE_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+              return true;
+            }
+
+            if (obj.isDynamicObject){
+              terminal.printError(Text.DYNAMIC_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
+              return true;
+            }
+            if (!obj.mesh.material.uniforms.shadowMap){
+              terminal.printError(Text.OBJECT_NR_X_DOES_NOT_HAVE_SHADOW_MAP.replace(Text.PARAM1, (i + 1)));
+              return true;
+            }
+            objAry.push(obj);
+          }
+
+          if (objAry.length == 0){
+            terminal.printError(Text.NO_OBJECT_FOUND);
+            return true;
+          }
+
+          shadowBaker.batchUnbake(objAry);
           return true;
         break;
       }

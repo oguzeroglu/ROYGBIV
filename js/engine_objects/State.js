@@ -1,4 +1,4 @@
-var State = function(projectName, author){
+var State = function(projectName, author, isBuildingForDeploymentMode){
   // PROJECT INFOS *************************************************
   if (!(typeof projectName == UNDEFINED)){
     this.projectName = projectName;
@@ -183,4 +183,6 @@ var State = function(projectName, author){
   this.steeringHandler = steeringHandler.export();
   // DECISION HANDLER **********************************************
   this.decisionHandler = decisionHandler.export();
+  // SHADOW BAKER **************************************************
+  this.shadowBaker = shadowBaker.export(isBuildingForDeploymentMode);
 }

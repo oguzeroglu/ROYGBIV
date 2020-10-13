@@ -2,6 +2,10 @@ var ImportHandler = function(){
 
 }
 
+ImportHandler.prototype.importShadowBaker = function(obj, onReady){
+  shadowBaker.import(obj.shadowBaker, onReady);
+}
+
 ImportHandler.prototype.importDecisionHandler = function(obj){
   decisionHandler.import(obj.decisionHandler);
 }

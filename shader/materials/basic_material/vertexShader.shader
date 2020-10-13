@@ -20,6 +20,9 @@ varying vec3 vColor;
   varying vec2 vUV;
   uniform mat3 textureMatrix;
 #endif
+#ifdef HAS_SHADOW_MAP
+  varying vec2 vShadowMapUV;
+#endif
 #ifdef DISPLACEMENT_SEPARATE_UV
   uniform mat3 displacementTextureMatrix;
 #endif
@@ -806,6 +809,10 @@ void main(){
 
   #ifdef HAS_TEXTURE
     vUV = (textureMatrix * vec3(uv, 1.0)).xy;
+  #endif
+
+  #ifdef HAS_SHADOW_MAP
+    vShadowMapUV = uv;
   #endif
 
   #ifdef HAS_SKYBOX_FOG

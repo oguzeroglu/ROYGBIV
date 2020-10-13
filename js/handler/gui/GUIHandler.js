@@ -45,6 +45,30 @@ var GUIHandler = function(){
     "Jump speed": "500",
     "Look speed": 0.1,
     "Hidden": false,
+    "Light": "diffuse1",
+    "Bake shadow": function(){
+      terminal.clear();
+      var lightName = guiHandler.objectManipulationParameters["Light"];
+      if (!lightName){
+        terminal.printError(Text.A_LIGHT_IS_NECESSARY_TO_BAKE_SHADOW);
+        return;
+      }
+      if (!shadowBaker.isSupported(selectionHandler.getSelectedObject())){
+        terminal.printError(Text.OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING.replace(Text.PARAM1, selectionHandler.getSelectedObject().name));
+        return;
+      }
+
+      parseCommand("bakeShadow " + selectionHandler.getSelectedObject().name + " " + lightName);
+    },
+    "Unbake shadow": function(){
+      terminal.clear();
+      if (!selectionHandler.getSelectedObject().mesh.material.uniforms.shadowMap){
+        terminal.printError(Text.OBJECT_DOES_NOT_HAVE_BAKED_SHADOW);
+        return;
+      }
+
+      parseCommand("unbakeShadow " + selectionHandler.getSelectedObject().name);
+    },
     "Export": function(){
       terminal.clear();
       parseCommand("exportObject " + selectionHandler.getSelectedObject().name);
@@ -1321,6 +1345,11 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
         guiHandler.objectManipulationParameters["Mass"] = 0;
         return;
       }
+      if (!!obj.mesh.material.uniforms.shadowMap){
+        terminal.printError(Text.OBJECT_HAS_BAKED_SHADOW_CANNOT_MARK_AS_DYNAMIC);
+        guiHandler.objectManipulationParameters["Mass"] = 0;
+        return;
+      }
     }
     parseCommand("setMass "+obj.name+" "+val);
     if (!isNaN(val) && parseFloat(val) > 0){
@@ -1434,6 +1463,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     if (obj.bakedColors){
       terminal.clear();
       terminal.printError(Text.OBJECT_HAS_BAKED_LIGHTS_CANNOT_MARK_AS_CHANGEABLE);
+      guiHandler.objectManipulationParameters["Changeable"] = false;
+      return;
+    }
+    if (!!obj.mesh.material.uniforms.shadowMap){
+      terminal.clear();
+      terminal.printError(Text.OBJECT_HAS_BAKED_SHADOW_CANNOT_MARK_AS_CHANGEABLE);
       guiHandler.objectManipulationParameters["Changeable"] = false;
       return;
     }
@@ -1630,6 +1665,17 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
     }
   }).listen();
+
+  // SHADOW
+  var lightNames = [];
+  for (var i = 0; i < 5; i ++){
+    lightNames.push("point" + (i + 1));
+    lightNames.push("diffuse" + (i + 1));
+  }
+  var shadowFolder = graphicsFolder.addFolder("Shadow");
+  shadowFolder.add(guiHandler.objectManipulationParameters, "Light", lightNames);
+  shadowFolder.add(guiHandler.objectManipulationParameters, "Bake shadow");
+  shadowFolder.add(guiHandler.objectManipulationParameters, "Unbake shadow");
 
   // TEXTURE
   guiHandler.omEmissiveColorController = textureFolder.add(guiHandler.objectManipulationParameters, "Emissive col.").onFinishChange(function(val){

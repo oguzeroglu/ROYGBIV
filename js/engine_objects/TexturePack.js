@@ -10,6 +10,10 @@ var TexturePack = function(name, directoryName, textureDescription){
     this.maxAttemptCount = 1;
     return this;
   }
+  if (this.textureDescription.isShadowAtlas){
+    this.maxAttemptCount = 1;
+    return this;
+  }
   this.directoryName = directoryName;
   this.name = name;
   this.maxAttemptCount = 0;
@@ -64,7 +68,7 @@ TexturePack.prototype.destroy = function(noDelete){
   if (this.hasHeight){
     this.heightTexture.dispose();
   }
-  if (this.textureDescription && !this.textureDescription.isAtlas && !this.isDynamic && !noDelete){
+  if (this.textureDescription && !this.textureDescription.isAtlas && !this.textureDescription.isShadowAtlas && !this.isDynamic && !noDelete){
     delete texturePacks[this.name];
   }
 }
@@ -99,9 +103,19 @@ TexturePack.prototype.loadAtlas = function(onLoaded){
   this.loadTexture(false, atlasPath, "diffuseTexture", "hasDiffuse", onLoaded);
 }
 
+TexturePack.prototype.loadShadowAtlas = function(onLoaded){
+  var postfix = textureLoaderFactory.getFilePostfix();
+  var shadowAtlasPath = atlasRootDirectory + "shadowAtlas" + postfix;
+  this.loadTexture(false, shadowAtlasPath, "diffuseTexture", "hasDiffuse", onLoaded);
+}
+
 TexturePack.prototype.loadTextures = function(forcePNG, onLoaded){
   if (this.textureDescription.isAtlas){
     this.loadAtlas(onLoaded);
+    return;
+  }
+  if (this.textureDescription.isShadowAtlas){
+    this.loadShadowAtlas(onLoaded);
     return;
   }
   if (isDeployment){

@@ -39,6 +39,9 @@ window.onload = function() {
   decisionHandler = new DecisionHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
+  // SHADOW BAKER
+  shadowBaker = new ShadowBaker();
+
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
   cliDivheader = document.getElementById("cliDivheader");
@@ -303,7 +306,7 @@ function build(projectName, author){
       terminal.enable();
     }
   }
-  var data = JSON.stringify(new State(projectName, author));
+  var data = JSON.stringify(new State(projectName, author, true));
   xhr.send(data);
 }
 
@@ -439,7 +442,7 @@ function startDeployment(){
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
     if (result){
-      if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasTextureAtlas){
+      if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasTextureAtlas || stateLoader.hasShadows){
         appendtoDeploymentConsole("Loading assets.");
       }
     }else{

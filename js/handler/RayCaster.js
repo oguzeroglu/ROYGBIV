@@ -138,6 +138,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
   }
   this.origin.copy(from);
   this.direction.copy(direction);
+  this.origin.addScaledVector(this.direction, RAYCASTER_STEP_AMOUNT);
   this.oldPosition.copy(this.origin);
   var iterate = true;
   if (!isDeployment && mode == 0){

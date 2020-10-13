@@ -37,6 +37,11 @@ StateLoader.prototype.onFontLoaded = function(){
   this.finalize();
 }
 
+StateLoader.prototype.onShadowsLoaded = function(){
+  this.shadowReady = true;
+  this.finalize();
+}
+
 StateLoader.prototype.load = function(){
   try{
     projectLoaded = false;
@@ -46,7 +51,9 @@ StateLoader.prototype.load = function(){
     this.hasTextureAtlas = this.stateObj.textureAtlas? this.stateObj.textureAtlas.hasTextureAtlas: false;
     this.hasSkyboxes = this.stateObj.totalSkyboxCount > 0;
     this.hasFonts = this.stateObj.totalFontCount > 0;
+    this.hasShadows = Object.keys(this.stateObj.shadowBaker.textureRangesByObjectName).length > 0;
     this.textureAtlasReady = false;
+    this.shadowReady = false;
 
     this.importHandler.importEngineVariables(obj);
     this.importHandler.importGridSystems(obj);
@@ -58,8 +65,9 @@ StateLoader.prototype.load = function(){
     this.importHandler.importTexturePacks(obj, this.onTexturePackLoaded.bind(this));
     this.importHandler.importSkyboxes(obj, this.onSkyboxLoaded.bind(this));
     this.importHandler.importFonts(obj, this.onFontLoaded.bind(this));
+    this.importHandler.importShadowBaker(obj, this.onShadowsLoaded.bind(this));
 
-    if (!this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts && !this.hasTextureAtlas){
+    if (!this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts && !this.hasTextureAtlas && !this.hasShadows){
       this.finalize();
     }
     return true;
@@ -76,7 +84,8 @@ StateLoader.prototype.shouldFinalize = function(){
     (this.hasTextureAtlas && !this.textureAtlasReady) ||
     (this.hasTexturePacks && parseInt(this.totalLoadedTexturePackCount) < parseInt(this.stateObj.totalTexturePackCount)) ||
     (this.hasSkyboxes && parseInt(this.totalLoadedSkyboxCount) < parseInt(this.stateObj.totalSkyboxCount)) ||
-    (this.hasFonts && parseInt(this.totalLoadedFontCount) < parseInt(this.stateObj.totalFontCount))
+    (this.hasFonts && parseInt(this.totalLoadedFontCount) < parseInt(this.stateObj.totalFontCount)) ||
+    (this.hasShadows && !this.shadowReady)
   )
   return res;
 }
@@ -316,6 +325,7 @@ StateLoader.prototype.resetProject = function(){
   currentMouseOverObjectName = 0;
   raycasterFactory.reset();
   physicsFactory.reset();
+  shadowBaker.reset();
   rayCaster = raycasterFactory.get();
   physicsWorld = physicsFactory.get();
   anchorGrid = 0;
@@ -358,6 +368,8 @@ StateLoader.prototype.resetProject = function(){
   roygbivSkippedArrayBufferUpdates = 0;
   roygbivSkippedElementArrayBufferUpdates = 0;
   particleSystemRefHeight = 0;
+  jobHandlerShadowBakerRefresh = false;
+  jobHandlerRaycasterRefresh = false;
   GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
   boundingClientRect = renderer.getBoundingClientRect();
   pointerLockRequested = false;
