@@ -193,7 +193,7 @@ ShadowBaker.prototype.batchBake = function(objAry, lightInfo){
 
 ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, skipRefresh){
   if (!this.isSupported(obj)){
-    terminal.printError(Text.OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING);
+    terminal.printError(Text.OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING.replace(Text.PARAM1, obj.name));
     return false;
   }
 
