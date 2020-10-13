@@ -183,4 +183,6 @@ var State = function(projectName, author){
   this.steeringHandler = steeringHandler.export();
   // DECISION HANDLER **********************************************
   this.decisionHandler = decisionHandler.export();
+  // SHADOW BAKER **************************************************
+  this.shadowBaker = shadowBaker.export();
 }

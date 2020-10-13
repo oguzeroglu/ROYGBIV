@@ -13,10 +13,70 @@ var ShadowBaker = function(){
 ShadowBaker.prototype.export = function(){
   var exportObj = {
     quality: this.quality,
-    intensity: this.intensity
+    intensity: this.intensity,
+    textureRangesByObjectName: JSON.parse(JSON.stringify(this.textureRangesByObjectName)),
+    dataURLsByTextureID: {},
+    textureIDsByObjName: {}
   };
 
+  for (var dataURL in this.canvasTexturesByDataURL){
+    exportObj.dataURLsByTextureID[generateUUID()] = dataURL;
+  }
+
+  for (var objName in this.texturesByObjName){
+    var dataURL = this.texturesByObjName[objName].image.toDataURL();
+    for (var textureID in exportObj.dataURLsByTextureID){
+      if (exportObj.dataURLsByTextureID[textureID] == dataURL){
+        exportObj.textureIDsByObjName[objName] = textureID;
+        break;
+      }
+    }
+  }
+
   return exportObj;
+}
+
+ShadowBaker.prototype.import = function(exportObj, onReady){
+  this.reset();
+  this.quality = exportObj.quality;
+  this.intensity = exportObj.intensity;
+
+  if (Object.keys(exportObj.textureRangesByObjectName).length == 0){
+    onReady();
+    return;
+  }
+
+  this.textureRangesByObjectName = JSON.parse(JSON.stringify(exportObj.textureRangesByObjectName));
+
+  var curCount = 0;
+  var totalCount = Object.keys(exportObj.dataURLsByTextureID).length;
+
+  for (var tid in exportObj.dataURLsByTextureID){
+    var dataURL = exportObj.dataURLsByTextureID[tid];
+    var tmpCanvas = document.createElement("canvas");
+    tmpCanvas.width = this.getSizeFromQuality(this.quality);
+    tmpCanvas.height = tmpCanvas.width;
+    var tmpContext = tmpCanvas.getContext("2d");
+    var img = new Image();
+    img.onload = function(){
+      this.ctx.drawImage(this.img, 0, 0);
+      shadowBaker.canvasTexturesByDataURL[this.dataURL] = new THREE.CanvasTexture(this.canvas);
+      curCount ++;
+      if (curCount == totalCount){
+        for (var objName in exportObj.textureIDsByObjName){
+          var textureID = exportObj.textureIDsByObjName[objName];
+          var dataURL = exportObj.dataURLsByTextureID[textureID];
+          var canvasTexture = shadowBaker.canvasTexturesByDataURL[dataURL];
+          shadowBaker.texturesByObjName[objName] = canvasTexture;
+        }
+
+        shadowBaker.refreshTextures(onReady, function(){
+          throw new Error("Error happened refreshing shadow textures.");
+        });
+      }
+    }.bind({ctx: tmpContext, img: img, canvas: tmpCanvas, dataURL: dataURL})
+    img.src = dataURL;
+  }
 }
 
 ShadowBaker.prototype.reset = function(){
