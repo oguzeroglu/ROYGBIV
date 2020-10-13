@@ -306,7 +306,7 @@ function build(projectName, author){
       terminal.enable();
     }
   }
-  var data = JSON.stringify(new State(projectName, author));
+  var data = JSON.stringify(new State(projectName, author, true));
   xhr.send(data);
 }
 

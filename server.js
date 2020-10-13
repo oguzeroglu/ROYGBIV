@@ -508,6 +508,13 @@ function copyAssets(application){
     copyFileSync("texture_atlas/textureAtlas-s3tc.ktx", "deploy/"+application.projectName+"/texture_atlas/");
     console.log("[*] Copied texture atlas.");
   }
+  if (Object.keys(application.shadowBaker.textureRangesByObjectName).length > 0){
+    copyFileSync("texture_atlas/shadowAtlas.png", "deploy/"+application.projectName+"/texture_atlas/");
+    copyFileSync("texture_atlas/shadowAtlas-astc.ktx", "deploy/"+application.projectName+"/texture_atlas/");
+    copyFileSync("texture_atlas/shadowAtlas-pvrtc.ktx", "deploy/"+application.projectName+"/texture_atlas/");
+    copyFileSync("texture_atlas/shadowAtlas-s3tc.ktx", "deploy/"+application.projectName+"/texture_atlas/");
+    console.log("[*] Copied shadow atlas.");
+  }
   for (var skyboxName in application.skyBoxes){
     var dirName = application.skyBoxes[skyboxName].directoryName;
     fs.readdirSync("skybox").forEach(file => {
@@ -559,6 +566,7 @@ function generateDeployDirectory(projectName, application){
   var hasFonts = (Object.keys(application.fonts).length != 0);
   var hasDynamicTextureFolders = (Object.keys(application.dynamicTextureFolders) != 0);
   var hasTextureAtlas = application.textureAtlas.hasTextureAtlas;
+  var hasShadowAtlas = Object.keys(application.shadowBaker.textureRangesByObjectName).length > 0;
   if (hasTexturePacks){
     fs.mkdirSync("deploy/"+projectName+"/texture_packs");
     console.log("[*] Project has texture packs to load.");
@@ -571,7 +579,7 @@ function generateDeployDirectory(projectName, application){
   }else{
     console.log("[*] Project has no skyboxes to load.");
   }
-  if (hasFonts || hasTextureAtlas){
+  if (hasFonts || hasTextureAtlas || hasShadowAtlas){
     fs.mkdirSync("deploy/"+projectName+"/fonts");
     fs.mkdirSync("deploy/"+projectName+"/texture_atlas");
     if (hasFonts){

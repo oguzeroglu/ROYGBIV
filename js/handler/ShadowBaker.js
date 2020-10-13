@@ -10,7 +10,7 @@ var ShadowBaker = function(){
   this.reset();
 }
 
-ShadowBaker.prototype.export = function(){
+ShadowBaker.prototype.export = function(isBuildingForDeploymentMode){
   var exportObj = {
     quality: this.quality,
     intensity: this.intensity,
@@ -19,18 +19,23 @@ ShadowBaker.prototype.export = function(){
     textureIDsByObjName: {}
   };
 
-  for (var dataURL in this.canvasTexturesByDataURL){
-    exportObj.dataURLsByTextureID[generateUUID()] = dataURL;
-  }
+  if (!isBuildingForDeploymentMode){
+    for (var dataURL in this.canvasTexturesByDataURL){
+      exportObj.dataURLsByTextureID[generateUUID()] = dataURL;
+    }
 
-  for (var objName in this.texturesByObjName){
-    var dataURL = this.texturesByObjName[objName].image.toDataURL();
-    for (var textureID in exportObj.dataURLsByTextureID){
-      if (exportObj.dataURLsByTextureID[textureID] == dataURL){
-        exportObj.textureIDsByObjName[objName] = textureID;
-        break;
+    for (var objName in this.texturesByObjName){
+      var dataURL = this.texturesByObjName[objName].image.toDataURL();
+      for (var textureID in exportObj.dataURLsByTextureID){
+        if (exportObj.dataURLsByTextureID[textureID] == dataURL){
+          exportObj.textureIDsByObjName[objName] = textureID;
+          break;
+        }
       }
     }
+  }else{
+    delete exportObj.dataURLsByTextureID;
+    delete exportObj.textureIDsByObjName;
   }
 
   return exportObj;
@@ -47,6 +52,41 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
   }
 
   this.textureRangesByObjectName = JSON.parse(JSON.stringify(exportObj.textureRangesByObjectName));
+  if (isDeployment){
+
+    for (var objName in this.textureRangesByObjectName){
+      this.texturesByObjName[objName] = true;
+    }
+
+    var textureMerger = new TextureMerger();
+    textureMerger.ranges = JSON.parse(JSON.stringify(this.textureRangesByObjectName));
+    textureAtlasHandler.atlas = new TexturePack(null, null, {isShadowAtlas: true});
+    textureAtlasHandler.atlas.loadTextures(false, function(){
+      var shadowMapUniform = new THREE.Uniform(textureAtlasHandler.atlas.diffuseTexture);
+      shadowBaker.shadowMapUniform = shadowMapUniform;
+      for (var objName in shadowBaker.textureRangesByObjectName){
+        var obj = addedObjects[objName];
+
+        var material = obj.mesh.material;
+        var uniforms = material.uniforms;
+
+        var range = textureMerger.ranges[objName];
+
+        uniforms.shadowMap = shadowMapUniform;
+        macroHandler.injectMacro("HAS_SHADOW_MAP", material, true, true);
+        macroHandler.injectMacro("SHADOW_INTENSITY " + shadowBaker.intensity, material, false, true);
+        macroHandler.injectMacro("SHADOW_MAP_START_U " + range.startU, material, false, true);
+        macroHandler.injectMacro("SHADOW_MAP_START_V " + range.startV, material, false, true);
+        macroHandler.injectMacro("SHADOW_MAP_END_U " + range.endU, material, false, true);
+        macroHandler.injectMacro("SHADOW_MAP_END_V " + range.endV, material, false, true);
+        macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.getSizeFromQuality(shadowBaker.quality), material, false, true);
+        material.uniformsNeedUpdate = true;
+      }
+
+      onReady();
+    });
+    return;
+  }
 
   var curCount = 0;
   var totalCount = Object.keys(exportObj.dataURLsByTextureID).length;
