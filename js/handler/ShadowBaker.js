@@ -137,6 +137,13 @@ ShadowBaker.prototype.unbakeShadow = function(obj, skipRefresh){
   delete this.texturesByObjName[obj.name];
   this.unbakeFromShader(obj.mesh.material);
 
+  if (obj.isObjectGroup){
+    for (var childName in obj.group){
+      this.unbakeShadow(obj.group[childName], skipRefresh);
+    }
+    obj.mesh.geometry.removeAttribute("shadowMapUV");
+  }
+
   if (!skipRefresh){
     this.refreshTextures(function(){
       terminal.enable();
