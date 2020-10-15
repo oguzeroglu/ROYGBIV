@@ -3186,38 +3186,45 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
         grid2 = gridSelections[gridName];
       }
     }
+
     if (!grid2){
       grid2 = grid1;
     }
-    if (!this.skipToggleGrid){
-      grid1.toggleSelect(false, false, false, true);
-      if (grid1.name != grid2.name){
-        grid2.toggleSelect(false, false, false, true);
+
+    if (grid1){
+      if (!this.skipToggleGrid){
+        grid1.toggleSelect(false, false, false, true);
+        if (grid1.name != grid2.name){
+          grid2.toggleSelect(false, false, false, true);
+        }
+        delete gridSelections[grid1.name];
+        delete gridSelections[grid2.name];
       }
-      delete gridSelections[grid1.name];
-      delete gridSelections[grid2.name];
-    }
-    startRow = grid1.rowNumber;
-    if (grid2.rowNumber < grid1.rowNumber){
-      startRow = grid2.rowNumber;
-    }
-    startCol = grid1.colNumber;
-    if (grid2.colNumber < grid1.colNumber){
-      startCol = grid2.colNumber;
-    }
-    finalRow = grid1.rowNumber;
-    if (grid2.rowNumber > grid1.rowNumber){
-      finalRow = grid2.rowNumber;
-    }
-    finalCol = grid1.colNumber;
-    if (grid2.colNumber > grid1.colNumber){
-      finalCol = grid2.colNumber;
-    }
-    for (var row = startRow; row <= finalRow; row++){
-      for (var col = startCol; col <= finalCol; col++ ){
-        var grid = gridSystem.getGridByColRow(col, row);
-        if (grid){
-          destroyedGrids[grid.name] = grid;
+
+      startRow = grid1.rowNumber;
+      if (grid2.rowNumber < grid1.rowNumber){
+        startRow = grid2.rowNumber;
+      }
+
+      startCol = grid1.colNumber;
+      if (grid2.colNumber < grid1.colNumber){
+        startCol = grid2.colNumber;
+      }
+      finalRow = grid1.rowNumber;
+      if (grid2.rowNumber > grid1.rowNumber){
+        finalRow = grid2.rowNumber;
+      }
+      finalCol = grid1.colNumber;
+      if (grid2.colNumber > grid1.colNumber){
+        finalCol = grid2.colNumber;
+      }
+
+      for (var row = startRow; row <= finalRow; row++){
+        for (var col = startCol; col <= finalCol; col++ ){
+          var grid = gridSystem.getGridByColRow(col, row);
+          if (grid){
+            destroyedGrids[grid.name] = grid;
+          }
         }
       }
     }
@@ -3232,8 +3239,8 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   copyInstance.updateMVMatrix();
   copyInstance.isCopied = true;
   if (!jobHandlerWorking){
-    copyInstance.metaData["grid1Name"] = grid1.name;
-    copyInstance.metaData["grid2Name"] = grid2.name;
+    copyInstance.metaData["grid1Name"] = grid1? grid1.name: null;
+    copyInstance.metaData["grid2Name"] = grid2? grid2.name: null;
   }
   if (jobHandlerWorking){
     copyInstance.metaData["grid1Name"] = jobHandlerSelectedGrid.name;

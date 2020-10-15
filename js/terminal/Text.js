@@ -124,6 +124,7 @@ var Text = function(){
   this.NO_CREATED_MATERIALS = "There are no created materials.";
   this.NO_SUCH_MATERIAL = "No such material.";
   this.MATERIAL_DESTROYED = "Material destroyed.";
+  this.MUST_HAVE_0_1_OR_2_GRIDS_SELECTED = "Must have 0, 1 or 2 grids selected."
   this.MUST_HAVE_1_OR_2_GRIDS_SELECTED = "Must have 1 or 2 grids selected.";
   this.NAME_MUST_BE_UNIQUE = "Name must be unique.";
   this.ID_MUST_BE_UNIQUE = "ID must be unique.";

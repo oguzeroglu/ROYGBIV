@@ -3253,8 +3253,12 @@ function parse(input){
           var gridSelectionSize;
           if (!jobHandlerWorking){
             gridSelectionSize = Object.keys(gridSelections).length;
-            if (gridSelectionSize != 1 && gridSelectionSize != 2){
-              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+            if (gridSelectionSize == 0){
+              var srcObj = addedObjects[sourceName] || objectGroups[sourceName];
+              var srcPos = srcObj.mesh.position;
+              copyPosition.set(srcPos.x + offsetX, srcPos.y + offsetY, srcPos.z + offsetZ);
+            }else if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_0_1_OR_2_GRIDS_SELECTED);
               return true;
             }
           }else{
@@ -3284,14 +3288,15 @@ function parse(input){
             copyPosition.y += jobHandlerSelectedGrid.centerY;
             copyPosition.z += jobHandlerSelectedGrid.centerZ;
           }
-          var gs = gridSystems[gsName];
-          copyPosition.x = (copyPosition.x / ct) + offsetX;
-          copyPosition.y = (copyPosition.y / ct) + offsetY;
-          copyPosition.z = (copyPosition.z / ct) + offsetZ;
-          var sourceObj = addedObjects[sourceName];
-          if (!sourceObj){
-            sourceObj = objectGroups[sourceName];
+
+          var gs = null;
+          if (gridSelectionSize != 0){
+            var gs = gridSystems[gsName];
+            copyPosition.x = (copyPosition.x / ct) + offsetX;
+            copyPosition.y = (copyPosition.y / ct) + offsetY;
+            copyPosition.z = (copyPosition.z / ct) + offsetZ;
           }
+          var sourceObj = addedObjects[sourceName] || objectGroups[sourceName];
           if (sourceObj.registeredSceneName != sceneHandler.getActiveSceneName()){
             terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             return true;
