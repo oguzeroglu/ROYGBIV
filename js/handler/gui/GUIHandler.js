@@ -538,11 +538,11 @@ GUIHandler.prototype.afterObjectSelection = function(){
     var obj = curSelection;
     obj.visualiseBoundingBoxes();
     guiHandler.objectManipulationParameters["Object"] = obj.name;
+    guiHandler.objectManipulationParameters["Position"] = obj.mesh.position.x + "," + obj.mesh.position.y + "," + obj.mesh.position.z;
     if (obj.isAddedObject){
       guiHandler.objectManipulationParameters["Rotate x"] = "0";
       guiHandler.objectManipulationParameters["Rotate y"] = "0";
       guiHandler.objectManipulationParameters["Rotate z"] = "0";
-      guiHandler.objectManipulationParameters["Position"] = obj.mesh.position.x + "," + obj.mesh.position.y + "," + obj.mesh.position.z;
       guiHandler.objectManipulationParameters["Opacity"] = obj.getOpacity();
       if (obj.metaData.isSlippery){
         guiHandler.objectManipulationParameters["Slippery"] = true;
