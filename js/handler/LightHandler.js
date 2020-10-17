@@ -581,6 +581,14 @@ LightHandler.prototype.removeStaticPointLight = function(slotID){
 
   for (var objName in objectGroupsInScene){
     var obj = objectGroupsInScene[objName];
+
+    for (var childName in obj.group){
+      var child = obj.group[childName];
+      if (obj.group[childName].affectedByLight){
+        this.removeStaticPointLightMacros(child, slotID);
+      }
+    }
+
     if (!obj.affectedByLight){
       continue;
     }
@@ -626,6 +634,12 @@ LightHandler.prototype.addStaticPointLight = function(position, color, strength,
 
   for (var objName in objectGroupsInScene){
     var obj = objectGroupsInScene[objName];
+    for (var childName in obj.group){
+      var child = obj.group[childName];
+      if (child.affectedByLight){
+        this.handleStaticPointLightMacros(foundSlotID, child, position, color, strength);
+      }
+    }
     if (!obj.affectedByLight){
       continue;
     }
@@ -662,16 +676,22 @@ LightHandler.prototype.removeStaticDiffuseLight = function(slotID){
       continue;
     }
 
-    this.removeStaticDiffuseLightMacros(obj,slotID);
+    this.removeStaticDiffuseLightMacros(obj, slotID);
   }
 
   for (var objName in objectGroupsInScene){
     var obj = objectGroupsInScene[objName];
+    for (var childName in obj.group){
+      var child = obj.group[childName];
+      if (child.affectedByLight){
+        this.removeStaticDiffuseLightMacros(child, slotID);
+      }
+    }
     if (!obj.affectedByLight){
       continue;
     }
 
-    this.removeStaticDiffuseLightMacros(obj,slotID);
+    this.removeStaticDiffuseLightMacros(obj, slotID);
   }
 
   this.staticDiffuseLightCount --;
@@ -712,6 +732,13 @@ LightHandler.prototype.addStaticDiffuseLight = function(direction, color, streng
 
   for (var objName in objectGroupsInScene){
     var obj = objectGroupsInScene[objName];
+    for (var childName in obj.group){
+      var child = obj.group[childName];
+      if (child.affectedByLight){
+        this.handleStaticDiffuseLightMacros(foundSlotID, child, direction, color, strength);
+      }
+    }
+
     if (!obj.affectedByLight){
       continue;
     }
