@@ -103,6 +103,7 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   }
   protocolDefinitionFileName = obj.protocolDefinitionFileName;
   serverWSURL = obj.serverWSURL;
+  skyboxDistance = obj.skyboxDistance || skyboxDistance;
 }
 
 ImportHandler.prototype.importGridSystems = function(obj){

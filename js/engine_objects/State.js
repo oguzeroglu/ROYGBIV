@@ -77,6 +77,7 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   }
   this.skyBoxes = skyBoxExport;
   this.skyboxHandlerInfo = skyboxHandler.export();
+  this.skyboxDistance = skyboxDistance;
   // ANCHOR GRID ***************************************************
   if (anchorGrid){
     this.anchorGrid = anchorGrid.export();

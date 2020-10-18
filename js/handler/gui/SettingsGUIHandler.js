@@ -88,7 +88,8 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     "Accepted texture size": "" + ACCEPTED_TEXTURE_SIZE,
     "Disable instancing": INSTANCING_DISABLED,
     "Shadow quality": shadowBaker.quality,
-    "Shadow intensity": shadowBaker.intensity
+    "Shadow intensity": shadowBaker.intensity,
+    "Skybox distance": "" + skyboxDistance
   };
 
   var resolutionController = parentFolder.add(params, "Resolution").onFinishChange(function(val){
@@ -188,6 +189,28 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     terminal.clear();
     shadowBaker.updateIntensity(val);
     terminal.printInfo(Text.SHADOW_INTENSITY_UPDATED);
+  });
+
+  parentFolder.add(params, "Skybox distance").onFinishChange(function(val){
+    terminal.clear();
+    var valParsed = parseFloat(val);
+
+    if (isNaN(valParsed)){
+      terminal.printError(Text.INVALID_NUMERICAL_VALUE);
+      return;
+    }
+
+    if (valParsed <= 0){
+      terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "Skybox distance").replace(Text.PARAM2, "0"));
+      return;
+    }
+
+    skyboxDistance = valParsed;
+    if (skyboxHandler.mappedSkyboxName){
+      skyboxHandler.map(skyBoxes[skyboxHandler.mappedSkyboxName]);
+    }
+
+    terminal.printInfo(Text.SKYBOX_DISTANCE_UPDATED);
   });
 
   var shaderPrecisionFolder = parentFolder.addFolder("Shader precision");

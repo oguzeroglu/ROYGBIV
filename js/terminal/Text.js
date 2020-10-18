@@ -936,6 +936,7 @@ var Text = function(){
   this.KEYBOARD_BUFFER_RESET = "Keyboard buffer reset.";
   this.BLENDING_MODE_MUST_BE_ONE_OF = "Blending mode should be one of NO_BLENDING, NORMAL_BLENDING, ADDITIVE_BLENDING, SUBTRACTIVE_BLENDING and MULTIPLY_BLENDING.";
   this.MUST_BE_GREATER_THAN = "@@1 must be greater than @@2.";
+  this.SKYBOX_DISTANCE_UPDATED = "Skybox distance updated.";
   this.MUST_BE_LESS_THAN = "@@1 must be less than @@2.";
   this.ACCEPTED_TEXTURE_SIZE_SET = "Accepted texture size set.";
   this.OCTREE_LIMIT_SET = "World limit set.";
