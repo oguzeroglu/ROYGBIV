@@ -293,6 +293,9 @@ function parse(input){
           name = name.replace(/_/g, "-");
 
           var result = processNewGridSystemCommand(name, croppedGridSystem.sizeX, croppedGridSystem.sizeZ, croppedGridSystem.centerX, croppedGridSystem.centerY, croppedGridSystem.centerZ, outlineColor, cellSize, croppedGridSystem.axis, false);
+          for (var gridName in gridSelections){
+            gridSelections[gridName].toggleSelect(false, false, false, true);
+          }
           return result;
         break;
         case 13: //switchView
