@@ -141,6 +141,13 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
       }
       guiHandler.afterObjectSelection();
     break;
+    case 27: //ESC
+    if (mode == 0 && !isDeployment){
+      selectionHandler.resetCurrentSelection();
+      terminal.clear();
+      terminal.printInfo(Text.SELECTION_RESET);
+    }
+    break;
   }
 }
 

@@ -237,6 +237,7 @@ var Text = function(){
   this.COMMAND_EXECUTED_FOR_X_IMAGES = "Command executed for @@1 images.";
   this.NO_TEXTURE_FOUND = "No texture found.";
   this.NO_OBJECT_FOUND = "No object found.";
+  this.SELECTION_RESET = "Selection reset.";
   this.PARTICLE_SYSTEMS = "Particle systems";
   this.PARTICLE_SYSTEM_POOLS = "Particle system pools.";
   this.MUZZLE_FLASHES = "Muzzleflashes.";
