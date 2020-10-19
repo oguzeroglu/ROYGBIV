@@ -274,27 +274,19 @@ ShadowBaker.prototype.batchBake = function(objAry, lightInfo){
   terminal.disable();
   terminal.printInfo(Text.BAKING_SHADOW, true);
 
-  var objGroups = [];
-  var removeIndices = [];
+  var objAryExpanded = [];
   for (var i = 0; i < objAry.length; i ++){
     if (objAry[i].isObjectGroup){
-      objGroups.push(objAry[i]);
-      removeIndices.push(i);
-    }
-  }
-
-  for (var i = 0; i < removeIndices.length; i ++){
-    objAry.splice(removeIndices[i], 1);
-  }
-
-  for (var i = 0; i < objGroups.length; i ++){
-    for (var childName in objGroups[i].group){
-      objAry.push(objGroups[i].group[childName]);
+      for (var childName in objAry[i].group){
+        objAryExpanded.push(objAry[i].group[childName]);
+      }
+    }else{
+      objAryExpanded.push(objAry[i]);
     }
   }
 
   this.lightInfo = lightInfo;
-  this.objAry = objAry;
+  this.objAry = objAryExpanded;
   this.ctr = 0;
 
   this.oldBinSize = BIN_SIZE;
