@@ -206,7 +206,7 @@ ShadowBaker.prototype.onAfterShadowBaked = function(){
 
 ShadowBaker.prototype.onMessageReceived = function(data){
   var payload = data.payload;
-  terminal.printInfo(Text.SHADOW_BAKE_DONE, true);
+  terminal.printInfo(Text.SHADOW_BAKE_DONE.replace(Text.PARAM1, performance.now() - this.startTime), true);
 
   var shadowCanvas = this.intermediateCanvasesByObjName[payload.objName];
   var ctx = shadowCanvas.getContext("2d");
@@ -259,6 +259,8 @@ ShadowBaker.prototype.bakeShadow = function(){
   if (obj.parentObjectName){
     objectGroups[obj.parentObjectName].hasShadowMap = true;
   }
+
+  this.startTime = performance.now();
 
   var payload = this.generateWorkerPayloadForSurface(obj, this.lightInfo);
 

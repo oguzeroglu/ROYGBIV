@@ -1,7 +1,5 @@
 var WorldBinHandler = function(){
   this.bin = new Map();
-  this.cache = new Map();
-  this.cacheHitCount = 0;
 }
 
 WorldBinHandler.prototype.deleteObjectFromBin = function(binInfo, objName){
@@ -220,7 +218,7 @@ WorldBinHandler.prototype.query = function(point){
       }
     }
   }
-  
+
   return results;
 }
 
