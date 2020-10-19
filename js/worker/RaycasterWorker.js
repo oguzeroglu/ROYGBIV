@@ -422,6 +422,65 @@ RaycasterWorker.prototype.onActiveVirtualKeyboardChanged = function(vkName){
   }
 }
 
+RaycasterWorker.prototype.bakeShadow = function(data){
+  var payload = data.payload;
+  var pixelIndex = 0;
+  var intersectionTests = payload.intersectionTests;
+  var pixels = new Uint8ClampedArray (payload.pixels);
+
+  var obj = null;
+  if (payload.parentName){
+    var parent = objectGroups[payload.parentName];
+    obj = parent.group[payload.objName];
+  }else{
+    obj = addedObjects[payload.objName];
+  }
+
+  for (var i = 0; i < intersectionTests.length; i ++){
+    var intersectionTest = intersectionTests[i];
+    var isPointLight = (typeof intersectionTest.distanceToLight) != UNDEFINED;
+
+    if (isPointLight){
+      rayCaster.findIntersections(intersectionTest.from, intersectionTest.dir, false, function(x, y, z, objName){
+        if (objName == obj.name || !objName){
+          pixels[pixelIndex ++] = 255;
+          pixels[pixelIndex ++] = 255;
+          pixels[pixelIndex ++] = 255;
+        }else{
+          var toIntersection = new THREE.Vector3(x - intersectionTest.curX, y - intersectionTest.curY, z - intersectionTest.curZ);
+          if (toIntersection.length() > intersectionTest.distanceToLight){
+            pixels[pixelIndex ++] = 255;
+            pixels[pixelIndex ++] = 255;
+            pixels[pixelIndex ++] = 255;
+          }else{
+            pixels[pixelIndex ++] = 0;
+            pixels[pixelIndex ++] = 0;
+            pixels[pixelIndex ++] = 0;
+          }
+        }
+
+        pixels[pixelIndex ++] = 255;
+      }, null, null, true);
+    }else{
+      this.rayCaster.findIntersections(intersectionTest.from, intersectionTest.dir, false, function(x, y, z, objName){
+        if (!objName){
+          pixels[pixelIndex ++] = 255;
+          pixels[pixelIndex ++] = 255;
+          pixels[pixelIndex ++] = 255;
+        }else{
+          pixels[pixelIndex ++] = 0;
+          pixels[pixelIndex ++] = 0;
+          pixels[pixelIndex ++] = 0;
+        }
+
+        pixels[pixelIndex ++] = 255;
+      });
+    }
+  }
+
+  postMessage(data, [payload.pixels]);
+}
+
 // START
 raycasterFactory = new RaycasterFactory();
 var particleSystemGenerator = new ParticleSystemGenerator();
@@ -459,6 +518,8 @@ self.onmessage = function(msg){
     worker.set2DTextSizes(msg.data);
   }else if (msg.data.activeVirtualKeyboardChanged){
     worker.onActiveVirtualKeyboardChanged(msg.data.activeVKName);
+  }else if (msg.data.isBakeShadow){
+    worker.bakeShadow(msg.data);
   }else{
     worker.update(msg.data);
     worker.transferableMessageBody = msg.data;

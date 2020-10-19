@@ -473,7 +473,7 @@ SettingsGUIHandler.prototype.initializeWorkerFolder = function(parentFolder){
     terminal.printInfo(val? Text.RAYCASTER_WORKER_TURNED_ON: Text.RAYCASTER_WORKER_TURNED_OFF);
 
     if (val){
-      rayCaster.onReadyCallback = function(){};
+      rayCaster.onReadyCallback = noop;
     }
   });
 
