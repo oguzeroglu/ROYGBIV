@@ -47,7 +47,6 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
   this.intensity = exportObj.intensity;
 
   if (Object.keys(exportObj.textureRangesByObjectName).length == 0){
-    onReady();
     return;
   }
 
