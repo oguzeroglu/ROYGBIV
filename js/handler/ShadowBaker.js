@@ -256,6 +256,10 @@ ShadowBaker.prototype.bakeShadow = function(){
     return;
   }
 
+  if (obj.parentObjectName){
+    objectGroups[obj.parentObjectName].hasShadowMap = true;
+  }
+
   var payload = this.generateWorkerPayloadForSurface(obj, this.lightInfo);
 
   rayCaster.worker.postMessage({
@@ -307,59 +311,6 @@ ShadowBaker.prototype.batchBake = function(objAry, lightInfo){
     shadowBaker.bakeShadow(lightInfo);
   };
 }
-
-/*
-ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, skipRefresh){
-  if (!this.isSupported(obj)){
-    terminal.printError(Text.OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING.replace(Text.PARAM1, obj.name));
-    return false;
-  }
-
-  var oldBinSize = BIN_SIZE;
-  var oldRaycasterStep = RAYCASTER_STEP_AMOUNT;
-
-  BIN_SIZE = 20;
-  RAYCASTER_STEP_AMOUNT = 10;
-
-  this.rayCaster = new RayCaster();
-  this.rayCaster.refresh();
-
-  if (obj.isAddedObject && (obj.type == "surface" || obj.type == "ramp")){
-    this.bakeSurfaceShadow(obj, lightInfo);
-  }
-
-  if (obj.isObjectGroup){
-    var hasBakedShadow = false;
-    for (var childName in obj.group){
-      var childObj = obj.group[childName];
-      if (this.isSupported(childObj)){
-        this.bakeShadow(childObj, lightInfo, skipRefresh);
-        hasBakedShadow = true;
-      }else{
-        terminal.printError(Text.CHILD_OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING);
-      }
-    }
-
-    obj.hasShadowMap = hasBakedShadow;
-  }
-
-  BIN_SIZE = oldBinSize;
-  RAYCASTER_STEP_AMOUNT = oldRaycasterStep;
-
-  delete this.rayCaster;
-
-  if (!skipRefresh){
-    this.refreshTextures(function(){
-      terminal.enable();
-      terminal.clear();
-      terminal.printInfo(Text.SHADOW_BAKED);
-    }, function(){
-      terminal.enable();
-      terminal.clear();
-      terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
-    });
-  }
-}*/
 
 ShadowBaker.prototype.unbakeShadow = function(obj, skipRefresh){
   delete this.texturesByObjName[obj.name];
