@@ -172,7 +172,6 @@ ShadowBaker.prototype.batchUnbake = function(objAry){
 }
 
 ShadowBaker.prototype.batchBake = function(objAry, lightInfo){
-  terminal.clear();
   terminal.disable();
   terminal.printInfo(Text.BAKING_SHADOW);
 
@@ -182,11 +181,9 @@ ShadowBaker.prototype.batchBake = function(objAry, lightInfo){
 
   shadowBaker.refreshTextures(function(){
     terminal.enable();
-    terminal.clear();
     terminal.printInfo(Text.SHADOW_BAKED);
   }, function(){
     terminal.enable();
-    terminal.clear();
     terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
   });
 }
