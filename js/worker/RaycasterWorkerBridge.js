@@ -407,7 +407,7 @@ RaycasterWorkerBridge.prototype.onReady = function(){
 }
 
 RaycasterWorkerBridge.prototype.flush = function(){
-  if (!this.hasOwnership || !this.ready){
+  if (!this.hasOwnership || !this.ready || shadowBaker.isBakingShadow){
     return;
   }
   var flushStartTime;

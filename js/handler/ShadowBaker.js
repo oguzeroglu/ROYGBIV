@@ -173,9 +173,10 @@ ShadowBaker.prototype.batchUnbake = function(objAry){
 ShadowBaker.prototype.onAfterShadowBaked = function(){
   BIN_SIZE = this.oldBinSize;
   RAYCASTER_STEP_AMOUNT = this.oldRaycasterStep;
-  RAYCASTER_WORKER_ON = this.oldRaycasterWorkerStatus
+  RAYCASTER_WORKER_ON = this.oldRaycasterWorkerStatus;
   raycasterFactory.refresh();
   rayCaster = raycasterFactory.get();
+  this.isBakingShadow = false;
   if (RAYCASTER_WORKER_ON){
     rayCaster.onReadyCallback = function(){
       terminal.printInfo(Text.SHADOW_BAKED);
@@ -268,6 +269,8 @@ ShadowBaker.prototype.bakeShadow = function(){
 }
 
 ShadowBaker.prototype.batchBake = function(objAry, lightInfo){
+  this.isBakingShadow = true;
+
   terminal.disable();
   terminal.printInfo(Text.BAKING_SHADOW, true);
 
