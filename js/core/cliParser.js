@@ -6586,6 +6586,11 @@ function parse(input){
             return true;
           }
 
+          if (!WORKERS_SUPPORTED){
+            terminal.printError(Text.THIS_COMMAND_REQUIRES_WEB_WORKERS_TO_BE_ENABLED);
+            return true;
+          }
+
           var objectNamesArray = splitted[1].split(",");
           for (var i = 0; i<objectNamesArray.length; i++){
             if (!(objectNamesArray[i].indexOf("*") == -1)){

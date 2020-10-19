@@ -209,6 +209,7 @@ var Text = function(){
   this.OBJECT_IS_A_COPY = "Object is a copy. Cannot export.";
   this.GENERATING_TEXTURE_ATLAS = "Generating texture atlas.";
   this.INITIALIZING_WORKERS = "Initializing workers.";
+  this.THIS_COMMAND_REQUIRES_WEB_WORKERS_TO_BE_ENABLED = "This command requires Web Workers to be enabled.";
   this.RAYCASTER_WORKER_TURNED_ON = "Raycaster worker turned on.";
   this.RAYCASTER_WORKER_TURNED_OFF = "Raycaster worker turned off.";
   this.PHYSICS_WORKER_TURNED_ON = "Physics worker turned on.";
