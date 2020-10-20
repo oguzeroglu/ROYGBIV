@@ -1022,6 +1022,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     for (var name in curObjectGroupExport.group){
       group[name] = addedObjects[name];
     }
+
     var objectGroupInstance = new ObjectGroup(objectName, group);
     objectGroups[objectName] = objectGroupInstance;
     if (curObjectGroupExport.isRotationDirty){

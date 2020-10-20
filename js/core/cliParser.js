@@ -6586,6 +6586,11 @@ function parse(input){
             return true;
           }
 
+          if (!WORKERS_SUPPORTED){
+            terminal.printError(Text.THIS_COMMAND_REQUIRES_WEB_WORKERS_TO_BE_ENABLED);
+            return true;
+          }
+
           var objectNamesArray = splitted[1].split(",");
           for (var i = 0; i<objectNamesArray.length; i++){
             if (!(objectNamesArray[i].indexOf("*") == -1)){
@@ -6610,21 +6615,19 @@ function parse(input){
           for (var i = 0; i < objectNamesArray.length; i ++){
             var obj = addedObjects[objectNamesArray[i]] || objectGroups[objectNamesArray[i]];
             if (!obj){
-              terminal.printError(Text.OBJECT_NR_DOES_NOT_EXIST.replace(Text.PARAM1, i + 1));
-              return true;
+              continue;
             }
             if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
-              terminal.printError(Text.OBJECT_NR_X_NOT_IN_SCENE.replace(Text.PARAM1, i + 1));
-              return true;
+              continue;
             }
             if (obj.isChangeable){
               terminal.printError(Text.CHANGEABLE_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
-              return true;
+              continue;
             }
 
             if (obj.isDynamicObject){
               terminal.printError(Text.DYNAMIC_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
-              return true;
+              continue;
             }
             objAry.push(obj);
           }
@@ -6696,31 +6699,19 @@ function parse(input){
           for (var i = 0; i < objectNamesArray.length; i ++){
             var obj = addedObjects[objectNamesArray[i]] || objectGroups[objectNamesArray[i]];
             if (!obj){
-              terminal.printError(Text.OBJECT_NR_DOES_NOT_EXIST.replace(Text.PARAM1, i + 1));
-              return true;
+              continue;
             }
             if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
-              terminal.printError(Text.OBJECT_NR_X_NOT_IN_SCENE.replace(Text.PARAM1, i + 1));
-              return true;
-            }
-            if (obj.isChangeable){
-              terminal.printError(Text.CHANGEABLE_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
-              return true;
-            }
-
-            if (obj.isDynamicObject){
-              terminal.printError(Text.DYNAMIC_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
-              return true;
+              continue;
             }
             if (!obj.mesh.material.uniforms.shadowMap){
-              terminal.printError(Text.OBJECT_NR_X_DOES_NOT_HAVE_SHADOW_MAP.replace(Text.PARAM1, (i + 1)));
-              return true;
+              continue;
             }
             objAry.push(obj);
           }
 
           if (objAry.length == 0){
-            terminal.printError(Text.NO_OBJECT_FOUND);
+            terminal.printError(Text.NO_OBJECT_FOUND_WITH_SHADOWS);
             return true;
           }
 

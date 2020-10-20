@@ -1,8 +1,5 @@
 var WorldBinHandler = function(){
   this.bin = new Map();
-  this.cache = new Map();
-  this.applyCaching = true;
-  this.cacheHitCount = 0;
 }
 
 WorldBinHandler.prototype.deleteObjectFromBin = function(binInfo, objName){
@@ -57,10 +54,6 @@ WorldBinHandler.prototype.updateObject = function(obj){
     }
     this.insert(obj.boundingBox, obj.name);
   }
-  if (this.applyCaching && this.cache.size > 0){
-    this.cache.clear();
-    this.cacheHitCount = 0;
-  }
 }
 
 WorldBinHandler.prototype.show = function(obj){
@@ -81,10 +74,6 @@ WorldBinHandler.prototype.show = function(obj){
   }else if (obj.isAddedText){
     this.insert(obj.boundingBox, obj.name);
   }
-  if (this.applyCaching && this.cache.size > 0){
-    this.cache.clear();
-    this.cacheHitCount = 0;
-  }
 }
 
 WorldBinHandler.prototype.hide = function(obj){
@@ -92,10 +81,6 @@ WorldBinHandler.prototype.hide = function(obj){
     return;
   }
   this.deleteObjectFromBin(obj.binInfo, obj.name);
-  if (this.applyCaching && this.cache.size > 0){
-    this.cache.clear();
-    this.cacheHitCount = 0;
-  }
 }
 
 WorldBinHandler.prototype.visualize = function(selectedScene, customBin){
@@ -201,18 +186,6 @@ WorldBinHandler.prototype.query = function(point){
     minZ = rZ - BIN_SIZE;
   }
 
-  var cacheKey;
-  if (this.applyCaching){
-    cacheKey = minX + PIPE + minY + PIPE + minZ;
-    var cached = this.cache.get(cacheKey);
-    if (cached){
-      this.cacheHitCount ++;
-      if (this.cacheHitCount > 10000){
-        this.cacheHitCount = 0;
-      }
-      return cached;
-    }
-  }
   var results = new Object();
 
   for (var xDiff = -BIN_SIZE; xDiff <= BIN_SIZE; xDiff += BIN_SIZE){
@@ -245,9 +218,7 @@ WorldBinHandler.prototype.query = function(point){
       }
     }
   }
-  if (this.applyCaching){
-    this.cache.set(cacheKey, results);
-  }
+
   return results;
 }
 

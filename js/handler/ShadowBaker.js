@@ -47,7 +47,6 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
   this.intensity = exportObj.intensity;
 
   if (Object.keys(exportObj.textureRangesByObjectName).length == 0){
-    onReady();
     return;
   }
 
@@ -171,76 +170,142 @@ ShadowBaker.prototype.batchUnbake = function(objAry){
   });
 }
 
-ShadowBaker.prototype.batchBake = function(objAry, lightInfo){
-  terminal.clear();
-  terminal.disable();
-  terminal.printInfo(Text.BAKING_SHADOW);
+ShadowBaker.prototype.onAfterShadowBaked = function(){
+  BIN_SIZE = this.oldBinSize;
+  RAYCASTER_STEP_AMOUNT = this.oldRaycasterStep;
+  RAYCASTER_WORKER_ON = this.oldRaycasterWorkerStatus;
+  raycasterFactory.refresh();
+  rayCaster = raycasterFactory.get();
+  this.isBakingShadow = false;
+  if (RAYCASTER_WORKER_ON){
+    rayCaster.onReadyCallback = function(){
+      terminal.printInfo(Text.SHADOW_BAKED);
+      rayCaster.onReadyCallback = noop;
 
-  for (var i = 0; i < objAry.length; i ++){
-    shadowBaker.bakeShadow(objAry[i], lightInfo, true);
-  }
-
-  shadowBaker.refreshTextures(function(){
-    terminal.enable();
-    terminal.clear();
+      terminal.printInfo(Text.REFRESHING_SHADOW_MAPS);
+      shadowBaker.refreshTextures(function(){
+        terminal.enable();
+      },function(){
+        terminal.enable();
+        terminal.printError(Text.ERROR_HAPPENED_REFRESINH_SHADOW_MAPS);
+      });
+    }
+  }else{
+    rayCaster.onReadyCallback = noop;
     terminal.printInfo(Text.SHADOW_BAKED);
-  }, function(){
-    terminal.enable();
-    terminal.clear();
-    terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
-  });
+
+    terminal.printInfo(Text.REFRESHING_SHADOW_MAPS);
+    shadowBaker.refreshTextures(function(){
+      terminal.enable();
+    },function(){
+      terminal.enable();
+      terminal.printError(Text.ERROR_HAPPENED_REFRESINH_SHADOW_MAPS);
+    });
+  }
 }
 
-ShadowBaker.prototype.bakeShadow = function(obj, lightInfo, skipRefresh){
-  if (!this.isSupported(obj)){
-    terminal.printError(Text.OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING.replace(Text.PARAM1, obj.name));
-    return false;
+ShadowBaker.prototype.onMessageReceived = function(data){
+  var payload = data.payload;
+  terminal.printInfo(Text.SHADOW_BAKE_DONE.replace(Text.PARAM1, performance.now() - this.startTime), true);
+
+  var shadowCanvas = this.intermediateCanvasesByObjName[payload.objName];
+  var ctx = shadowCanvas.getContext("2d");
+
+  delete this.intermediateCanvasesByObjName[payload.objName];
+
+  var imageData = ctx.getImageData(0, 0, shadowCanvas.width, shadowCanvas.height);
+  imageData.data.set(new Uint8ClampedArray(payload.pixels));
+
+  ctx.putImageData(imageData, 0, 0);
+
+  var tmpCanvas = document.createElement("canvas");
+  tmpCanvas.width = shadowCanvas.width;
+  tmpCanvas.height = shadowCanvas.height;
+  var tmpCtx = tmpCanvas.getContext('2d');
+  tmpCtx.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height);
+  tmpCtx.translate(shadowCanvas.width / 2, shadowCanvas.height / 2);
+  tmpCtx.rotate(-Math.PI/2);
+  tmpCtx.drawImage(shadowCanvas, -shadowCanvas.width / 2, -shadowCanvas.width / 2);
+
+  var dataURL = tmpCanvas.toDataURL();
+  var canvasTexture = this.canvasTexturesByDataURL[dataURL];
+
+  if (!canvasTexture){
+    canvasTexture = new THREE.CanvasTexture(tmpCanvas);
+    this.canvasTexturesByDataURL[dataURL] = canvasTexture;
   }
 
-  var oldBinSize = BIN_SIZE;
-  var oldRaycasterStep = RAYCASTER_STEP_AMOUNT;
+  this.texturesByObjName[payload.objName] = canvasTexture;
 
+  this.bakeShadow();
+}
+
+ShadowBaker.prototype.bakeShadow = function(){
+  if (this.ctr == this.objAry.length){
+    this.onAfterShadowBaked();
+    return;
+  }
+
+  var obj = this.objAry[this.ctr ++];
+  var indicatorText = (this.ctr) + "/" + this.objAry.length;
+  terminal.printInfo(Text.BAKING_SHADOW_FOR.replace(Text.PARAM1, obj.name).replace(Text.PARAM2, indicatorText), true);
+
+  if (!this.isSupported(obj)){
+    terminal.printError(Text.TYPE_NOT_SUPPORTED, true);
+    this.bakeShadow();
+    return;
+  }
+
+  if (obj.parentObjectName){
+    objectGroups[obj.parentObjectName].hasShadowMap = true;
+  }
+
+  this.startTime = performance.now();
+
+  var payload = this.generateWorkerPayloadForSurface(obj, this.lightInfo);
+
+  rayCaster.worker.postMessage({
+    isBakeShadow: true,
+    payload: payload
+  }, [payload.pixels]);
+}
+
+ShadowBaker.prototype.batchBake = function(objAry, lightInfo){
+  this.isBakingShadow = true;
+
+  terminal.disable();
+  terminal.printInfo(Text.BAKING_SHADOW, true);
+
+  var objAryExpanded = [];
+  for (var i = 0; i < objAry.length; i ++){
+    if (objAry[i].isObjectGroup){
+      for (var childName in objAry[i].group){
+        objAryExpanded.push(objAry[i].group[childName]);
+      }
+    }else{
+      objAryExpanded.push(objAry[i]);
+    }
+  }
+
+  this.lightInfo = lightInfo;
+  this.objAry = objAryExpanded;
+  this.ctr = 0;
+
+  this.oldBinSize = BIN_SIZE;
+  this.oldRaycasterStep = RAYCASTER_STEP_AMOUNT;
+  this.oldRaycasterWorkerStatus = RAYCASTER_WORKER_ON;
+
+  RAYCASTER_WORKER_ON = true;
   BIN_SIZE = 20;
   RAYCASTER_STEP_AMOUNT = 10;
 
-  this.rayCaster = new RayCaster();
-  this.rayCaster.refresh();
+  this.intermediateCanvasesByObjName = {};
 
-  if (obj.isAddedObject && (obj.type == "surface" || obj.type == "ramp")){
-    this.bakeSurfaceShadow(obj, lightInfo);
-  }
-
-  if (obj.isObjectGroup){
-    var hasBakedShadow = false;
-    for (var childName in obj.group){
-      var childObj = obj.group[childName];
-      if (this.isSupported(childObj)){
-        this.bakeShadow(childObj, lightInfo, skipRefresh);
-        hasBakedShadow = true;
-      }else{
-        terminal.printError(Text.CHILD_OBJECT_TYPE_NOT_SUPPORTED_FOR_SHADOW_BAKING);
-      }
-    }
-
-    obj.hasShadowMap = hasBakedShadow;
-  }
-
-  BIN_SIZE = oldBinSize;
-  RAYCASTER_STEP_AMOUNT = oldRaycasterStep;
-
-  delete this.rayCaster;
-
-  if (!skipRefresh){
-    this.refreshTextures(function(){
-      terminal.enable();
-      terminal.clear();
-      terminal.printInfo(Text.SHADOW_BAKED);
-    }, function(){
-      terminal.enable();
-      terminal.clear();
-      terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
-    });
-  }
+  raycasterFactory.refresh();
+  rayCaster = raycasterFactory.get();
+  rayCaster.onReadyCallback = function(){
+    shadowBaker.bakeShadow(lightInfo);
+  };
 }
 
 ShadowBaker.prototype.unbakeShadow = function(obj, skipRefresh){
@@ -419,7 +484,14 @@ ShadowBaker.prototype.isSupported = function(obj){
   return false;
 }
 
-ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo){
+ShadowBaker.prototype.generateWorkerPayloadForSurface = function(obj, lightInfo){
+
+  var payload = {
+    objName: obj.name,
+    parentName: obj.parentObjectName,
+    intersectionTests: []
+  };
+
   var uvs = obj.mesh.geometry.attributes.uv.array;
   var positions = obj.mesh.geometry.attributes.position.array;
   var uvsConstructed = [];
@@ -464,11 +536,17 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo){
   var ctx = shadowCanvas.getContext('2d');
   ctx.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height);
 
-  var imageData = ctx.getImageData(0, 0, shadowCanvas.width, shadowCanvas.height);
-  var pixels = imageData.data;
+  var firstLocal = positionsConstructed[firstIndex].clone();
+  var lastLocal = positionsConstructed[lastIndex].clone();
 
-  var pixelIndex = 0;
-  var iterCount = 0;
+  var shadowCanvas = this.getCanvasFromQuality(this.quality);
+  var ctx = shadowCanvas.getContext('2d');
+  ctx.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height);
+
+  var imageData = ctx.getImageData(0, 0, shadowCanvas.width, shadowCanvas.height);
+  payload.pixels = imageData.data.buffer;
+
+  this.intermediateCanvasesByObjName[obj.name] = shadowCanvas;
 
   var lightPos;
   var lightDirNegative;
@@ -501,64 +579,25 @@ ShadowBaker.prototype.bakeSurfaceShadow = function(obj, lightInfo){
         var toLight = new THREE.Vector3(lightPos.x - curX, lightPos.y - curY, lightPos.z - curZ);
         var distanceToLight = toLight.length();
         var directionVector = toLight.normalize();
-        this.rayCaster.findIntersections(fromVector, directionVector, false, function(x, y, z, objName){
-          if (objName == obj.name || !objName){
-            pixels[pixelIndex ++] = 255;
-            pixels[pixelIndex ++] = 255;
-            pixels[pixelIndex ++] = 255;
-          }else{
-            var toIntersection = new THREE.Vector3(x - curX, y - curY, z - curZ);
-            if (toIntersection.length() > distanceToLight){
-              pixels[pixelIndex ++] = 255;
-              pixels[pixelIndex ++] = 255;
-              pixels[pixelIndex ++] = 255;
-            }else{
-              pixels[pixelIndex ++] = 0;
-              pixels[pixelIndex ++] = 0;
-              pixels[pixelIndex ++] = 0;
-            }
-          }
 
-          pixels[pixelIndex ++] = 255;
-        }, null, null, true);
+        payload.intersectionTests.push({
+          from: fromVector.clone(),
+          dir: directionVector.clone(),
+          distanceToLight: distanceToLight,
+          curX: curX,
+          curY: curY,
+          curZ: curZ
+        });
       }else{
-        var fromVector = new THREE.Vector3(curX, curY, curZ);
-        this.rayCaster.findIntersections(fromVector, lightDirNegative, false, function(x, y, z, objName){
-          if (!objName){
-            pixels[pixelIndex ++] = 255;
-            pixels[pixelIndex ++] = 255;
-            pixels[pixelIndex ++] = 255;
-          }else{
-            pixels[pixelIndex ++] = 0;
-            pixels[pixelIndex ++] = 0;
-            pixels[pixelIndex ++] = 0;
-          }
-
-          pixels[pixelIndex ++] = 255;
+        payload.intersectionTests.push({
+          from: new THREE.Vector3(curX, curY, curZ),
+          dir: lightDirNegative.clone()
         });
       }
     }
   }
 
-  ctx.putImageData(imageData, 0, 0);
-  var tmpCanvas = document.createElement("canvas");
-  tmpCanvas.width = shadowCanvas.width;
-  tmpCanvas.height = shadowCanvas.height;
-  var tmpCtx = tmpCanvas.getContext('2d');
-  tmpCtx.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height);
-  tmpCtx.translate(shadowCanvas.width / 2, shadowCanvas.height / 2);
-  tmpCtx.rotate(-Math.PI/2);
-  tmpCtx.drawImage(shadowCanvas, -shadowCanvas.width / 2, -shadowCanvas.width / 2);
-
-  var dataURL = tmpCanvas.toDataURL();
-  var canvasTexture = this.canvasTexturesByDataURL[dataURL];
-
-  if (!canvasTexture){
-    canvasTexture = new THREE.CanvasTexture(tmpCanvas);
-    this.canvasTexturesByDataURL[dataURL] = canvasTexture;
-  }
-
-  this.texturesByObjName[obj.name] = canvasTexture;
+  return payload;
 }
 
 ShadowBaker.prototype.compressTexture = function(base64Data, readyCallback, errorCallback){

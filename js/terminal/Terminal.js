@@ -67,11 +67,16 @@ Terminal.prototype.printHeader = function(text){
 	this.print(text, {color: "#67b6bd", noNewLine: true});
 }
 
-Terminal.prototype.printError = function(text){
+Terminal.prototype.printError = function(text, noNewLine){
 	if (this.skip){
 		return;
 	}
-	this.print(text, {color: "#67b6bd"});
+	var colorText = "#67b6bd";
+	if (!noNewLine){
+		this.print(text, {color: colorText});
+	}else{
+		this.print(text, {color: colorText, noNewLine: true});
+	}
 }
 
 Terminal.prototype.printInfo = function(text, noNewLine){

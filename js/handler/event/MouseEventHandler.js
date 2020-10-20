@@ -218,6 +218,9 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
       if (!isDeployment && guiHandler.isOneOfBlockingGUIActive()){
         return;
       }
+      if (shadowBaker.isBakingShadow){
+        return;
+      }
     }
     var rect = renderer.getCurrentViewport();
     var rectX = rect.x, rectY = rect.y, rectZ = rect.z, rectW = rect.w;

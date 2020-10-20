@@ -30,6 +30,8 @@ var RaycasterWorkerBridge = function(){
       console.log("%c                    RAYCASTER WORKER                  ", "background: black; color: lime");
       console.log("%cUpdate time: "+msg.data.updateTime+" ms", "background: black; color: magenta");
       console.log("%cBinhandler cache hit count: "+msg.data.binHandlerCacheHitCount, "background: black; color: magenta");
+    }else if (msg.data.isBakeShadow){
+      shadowBaker.onMessageReceived(msg.data);
     }else if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
       rayCaster.idsByObjectNames = new Object();
@@ -405,7 +407,7 @@ RaycasterWorkerBridge.prototype.onReady = function(){
 }
 
 RaycasterWorkerBridge.prototype.flush = function(){
-  if (!this.hasOwnership || !this.ready){
+  if (!this.hasOwnership || !this.ready || shadowBaker.isBakingShadow){
     return;
   }
   var flushStartTime;
