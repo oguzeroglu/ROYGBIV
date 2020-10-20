@@ -474,7 +474,7 @@ RaycasterWorker.prototype.bakeShadow = function(data){
         }
 
         pixels[pixelIndex ++] = 255;
-      });
+      }, null, null, true);
     }
   }
 
