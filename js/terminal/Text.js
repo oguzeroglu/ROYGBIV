@@ -696,7 +696,6 @@ var Text = function(){
   this.FOG_REMOVED = "Fog removed from the scene.";
   this.ATLAS_TEXTURE_SIZE = "Atlas texture size";
   this.ATLAS_TEXTURE_SIZE_NOT_SET = "Atlas texture size not set.";
-  this.TEXTURE_SIZE_CANNOT_EXCEED = "Texture size cannot exceed "+MAX_TEXTURE_SIZE;
   this.CANNOT_GLUE_OBJECTS_WITH_DIFFERENT_MATERIAL_TYPES = "Cannot glue objects with different material types.";
   this.MUST_GLUE_AT_LEAST_2_OBJECTS = "Must glue at least 2 objects.";
   this.OBJECT_NR_DOES_NOT_EXIST = "Object #@@1 does not exist.";

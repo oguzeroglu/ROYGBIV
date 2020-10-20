@@ -81,10 +81,6 @@ var TextureMerger = function(texturesObj){
     this.ranges[textureName] = range;
   }
 
-  if (this.canvas.width > MAX_TEXTURE_SIZE || this.canvas.height > MAX_TEXTURE_SIZE){
-    throw new Error("TextureMerger error: Max texture size exceeded. ("+MAX_TEXTURE_SIZE+"x"+MAX_TEXTURE_SIZE+")");
-    return;
-  }
   this.makeCanvasPowerOfTwo();
   this.mergedTexture = new THREE.CanvasTexture(this.canvas);
   this.mergedTexture.wrapS = THREE.ClampToEdgeWrapping;
@@ -132,7 +128,7 @@ TextureMerger.prototype.insert = function(node, textureName, texturesObj){
         this.textureOffsets[textureName] = {x: curNode.rectangle.x, y: curNode.rectangle.y};
         var calculatedSize = this.calculateImageSize(texturesObj);
         var calculatedArea = calculatedSize.width + calculatedSize.height;
-        if (calculatedArea < minArea && calculatedSize.width <= MAX_TEXTURE_SIZE && calculatedSize.height <= MAX_TEXTURE_SIZE){
+        if (calculatedArea < minArea){
           var overlaps = false;
           for (var tName in this.textureOffsets){
             if (tName == textureName){
@@ -214,6 +210,14 @@ TextureMerger.prototype.makeCanvasPowerOfTwo = function(canvas){
   var oldHeight = canvas.height;
   var newWidth = Math.pow(2, Math.round(Math.log(oldWidth) / Math.log(2)));
   var newHeight = Math.pow(2, Math.round(Math.log(oldHeight) / Math.log(2)));
+
+  if (newWidth > MAX_TEXTURE_SIZE){
+    newWidth = MAX_TEXTURE_SIZE;
+  }
+  if (newHeight > MAX_TEXTURE_SIZE){
+    newHeight = MAX_TEXTURE_SIZE;
+  }
+
   var newCanvas = document.createElement("canvas");
   newCanvas.width = newWidth;
   newCanvas.height = newHeight;
