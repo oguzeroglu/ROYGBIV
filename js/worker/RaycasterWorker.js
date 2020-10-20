@@ -429,16 +429,33 @@ RaycasterWorker.prototype.bakeShadow = function(data){
   var pixels = new Uint8ClampedArray (payload.pixels);
 
   var obj = null;
+  var bbs = [];
   if (payload.parentName){
     var parent = objectGroups[payload.parentName];
     obj = parent.group[payload.objName];
+    bbs = parent.boundingBoxes;
   }else{
     obj = addedObjects[payload.objName];
+    bbs = obj.boundingBoxes;
+  }
+
+  var isPointLight = payload.isPointLight;
+
+  var originalLimitBox;
+  if (isPointLight){
+    originalLimitBox = LIMIT_BOUNDING_BOX.clone();
+    LIMIT_BOUNDING_BOX.makeEmpty();
+    for (var i = 0; i < bbs.length; i ++){
+      var bb = bbs[i];
+      LIMIT_BOUNDING_BOX.expandByPoint(bb.min);
+      LIMIT_BOUNDING_BOX.expandByPoint(bb.max);
+    }
+
+    LIMIT_BOUNDING_BOX.expandByPoint(new THREE.Vector3(payload.lightPosX, payload.lightPosY, payload.lightPosZ));
   }
 
   for (var i = 0; i < intersectionTests.length; i ++){
     var intersectionTest = intersectionTests[i];
-    var isPointLight = (typeof intersectionTest.distanceToLight) != UNDEFINED;
 
     if (isPointLight){
       rayCaster.findIntersections(intersectionTest.from, intersectionTest.dir, false, function(x, y, z, objName){
@@ -476,6 +493,10 @@ RaycasterWorker.prototype.bakeShadow = function(data){
         pixels[pixelIndex ++] = 255;
       }, null, null, true);
     }
+  }
+
+  if (originalLimitBox){
+    LIMIT_BOUNDING_BOX = originalLimitBox;
   }
 
   postMessage(data, [payload.pixels]);

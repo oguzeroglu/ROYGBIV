@@ -554,6 +554,10 @@ ShadowBaker.prototype.generateWorkerPayloadForSurface = function(obj, lightInfo)
   if (lightInfo.type == "point"){
     var light = lightHandler.staticPointLightsBySlotId[lightInfo.slotID];
     lightPos = new THREE.Vector3(light.positionX, light.positionY, light.positionZ);
+    payload.isPointLight = true;
+    payload.lightPosX = light.positionX;
+    payload.lightPosY = light.positionY;
+    payload.lightPosZ = light.positionZ; 
   }else{
     var light = lightHandler.staticDiffuseLightsBySlotId[lightInfo.slotID];
     lightDirNegative = new THREE.Vector3(light.directionX, light.directionY, light.directionZ).negate().normalize();
