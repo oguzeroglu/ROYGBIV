@@ -500,7 +500,6 @@ Sprite.prototype.getTextureUniform = function(texture){
 Sprite.prototype.mapTexture = function(texturePack){
   if (!this.isTextured){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
     this.mesh.material.needsUpdate = true;
   }
   var ranges;

@@ -473,10 +473,6 @@ var ObjectTrail = function(configurations){
 
   this.compressGeometry();
 
-  if (this.hasTexture()){
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
-  }
-
   if (this.hasTexture() && this.object.isAddedObject){
     if (this.object.hasDiffuseMap()){
       var ranges = textureAtlasHandler.getRangesForTexturePack(this.object.tpInfo.diffuse.texturePack, "diffuse");

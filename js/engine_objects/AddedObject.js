@@ -1350,7 +1350,6 @@ AddedObject.prototype.unMapEmissive = function(){
       delete this.mesh.material.uniforms.textureMatrix;
       delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
-      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
     }
   }
 }
@@ -1385,10 +1384,6 @@ AddedObject.prototype.mapEmissive = function(texturePack){
   macroHandler.injectMacro("EMISSIVE_END_U " + this.tpInfo.emissive.endU, this.mesh.material, false, true);
   macroHandler.injectMacro("EMISSIVE_END_V " + this.tpInfo.emissive.endV, this.mesh.material, false, true);
   this.mesh.material.uniformsNeedUpdate = true;
-
-  if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
-  }
 }
 
 AddedObject.prototype.hasDisplacementMap = function(){
@@ -1446,10 +1441,6 @@ AddedObject.prototype.mapDisplacement = function(texturePack){
   macroHandler.injectMacro("HEIGHT_END_U " + this.tpInfo.height.endU, this.mesh.material, true, false);
   macroHandler.injectMacro("HEIGHT_END_V " + this.tpInfo.height.endV, this.mesh.material, true, false);
   this.mesh.material.uniformsNeedUpdate = true;
-
-  if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
-  }
 }
 
 AddedObject.prototype.hasAOMap = function(){
@@ -1469,7 +1460,6 @@ AddedObject.prototype.unMapAO = function(){
       delete this.mesh.material.uniforms.textureMatrix;
       delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
-      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
     }
   }
 }
@@ -1502,10 +1492,6 @@ AddedObject.prototype.mapAO = function(texturePack){
   macroHandler.injectMacro("AO_END_U " + this.tpInfo.ao.endU, this.mesh.material, false, true);
   macroHandler.injectMacro("AO_END_V " + this.tpInfo.ao.endV, this.mesh.material, false, true);
   this.mesh.material.uniformsNeedUpdate = true;
-
-  if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
-  }
 }
 
 AddedObject.prototype.hasAlphaMap = function(){
@@ -1524,7 +1510,6 @@ AddedObject.prototype.unMapAlpha = function(){
       delete this.mesh.material.uniforms.textureMatrix;
       delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
-      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
     }
   }
 }
@@ -1557,10 +1542,6 @@ AddedObject.prototype.mapAlpha = function(texturePack){
   macroHandler.injectMacro("ALPHA_END_U " + this.tpInfo.alpha.endU, this.mesh.material, false, true);
   macroHandler.injectMacro("ALPHA_END_V " + this.tpInfo.alpha.endV, this.mesh.material, false, true);
   this.mesh.material.uniformsNeedUpdate = true;
-
-  if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
-  }
 }
 
 AddedObject.prototype.hasDiffuseMap = function(){
@@ -1579,7 +1560,6 @@ AddedObject.prototype.unMapDiffuse = function(){
       delete this.mesh.material.uniforms.textureMatrix;
       delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
-      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
     }
   }
 }
@@ -1632,10 +1612,6 @@ AddedObject.prototype.mapDiffuse = function(texturePack){
   macroHandler.injectMacro("DIFFUSE_END_U " + this.tpInfo.diffuse.endU, this.mesh.material, false, true);
   macroHandler.injectMacro("DIFFUSE_END_V " + this.tpInfo.diffuse.endV, this.mesh.material, false, true);
   this.mesh.material.uniformsNeedUpdate = true;
-
-  if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
-  }
 }
 
 AddedObject.prototype.getOpacity = function(){

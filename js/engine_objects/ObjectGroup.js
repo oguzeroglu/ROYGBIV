@@ -2177,7 +2177,6 @@ ObjectGroup.prototype.glue = function(simplifiedChildrenPhysicsBodies){
   }
   if (this.hasTexture){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
   }
   if (this.hasShadowMap){
     macroHandler.injectMacro("HAS_SHADOW_MAP", this.mesh.material, true, true);

@@ -143,7 +143,6 @@ AutoInstancedObject.prototype.init = function(){
   }
   if (this.pseudoObjectGroup.hasTexture){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
   }
   macroHandler.injectMacro("IS_AUTO_INSTANCED", this.mesh.material, true, true);
   var objCount = 0;

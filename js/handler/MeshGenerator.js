@@ -39,8 +39,6 @@ MeshGenerator.prototype.generateCrosshair = function(chObject, ranges){
     macroHandler.injectMacro("HAS_SIZE_SCALE", material, true, false);
   }
 
-  macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, material, false, true);
-
   scene.add(mesh);
   mesh.renderOrder = renderOrders.CROSSHAIR;
   mesh.position.set(0, 0, 0);
@@ -266,7 +264,6 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
   if (texture){
     ps.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
     macroHandler.injectMacro("HAS_TEXTURE", ps.material, true, true);
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, ps.material, true, false);
   }
   if (!noTargetColor){
     macroHandler.injectMacro("HAS_TARGET_COLOR", ps.material, true, false);
@@ -321,7 +318,6 @@ MeshGenerator.prototype.generateMergedParticleSystemMesh = function(params){
   if (params.texture){
     material.uniforms.texture = textureAtlasHandler.getTextureUniform();
     macroHandler.injectMacro("HAS_TEXTURE", material, true, true);
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, material, true, false);
   }
   if (!params.noTargetColor){
     macroHandler.injectMacro("HAS_TARGET_COLOR", material, true, false);
