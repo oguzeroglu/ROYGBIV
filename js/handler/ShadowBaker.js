@@ -1,18 +1,11 @@
 var ShadowBaker = function(){
-  this.qualities = {
-    "HIGH": "HIGH",
-    "MEDIUM": "MEDIUM",
-    "LOW": "LOW",
-    "LOWER": "LOWER",
-    "LOWEST": "LOWEST"
-  };
-
+  this.bakeSize = 256;
+  this.sizePerObject = 128;
   this.reset();
 }
 
 ShadowBaker.prototype.export = function(isBuildingForDeploymentMode){
   var exportObj = {
-    quality: this.quality,
     intensity: this.intensity,
     textureRangesByObjectName: JSON.parse(JSON.stringify(this.textureRangesByObjectName)),
     dataURLsByTextureID: {},
@@ -43,7 +36,6 @@ ShadowBaker.prototype.export = function(isBuildingForDeploymentMode){
 
 ShadowBaker.prototype.import = function(exportObj, onReady){
   this.reset();
-  this.quality = exportObj.quality;
   this.intensity = exportObj.intensity;
 
   if (Object.keys(exportObj.textureRangesByObjectName).length == 0){
@@ -78,7 +70,7 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
         macroHandler.injectMacro("SHADOW_MAP_START_V " + range.startV, material, false, true);
         macroHandler.injectMacro("SHADOW_MAP_END_U " + range.endU, material, false, true);
         macroHandler.injectMacro("SHADOW_MAP_END_V " + range.endV, material, false, true);
-        macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.getSizeFromQuality(shadowBaker.quality), material, false, true);
+        macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.sizePerObject, material, false, true);
         material.uniformsNeedUpdate = true;
       }
 
@@ -93,7 +85,7 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
   for (var tid in exportObj.dataURLsByTextureID){
     var dataURL = exportObj.dataURLsByTextureID[tid];
     var tmpCanvas = document.createElement("canvas");
-    tmpCanvas.width = this.getSizeFromQuality(this.quality);
+    tmpCanvas.width = this.sizePerObject;
     tmpCanvas.height = tmpCanvas.width;
     var tmpContext = tmpCanvas.getContext("2d");
     var img = new Image();
@@ -122,28 +114,13 @@ ShadowBaker.prototype.reset = function(){
   this.canvasTexturesByDataURL = {};
   this.texturesByObjName = {};
   this.textureRangesByObjectName = {};
-  this.quality = this.qualities.LOW;
   this.intensity = 0.5;
 }
 
-ShadowBaker.prototype.getSizeFromQuality = function(quality){
-  if (quality == this.qualities.HIGH){
-    return 512;
-  }else if (quality == this.qualities.MEDIUM){
-    return 256;
-  }else if (quality == this.qualities.LOW){
-    return 128;
-  }else if (quality == this.qualities.LOWER){
-    return 64;
-  }else if (quality == this.qualities.LOWEST){
-    return 32;
-  }
-}
-
-ShadowBaker.prototype.getCanvasFromQuality = function(quality){
+ShadowBaker.prototype.getBakingCanvas = function(){
   var shadowCanvas = document.createElement("canvas");
 
-  var size = this.getSizeFromQuality(quality);
+  var size = this.bakeSize;
   shadowCanvas.width = size;
   shadowCanvas.height = size;
 
@@ -218,14 +195,20 @@ ShadowBaker.prototype.onMessageReceived = function(data){
 
   ctx.putImageData(imageData, 0, 0);
 
+  var scaleCanvas = document.createElement("canvas");
+  scaleCanvas.width = this.sizePerObject;
+  scaleCanvas.height = this.sizePerObject;
+  var scaleCtx = scaleCanvas.getContext("2d");
+  scaleCtx.drawImage(shadowCanvas, 0, 0, this.bakeSize, this.bakeSize, 0, 0, this.sizePerObject, this.sizePerObject);
+
   var tmpCanvas = document.createElement("canvas");
-  tmpCanvas.width = shadowCanvas.width;
-  tmpCanvas.height = shadowCanvas.height;
-  var tmpCtx = tmpCanvas.getContext('2d');
-  tmpCtx.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height);
-  tmpCtx.translate(shadowCanvas.width / 2, shadowCanvas.height / 2);
+  tmpCanvas.width = this.sizePerObject;
+  tmpCanvas.height = this.sizePerObject;
+  var tmpCtx = tmpCanvas.getContext("2d");
+  tmpCtx.clearRect(0, 0, this.sizePerObject, this.sizePerObject);
+  tmpCtx.translate(this.sizePerObject / 2, this.sizePerObject / 2);
   tmpCtx.rotate(-Math.PI/2);
-  tmpCtx.drawImage(shadowCanvas, -shadowCanvas.width / 2, -shadowCanvas.width / 2);
+  tmpCtx.drawImage(scaleCanvas, -this.sizePerObject / 2, -this.sizePerObject / 2);
 
   var dataURL = tmpCanvas.toDataURL();
   var canvasTexture = this.canvasTexturesByDataURL[dataURL];
@@ -411,7 +394,7 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
       macroHandler.injectMacro("SHADOW_MAP_START_V " + range.startV, material, false, true);
       macroHandler.injectMacro("SHADOW_MAP_END_U " + range.endU, material, false, true);
       macroHandler.injectMacro("SHADOW_MAP_END_V " + range.endV, material, false, true);
-      macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.getSizeFromQuality(shadowBaker.quality), material, false, true);
+      macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.sizePerObject, material, false, true);
       material.uniformsNeedUpdate = true;
     }
 
@@ -424,7 +407,7 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
       shadowBaker.unbakeFromShader(objectGroup.mesh.material);
       macroHandler.injectMacro("HAS_SHADOW_MAP", objectGroup.mesh.material, true, true);
       macroHandler.injectMacro("SHADOW_INTENSITY " + shadowBaker.intensity, objectGroup.mesh.material, false, true);
-      macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.getSizeFromQuality(shadowBaker.quality), objectGroup.mesh.material, false, true);
+      macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.sizePerObject, objectGroup.mesh.material, false, true);
 
       if (!objectGroup.isInstanced){
         objectGroup.mesh.geometry.removeAttribute("shadowMapUV");
@@ -532,14 +515,7 @@ ShadowBaker.prototype.generateWorkerPayloadForSurface = function(obj, lightInfo)
   var firstLocal = positionsConstructed[firstIndex].clone();
   var lastLocal = positionsConstructed[lastIndex].clone();
 
-  var shadowCanvas = this.getCanvasFromQuality(this.quality);
-  var ctx = shadowCanvas.getContext('2d');
-  ctx.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height);
-
-  var firstLocal = positionsConstructed[firstIndex].clone();
-  var lastLocal = positionsConstructed[lastIndex].clone();
-
-  var shadowCanvas = this.getCanvasFromQuality(this.quality);
+  var shadowCanvas = this.getBakingCanvas();
   var ctx = shadowCanvas.getContext('2d');
   ctx.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height);
 
@@ -557,7 +533,7 @@ ShadowBaker.prototype.generateWorkerPayloadForSurface = function(obj, lightInfo)
     payload.isPointLight = true;
     payload.lightPosX = light.positionX;
     payload.lightPosY = light.positionY;
-    payload.lightPosZ = light.positionZ; 
+    payload.lightPosZ = light.positionZ;
   }else{
     var light = lightHandler.staticDiffuseLightsBySlotId[lightInfo.slotID];
     lightDirNegative = new THREE.Vector3(light.directionX, light.directionY, light.directionZ).negate().normalize();
