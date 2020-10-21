@@ -788,11 +788,6 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
     return vec2(coordX, coordY);
   }
-
-  vec4 fixTextureBleeding(vec4 uvCoordinates){
-    float offset = 0.5 / float(TEXTURE_SIZE);
-    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
-  }
 #endif
 
 void main(){
@@ -825,7 +820,7 @@ void main(){
     #ifdef DISPLACEMENT_SEPARATE_UV
       displacementUV = (displacementTextureMatrix * vec3(uv, 1.0)).xy;
     #endif
-    vec4 heightUVFixed = fixTextureBleeding(vec4(float(HEIGHT_START_U), float(HEIGHT_START_V), float(HEIGHT_END_U), float(HEIGHT_END_V)));
+    vec4 heightUVFixed = vec4(float(HEIGHT_START_U), float(HEIGHT_START_V), float(HEIGHT_END_U), float(HEIGHT_END_V));
     vec3 objNormal = normalize(normal);
     transformedPosition += objNormal * (texture2D(texture, uvAffineTransformation(displacementUV, heightUVFixed.x, heightUVFixed.y, heightUVFixed.z, heightUVFixed.w)).r * displacementInfo.x + displacementInfo.y);
   #endif

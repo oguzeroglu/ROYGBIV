@@ -895,11 +895,6 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
     return vec2(coordX, coordY);
   }
 
-  vec4 fixTextureBleeding(vec4 uvCoordinates){
-    float offset = 0.5 / float(TEXTURE_SIZE);
-    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
-  }
-
   void handleUVs(vec2 transformedUV){
     #ifdef HAS_DIFFUSE
       vDiffuseUV = diffuseUV;
@@ -914,8 +909,7 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
       vAOUV = aoUV;
     #endif
     #ifdef HAS_DISPLACEMENT
-      vec4 displacementUVFixed = fixTextureBleeding(displacementUV);
-      calculatedDisplacementUV = uvAffineTransformation(transformedDisplacementUV, displacementUVFixed.x, displacementUVFixed.y, displacementUVFixed.z, displacementUVFixed.w);
+      calculatedDisplacementUV = uvAffineTransformation(transformedDisplacementUV, displacementUV.x, displacementUV.y, displacementUV.z, displacementUV.w);
     #endif
   }
 #endif

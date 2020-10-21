@@ -86,11 +86,6 @@ varying vec3 vColor;
 
     return vec2(coordX, coordY);
   }
-
-  vec4 fixTextureBleeding(vec4 uvCoordinates){
-    float offset = 0.5 / float(TEXTURE_SIZE);
-    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
-  }
 #endif
 
 #ifdef HAS_SHADOW_MAP
@@ -99,10 +94,6 @@ varying vec3 vColor;
     float coordY = (original.y * (startV - endV) + endV);
 
     return vec2(coordX, coordY);
-  }
-  vec4 fixShadowTextureBleeding(vec4 uvCoordinates){
-    float offset = 0.5 / float(SHADOW_MAP_SIZE);
-    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
   }
 #endif
 
@@ -118,14 +109,14 @@ void main(){
   #ifdef HAS_TEXTURE
     vec2 transformedUV = vUV;
     #ifdef HAS_DIFFUSE
-      vec4 diffuseUVFixed = fixTextureBleeding(vec4(float(DIFFUSE_START_U), float(DIFFUSE_START_V), float(DIFFUSE_END_U), float(DIFFUSE_END_V)));
+      vec4 diffuseUVFixed = vec4(float(DIFFUSE_START_U), float(DIFFUSE_START_V), float(DIFFUSE_END_U), float(DIFFUSE_END_V));
       vec4 diffuseColor = texture2D(texture, uvAffineTransformation(transformedUV, diffuseUVFixed.x, diffuseUVFixed.y, diffuseUVFixed.z, diffuseUVFixed.w));
       gl_FragColor = vec4(vColor, alpha) * diffuseColor;
     #else
       gl_FragColor = vec4(vColor, alpha);
     #endif
     #ifdef HAS_ALPHA
-      vec4 alphaUVFixed = fixTextureBleeding(vec4(float(ALPHA_START_U), float(ALPHA_START_V), float(ALPHA_END_U), float(ALPHA_END_V)));
+      vec4 alphaUVFixed = vec4(float(ALPHA_START_U), float(ALPHA_START_V), float(ALPHA_END_U), float(ALPHA_END_V));
       float val = texture2D(texture, uvAffineTransformation(transformedUV, alphaUVFixed.x, alphaUVFixed.y, alphaUVFixed.z, alphaUVFixed.w)).g;
       gl_FragColor.a *= val;
       if (val <= ALPHA_TEST){
@@ -133,12 +124,12 @@ void main(){
       }
     #endif
     #ifdef HAS_AO
-      vec4 aoUVFixed = fixTextureBleeding(vec4(float(AO_START_U), float(AO_START_V), float(AO_END_U), float(AO_END_V)));
+      vec4 aoUVFixed = vec4(float(AO_START_U), float(AO_START_V), float(AO_END_U), float(AO_END_V));
       float ao = (texture2D(texture, uvAffineTransformation(transformedUV, aoUVFixed.x, aoUVFixed.y, aoUVFixed.z, aoUVFixed.w)).r - 1.0) * aoIntensity + 1.0;
       gl_FragColor.rgb *= ao;
     #endif
     #ifdef HAS_EMISSIVE
-      vec4 emissiveUVFixed = fixTextureBleeding(vec4(float(EMISSIVE_START_U), float(EMISSIVE_START_V), float(EMISSIVE_END_U), float(EMISSIVE_END_V)));
+      vec4 emissiveUVFixed = vec4(float(EMISSIVE_START_U), float(EMISSIVE_START_V), float(EMISSIVE_END_U), float(EMISSIVE_END_V));
       vec4 eColor = texture2D(texture, uvAffineTransformation(transformedUV, emissiveUVFixed.x, emissiveUVFixed.y, emissiveUVFixed.z, emissiveUVFixed.w));
       vec3 totalEmissiveRadiance = vec3(emissiveIntensity, emissiveIntensity, emissiveIntensity) * emissiveColor;
       totalEmissiveRadiance *= eColor.rgb;
@@ -149,7 +140,7 @@ void main(){
   #endif
 
   #ifdef HAS_SHADOW_MAP
-    vec4 shadowUVFixed = fixShadowTextureBleeding(vec4(float(SHADOW_MAP_START_U), float(SHADOW_MAP_START_V), float(SHADOW_MAP_END_U), float(SHADOW_MAP_END_V)));
+    vec4 shadowUVFixed = vec4(float(SHADOW_MAP_START_U), float(SHADOW_MAP_START_V), float(SHADOW_MAP_END_U), float(SHADOW_MAP_END_V));
     float shadowCoef = (texture2D(shadowMap, uvAffineTransformationShadow(vShadowMapUV, shadowUVFixed.x, shadowUVFixed.y, shadowUVFixed.z, shadowUVFixed.w)).r - 1.0) * float(SHADOW_INTENSITY) + 1.0;
     gl_FragColor.rgb *= shadowCoef;
   #endif

@@ -5,6 +5,8 @@ var TextureMerger = function(texturesObj){
     return;
   }
 
+  var TEXTURE_BLEEDING_FIX_PIXELS = 2;
+
   this.dataURLs = new Object();
   for (var textureName in texturesObj){
     var txt = texturesObj[textureName];
@@ -67,9 +69,11 @@ var TextureMerger = function(texturesObj){
     var imgWidth = texture.image.width;
     var imgHeight = texture.image.height;
 
+    var bleedingFixed = this.fixTextureBleeding(texture.image, TEXTURE_BLEEDING_FIX_PIXELS);
+
     for (var y = offsetY; y<offsetY+imgHeight; y+=imgHeight){
       for (var x = offsetX; x<offsetX+imgWidth; x+=imgWidth){
-        context.drawImage(texture.image, x, y, imgWidth, imgHeight);
+        context.drawImage(bleedingFixed, x, y, imgWidth, imgHeight);
       }
     }
 
@@ -78,6 +82,12 @@ var TextureMerger = function(texturesObj){
     range.endU = (offsetX + imgWidth) / imgSize.width;
     range.startV = 1 - (offsetY / imgSize.height);
     range.endV = 1 - ((offsetY + imgHeight) / imgSize.height);
+
+    range.startU += (TEXTURE_BLEEDING_FIX_PIXELS) / imgSize.width;
+    range.endU -= (TEXTURE_BLEEDING_FIX_PIXELS ) / imgSize.width;
+    range.startV -= (TEXTURE_BLEEDING_FIX_PIXELS) / imgSize.height;
+    range.endV += (TEXTURE_BLEEDING_FIX_PIXELS ) / imgSize.height;
+
     this.ranges[textureName] = range;
   }
 
@@ -271,6 +281,39 @@ TextureMerger.prototype.rescale = function(canvas, scale){
   resizedCanvas.height = canvas.height * scale;
   var resizedContext = resizedCanvas.getContext("2d");
   resizedContext.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, resizedCanvas.width, resizedCanvas.height);
-  //this.debugCanvas(resizedCanvas);
   return resizedCanvas;
+}
+
+TextureMerger.prototype.fixTextureBleeding = function(tmpCanvas, offsetInPixels){
+  var newCanvas = document.createElement("canvas");
+  var newContext = newCanvas.getContext("2d");
+
+  newCanvas.width = tmpCanvas.width;
+  newCanvas.height = tmpCanvas.height;
+
+  for (var i = 0; i <= offsetInPixels; i ++){
+    newContext.drawImage(tmpCanvas, 0, 0, tmpCanvas.width, tmpCanvas.height, i, i, tmpCanvas.width - (2 * i), tmpCanvas.height - (2 * i));
+  }
+
+  return newCanvas;
+}
+
+TextureMerger.prototype.getPixel = function(imageData, index){
+  return {
+    r: imageData.data[index],
+    g: imageData.data[index + 1],
+    b: imageData.data[index + 2],
+    a: imageData.data[index + 3]
+  };
+}
+
+TextureMerger.prototype.putPixel = function(imageData, index, pixel){
+  imageData.data[index] = pixel.r;
+  imageData.data[index + 1] = pixel.g;
+  imageData.data[index + 2] = pixel.b;
+  imageData.data[index + 3] = pixel.a;
+}
+
+TextureMerger.prototype.getIndexOfCoord = function(coordX, coordY, width){
+  return (width * 4 * coordY) + (coordX * 4);
 }

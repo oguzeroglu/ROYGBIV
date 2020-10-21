@@ -58,11 +58,6 @@ uniform float alpha;
 
     return vec2(coordX, coordY);
   }
-
-  vec4 fixTextureBleeding(vec4 uvCoordinates){
-    float offset = 0.5 / float(TEXTURE_SIZE);
-    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
-  }
 #endif
 
 void main(){
@@ -77,15 +72,13 @@ void main(){
     float hasAlpha    = vTextureFlags[2];
     #ifdef HAS_DIFFUSE
       if (hasDiffuse > 0.0){
-        vec4 diffuseUVsFixed = fixTextureBleeding(vDiffuseUV);
-        diffuseColor = texture2D(texture, uvAffineTransformation(vFaceVertexUV, diffuseUVsFixed.x, diffuseUVsFixed.y, diffuseUVsFixed.z, diffuseUVsFixed.w));
+        diffuseColor = texture2D(texture, uvAffineTransformation(vFaceVertexUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w));
       }
     #endif
     gl_FragColor = vec4(vColor, alpha) * diffuseColor;
     #ifdef HAS_ALPHA
       if (hasAlpha > 0.0){
-        vec4 alphaUVsFixed = fixTextureBleeding(vAlphaUV);
-        float val = texture2D(texture, uvAffineTransformation(vFaceVertexUV, alphaUVsFixed.x, alphaUVsFixed.y, alphaUVsFixed.z, alphaUVsFixed.w)).g;
+        float val = texture2D(texture, uvAffineTransformation(vFaceVertexUV, vAlphaUV.x, vAlphaUV.y, vAlphaUV.z, vAlphaUV.w)).g;
         gl_FragColor.a *= val;
         if (val <= ALPHA_TEST){
           discard;
@@ -94,8 +87,7 @@ void main(){
     #endif
     #ifdef HAS_EMISSIVE
       if (hasEmissive > 0.0){
-        vec4 emissiveUVsFixed = fixTextureBleeding(vEmissiveUV);
-        vec4 eColor = texture2D(texture, uvAffineTransformation(vFaceVertexUV, emissiveUVsFixed.x, emissiveUVsFixed.y, emissiveUVsFixed.z, emissiveUVsFixed.w));
+        vec4 eColor = texture2D(texture, uvAffineTransformation(vFaceVertexUV, vEmissiveUV.x, vEmissiveUV.y, vEmissiveUV.z, vEmissiveUV.w));
         vec3 totalEmissiveRadiance = vec3(vEmissiveIntensity, vEmissiveIntensity, vEmissiveIntensity) * vEmissiveColor;
         totalEmissiveRadiance *= eColor.rgb;
         gl_FragColor.rgb += totalEmissiveRadiance;

@@ -70,7 +70,6 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
         macroHandler.injectMacro("SHADOW_MAP_START_V " + range.startV, material, false, true);
         macroHandler.injectMacro("SHADOW_MAP_END_U " + range.endU, material, false, true);
         macroHandler.injectMacro("SHADOW_MAP_END_V " + range.endV, material, false, true);
-        macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.sizePerObject, material, false, true);
         material.uniformsNeedUpdate = true;
       }
 
@@ -344,14 +343,12 @@ ShadowBaker.prototype.unbakeFromShader = function(material){
   var shadowMapStartVVal = macroHandler.getMacroValue("SHADOW_MAP_START_V", material, false);
   var shadowMapEndUVal = macroHandler.getMacroValue("SHADOW_MAP_END_U", material, false);
   var shadowMapEndVVal = macroHandler.getMacroValue("SHADOW_MAP_END_V", material, false);
-  var shadowMapSizeVal = macroHandler.getMacroValue("SHADOW_MAP_SIZE", material, false);
   macroHandler.removeMacro("HAS_SHADOW_MAP", material, true, true);
   macroHandler.removeMacro("SHADOW_INTENSITY " + shadowIntensityMacroVal, material, false, true);
   macroHandler.removeMacro("SHADOW_MAP_START_U " + shadowMapStartUVal, material, false, true);
   macroHandler.removeMacro("SHADOW_MAP_END_U " + shadowMapEndUVal, material, false, true);
   macroHandler.removeMacro("SHADOW_MAP_START_V " + shadowMapStartVVal, material, false, true);
   macroHandler.removeMacro("SHADOW_MAP_END_V " + shadowMapEndVVal, material, false, true);
-  macroHandler.removeMacro("SHADOW_MAP_SIZE " + shadowMapSizeVal, material, false, true);
 
   material.uniformsNeedUpdate = true;
 }
@@ -394,7 +391,6 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
       macroHandler.injectMacro("SHADOW_MAP_START_V " + range.startV, material, false, true);
       macroHandler.injectMacro("SHADOW_MAP_END_U " + range.endU, material, false, true);
       macroHandler.injectMacro("SHADOW_MAP_END_V " + range.endV, material, false, true);
-      macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.sizePerObject, material, false, true);
       material.uniformsNeedUpdate = true;
     }
 
@@ -407,7 +403,6 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
       shadowBaker.unbakeFromShader(objectGroup.mesh.material);
       macroHandler.injectMacro("HAS_SHADOW_MAP", objectGroup.mesh.material, true, true);
       macroHandler.injectMacro("SHADOW_INTENSITY " + shadowBaker.intensity, objectGroup.mesh.material, false, true);
-      macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.sizePerObject, objectGroup.mesh.material, false, true);
 
       if (!objectGroup.isInstanced){
         objectGroup.mesh.geometry.removeAttribute("shadowMapUV");

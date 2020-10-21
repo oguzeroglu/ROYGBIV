@@ -809,11 +809,6 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
 
     return vec2(coordX, coordY);
   }
-
-  vec4 fixTextureBleeding(vec4 uvCoordinates){
-    float offset = 0.5 / float(TEXTURE_SIZE);
-    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
-  }
 #endif
 
 void handleFragmentTextureUVs(){
@@ -886,8 +881,7 @@ void main(){
     #ifdef HAS_DISPLACEMENT
       if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
         vec3 objNormal = normalize(normal);
-        vec4 displacementUVsFixed = fixTextureBleeding(displacementUVs);
-        transformedPosition += objNormal * (texture2D(texture, uvAffineTransformation(calculatedDisplacementUV, displacementUVsFixed.x, displacementUVsFixed.y, displacementUVsFixed.z, displacementUVsFixed.w)).r * displacementInfo.x + displacementInfo.y);
+        transformedPosition += objNormal * (texture2D(texture, uvAffineTransformation(calculatedDisplacementUV, displacementUVs.x, displacementUVs.y, displacementUVs.z, displacementUVs.w)).r * displacementInfo.x + displacementInfo.y);
       }
     #endif
     vec3 rotatedPos = applyQuaternionToVector(transformedPosition, quat);

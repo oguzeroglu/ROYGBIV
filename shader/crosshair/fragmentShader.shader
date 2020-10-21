@@ -31,15 +31,9 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
   return vec2(coordX, coordY);
 }
 
-vec4 fixTextureBleeding(vec4 uvCoordinates){
-  float offset = 0.5 / float(TEXTURE_SIZE);
-  return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
-}
-
 void main(){
-  vec4 uvRangesFixed = fixTextureBleeding(uvRanges);
   vec2 uv = (uvTransform * vec3(gl_PointCoord.x, 1.0 - gl_PointCoord.y, 1.0)).xy;
-  vec4 textureColor = texture2D(texture, uvAffineTransformation(uv, uvRangesFixed.x, uvRangesFixed.y, uvRangesFixed.z, uvRangesFixed.w));
+  vec4 textureColor = texture2D(texture, uvAffineTransformation(uv, uvRanges.x, uvRanges.y, uvRanges.z, uvRanges.w));
   if (textureColor.a < 0.5){
     discard;
   }else{

@@ -183,13 +183,6 @@ float decomposeScaleFromWorldMatrix(mat4 worldMatrix){
   return sx;
 }
 
-#ifdef HAS_TEXTURE
-  vec4 fixTextureBleeding(vec4 uvCoordinates){
-    float offset = 0.5 / float(TEXTURE_SIZE);
-    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
-  }
-#endif
-
 void main(){
 
   float respawnFlag = flags1[0];
@@ -360,6 +353,6 @@ void main(){
   #ifdef HAS_TEXTURE
     vTextureFlag = flags2[2];
     vRgbThreshold = rgbThreshold;
-    vUVCoordinates = fixTextureBleeding(uvCoordinates);
+    vUVCoordinates = uvCoordinates;
   #endif
 }

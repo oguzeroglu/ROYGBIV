@@ -832,11 +832,6 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     return vec2(coordX, coordY);
   }
 
-  vec4 fixTextureBleeding(vec4 uvCoordinates){
-    float offset = 0.5 / float(TEXTURE_SIZE);
-    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
-  }
-
   void handleUVs(vec2 transformedUV){
     #ifdef HAS_DIFFUSE
       vDiffuseUV = diffuseUV;
@@ -861,8 +856,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
           ) * vec3(uv, 1.0)
         ).xy;
       }
-      vec4 displacementUVFixed = fixTextureBleeding(displacementUV);
-      calculatedDisplacementUV = uvAffineTransformation(transformedDisplacementUV, displacementUVFixed.x, displacementUVFixed.y, displacementUVFixed.z, displacementUVFixed.w);
+      calculatedDisplacementUV = uvAffineTransformation(transformedDisplacementUV, displacementUV.x, displacementUV.y, displacementUV.z, displacementUV.w);
     #endif
   }
 #endif

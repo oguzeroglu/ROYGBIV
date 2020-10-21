@@ -35,18 +35,12 @@ uniform float alpha;
 
     return vec2(coordX, coordY);
   }
-
-  vec4 fixTextureBleeding(vec4 uvCoordinates){
-    float offset = 0.5 / float(TEXTURE_SIZE);
-    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
-  }
 #endif
 
 void main(){
   gl_FragColor = vec4(color.r, color.g, color.b, alpha);
   #ifdef HAS_TEXTURE
-    vec4 uvFixed = fixTextureBleeding(uvRanges);
-    vec4 textureColor = texture2D(texture, uvAffineTransformation(vUV, uvFixed.x, uvFixed.y, uvFixed.z, uvFixed.w));
+    vec4 textureColor = texture2D(texture, uvAffineTransformation(vUV, uvRanges.x, uvRanges.y, uvRanges.z, uvRanges.w));
     if (textureColor.a <= 0.5){
       discard;
     }else{

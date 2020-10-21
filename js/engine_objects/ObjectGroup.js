@@ -2181,7 +2181,6 @@ ObjectGroup.prototype.glue = function(simplifiedChildrenPhysicsBodies){
   }
   if (this.hasShadowMap){
     macroHandler.injectMacro("HAS_SHADOW_MAP", this.mesh.material, true, true);
-    macroHandler.injectMacro("SHADOW_MAP_SIZE " + shadowBaker.sizePerObject, this.mesh.material, false, true);
     macroHandler.injectMacro("SHADOW_INTENSITY " + shadowBaker.intensity, this.mesh.material, false, true);
   }
 
