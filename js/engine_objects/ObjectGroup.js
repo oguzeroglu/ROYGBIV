@@ -878,6 +878,12 @@ ObjectGroup.prototype.handleRenderSide = function(val){
     this.mesh.material.side = THREE.BackSide;
     this.defaultSide = SIDE_BACK;
   }
+
+  for (var objName in objectGroups){
+    if (objectGroups[objName].softCopyParentName == this.name){
+      objectGroups[objName].handleRenderSide(val);
+    }
+  }
 }
 
 ObjectGroup.prototype.textureCompare = function(txt1, txt2){

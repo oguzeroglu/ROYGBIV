@@ -1163,6 +1163,12 @@ AddedObject.prototype.handleRenderSide = function(val){
     this.mesh.material.side = THREE.BackSide;
     this.defaultSide = SIDE_BACK;
   }
+
+  for (var objName in addedObjects){
+    if (addedObjects[objName].softCopyParentName == this.name){
+      addedObjects[objName].handleRenderSide(val);
+    }
+  }
 }
 
 AddedObject.prototype.isSlicable = function(){
