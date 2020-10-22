@@ -1289,7 +1289,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   if (typeof selectionHandler.getSelectedObject().softCopyParentName === UNDEFINED){
     graphicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Graphics");
   }
-  var textureFolder = guiHandler.datGuiObjectManipulation.addFolder("Texture");
+  var textureFolder;
+  if (typeof selectionHandler.getSelectedObject().softCopyParentName === UNDEFINED){
+    textureFolder = guiHandler.datGuiObjectManipulation.addFolder("Texture");
+  }
   var aiFolder = guiHandler.datGuiObjectManipulation.addFolder("AI");
   var motionBlurFolder = guiHandler.datGuiObjectManipulation.addFolder("Motion Blur");
 
@@ -1699,65 +1702,67 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }
 
   // TEXTURE
-  guiHandler.omEmissiveColorController = textureFolder.add(guiHandler.objectManipulationParameters, "Emissive col.").onFinishChange(function(val){
-    REUSABLE_COLOR.set(val);
-    selectionHandler.getSelectedObject().setEmissiveColor(REUSABLE_COLOR);
-  }).listen();
-  guiHandler.omTextureOffsetXController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
-    selectionHandler.getSelectedObject().setTextureOffsetX(val);
-  }).listen();
-  guiHandler.omTextureOffsetYController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
-    selectionHandler.getSelectedObject().setTextureOffsetY(val);
-  }).listen();
-  guiHandler.omTextureRepeatXController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture repeat x").min(1).max(100).step(1).onChange(function(val){
-    selectionHandler.getSelectedObject().adjustTextureRepeat(val, null);
-  }).listen();
-  guiHandler.omTextureRepeatYController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture repeat y").min(1).max(100).step(1).onChange(function(val){
-    selectionHandler.getSelectedObject().adjustTextureRepeat(null, val);
-  }).listen();
-  guiHandler.omHasCustomDisplacementMatrixController = textureFolder.add(guiHandler.objectManipulationParameters, "Has custom disp. matrix").onChange(function(val){
-    if (!selectionHandler.getSelectedObject().hasDisplacementMap() || selectionHandler.getSelectedObject().isObjectGroup){
-      guiHandler.objectManipulationParameters["Has custom disp. matrix"] = false;
-      return;
-    }
-    if (val){
-      selectionHandler.getSelectedObject().setCustomDisplacementTextureMatrix();
-      guiHandler.enableController(guiHandler.omDisplacementTextureOffsetXController);
-      guiHandler.enableController(guiHandler.omDisplacementTextureOffsetYController);
-      guiHandler.enableController(guiHandler.omDisplacementTextureRepeatXController);
-      guiHandler.enableController(guiHandler.omDisplacementTextureRepeatYController);
-    }else{
-      selectionHandler.getSelectedObject().removeCustomDisplacementTextureMatrix();
-      guiHandler.disableController(guiHandler.omDisplacementTextureOffsetXController);
-      guiHandler.disableController(guiHandler.omDisplacementTextureOffsetYController);
-      guiHandler.disableController(guiHandler.omDisplacementTextureRepeatXController);
-      guiHandler.disableController(guiHandler.omDisplacementTextureRepeatYController);
-    }
-  }).listen();
-  guiHandler.omDisplacementTextureOffsetXController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
-    selectionHandler.getSelectedObject().setCustomDisplacementTextureOffset(val, null);
-  }).listen();
-  guiHandler.omDisplacementTextureOffsetYController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
-    selectionHandler.getSelectedObject().setCustomDisplacementTextureOffset(null, val);
-  }).listen();
-  guiHandler.omDisplacementTextureRepeatXController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture repeat x").min(1).max(100).step(1).onChange(function(val){
-    selectionHandler.getSelectedObject().setCustomDisplacementTextureRepeat(val, null);
-  }).listen();
-  guiHandler.omDisplacementTextureRepeatYController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture repeat y").min(1).max(100).step(1).onChange(function(val){
-    selectionHandler.getSelectedObject().setCustomDisplacementTextureRepeat(null, val);
-  }).listen();
-  guiHandler.omAOIntensityController = textureFolder.add(guiHandler.objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
-    selectionHandler.getSelectedObject().setAOIntensity(val);
-  }).listen();
-  guiHandler.omEmissiveIntensityController = textureFolder.add(guiHandler.objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
-    selectionHandler.getSelectedObject().setEmissiveIntensity(val);
-  }).listen();
-  guiHandler.omDisplacementScaleController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
-    selectionHandler.getSelectedObject().setDisplacementScale(val);
-  }).listen();
-  guiHandler.omDisplacementBiasController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
-    selectionHandler.getSelectedObject().setDisplacementBias(val);
-  }).listen();
+  if (typeof selectionHandler.getSelectedObject().softCopyParentName == UNDEFINED){
+    guiHandler.omEmissiveColorController = textureFolder.add(guiHandler.objectManipulationParameters, "Emissive col.").onFinishChange(function(val){
+      REUSABLE_COLOR.set(val);
+      selectionHandler.getSelectedObject().setEmissiveColor(REUSABLE_COLOR);
+    }).listen();
+    guiHandler.omTextureOffsetXController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
+      selectionHandler.getSelectedObject().setTextureOffsetX(val);
+    }).listen();
+    guiHandler.omTextureOffsetYController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
+      selectionHandler.getSelectedObject().setTextureOffsetY(val);
+    }).listen();
+    guiHandler.omTextureRepeatXController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture repeat x").min(1).max(100).step(1).onChange(function(val){
+      selectionHandler.getSelectedObject().adjustTextureRepeat(val, null);
+    }).listen();
+    guiHandler.omTextureRepeatYController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture repeat y").min(1).max(100).step(1).onChange(function(val){
+      selectionHandler.getSelectedObject().adjustTextureRepeat(null, val);
+    }).listen();
+    guiHandler.omHasCustomDisplacementMatrixController = textureFolder.add(guiHandler.objectManipulationParameters, "Has custom disp. matrix").onChange(function(val){
+      if (!selectionHandler.getSelectedObject().hasDisplacementMap() || selectionHandler.getSelectedObject().isObjectGroup){
+        guiHandler.objectManipulationParameters["Has custom disp. matrix"] = false;
+        return;
+      }
+      if (val){
+        selectionHandler.getSelectedObject().setCustomDisplacementTextureMatrix();
+        guiHandler.enableController(guiHandler.omDisplacementTextureOffsetXController);
+        guiHandler.enableController(guiHandler.omDisplacementTextureOffsetYController);
+        guiHandler.enableController(guiHandler.omDisplacementTextureRepeatXController);
+        guiHandler.enableController(guiHandler.omDisplacementTextureRepeatYController);
+      }else{
+        selectionHandler.getSelectedObject().removeCustomDisplacementTextureMatrix();
+        guiHandler.disableController(guiHandler.omDisplacementTextureOffsetXController);
+        guiHandler.disableController(guiHandler.omDisplacementTextureOffsetYController);
+        guiHandler.disableController(guiHandler.omDisplacementTextureRepeatXController);
+        guiHandler.disableController(guiHandler.omDisplacementTextureRepeatYController);
+      }
+    }).listen();
+    guiHandler.omDisplacementTextureOffsetXController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
+      selectionHandler.getSelectedObject().setCustomDisplacementTextureOffset(val, null);
+    }).listen();
+    guiHandler.omDisplacementTextureOffsetYController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
+      selectionHandler.getSelectedObject().setCustomDisplacementTextureOffset(null, val);
+    }).listen();
+    guiHandler.omDisplacementTextureRepeatXController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture repeat x").min(1).max(100).step(1).onChange(function(val){
+      selectionHandler.getSelectedObject().setCustomDisplacementTextureRepeat(val, null);
+    }).listen();
+    guiHandler.omDisplacementTextureRepeatYController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture repeat y").min(1).max(100).step(1).onChange(function(val){
+      selectionHandler.getSelectedObject().setCustomDisplacementTextureRepeat(null, val);
+    }).listen();
+    guiHandler.omAOIntensityController = textureFolder.add(guiHandler.objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
+      selectionHandler.getSelectedObject().setAOIntensity(val);
+    }).listen();
+    guiHandler.omEmissiveIntensityController = textureFolder.add(guiHandler.objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
+      selectionHandler.getSelectedObject().setEmissiveIntensity(val);
+    }).listen();
+    guiHandler.omDisplacementScaleController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
+      selectionHandler.getSelectedObject().setDisplacementScale(val);
+    }).listen();
+    guiHandler.omDisplacementBiasController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
+      selectionHandler.getSelectedObject().setDisplacementBias(val);
+    }).listen();
+  }
 
   // AI
   guiHandler.omAIEntityController = aiFolder.add(guiHandler.objectManipulationParameters, "AI entity").onChange(function(val){

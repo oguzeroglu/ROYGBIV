@@ -1288,6 +1288,10 @@ function parse(input){
               terminal.printError(Text.OBJECT_NOT_IN_SCENE);
               return true;
             }
+            if (!(typeof addedObject.softCopyParentName == UNDEFINED)){
+              terminal.printError(Text.OBJECT_HAS_SOFT_COPY_PARENT_TEXTURE);
+              return true;
+            }
             addedObject.mapTexturePack(texturePack);
 
             for (var animName in addedObject.animations){
@@ -1419,6 +1423,10 @@ function parse(input){
           }
           if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
             terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+          if (!(typeof addedObject.softCopyParentName == UNDEFINED)){
+            terminal.printError(Text.OBJECT_HAS_SOFT_COPY_PARENT_TEXTURE);
             return true;
           }
           addedObject.resetMaps(true);

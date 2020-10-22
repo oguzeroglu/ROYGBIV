@@ -408,6 +408,7 @@ var Text = function(){
   this.MIRROR_STATE_MUST_BE_ON_OR_OFF = "Mirror state must be on or off.";
   this.MIRRORED_REPEAT_SET = "Mirrored repeat set @@1 for @@2.";
   this.BOX_CREATED = "Box created.";
+  this.OBJECT_HAS_SOFT_COPY_PARENT_TEXTURE = "Object has a soft copy parent. Run this command on the parent instead.";
   this.AN_ERROR_HAPPENED_CHOOSE_ANOTHER_NAME = "An error happened. Choose another name.";
   this.ERROR_HAPPENED_COMPRESSING_TEXTURE = "Error happened compressing texture @@1. Provide a JPG alternative.";
   this.DYNAMIC_TEXTURE_FOLDER_PREPARED = "Dynamic texture folder prepared.";
