@@ -867,6 +867,9 @@ GUIHandler.prototype.omGUIRotateEvent = function(axis, val){
 }
 
 GUIHandler.prototype.disableController = function(controller, noOpacityAdjustment){
+  if (!controller){
+    return;
+  }
   controller.domElement.style.pointerEvents = "none";
   if (!noOpacityAdjustment){
     controller.domElement.style.opacity = .5;
@@ -874,6 +877,9 @@ GUIHandler.prototype.disableController = function(controller, noOpacityAdjustmen
 }
 
 GUIHandler.prototype.enableController = function(controller){
+  if (!controller){
+    return;
+  }
   controller.domElement.style.pointerEvents = "";
   controller.domElement.style.opacity = 1;
 }
@@ -1279,7 +1285,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   var transformationFolder = guiHandler.datGuiObjectManipulation.addFolder("Transformation");
   var physicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Physics");
   var generalFolder = guiHandler.datGuiObjectManipulation.addFolder("General");
-  var graphicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Graphics");
+  var graphicsFolder;
+  if (typeof selectionHandler.getSelectedObject().softCopyParentName === UNDEFINED){
+    graphicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Graphics");
+  }
   var textureFolder = guiHandler.datGuiObjectManipulation.addFolder("Texture");
   var aiFolder = guiHandler.datGuiObjectManipulation.addFolder("AI");
   var motionBlurFolder = guiHandler.datGuiObjectManipulation.addFolder("Motion Blur");
@@ -1562,130 +1571,132 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
 
   // GRAPHICS
-  guiHandler.omOpacityController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    obj.updateOpacity(val);
-    obj.initOpacitySet = false;
-    obj.initOpacity = obj.opacity;
-    if (obj.isObjectGroup){
-      for (var objName in obj.group){
-        obj.group[objName].updateOpacity(val * obj.group[objName].opacityWhenAttached);
+  if (typeof selectionHandler.getSelectedObject().softCopyParentName == UNDEFINED){
+    guiHandler.omOpacityController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
+      var obj = selectionHandler.getSelectedObject();
+      obj.updateOpacity(val);
+      obj.initOpacitySet = false;
+      obj.initOpacity = obj.opacity;
+      if (obj.isObjectGroup){
+        for (var objName in obj.group){
+          obj.group[objName].updateOpacity(val * obj.group[objName].opacityWhenAttached);
+        }
       }
-    }
-  }).listen();
-  guiHandler.omShaderPrecisionController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Shader precision", ["default", "low", "medium", "high"]).onChange(function(val){
-    switch (val){
-      case "default":
-        selectionHandler.getSelectedObject().useDefaultPrecision();
-      break;
-      case "low":
-        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.LOW);
-      break;
-      case "medium":
-        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.MEDIUM);
-      break;
-      case "high":
-        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.HIGH);
-      break;
-    }
-    terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  }).listen();
-  guiHandler.omSideController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Side", [
-    "Both", "Front", "Back"
-  ]).onChange(function(val){
-    var pseudoVal = 0;
-    if (val == "Front"){
-      pseudoVal = 1;
-    }else if (val == "Back"){
-      pseudoVal = 2;
-    }
-    selectionHandler.getSelectedObject().handleRenderSide(pseudoVal);
-  }).listen();
-  guiHandler.omHideHalfController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Hide half", [
-    "None", "Part 1", "Part 2", "Part 3", "Part 4"
-  ]).onChange(function(val){
-    if (val == "None"){
-      selectionHandler.getSelectedObject().sliceInHalf(4);
-    }else if (val == "Part 1"){
-      selectionHandler.getSelectedObject().sliceInHalf(0);
-    }else if (val == "Part 2"){
-      selectionHandler.getSelectedObject().sliceInHalf(1);
-    }else if (val == "Part 3"){
-      selectionHandler.getSelectedObject().sliceInHalf(2);
-    }else if (val == "Part 4"){
-      selectionHandler.getSelectedObject().sliceInHalf(3);
-    }
-    rayCaster.updateObject(selectionHandler.getSelectedObject());
-  }).listen();
-  guiHandler.omBlendingController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Blending", [
-    "None", "Normal", "Additive", "Subtractive", "Multiply"
-  ]).onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    if (obj.isAddedObject || obj.isObjectGroup){
-      guiHandler.enableController(guiHandler.omOpacityController);
-    }
-    if (val == "None"){
-      obj.setBlending(NO_BLENDING);
+    }).listen();
+    guiHandler.omShaderPrecisionController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Shader precision", ["default", "low", "medium", "high"]).onChange(function(val){
+      switch (val){
+        case "default":
+          selectionHandler.getSelectedObject().useDefaultPrecision();
+        break;
+        case "low":
+          selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.LOW);
+        break;
+        case "medium":
+          selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.MEDIUM);
+        break;
+        case "high":
+          selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.HIGH);
+        break;
+      }
+      terminal.clear();
+      terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+    }).listen();
+    guiHandler.omSideController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Side", [
+      "Both", "Front", "Back"
+    ]).onChange(function(val){
+      var pseudoVal = 0;
+      if (val == "Front"){
+        pseudoVal = 1;
+      }else if (val == "Back"){
+        pseudoVal = 2;
+      }
+      selectionHandler.getSelectedObject().handleRenderSide(pseudoVal);
+    }).listen();
+    guiHandler.omHideHalfController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Hide half", [
+      "None", "Part 1", "Part 2", "Part 3", "Part 4"
+    ]).onChange(function(val){
+      if (val == "None"){
+        selectionHandler.getSelectedObject().sliceInHalf(4);
+      }else if (val == "Part 1"){
+        selectionHandler.getSelectedObject().sliceInHalf(0);
+      }else if (val == "Part 2"){
+        selectionHandler.getSelectedObject().sliceInHalf(1);
+      }else if (val == "Part 3"){
+        selectionHandler.getSelectedObject().sliceInHalf(2);
+      }else if (val == "Part 4"){
+        selectionHandler.getSelectedObject().sliceInHalf(3);
+      }
+      rayCaster.updateObject(selectionHandler.getSelectedObject());
+    }).listen();
+    guiHandler.omBlendingController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Blending", [
+      "None", "Normal", "Additive", "Subtractive", "Multiply"
+    ]).onChange(function(val){
+      var obj = selectionHandler.getSelectedObject();
       if (obj.isAddedObject || obj.isObjectGroup){
-        guiHandler.disableController(guiHandler.omOpacityController);
+        guiHandler.enableController(guiHandler.omOpacityController);
       }
-    }else if (val == "Normal"){
-      obj.setBlending(NORMAL_BLENDING);
-    }else if (val == "Additive"){
-      obj.setBlending(ADDITIVE_BLENDING);
-    }else if (val == "Subtractive"){
-      obj.setBlending(SUBTRACTIVE_BLENDING);
-    }else if (val == "Multiply"){
-      obj.setBlending(MULTIPLY_BLENDING);
-    }
-  }).listen();
-  guiHandler.omColorizableController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Colorizable").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    terminal.clear();
-    obj.isColorizable = val;
-    for (var objName in addedObjects){
-      if (addedObjects[objName].softCopyParentName == obj.name){
-        addedObjects[objName].isColorizable = val;
+      if (val == "None"){
+        obj.setBlending(NO_BLENDING);
+        if (obj.isAddedObject || obj.isObjectGroup){
+          guiHandler.disableController(guiHandler.omOpacityController);
+        }
+      }else if (val == "Normal"){
+        obj.setBlending(NORMAL_BLENDING);
+      }else if (val == "Additive"){
+        obj.setBlending(ADDITIVE_BLENDING);
+      }else if (val == "Subtractive"){
+        obj.setBlending(SUBTRACTIVE_BLENDING);
+      }else if (val == "Multiply"){
+        obj.setBlending(MULTIPLY_BLENDING);
       }
-    }
-    for (var objName in objectGroups){
-      if (objectGroups[objName].softCopyParentName == obj.name){
-        objectGroups[objName].isColorizable = val;
+    }).listen();
+    guiHandler.omColorizableController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Colorizable").onChange(function(val){
+      var obj = selectionHandler.getSelectedObject();
+      terminal.clear();
+      obj.isColorizable = val;
+      for (var objName in addedObjects){
+        if (addedObjects[objName].softCopyParentName == obj.name){
+          addedObjects[objName].isColorizable = val;
+        }
       }
-    }
-    if (obj.isColorizable){
-      macroHandler.injectMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
-      obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "colorizable"));
-    }else{
-      delete obj.mesh.material.uniforms.forcedColor;
-      macroHandler.removeMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
-    }
-    obj.mesh.material.needsUpdate = true;
-  }).listen();
-  guiHandler.omAffectedByLightController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Affected by light").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    terminal.clear();
-    obj.setAffectedByLight(val);
-    if (val){
-      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
-    }else{
-      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
-    }
-  }).listen();
+      for (var objName in objectGroups){
+        if (objectGroups[objName].softCopyParentName == obj.name){
+          objectGroups[objName].isColorizable = val;
+        }
+      }
+      if (obj.isColorizable){
+        macroHandler.injectMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
+        obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
+        terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "colorizable"));
+      }else{
+        delete obj.mesh.material.uniforms.forcedColor;
+        macroHandler.removeMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
+        terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
+      }
+      obj.mesh.material.needsUpdate = true;
+    }).listen();
+    guiHandler.omAffectedByLightController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Affected by light").onChange(function(val){
+      var obj = selectionHandler.getSelectedObject();
+      terminal.clear();
+      obj.setAffectedByLight(val);
+      if (val){
+        terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
+      }else{
+        terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
+      }
+    }).listen();
 
-  // SHADOW
-  var lightNames = [];
-  for (var i = 0; i < 5; i ++){
-    lightNames.push("point" + (i + 1));
-    lightNames.push("diffuse" + (i + 1));
+    // SHADOW
+    var lightNames = [];
+    for (var i = 0; i < 5; i ++){
+      lightNames.push("point" + (i + 1));
+      lightNames.push("diffuse" + (i + 1));
+    }
+    var shadowFolder = graphicsFolder.addFolder("Shadow");
+    shadowFolder.add(guiHandler.objectManipulationParameters, "Light", lightNames);
+    shadowFolder.add(guiHandler.objectManipulationParameters, "Bake shadow");
+    shadowFolder.add(guiHandler.objectManipulationParameters, "Unbake shadow");
   }
-  var shadowFolder = graphicsFolder.addFolder("Shadow");
-  shadowFolder.add(guiHandler.objectManipulationParameters, "Light", lightNames);
-  shadowFolder.add(guiHandler.objectManipulationParameters, "Bake shadow");
-  shadowFolder.add(guiHandler.objectManipulationParameters, "Unbake shadow");
 
   // TEXTURE
   guiHandler.omEmissiveColorController = textureFolder.add(guiHandler.objectManipulationParameters, "Emissive col.").onFinishChange(function(val){
