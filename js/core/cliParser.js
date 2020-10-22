@@ -6494,6 +6494,10 @@ function parse(input){
             terminal.printError(Text.DYNAMIC_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND);
             return true;
           }
+          if (!(typeof obj.softCopyParentName === UNDEFINED)){
+            terminal.printError(Text.LIGHT_BAKING_MUST_BE_PERFORMED_ON_COPY_PARENT.replace(Text.PARAM1, obj.softCopyParentName));
+            return true;
+          }
 
           var hasStaticLight = false;
           for (var i = 0; i < MAX_STATIC_POINT_LIGHT_COUNT; i ++){
@@ -6557,6 +6561,10 @@ function parse(input){
           }
           if (!obj.bakedColors){
             terminal.printError(Text.NO_LIGHTS_BAKED_FOR_GIVEN_OBJECT);
+            return true;
+          }
+          if (!(typeof obj.softCopyParentName === UNDEFINED)){
+            terminal.printError(Text.LIGHT_UNBAKING_MUST_BE_PERFORMED_ON_COPY_PARENT.replace(Text.PARAM1, obj.softCopyParentName));
             return true;
           }
 

@@ -49,6 +49,12 @@ ObjectGroup.prototype.unbakeLights = function(){
 
   this.mesh.geometry.attributes.color.needsUpdate = true;
   delete this.bakedColors;
+
+  for (var objName in objectGroups){
+    if (objectGroups[objName].softCopyParentName == this.name){
+      objectGroups[objName].unbakeLights();
+    }
+  }
 }
 
 ObjectGroup.prototype.bakeLights = function(overrideColors){
@@ -63,6 +69,13 @@ ObjectGroup.prototype.bakeLights = function(overrideColors){
   this.mesh.geometry.attributes.color.needsUpdate = true;
 
   this.bakedColors = newColors;
+
+  for (var objName in objectGroups){
+    if (objectGroups[objName].softCopyParentName == this.name){
+      objectGroups[objName].bakeLights(overrideColors);
+    }
+  }
+
   this.setAffectedByLight(false);
 }
 
