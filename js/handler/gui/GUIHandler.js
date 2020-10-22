@@ -1644,6 +1644,16 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
     obj.isColorizable = val;
+    for (var objName in addedObjects){
+      if (addedObjects[objName].softCopyParentName == obj.name){
+        addedObjects[objName].isColorizable = val;
+      }
+    }
+    for (var objName in objectGroups){
+      if (objectGroups[objName].softCopyParentName == obj.name){
+        objectGroups[objName].isColorizable = val;
+      }
+    }
     if (obj.isColorizable){
       macroHandler.injectMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
       obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
