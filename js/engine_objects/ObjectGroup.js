@@ -237,6 +237,18 @@ ObjectGroup.prototype.setAffectedByLight = function(isAffectedByLight){
   this.mesh.material.needsUpdate = true;
 
   this.affectedByLight = isAffectedByLight;
+
+  for (var objName in objectGroups){
+    if (objName != this.name){
+      var obj = objectGroups[objName];
+      if (obj.softCopyParentName == this.name){
+        obj.affectedByLight = isAffectedByLight;
+        if (isAffectedByLight){
+          obj.updateWorldInverseTranspose();
+        }
+      }
+    }
+  }
 }
 
 ObjectGroup.prototype.onAfterRotationAnimation = function(){

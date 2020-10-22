@@ -201,6 +201,18 @@ AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
   this.mesh.material.needsUpdate = true;
 
   this.affectedByLight = isAffectedByLight;
+
+  for (var objName in addedObjects){
+    if (objName != this.name){
+      var obj = addedObjects[objName];
+      if (obj.softCopyParentName == this.name){
+        obj.affectedByLight = isAffectedByLight;
+        if (isAffectedByLight){
+          obj.updateWorldInverseTranspose();
+        }
+      }
+    }
+  }
 }
 
 AddedObject.prototype.isAnimationSuitable = function(animation){
