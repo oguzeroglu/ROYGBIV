@@ -86,6 +86,7 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     "Resolution": "" + screenResolution,
     "Use original resolution": useOriginalResolution,
     "Accepted texture size": "" + ACCEPTED_TEXTURE_SIZE,
+    "Texture margin in PX": "" + TEXTURE_BLEEDING_FIX_PIXELS,
     "Disable instancing": INSTANCING_DISABLED,
     "Shadow intensity": shadowBaker.intensity,
     "Skybox distance": "" + skyboxDistance
@@ -158,6 +159,47 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     }
     ACCEPTED_TEXTURE_SIZE = textureSize;
     terminal.printInfo(Text.ACCEPTED_TEXTURE_SIZE_SET);
+  });
+
+  parentFolder.add(params, "Texture margin in PX").onFinishChange(function(val){
+    terminal.clear();
+    var margin = parseFloat(val);
+
+    if (isNaN(margin)){
+      terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "margin"));
+      return;
+    }
+    if (margin <= 0){
+      terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "margin").replace(Text.PARAM2, "0"));
+      return;
+    }
+
+    TEXTURE_BLEEDING_FIX_PIXELS = margin;
+    terminal.printInfo(Text.REFRESHING_SHADOW_MAPS);
+    terminal.disable();
+    shadowBaker.refreshTextures(function(){
+      if (Object.keys(texturePacks).length > 0){
+        terminal.clear();
+        terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+        textureAtlasHandler.onTexturePackChange(function(){
+          terminal.clear();
+          terminal.enable();
+          terminal.printInfo(Text.TEXTURE_MARGIN_UPDATED);
+        }, function(){
+          terminal.clear();
+          terminal.printError(Text.ERROR_HAPPENED_GENERATING_TEXTURE_ATLAS);
+          terminal.enable();
+        }, true);
+      }else{
+        terminal.clear();
+        terminal.enable();
+        terminal.printInfo(Text.TEXTURE_MARGIN_UPDATED);
+      }
+    }, function(){
+      terminal.clear();
+      terminal.printError(Text.ERROR_HAPPENED_REFRESINH_SHADOW_MAPS);
+      terminal.enable();
+    });
   });
 
   parentFolder.add(params, "Disable instancing").onChange(function(val){

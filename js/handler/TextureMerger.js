@@ -5,8 +5,6 @@ var TextureMerger = function(texturesObj){
     return;
   }
 
-  var TEXTURE_BLEEDING_FIX_PIXELS = 2;
-
   this.dataURLs = new Object();
   for (var textureName in texturesObj){
     var txt = texturesObj[textureName];

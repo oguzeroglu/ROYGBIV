@@ -372,6 +372,7 @@ StateLoader.prototype.resetProject = function(){
   jobHandlerShadowBakerRefresh = false;
   jobHandlerRaycasterRefresh = false;
   GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
+  TEXTURE_BLEEDING_FIX_PIXELS = 2;
   boundingClientRect = renderer.getBoundingClientRect();
   pointerLockRequested = false;
   fullScreenRequested = false;
