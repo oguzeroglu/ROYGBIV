@@ -422,6 +422,7 @@ var Text = function(){
   this.UNBAKING_SHADOW = "Unbaking shadow.";
   this.SHADOW_BAKED = "|____Shadow baked.";
   this.SHADOW_UNBAKED = "Shadow unbaked.";
+  this.OBJECT_HAS_SOFT_COPIES_CANNOT_DESTROY = "Object has soft copies. Cannot destroy.";
   this.ERROR_HAPPENED_BAKING_SHADOW = "An error happened baking shadow.";
   this.ERROR_HAPPENED_UNBAKING_SHADOW = "An error happened unbaking shadow.";
   this.DECISION_TREE_DOES_NOT_HAVE_A_ROOT = "Decision tree [@@1] does not have a root decision set. Either set the root decision or destroy the tree.";

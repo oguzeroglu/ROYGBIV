@@ -580,6 +580,20 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
+
+          for (var objName in addedObjects){
+            if (addedObjects[objName].softCopyParentName == objectName){
+              terminal.printError(Text.OBJECT_HAS_SOFT_COPIES_CANNOT_DESTROY);
+              return true;
+            }
+          }
+          for (var objName in objectGroups){
+            if (objectGroups[objName].softCopyParentName == objectName){
+              terminal.printError(Text.OBJECT_HAS_SOFT_COPIES_CANNOT_DESTROY);
+              return true;
+            }
+          }
+
           selectionHandler.resetCurrentSelection();
           if (object){
             object.destroy(true);

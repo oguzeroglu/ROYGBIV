@@ -132,11 +132,13 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
       }
       var currentSelection = selectionHandler.getSelectedObject();
       if (currentSelection.isAddedObject || currentSelection.isObjectGroup){
+        terminal.clear();
         parseCommand("destroyObject "+currentSelection.name);
       }else if (currentSelection.isAddedText){
         terminal.clear();
         parseCommand("destroyText "+currentSelection.name);
       }else if (currentSelection.isSprite){
+        terminal.clear();
         parseCommand("destroySprite "+currentSelection.name);
       }
       guiHandler.afterObjectSelection();
