@@ -3357,6 +3357,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   if (!isHardCopy){
     newObjGroup.mesh.material = this.mesh.material;
     newObjGroup.softCopyParentName = this.name;
+    if (this.affectedByLight){
+      newObjGroup.affectedByLight = true;
+      newObjGroup.updateWorldInverseTranspose();
+    }
   }else{
     newObjGroup.updateOpacity(this.getOpacity());
     if (newObjGroup.mesh.material.uniforms.totalTextureOffset){

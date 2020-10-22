@@ -3317,6 +3317,10 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   copyInstance.setBlending(this.mesh.material.blending);
   if (!isHardCopy){
     copyInstance.softCopyParentName = this.name;
+    if (this.affectedByLight){
+      copyInstance.affectedByLight = true;
+      copyInstance.updateWorldInverseTranspose();
+    }
   }
   if (this.hasCustomPrecision){
     copyInstance.useCustomShaderPrecision(this.customPrecision);
