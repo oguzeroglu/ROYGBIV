@@ -238,6 +238,12 @@ ShadowBaker.prototype.bakeShadow = function(){
     return;
   }
 
+  if (!(typeof obj.softCopyParentName == UNDEFINED) && !obj.parentObjectName){
+    terminal.printError(Text.CANNOT_BAKE_SHADOW_ON_SOFT_COPIES, true);
+    this.bakeShadow();
+    return;
+  }
+
   if (obj.parentObjectName){
     objectGroups[obj.parentObjectName].hasShadowMap = true;
   }
@@ -631,5 +637,23 @@ ShadowBaker.prototype.updateIntensity = function(newIntensity){
     macroHandler.removeMacro("SHADOW_INTENSITY " + shadowIntensityMacroVal, material, false, true);
     macroHandler.injectMacro("SHADOW_INTENSITY " + newIntensity, material, false, true);
     material.needsUpdate = true;
+  }
+}
+
+ShadowBaker.prototype.onObjectGroupsDetached = function(objGroupAry){
+  var objAry = [];
+
+  for (var objGroupName in objGroupAry){
+    var objGroup = objGroupAry[objGroupName];
+
+    for (var objName in objGroup.group){
+      if (this.texturesByObjName[objName]){
+        objAry.push(objGroup.group[objName]);
+      }
+    }
+
+    if (objAry.length > 0){
+      this.batchUnbake(objAry);
+    }
   }
 }

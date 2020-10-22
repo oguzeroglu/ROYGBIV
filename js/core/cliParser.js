@@ -2111,6 +2111,7 @@ function parse(input){
             }
           }
           if (!jobHandlerWorking){
+            shadowBaker.onObjectGroupsDetached([objectGroup]);
             refreshRaycaster(Text.OBJECT_DETACHED);
           }else{
             jobHandlerRaycasterRefresh = true;

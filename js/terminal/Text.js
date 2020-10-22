@@ -321,6 +321,7 @@ var Text = function(){
   this.NO_SUCH_EFFECT = "No such effect.";
   this.COMMAND_EXECUTED_FOR_X_CONTAINERS = "Command executed for @@1 containers.";
   this.NO_CONTAINERS_FOUND = "No containers found.";
+  this.CANNOT_BAKE_SHADOW_ON_SOFT_COPIES = "      |____Baking shadow on soft copies is not supported.";
   this.SIZEX_MUST_BE_A_NUMBER = "SizeX must be a number.";
   this.SIZEY_MUST_BE_A_NUMBER = "SizeY must be a number.";
   this.SIZEZ_MUST_BE_A_NUMBER = "SizeZ must be a number.";
