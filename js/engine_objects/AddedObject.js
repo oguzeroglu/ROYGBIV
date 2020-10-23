@@ -163,6 +163,9 @@ AddedObject.prototype.onTextureAtlasRefreshed = function(){
 }
 
 AddedObject.prototype.updateWorldInverseTranspose = function(overrideMatrix){
+  if (!projectLoaded){
+    return;
+  }
   var val = overrideMatrix? overrideMatrix: this.mesh.material.uniforms.worldInverseTranspose.value;
   val.getInverse(this.mesh.matrixWorld).transpose();
   this.matrixCache.copy(this.mesh.matrixWorld);

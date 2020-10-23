@@ -266,6 +266,8 @@ ImportHandler.prototype.importFog = function(obj){
 }
 
 ImportHandler.prototype.importAddedObjects = function(obj){
+  var materialCache = {};
+
   var addedObjectsExport = obj.addedObjects;
   for (var grouppedObjectName in obj.objectGroups){
     var curObjectGroupExport = obj.objectGroups[grouppedObjectName];
@@ -375,7 +377,26 @@ ImportHandler.prototype.importAddedObjects = function(obj){
         );
         geometryCache[geomKey] = geom;
       }
-      boxMesh = new MeshGenerator(geom, material).generateMesh();
+
+      var boxMesh;
+      if (isDeployment && curAddedObjectExport.fromObjectGroup){
+        var materialKey = curAddedObjectExport.opacity + PIPE + curAddedObjectExport.roygbivMaterialName + PIPE +
+                          curAddedObjectExport.associatedTexturePack + PIPE + curAddedObjectExport.aoMapIntensity + PIPE +
+                          curAddedObjectExport.emissiveIntensity + PIPE + curAddedObjectExport.emissiveColor + PIPE +
+                          curAddedObjectExport.textureOffsetX + PIPE + curAddedObjectExport.textureOffsetY + PIPE +
+                          curAddedObjectExport.textureRepeatU + PIPE + curAddedObjectExport.textureRepeatV + PIPE +
+                          curAddedObjectExport.displacementScale + PIPE + curAddedObjectExport.displacementBias + PIPE +
+                          curAddedObjectExport.blendingMode;
+        var rawShaderMaterial = materialCache[materialKey];
+        if (rawShaderMaterial){
+          boxMesh = new THREE.Mesh(geom, rawShaderMaterial);
+        }else{
+          boxMesh = new MeshGenerator(geom, material).generateMesh();
+          materialCache[materialKey] = boxMesh.material;
+        }
+      }else{
+        boxMesh = new MeshGenerator(geom, material).generateMesh();
+      }
       boxMesh.position.x = centerX;
       boxMesh.position.y = centerY;
       boxMesh.position.z = centerZ;
@@ -415,7 +436,26 @@ ImportHandler.prototype.importAddedObjects = function(obj){
         geom = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
         geometryCache[geomKey] = geom;
       }
-      var surface = new MeshGenerator(geom, material).generateMesh();
+
+      var surface;
+      if (isDeployment && curAddedObjectExport.fromObjectGroup){
+        var materialKey = curAddedObjectExport.opacity + PIPE + curAddedObjectExport.roygbivMaterialName + PIPE +
+                          curAddedObjectExport.associatedTexturePack + PIPE + curAddedObjectExport.aoMapIntensity + PIPE +
+                          curAddedObjectExport.emissiveIntensity + PIPE + curAddedObjectExport.emissiveColor + PIPE +
+                          curAddedObjectExport.textureOffsetX + PIPE + curAddedObjectExport.textureOffsetY + PIPE +
+                          curAddedObjectExport.textureRepeatU + PIPE + curAddedObjectExport.textureRepeatV + PIPE +
+                          curAddedObjectExport.displacementScale + PIPE + curAddedObjectExport.displacementBias + PIPE +
+                          curAddedObjectExport.blendingMode;
+        var rawShaderMaterial = materialCache[materialKey];
+        if (rawShaderMaterial){
+          surface = new THREE.Mesh(geom, rawShaderMaterial);
+        }else{
+          surface = new MeshGenerator(geom, material).generateMesh();
+          materialCache[materialKey] = surface.material;
+        }
+      }else{
+        surface = new MeshGenerator(geom, material).generateMesh();
+      }
 
       surface.position.x = positionX;
       surface.position.y = positionY;
@@ -462,7 +502,25 @@ ImportHandler.prototype.importAddedObjects = function(obj){
         geom = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, widthSegments, heightSegments);
         geometryCache[geomKey] = geom;
       }
-      var ramp = new MeshGenerator(geom, material).generateMesh();
+      var ramp;
+      if (isDeployment && curAddedObjectExport.fromObjectGroup){
+        var materialKey = curAddedObjectExport.opacity + PIPE + curAddedObjectExport.roygbivMaterialName + PIPE +
+                          curAddedObjectExport.associatedTexturePack + PIPE + curAddedObjectExport.aoMapIntensity + PIPE +
+                          curAddedObjectExport.emissiveIntensity + PIPE + curAddedObjectExport.emissiveColor + PIPE +
+                          curAddedObjectExport.textureOffsetX + PIPE + curAddedObjectExport.textureOffsetY + PIPE +
+                          curAddedObjectExport.textureRepeatU + PIPE + curAddedObjectExport.textureRepeatV + PIPE +
+                          curAddedObjectExport.displacementScale + PIPE + curAddedObjectExport.displacementBias + PIPE +
+                          curAddedObjectExport.blendingMode;
+        var rawShaderMaterial = materialCache[materialKey];
+        if (rawShaderMaterial){
+          ramp = new THREE.Mesh(geom, rawShaderMaterial);
+        }else{
+          ramp = new MeshGenerator(geom, material).generateMesh();
+          materialCache[materialKey] = ramp.material;
+        }
+      }else{
+        ramp = new MeshGenerator(geom, material).generateMesh();
+      }
       ramp.position.x = centerX;
       ramp.position.y = centerY;
       ramp.position.z = centerZ;
@@ -524,7 +582,24 @@ ImportHandler.prototype.importAddedObjects = function(obj){
         geom = new THREE.SphereBufferGeometry(Math.abs(radius), widthSegments, heightSegments);
         geometryCache[geomKey] = geom;
       }
-      sphereMesh = new MeshGenerator(geom, material).generateMesh();
+      if (isDeployment && curAddedObjectExport.fromObjectGroup){
+        var materialKey = curAddedObjectExport.opacity + PIPE + curAddedObjectExport.roygbivMaterialName + PIPE +
+                          curAddedObjectExport.associatedTexturePack + PIPE + curAddedObjectExport.aoMapIntensity + PIPE +
+                          curAddedObjectExport.emissiveIntensity + PIPE + curAddedObjectExport.emissiveColor + PIPE +
+                          curAddedObjectExport.textureOffsetX + PIPE + curAddedObjectExport.textureOffsetY + PIPE +
+                          curAddedObjectExport.textureRepeatU + PIPE + curAddedObjectExport.textureRepeatV + PIPE +
+                          curAddedObjectExport.displacementScale + PIPE + curAddedObjectExport.displacementBias + PIPE +
+                          curAddedObjectExport.blendingMode;
+        var rawShaderMaterial = materialCache[materialKey];
+        if (rawShaderMaterial){
+          sphereMesh = new THREE.Mesh(geom, rawShaderMaterial);
+        }else{
+          sphereMesh = new MeshGenerator(geom, material).generateMesh();
+          materialCache[materialKey] = sphereMesh.material;
+        }
+      }else{
+        sphereMesh = new MeshGenerator(geom, material).generateMesh();
+      }
       sphereMesh.position.x = centerX;
       sphereMesh.position.y = centerY;
       sphereMesh.position.z = centerZ;
@@ -554,7 +629,25 @@ ImportHandler.prototype.importAddedObjects = function(obj){
         );
         geometryCache[geomKey] = cylinderGeometry;
       }
-      var cylinderMesh = new MeshGenerator(cylinderGeometry, material).generateMesh();
+      var cylinderMesh;
+      if (isDeployment && curAddedObjectExport.fromObjectGroup){
+        var materialKey = curAddedObjectExport.opacity + PIPE + curAddedObjectExport.roygbivMaterialName + PIPE +
+                          curAddedObjectExport.associatedTexturePack + PIPE + curAddedObjectExport.aoMapIntensity + PIPE +
+                          curAddedObjectExport.emissiveIntensity + PIPE + curAddedObjectExport.emissiveColor + PIPE +
+                          curAddedObjectExport.textureOffsetX + PIPE + curAddedObjectExport.textureOffsetY + PIPE +
+                          curAddedObjectExport.textureRepeatU + PIPE + curAddedObjectExport.textureRepeatV + PIPE +
+                          curAddedObjectExport.displacementScale + PIPE + curAddedObjectExport.displacementBias + PIPE +
+                          curAddedObjectExport.blendingMode;
+        var rawShaderMaterial = materialCache[materialKey];
+        if (rawShaderMaterial){
+          cylinderMesh = new THREE.Mesh(cylinderGeometry, rawShaderMaterial);
+        }else{
+          cylinderMesh = new MeshGenerator(cylinderGeometry, material).generateMesh();
+          materialCache[materialKey] = cylinderMesh.material;
+        }
+      }else{
+        cylinderMesh = new MeshGenerator(cylinderGeometry, material).generateMesh();
+      }
       var centerX = metaData["centerX"];
       var centerY = metaData["centerY"];
       var centerZ = metaData["centerZ"];
