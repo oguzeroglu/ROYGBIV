@@ -834,6 +834,9 @@ ObjectGroup.prototype.loadState = function(){
 }
 
 ObjectGroup.prototype.saveState = function(){
+  if (isDeployment){
+    return;
+  }
   this.state = new Object();
   this.state.physicsPX = this.physicsBody.position.x;
   this.state.physicsPY = this.physicsBody.position.y;

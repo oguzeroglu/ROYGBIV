@@ -1124,6 +1124,9 @@ AddedObject.prototype.loadState = function(){
 }
 
 AddedObject.prototype.saveState = function(){
+  if (isDeployment){
+    return;
+  }
   this.state = new Object();
   this.state.physicsPX = this.physicsBody.position.x;
   this.state.physicsPY = this.physicsBody.position.y;

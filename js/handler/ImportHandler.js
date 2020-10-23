@@ -753,6 +753,10 @@ ImportHandler.prototype.importAddedObjects = function(obj){
     if (curAddedObjectExport.noMass){
       addedObjectInstance.noMass = true;
       physicsWorld.remove(addedObjectInstance.physicsBody);
+
+      if (isDeployment){
+        delete addedObjectInstance.physicsBody;
+      }
     }
 
     if (curAddedObjectExport.softCopyParentName){
@@ -1249,6 +1253,14 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (curObjectGroupExport.noMass){
       objectGroupInstance.noMass = true;
       physicsWorld.remove(objectGroupInstance.physicsBody);
+
+      if (isDeployment){
+        for (var childObjName in group){
+          delete group[childObjName].physicsBody;
+        }
+
+        delete objectGroupInstance.physicsBody;
+      }
     }
     if (!(typeof curObjectGroupExport.positionWhenUsedAsFPSWeapon == UNDEFINED)){
       objectGroupInstance.isFPSWeapon = true;
