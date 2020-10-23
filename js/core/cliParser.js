@@ -1439,6 +1439,18 @@ function parse(input){
               addedObject.removeAnimation(anim);
             }
           }
+          for (var objName in addedObjects){
+            var obj = addedObjects[objName];
+            if (obj.softCopyParentName == addedObject.name){
+              obj.resetMaps(true);
+              for (var animName in obj.animations){
+                var anim = obj.animations[animName];
+                if (anim.isTextureAnimation()){
+                  obj.removeAnimation(anim);
+                }
+              }
+            }
+          }
           return true;
         break;
         case 64: //segmentObject
