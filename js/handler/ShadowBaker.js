@@ -643,21 +643,3 @@ ShadowBaker.prototype.updateIntensity = function(newIntensity){
     material.needsUpdate = true;
   }
 }
-
-ShadowBaker.prototype.onObjectGroupsDetached = function(objGroupAry){
-  var objAry = [];
-
-  for (var objGroupName in objGroupAry){
-    var objGroup = objGroupAry[objGroupName];
-
-    for (var objName in objGroup.group){
-      if (this.texturesByObjName[objName]){
-        objAry.push(objGroup.group[objName]);
-      }
-    }
-
-    if (objAry.length > 0){
-      this.batchUnbake(objAry);
-    }
-  }
-}

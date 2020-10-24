@@ -1062,10 +1062,7 @@ JobHandler.prototype.handleDetachCommand = function(){
   var objGroupPrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
 
-  var ary = [];
-
   for (var objGroupName in sceneHandler.getObjectGroups()){
-    ary.push(objectGroups[objGroupName]);
     if (objGroupName.startsWith(objGroupPrefix)){
       parseCommand(
         "detach "+objGroupName
@@ -1079,8 +1076,6 @@ JobHandler.prototype.handleDetachCommand = function(){
   }else{
     terminal.printError(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
-
-  shadowBaker.onObjectGroupsDetached(ary);
 }
 
 JobHandler.prototype.handleRotateObjectCommand = function(){
