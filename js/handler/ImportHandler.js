@@ -1130,6 +1130,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
 
     objectGroupInstance.skipTotalAOIntensityUniform = curObjectGroupExport.skipTotalAOIntensityUniform;
     objectGroupInstance.skipTotalEmissiveIntensityUniform = curObjectGroupExport.skipTotalEmissiveIntensityUniform;
+    objectGroupInstance.skipTotalEmissiveColorUniform = curObjectGroupExport.skipTotalEmissiveColorUniform;
 
     var simplifiedChildrenPhysicsBodies = [];
     if (curObjectGroupExport.simplifiedChildrenPhysicsBodyDescriptions){
@@ -1247,7 +1248,12 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveColor){
       REUSABLE_COLOR.set(curObjectGroupExport.totalEmissiveColor);
       objectGroupInstance.setEmissiveColor(REUSABLE_COLOR);
+    }else if (objectGroupInstance.skipTotalEmissiveColorUniform){
+      REUSABLE_COLOR.set(curObjectGroupExport.totalEmissiveColor);
+      macroHandler.removeUniform(objectGroupInstance.mesh.material, "totalEmissiveColor");
+      macroHandler.injectVec3("totalEmissiveColor", REUSABLE_VECTOR.set(REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b), objectGroupInstance.mesh.material, false, true);
     }
+
     if (objectGroupInstance.mesh.material.uniforms.totalDisplacementInfo){
       objectGroupInstance.setDisplacementScale(curObjectGroupExport.totalDisplacementScale);
       objectGroupInstance.setDisplacementBias(curObjectGroupExport.totalDisplacementBias);

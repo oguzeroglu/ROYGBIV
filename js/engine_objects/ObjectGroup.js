@@ -2967,6 +2967,9 @@ ObjectGroup.prototype.export = function(isBuildingForDeploymentMode){
   if (isBuildingForDeploymentMode && this.hasEmissiveMap() && !this.hasEmissiveIntensityAnimation()){
     exportObj.skipTotalEmissiveIntensityUniform = true;
   }
+  if (isBuildingForDeploymentMode && this.hasEmissiveMap() && !this.hasEmissiveColorAnimation()){
+    exportObj.skipTotalEmissiveColorUniform = true;
+  }
 
   return exportObj;
 }
@@ -3639,6 +3642,15 @@ ObjectGroup.prototype.hasAOAnimation = function(){
 ObjectGroup.prototype.hasEmissiveIntensityAnimation = function(){
   for (var animName in this.animations){
     if (this.animations[animName].isEmissiveIntensityAnimation()){
+      return true;
+    }
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasEmissiveColorAnimation = function(){
+  for (var animName in this.animations){
+    if (this.animations[animName].isEmissiveColorAnimation()){
       return true;
     }
   }

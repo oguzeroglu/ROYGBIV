@@ -28,6 +28,23 @@ MacroHandler.prototype.injectFloat = function(variableName, value, material, ins
   material.needsUpdate = true;
 }
 
+MacroHandler.prototype.injectVec3 = function(variableName, vec, material, insertVertexShader, insertFragmentShader){
+  var macroText = "vec3 " + variableName + " = " + "vec3(@@1, @@2, @@3);";
+  macroText = macroText.replace("@@1", "float(" + vec.x + ")");
+  macroText = macroText.replace("@@2", "float(" + vec.y + ")");
+  macroText = macroText.replace("@@3", "float(" + vec.z + ")");
+
+  if (insertVertexShader){
+    material.vertexShader = material.vertexShader.replace("\n"+macroText, "");
+    material.vertexShader = material.vertexShader.replace("#define INSERTION", "#define INSERTION\n"+macroText);
+  }
+  if (insertFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace("\n"+macroText, "");
+    material.fragmentShader = material.fragmentShader.replace("#define INSERTION", "#define INSERTION\n"+macroText);
+  }
+  material.needsUpdate = true;
+}
+
 MacroHandler.prototype.removeMacro = function(macro, material, removeVertexShader, removeFragmentShader){
   if (removeVertexShader){
     material.vertexShader = material.vertexShader.replace("\n#define "+macro, "");
