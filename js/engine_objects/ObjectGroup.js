@@ -2964,6 +2964,9 @@ ObjectGroup.prototype.export = function(isBuildingForDeploymentMode){
   if (isBuildingForDeploymentMode && this.hasAOMap() && !this.hasAOAnimation()){
     exportObj.skipTotalAOIntensityUniform = true;
   }
+  if (isBuildingForDeploymentMode && this.hasEmissiveMap() && !this.hasEmissiveIntensityAnimation()){
+    exportObj.skipTotalEmissiveIntensityUniform = true;
+  }
 
   return exportObj;
 }
@@ -3627,6 +3630,15 @@ ObjectGroup.prototype.push = function(ary, val){
 ObjectGroup.prototype.hasAOAnimation = function(){
   for (var animName in this.animations){
     if (this.animations[animName].isAOAnimation()){
+      return true;
+    }
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasEmissiveIntensityAnimation = function(){
+  for (var animName in this.animations){
+    if (this.animations[animName].isEmissiveIntensityAnimation()){
       return true;
     }
   }

@@ -74,10 +74,18 @@ Animation.prototype.isDisplacementAnimation = function(){
 
 }
 
-Animation.prototype.isEmissiveAnimation = function(){
+Animation.prototype.isEmissiveIntensityAnimation = function(){
   var actionType = this.description.action;
-  return actionType == animationHandler.actionTypes.OBJECT.EMISSIVE_INTENSITY ||
-          actionType == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR;
+  return actionType == animationHandler.actionTypes.OBJECT.EMISSIVE_INTENSITY;
+}
+
+Animation.prototype.isEmissiveColorAnimation = function(){
+  var actionType = this.description.action;
+  return actionType == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR;
+}
+
+Animation.prototype.isEmissiveAnimation = function(){
+  return this.isEmissiveIntensityAnimation() || this.isEmissiveColorAnimation();
 }
 
 Animation.prototype.isAOAnimation = function(){
