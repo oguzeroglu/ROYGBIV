@@ -972,7 +972,7 @@ ObjectGroup.prototype.handleTextures = function(){
     if (obj.hasDisplacementMap() && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
       this.hasDisplacement = true;
     }
-    if (shadowBaker.texturesByObjName[obj.name]){
+    if (shadowBaker.texturesByObjName[obj.name] && !(isDeployment && !isWebGLFriendly && this.skipShadowsInNonWebGLFriendlyDevices)){
       this.hasShadowMap = true;
     }
   }
@@ -2984,6 +2984,8 @@ ObjectGroup.prototype.export = function(isBuildingForDeploymentMode){
   if (isBuildingForDeploymentMode && this.hasDisplacementMap() && !this.hasDisplacementAnimation()){
     exportObj.skipTotalDisplacementInfoUniform = true;
   }
+
+  exportObj.skipShadowsInNonWebGLFriendlyDevices = !!this.skipShadowsInNonWebGLFriendlyDevices;
 
   return exportObj;
 }

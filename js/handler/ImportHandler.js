@@ -863,6 +863,8 @@ ImportHandler.prototype.importAddedObjects = function(obj){
      addedObjectInstance.usedAsAIEntity = curAddedObjectExport.usedAsAIEntity;
      addedObjectInstance.fromObjectGroup = curAddedObjectExport.fromObjectGroup;
 
+     addedObjectInstance.skipShadowsInNonWebGLFriendlyDevices = curAddedObjectExport.skipShadowsInNonWebGLFriendlyDevices;
+
      if (curAddedObjectExport.hiddenInDesignMode){
        addedObjectInstance.hideInDesignMode(true);
      }
@@ -1129,6 +1131,8 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     objectGroupInstance.skipTotalEmissiveColorUniform = curObjectGroupExport.skipTotalEmissiveColorUniform;
     objectGroupInstance.skipTotalTextureOffsetUniform = curObjectGroupExport.skipTotalTextureOffsetUniform;
     objectGroupInstance.skipTotalDisplacementInfoUniform = curObjectGroupExport.skipTotalDisplacementInfoUniform;
+
+    objectGroupInstance.skipShadowsInNonWebGLFriendlyDevices = curObjectGroupExport.skipShadowsInNonWebGLFriendlyDevices;
 
     var simplifiedChildrenPhysicsBodies = [];
     if (curObjectGroupExport.simplifiedChildrenPhysicsBodyDescriptions){

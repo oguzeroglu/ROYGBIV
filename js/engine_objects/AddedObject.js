@@ -991,6 +991,7 @@ AddedObject.prototype.export = function(){
 
   exportObject.rotationMode = this.rotationMode;
   exportObject.hiddenInDesignMode = !!this.hiddenInDesignMode;
+  exportObject.skipShadowsInNonWebGLFriendlyDevices = !!this.skipShadowsInNonWebGLFriendlyDevices;
 
   return exportObject;
 }

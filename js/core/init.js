@@ -203,6 +203,7 @@ window.onload = function() {
   render();
   windowLoaded = true;
   MAX_VERTEX_UNIFORM_VECTORS = renderer.getMaxVertexUniformVectors();
+  isWebGLFriendly = MAX_VERTEX_UNIFORM_VECTORS >= 1024;
   MAX_VERTEX_ATTRIBS = renderer.getMaxVertexAttribs();
   VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = renderer.isVertexShaderTextureFetchSupported();
   ASTC_SUPPORTED = renderer.isASTCSupported();

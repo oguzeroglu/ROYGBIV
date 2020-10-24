@@ -69,6 +69,7 @@ var GUIHandler = function(){
 
       parseCommand("unbakeShadow " + selectionHandler.getSelectedObject().name);
     },
+    "Active in non WebGL friendly devices": false,
     "Export": function(){
       terminal.clear();
       parseCommand("exportObject " + selectionHandler.getSelectedObject().name);
@@ -829,6 +830,9 @@ GUIHandler.prototype.afterObjectSelection = function(){
     if (obj.affectedByLight){
       guiHandler.objectManipulationParameters["Affected by light"] = true;
     }
+
+    guiHandler.objectManipulationParameters["Active in non WebGL friendly devices"] = !obj.skipShadowsInNonWebGLFriendlyDevices;
+
     if (obj.hasCustomPrecision){
       switch(obj.customPrecision){
         case shaderPrecisionHandler.precisionTypes.LOW:
@@ -1699,6 +1703,9 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     shadowFolder.add(guiHandler.objectManipulationParameters, "Light", lightNames);
     shadowFolder.add(guiHandler.objectManipulationParameters, "Bake shadow");
     shadowFolder.add(guiHandler.objectManipulationParameters, "Unbake shadow");
+    shadowFolder.add(guiHandler.objectManipulationParameters, "Active in non WebGL friendly devices").onChange(function(val){
+      selectionHandler.getSelectedObject().skipShadowsInNonWebGLFriendlyDevices = !val;
+    }).listen();
   }
 
   // TEXTURE

@@ -58,7 +58,11 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
       for (var objName in shadowBaker.textureRangesByObjectName){
         var obj = addedObjects[objName];
 
-        if(obj.fromObjectGroup){
+        if (obj.fromObjectGroup){
+          continue;
+        }
+
+        if (isDeployment && !isWebGLFriendly && obj.skipShadowsInNonWebGLFriendlyDevices){
           continue;
         }
 
