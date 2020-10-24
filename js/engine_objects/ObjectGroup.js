@@ -2768,7 +2768,7 @@ ObjectGroup.prototype.exportLightweight = function(){
   return exportObj;
 }
 
-ObjectGroup.prototype.export = function(){
+ObjectGroup.prototype.export = function(isBuildingForDeploymentMode){
   var exportObj = new Object();
   exportObj.name = this.name;
   exportObj.group = new Object();
@@ -2959,6 +2959,10 @@ ObjectGroup.prototype.export = function(){
 
   if (this.bakedColors){
     exportObj.bakedColors = this.bakedColors;
+  }
+
+  if (isBuildingForDeploymentMode && this.hasAOMap() && !this.hasAOAnimation()){
+    exportObj.skipTotalAOIntensityUniform = true;
   }
 
   return exportObj;
@@ -3618,4 +3622,13 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
 ObjectGroup.prototype.push = function(ary, val){
   // Indexing is deprecated so this method now only pushes to an array
   ary.push(val);
+}
+
+ObjectGroup.prototype.hasAOAnimation = function(){
+  for (var animName in this.animations){
+    if (this.animations[animName].isAOAnimation()){
+      return true;
+    }
+  }
+  return false;
 }

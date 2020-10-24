@@ -112,7 +112,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
     uniforms.texture = textureAtlasHandler.getTextureUniform();
   }
-  if (objectGroup.hasAOMap()){
+  if (objectGroup.hasAOMap() && !objectGroup.skipTotalAOIntensityUniform){
     uniforms.totalAOIntensity = new THREE.Uniform(1);
   }
   if (objectGroup.hasEmissiveMap()){
@@ -152,7 +152,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
     uniforms.texture = textureAtlasHandler.getTextureUniform();
   }
-  if (objectGroup.hasAOMap()){
+  if (objectGroup.hasAOMap() && !objectGroup.skipTotalAOIntensityUniform){
     uniforms.totalAOIntensity = new THREE.Uniform(1);
   }
   if (objectGroup.hasEmissiveMap()){
@@ -177,6 +177,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   mesh.renderOrder = renderOrders.OBJECT;
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
+
   return mesh;
 }
 

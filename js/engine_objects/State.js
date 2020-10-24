@@ -91,7 +91,7 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   // OBJECT GROUPS *************************************************
   var objectGroupsExport = new Object();
   for (var objectName in objectGroups){
-    objectGroupsExport[objectName] = objectGroups[objectName].export();
+    objectGroupsExport[objectName] = objectGroups[objectName].export(isBuildingForDeploymentMode);
   }
   this.objectGroups = objectGroupsExport;
   // MARKED POINTS *************************************************

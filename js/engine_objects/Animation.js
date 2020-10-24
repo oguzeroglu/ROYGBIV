@@ -80,6 +80,11 @@ Animation.prototype.isEmissiveAnimation = function(){
           actionType == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR;
 }
 
+Animation.prototype.isAOAnimation = function(){
+  var actionType = this.description.action;
+  return actionType == animationHandler.actionTypes.OBJECT.AO_INTENSITY;
+}
+
 Animation.prototype.isTextureOffsetAnimation = function(){
   var actionType = this.description.action;
   return actionType == animationHandler.actionTypes.OBJECT.TEXTURE_OFFSET_X ||
@@ -88,7 +93,7 @@ Animation.prototype.isTextureOffsetAnimation = function(){
 
 Animation.prototype.isTextureAnimation = function(){
   var actionType = this.description.action;
-  return this.isEmissiveAnimation() || this.isDisplacementAnimation() || this.isTextureOffsetAnimation();
+  return this.isEmissiveAnimation() || this.isDisplacementAnimation() || this.isTextureOffsetAnimation() || this.isAOAnimation();
 }
 
 Animation.prototype.copyWithAnotherObject = function(obj){

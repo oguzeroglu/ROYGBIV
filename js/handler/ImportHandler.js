@@ -1127,6 +1127,9 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (curObjectGroupExport.isRotationDirty){
       objectGroupInstance.isRotationDirty = true;
     }
+
+    objectGroupInstance.skipTotalAOIntensityUniform = curObjectGroupExport.skipTotalAOIntensityUniform;
+
     var simplifiedChildrenPhysicsBodies = [];
     if (curObjectGroupExport.simplifiedChildrenPhysicsBodyDescriptions){
       for (var i = 0; i<curObjectGroupExport.simplifiedChildrenPhysicsBodyDescriptions.length; i++){
@@ -1229,6 +1232,9 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     }
     if (objectGroupInstance.mesh.material.uniforms.totalAOIntensity){
       objectGroupInstance.setAOIntensity(curObjectGroupExport.totalAOIntensity);
+    }else if(objectGroupInstance.skipTotalAOIntensityUniform){
+      macroHandler.removeUniform(objectGroupInstance.mesh.material, "totalAOIntensity");
+      macroHandler.injectFloat("totalAOIntensity", curObjectGroupExport.totalAOIntensity, objectGroupInstance.mesh.material, false, true);
     }
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity){
       objectGroupInstance.setEmissiveIntensity(curObjectGroupExport.totalEmissiveIntensity);
