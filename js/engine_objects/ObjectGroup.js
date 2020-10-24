@@ -384,6 +384,9 @@ ObjectGroup.prototype.setDisplacementScale = function(val){
 }
 
 ObjectGroup.prototype.getTextureOffsetY = function(){
+  if (!this.mesh.material.uniforms.totalTextureOffset){
+    return 0;
+  }
   return this.mesh.material.uniforms.totalTextureOffset.value.y;
 }
 
@@ -397,6 +400,9 @@ ObjectGroup.prototype.setTextureOffsetY = function(val){
 }
 
 ObjectGroup.prototype.getTextureOffsetX = function(){
+  if (!this.mesh.material.uniforms.totalTextureOffset){
+    return 0;
+  }
   return this.mesh.material.uniforms.totalTextureOffset.value.x;
 }
 
@@ -2970,6 +2976,9 @@ ObjectGroup.prototype.export = function(isBuildingForDeploymentMode){
   if (isBuildingForDeploymentMode && this.hasEmissiveMap() && !this.hasEmissiveColorAnimation()){
     exportObj.skipTotalEmissiveColorUniform = true;
   }
+  if (isBuildingForDeploymentMode && this.hasTexture && !this.hasTextureOffsetAnimation()){
+    exportObj.skipTotalTextureOffsetUniform = true;
+  }
 
   return exportObj;
 }
@@ -3651,6 +3660,15 @@ ObjectGroup.prototype.hasEmissiveIntensityAnimation = function(){
 ObjectGroup.prototype.hasEmissiveColorAnimation = function(){
   for (var animName in this.animations){
     if (this.animations[animName].isEmissiveColorAnimation()){
+      return true;
+    }
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasTextureOffsetAnimation = function(){
+  for (var animName in this.animations){
+    if (this.animations[animName].isTextureOffsetAnimation()){
       return true;
     }
   }

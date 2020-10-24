@@ -1131,6 +1131,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     objectGroupInstance.skipTotalAOIntensityUniform = curObjectGroupExport.skipTotalAOIntensityUniform;
     objectGroupInstance.skipTotalEmissiveIntensityUniform = curObjectGroupExport.skipTotalEmissiveIntensityUniform;
     objectGroupInstance.skipTotalEmissiveColorUniform = curObjectGroupExport.skipTotalEmissiveColorUniform;
+    objectGroupInstance.skipTotalTextureOffsetUniform = curObjectGroupExport.skipTotalTextureOffsetUniform;
 
     var simplifiedChildrenPhysicsBodies = [];
     if (curObjectGroupExport.simplifiedChildrenPhysicsBodyDescriptions){
@@ -1231,6 +1232,9 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (objectGroupInstance.mesh.material.uniforms.totalTextureOffset){
       objectGroupInstance.setTextureOffsetX(curObjectGroupExport.totalTextureOffsetX);
       objectGroupInstance.setTextureOffsetY(curObjectGroupExport.totalTextureOffsetY);
+    }else if (objectGroupInstance.skipTotalTextureOffsetUniform){
+      macroHandler.removeUniform(objectGroupInstance.mesh.material, "totalTextureOffset");
+      macroHandler.injectVec2("totalTextureOffset", new THREE.Vector2(curObjectGroupExport.totalTextureOffsetX, curObjectGroupExport.totalTextureOffsetY), objectGroupInstance.mesh.material, true, false);
     }
     if (objectGroupInstance.mesh.material.uniforms.totalAOIntensity){
       objectGroupInstance.setAOIntensity(curObjectGroupExport.totalAOIntensity);

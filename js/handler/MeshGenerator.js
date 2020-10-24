@@ -109,7 +109,9 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     totalAlpha: new THREE.Uniform(1)
   };
   if (objectGroup.hasTexture){
-    uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
+    if (!objectGroup.skipTotalTextureOffsetUniform){
+      uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
+    }
     uniforms.texture = textureAtlasHandler.getTextureUniform();
   }
   if (objectGroup.hasAOMap() && !objectGroup.skipTotalAOIntensityUniform){
@@ -153,7 +155,9 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     totalAlpha: new THREE.Uniform(1)
   }
   if (hasTexture){
-    uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
+    if (!objectGroup.skipTotalTextureOffsetUniform){
+      uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
+    }
     uniforms.texture = textureAtlasHandler.getTextureUniform();
   }
   if (objectGroup.hasAOMap() && !objectGroup.skipTotalAOIntensityUniform){
