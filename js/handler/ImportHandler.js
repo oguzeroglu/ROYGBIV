@@ -1132,6 +1132,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     objectGroupInstance.skipTotalEmissiveIntensityUniform = curObjectGroupExport.skipTotalEmissiveIntensityUniform;
     objectGroupInstance.skipTotalEmissiveColorUniform = curObjectGroupExport.skipTotalEmissiveColorUniform;
     objectGroupInstance.skipTotalTextureOffsetUniform = curObjectGroupExport.skipTotalTextureOffsetUniform;
+    objectGroupInstance.skipTotalDisplacementInfoUniform = curObjectGroupExport.skipTotalDisplacementInfoUniform;
 
     var simplifiedChildrenPhysicsBodies = [];
     if (curObjectGroupExport.simplifiedChildrenPhysicsBodyDescriptions){
@@ -1261,7 +1262,11 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (objectGroupInstance.mesh.material.uniforms.totalDisplacementInfo){
       objectGroupInstance.setDisplacementScale(curObjectGroupExport.totalDisplacementScale);
       objectGroupInstance.setDisplacementBias(curObjectGroupExport.totalDisplacementBias);
+    }else if (objectGroupInstance.skipTotalDisplacementInfoUniform){
+      macroHandler.removeUniform(objectGroupInstance.mesh.material, "totalDisplacementInfo");
+      macroHandler.injectVec2("totalDisplacementInfo", new THREE.Vector2(curObjectGroupExport.totalDisplacementScale, curObjectGroupExport.totalDisplacementBias), objectGroupInstance.mesh.material, true, false);
     }
+
     if (curObjectGroupExport.isPhysicsSimplified){
       var params = curObjectGroupExport.physicsSimplificationParameters;
       objectGroupInstance.simplifyPhysics(params.sizeX, params.sizeY, params.sizeZ);

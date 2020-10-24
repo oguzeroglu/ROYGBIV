@@ -125,7 +125,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
       uniforms.totalEmissiveIntensity = new THREE.Uniform(1);
     }
   }
-  if (objectGroup.hasDisplacementMap() && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
+  if (objectGroup.hasDisplacementMap() && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED && !objectGroup.skipTotalDisplacementInfoUniform){
     uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
   if (objectGroup.hasShadowMap){
@@ -171,7 +171,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
       uniforms.totalEmissiveColor = new THREE.Uniform(new THREE.Color("white"));
     }
   }
-  if (objectGroup.hasDisplacementMap()){
+  if (objectGroup.hasDisplacementMap() && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED && !objectGroup.skipTotalDisplacementInfoUniform){
     uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
   if (hasShadowMap){

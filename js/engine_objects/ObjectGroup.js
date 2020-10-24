@@ -2979,6 +2979,9 @@ ObjectGroup.prototype.export = function(isBuildingForDeploymentMode){
   if (isBuildingForDeploymentMode && this.hasTexture && !this.hasTextureOffsetAnimation()){
     exportObj.skipTotalTextureOffsetUniform = true;
   }
+  if (isBuildingForDeploymentMode && this.hasDisplacementMap() && !this.hasDisplacementAnimation()){
+    exportObj.skipTotalDisplacementInfoUniform = true;
+  }
 
   return exportObj;
 }
@@ -3669,6 +3672,15 @@ ObjectGroup.prototype.hasEmissiveColorAnimation = function(){
 ObjectGroup.prototype.hasTextureOffsetAnimation = function(){
   for (var animName in this.animations){
     if (this.animations[animName].isTextureOffsetAnimation()){
+      return true;
+    }
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasDisplacementAnimation = function(){
+  for (var animName in this.animations){
+    if (this.animations[animName].isDisplacementAnimation()){
       return true;
     }
   }
