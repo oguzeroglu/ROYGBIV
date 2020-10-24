@@ -2998,7 +2998,7 @@ ObjectGroup.prototype.getInitialCenter = function(){
   var centerZ = 0;
   var count = 0;
   for (var objectName in group){
-    var bodyPosition = group[objectName].mesh.position;
+    var bodyPosition = group[objectName].physicsBody.position;
     count ++;
     centerX += bodyPosition.x;
     centerY += bodyPosition.y;
