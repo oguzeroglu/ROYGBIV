@@ -58,6 +58,10 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
       for (var objName in shadowBaker.textureRangesByObjectName){
         var obj = addedObjects[objName];
 
+        if(obj.fromObjectGroup){
+          continue;
+        }
+
         var material = obj.mesh.material;
         var uniforms = material.uniforms;
 

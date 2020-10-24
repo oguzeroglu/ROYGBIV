@@ -865,6 +865,7 @@ ImportHandler.prototype.importAddedObjects = function(obj){
      }
 
      addedObjectInstance.usedAsAIEntity = curAddedObjectExport.usedAsAIEntity;
+     addedObjectInstance.fromObjectGroup = curAddedObjectExport.fromObjectGroup;
 
      if (curAddedObjectExport.hiddenInDesignMode){
        addedObjectInstance.hideInDesignMode(true);
