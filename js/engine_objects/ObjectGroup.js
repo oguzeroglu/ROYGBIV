@@ -1343,6 +1343,16 @@ ObjectGroup.prototype.merge = function(){
   this.geometry = new THREE.BufferGeometry();
   var pseudoGeometry = new THREE.Geometry();
 
+  var nonEmptyTextureMatrixInfo = null;
+  var nonEmptyDiffuseUV = null;
+  var nonEmptyEmissiveIntensity = null;
+  var nonEmptyEmissiveColor = null;
+  var nonEmptyEmissiveUV = null;
+  var nonEmptyAOIntensity = null;
+  var nonEmptyAOUV = null;
+  var nonEmptyDisplacementUV = null;
+  var nonEmptyAlphaUV = null;
+
   var miMap = new Object();
   var mi = 0;
   for (var childName in this.group){
@@ -1355,6 +1365,78 @@ ObjectGroup.prototype.merge = function(){
     mi++;
     childObj.mesh.updateMatrix();
     pseudoGeometry.merge(childGeom, childObj.mesh.matrix);
+
+    if (childObj.hasTexture() && !nonEmptyTextureMatrixInfo){
+      nonEmptyTextureMatrixInfo = [
+        childObj.getTextureOffsetX(), childObj.getTextureOffsetY(),
+        childObj.getTextureRepeatX(), childObj.getTextureRepeatY()
+      ];
+    }
+
+    if (childObj.hasDiffuseMap() && !nonEmptyDiffuseUV){
+      var ranges = textureAtlasHandler.getRangesForTexturePack(childObj.tpInfo.diffuse.texturePack, "diffuse");
+      nonEmptyDiffuseUV = [ranges.startU, ranges.startV, ranges.endU, ranges.endV];
+    }
+
+    if (childObj.hasEmissiveMap() && nonEmptyEmissiveIntensity == null){
+      nonEmptyEmissiveIntensity = childObj.getEmissiveIntensity();
+    }
+
+    if (childObj.hasEmissiveMap() && !nonEmptyEmissiveColor){
+      nonEmptyEmissiveColor = childObj.getEmissiveColor().clone();
+    }
+
+    if (childObj.hasEmissiveMap() && !nonEmptyEmissiveUV){
+      var ranges = textureAtlasHandler.getRangesForTexturePack(childObj.tpInfo.emissive.texturePack, "emissive");
+      nonEmptyEmissiveUV = [ranges.startU, ranges.startV, ranges.endU, ranges.endV];
+    }
+
+    if (childObj.hasAOMap() && nonEmptyAOIntensity == null){
+      nonEmptyAOIntensity = childObj.getAOIntensity();
+    }
+
+    if (childObj.hasAOMap() && !nonEmptyAOUV){
+      var ranges = textureAtlasHandler.getRangesForTexturePack(childObj.tpInfo.ao.texturePack, "ao");
+      nonEmptyAOUV = [ranges.startU, ranges.startV, ranges.endU, ranges.endV];
+    }
+
+    if (childObj.hasDisplacementMap() && !nonEmptyDisplacementUV){
+      var ranges = textureAtlasHandler.getRangesForTexturePack(childObj.tpInfo.height.texturePack, "height");
+      nonEmptyDisplacementUV = [ranges.startU, ranges.startV, ranges.endU, ranges.endV];
+    }
+
+    if (childObj.hasAlphaMap() && !nonEmptyAlphaUV){
+      var ranges = textureAtlasHandler.getRangesForTexturePack(childObj.tpInfo.alpha.texturePack, "alpha");
+      nonEmptyAlphaUV = [ranges.startU, ranges.startV, ranges.endU, ranges.endV];
+    }
+  }
+
+  if (!nonEmptyTextureMatrixInfo){
+    nonEmptyTextureMatrixInfo = [0, 0, 0, 0];
+  }
+  if (!nonEmptyDiffuseUV){
+    nonEmptyDiffuseUV = [0, 0, 0, 0];
+  }
+  if (nonEmptyEmissiveIntensity == null){
+    nonEmptyEmissiveIntensity = 0;
+  }
+  if (!nonEmptyEmissiveColor){
+    nonEmptyEmissiveColor = WHITE_COLOR;
+  }
+  if (!nonEmptyEmissiveUV){
+    nonEmptyEmissiveUV = [0, 0, 0, 0];
+  }
+  if (nonEmptyAOIntensity == null){
+    nonEmptyAOIntensity = 0;
+  }
+  if (!nonEmptyAOUV){
+    nonEmptyAOUV = [0, 0, 0, 0];
+  }
+  if (!nonEmptyDisplacementUV){
+    nonEmptyDisplacementUV = [0, 0, 0, 0];
+  }
+  if (!nonEmptyAlphaUV){
+    nonEmptyAlphaUV = [0, 0, 0, 0];
   }
 
   if (!isDeployment){
@@ -1510,10 +1592,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(this.uvRangeMap, addedObject);
         this.push(this.uvRangeMap, addedObject);
       }else{
-        this.push(diffuseUVs, 0);
-        this.push(diffuseUVs, 0);
-        this.push(diffuseUVs, 0);
-        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[0]);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[1]);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[2]);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[3]);
 
         this.push(this.uvRangeMap, addedObject);
         this.push(this.uvRangeMap, addedObject);
@@ -1533,10 +1615,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(this.uvRangeMap, addedObject);
         this.push(this.uvRangeMap, addedObject);
       }else{
-        this.push(diffuseUVs, 0);
-        this.push(diffuseUVs, 0);
-        this.push(diffuseUVs, 0);
-        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[0]);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[1]);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[2]);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[3]);
 
         this.push(this.uvRangeMap, addedObject);
         this.push(this.uvRangeMap, addedObject);
@@ -1556,10 +1638,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(this.uvRangeMap, addedObject);
         this.push(this.uvRangeMap, addedObject);
       }else{
-        this.push(diffuseUVs, 0);
-        this.push(diffuseUVs, 0);
-        this.push(diffuseUVs, 0);
-        this.push(diffuseUVs, 0);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[0]);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[1]);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[2]);
+        this.push(diffuseUVs, nonEmptyDiffuseUV[3]);
 
         this.push(this.uvRangeMap, addedObject);
         this.push(this.uvRangeMap, addedObject);
@@ -1576,10 +1658,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(alphaUVs, ranges.endU);
         this.push(alphaUVs, ranges.endV);
       }else{
-        this.push(alphaUVs, 0);
-        this.push(alphaUVs, 0);
-        this.push(alphaUVs, 0);
-        this.push(alphaUVs, 0);
+        this.push(alphaUVs, nonEmptyAlphaUV[0]);
+        this.push(alphaUVs, nonEmptyAlphaUV[1]);
+        this.push(alphaUVs, nonEmptyAlphaUV[2]);
+        this.push(alphaUVs, nonEmptyAlphaUV[3]);
       }
 
       if (addedObject.hasAlphaMap()){
@@ -1589,10 +1671,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(alphaUVs, ranges.endU);
         this.push(alphaUVs, ranges.endV);
       }else{
-        this.push(alphaUVs, 0);
-        this.push(alphaUVs, 0);
-        this.push(alphaUVs, 0);
-        this.push(alphaUVs, 0);
+        this.push(alphaUVs, nonEmptyAlphaUV[0]);
+        this.push(alphaUVs, nonEmptyAlphaUV[1]);
+        this.push(alphaUVs, nonEmptyAlphaUV[2]);
+        this.push(alphaUVs, nonEmptyAlphaUV[3]);
       }
 
       if (addedObject.hasAlphaMap()){
@@ -1602,10 +1684,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(alphaUVs, ranges.endU);
         this.push(alphaUVs, ranges.endV);
       }else{
-        this.push(alphaUVs, 0);
-        this.push(alphaUVs, 0);
-        this.push(alphaUVs, 0);
-        this.push(alphaUVs, 0);
+        this.push(alphaUVs, nonEmptyAlphaUV[0]);
+        this.push(alphaUVs, nonEmptyAlphaUV[1]);
+        this.push(alphaUVs, nonEmptyAlphaUV[2]);
+        this.push(alphaUVs, nonEmptyAlphaUV[3]);
       }
     }
     // DISPLACEMENT INFOS
@@ -1621,10 +1703,10 @@ ObjectGroup.prototype.merge = function(){
       }else{
         this.push(displacementInfos, -100);
         this.push(displacementInfos, -100);
-        this.push(displacementUVs, 0);
-        this.push(displacementUVs, 0);
-        this.push(displacementUVs, 0);
-        this.push(displacementUVs, 0);
+        this.push(displacementUVs, nonEmptyDisplacementUV[0]);
+        this.push(displacementUVs, nonEmptyDisplacementUV[1]);
+        this.push(displacementUVs, nonEmptyDisplacementUV[2]);
+        this.push(displacementUVs, nonEmptyDisplacementUV[3]);
       }
 
       if (addedObject.hasDisplacementMap()){
@@ -1638,10 +1720,10 @@ ObjectGroup.prototype.merge = function(){
       }else{
         this.push(displacementInfos, -100);
         this.push(displacementInfos, -100);
-        this.push(displacementUVs, 0);
-        this.push(displacementUVs, 0);
-        this.push(displacementUVs, 0);
-        this.push(displacementUVs, 0);
+        this.push(displacementUVs, nonEmptyDisplacementUV[0]);
+        this.push(displacementUVs, nonEmptyDisplacementUV[1]);
+        this.push(displacementUVs, nonEmptyDisplacementUV[2]);
+        this.push(displacementUVs, nonEmptyDisplacementUV[3]);
       }
 
       if (addedObject.hasDisplacementMap()){
@@ -1655,10 +1737,10 @@ ObjectGroup.prototype.merge = function(){
       }else{
         this.push(displacementInfos, -100);
         this.push(displacementInfos, -100);
-        this.push(displacementUVs, 0);
-        this.push(displacementUVs, 0);
-        this.push(displacementUVs, 0);
-        this.push(displacementUVs, 0);
+        this.push(displacementUVs, nonEmptyDisplacementUV[0]);
+        this.push(displacementUVs, nonEmptyDisplacementUV[1]);
+        this.push(displacementUVs, nonEmptyDisplacementUV[2]);
+        this.push(displacementUVs, nonEmptyDisplacementUV[3]);
       }
     }
     // SHADOW MAP UVS
@@ -1713,10 +1795,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(emissiveUVs, ranges.endU);
         this.push(emissiveUVs, ranges.endV);
       }else{
-        this.push(emissiveUVs, 0);
-        this.push(emissiveUVs, 0);
-        this.push(emissiveUVs, 0);
-        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[0]);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[1]);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[2]);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[3]);
       }
 
       if (addedObject.hasEmissiveMap()){
@@ -1726,10 +1808,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(emissiveUVs, ranges.endU);
         this.push(emissiveUVs, ranges.endV);
       }else{
-        this.push(emissiveUVs, 0);
-        this.push(emissiveUVs, 0);
-        this.push(emissiveUVs, 0);
-        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[0]);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[1]);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[2]);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[3]);
       }
 
       if (addedObject.hasEmissiveMap()){
@@ -1739,10 +1821,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(emissiveUVs, ranges.endU);
         this.push(emissiveUVs, ranges.endV);
       }else{
-        this.push(emissiveUVs, 0);
-        this.push(emissiveUVs, 0);
-        this.push(emissiveUVs, 0);
-        this.push(emissiveUVs, 0);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[0]);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[1]);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[2]);
+        this.push(emissiveUVs, nonEmptyEmissiveUV[3]);
       }
     }
     // EMISSIVE INTENSITY AND EMISSIVE COLOR
@@ -1751,18 +1833,18 @@ ObjectGroup.prototype.merge = function(){
       if (addedObject.hasEmissiveMap()){
         emissiveIntensity = addedObject.getEmissiveIntensity();
       }else{
-        emissiveIntensity = 0;
+        emissiveIntensity = nonEmptyEmissiveIntensity;
       }
 
-      this.push(emissiveIntensities, emissiveIntensity, a);
-      this.push(emissiveIntensities, emissiveIntensity, b);
-      this.push(emissiveIntensities, emissiveIntensity, c);
+      this.push(emissiveIntensities, emissiveIntensity);
+      this.push(emissiveIntensities, emissiveIntensity);
+      this.push(emissiveIntensities, emissiveIntensity);
 
       var emissiveColor;
       if (addedObject.hasEmissiveMap()){
         emissiveColor = addedObject.getEmissiveColor();
       }else{
-        emissiveColor = WHITE_COLOR;
+        emissiveColor = nonEmptyEmissiveColor;
       }
 
       this.push(emissiveColors, emissiveColor.r);
@@ -1786,10 +1868,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(aoUVs, ranges.endU);
         this.push(aoUVs, ranges.endV);
       }else{
-        this.push(aoUVs, 0);
-        this.push(aoUVs, 0);
-        this.push(aoUVs, 0);
-        this.push(aoUVs, 0);
+        this.push(aoUVs, nonEmptyAOUV[0]);
+        this.push(aoUVs, nonEmptyAOUV[1]);
+        this.push(aoUVs, nonEmptyAOUV[2]);
+        this.push(aoUVs, nonEmptyAOUV[3]);
       }
 
       if (addedObject.hasAOMap()){
@@ -1799,10 +1881,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(aoUVs, ranges.endU);
         this.push(aoUVs, ranges.endV);
       }else{
-        this.push(aoUVs, 0);
-        this.push(aoUVs, 0);
-        this.push(aoUVs, 0);
-        this.push(aoUVs, 0);
+        this.push(aoUVs, nonEmptyAOUV[0]);
+        this.push(aoUVs, nonEmptyAOUV[1]);
+        this.push(aoUVs, nonEmptyAOUV[2]);
+        this.push(aoUVs, nonEmptyAOUV[3]);
       }
 
       if (addedObject.hasAOMap()){
@@ -1812,10 +1894,10 @@ ObjectGroup.prototype.merge = function(){
         this.push(aoUVs, ranges.endU);
         this.push(aoUVs, ranges.endV);
       }else{
-        this.push(aoUVs, 0);
-        this.push(aoUVs, 0);
-        this.push(aoUVs, 0);
-        this.push(aoUVs, 0);
+        this.push(aoUVs, nonEmptyAOUV[0]);
+        this.push(aoUVs, nonEmptyAOUV[1]);
+        this.push(aoUVs, nonEmptyAOUV[2]);
+        this.push(aoUVs, nonEmptyAOUV[3]);
       }
     }
     // AO INTENSITY
@@ -1824,7 +1906,7 @@ ObjectGroup.prototype.merge = function(){
       if (addedObject.hasAOMap()){
         aoIntensity = addedObject.getAOIntensity();
       }else{
-        aoIntensity = 0;
+        aoIntensity = nonEmptyAOIntensity;
       }
 
       this.push(aoIntensities, aoIntensity);
@@ -1916,10 +1998,10 @@ ObjectGroup.prototype.merge = function(){
           }
         }
       }else{
-        this.push(textureMatrixInfos, 0);
-        this.push(textureMatrixInfos, 0);
-        this.push(textureMatrixInfos, 0);
-        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[0]);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[1]);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[2]);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[3]);
 
         if (this.hasDisplacement){
           this.push(displacementTextureMatrixInfos, -100);
@@ -1949,10 +2031,10 @@ ObjectGroup.prototype.merge = function(){
           }
         }
       }else{
-        this.push(textureMatrixInfos, 0);
-        this.push(textureMatrixInfos, 0);
-        this.push(textureMatrixInfos, 0);
-        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[0]);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[1]);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[2]);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[3]);
 
         if (this.hasDisplacement){
           this.push(displacementTextureMatrixInfos, -100);
@@ -1982,10 +2064,10 @@ ObjectGroup.prototype.merge = function(){
           }
         }
       }else{
-        this.push(textureMatrixInfos, 0);
-        this.push(textureMatrixInfos, 0);
-        this.push(textureMatrixInfos, 0);
-        this.push(textureMatrixInfos, 0);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[0]);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[1]);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[2]);
+        this.push(textureMatrixInfos, nonEmptyTextureMatrixInfo[3]);
 
         if (this.hasDisplacement){
           this.push(displacementTextureMatrixInfos, -100);
