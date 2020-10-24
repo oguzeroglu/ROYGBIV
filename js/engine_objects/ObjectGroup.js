@@ -2757,11 +2757,13 @@ ObjectGroup.prototype.exportLightweight = function(){
       boundingBox: this.boundingBoxes[i]
     });
   }
-  exportObj.mass = this.physicsBody.mass;
+  if (this.physicsBody){
+    exportObj.mass = this.physicsBody.mass;
+    exportObj.physicsPosition = {x: this.physicsBody.position.x, y: this.physicsBody.position.y, z: this.physicsBody.position.z};
+    exportObj.physicsQuaternion = {x: this.physicsBody.quaternion.x, y: this.physicsBody.quaternion.y, z: this.physicsBody.quaternion.z, w: this.physicsBody.quaternion.w};
+  }
   exportObj.noMass = this.noMass;
   exportObj.cannotSetMass = this.cannotSetMass;
-  exportObj.physicsPosition = {x: this.physicsBody.position.x, y: this.physicsBody.position.y, z: this.physicsBody.position.z};
-  exportObj.physicsQuaternion = {x: this.physicsBody.quaternion.x, y: this.physicsBody.quaternion.y, z: this.physicsBody.quaternion.z, w: this.physicsBody.quaternion.w};
   exportObj.initialPhysicsPositionWhenGlued = this.initialPhysicsPositionWhenGlued;
   exportObj.simplifiedChildrenPhysicsBodyDescriptions = this.simplifiedChildrenPhysicsBodyDescriptions;
   if (this.isPhysicsSimplified){
@@ -2996,7 +2998,7 @@ ObjectGroup.prototype.getInitialCenter = function(){
   var centerZ = 0;
   var count = 0;
   for (var objectName in group){
-    var bodyPosition = group[objectName].physicsBody.position;
+    var bodyPosition = group[objectName].mesh.position;
     count ++;
     centerX += bodyPosition.x;
     centerY += bodyPosition.y;
