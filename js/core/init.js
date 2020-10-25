@@ -928,6 +928,36 @@ function checkForTextureBleedingInIOS(){
   return false;
 }
 
+function checkForUnusedTexturePacks(){
+  for (var tpName in texturePacks){
+    var isUsed = false;
+    for (var addedObjectName in addedObjects){
+      var addedObject = addedObjects[addedObjectName];
+      if (addedObject.isTexturePackUsed(tpName)){
+        isUsed = true;
+        break;
+      }
+    }
+    for (var objectGroupName in objectGroups){
+      var objectGroup = objectGroups[objectGroupName];
+      var group = objectGroup.group;
+      for (var objectName in group){
+        var childObject = group[objectName];
+        if (childObject.isTexturePackUsed(tpName)){
+          isUsed = true;
+          break;
+        }
+      }
+    }
+
+    if (!isUsed){
+      return true;
+    }
+  }
+
+  return false;
+}
+
 //******************************************************************
 // WARNING: FOR TEST PURPOSES
 function debugTexture(texture){

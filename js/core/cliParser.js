@@ -3409,6 +3409,9 @@ function parse(input){
           if (checkForTextureBleedingInIOS()){
             terminal.printError("[!] Some of the objects contain custom texture offset, repeat properties or a texture offset animation.\nThis may cause rendering problems in iOS devices.");
           }
+          if (checkForUnusedTexturePacks()){
+            terminal.printError("[!] There are unused texture packs. Run \"destroyTexturePack *\" command to get rid of them.");
+          }
           return true;
         break;
         case 146: //skyboxConfigurations
