@@ -1068,6 +1068,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
   var nonEmptyAOUV = null;
   var nonEmptyDisplacementUV = null;
   var nonEmptyAlphaUV = null;
+  var nonEmptyTextureMirrorInfo = null;
 
   for (var objName in this.group){
     var childObj = this.group[objName];
@@ -1077,6 +1078,20 @@ ObjectGroup.prototype.mergeInstanced = function(){
         childObj.getTextureOffsetX(), childObj.getTextureOffsetY(),
         childObj.getTextureRepeatX(), childObj.getTextureRepeatY()
       ];
+    }
+
+    if (childObj.hasTexture() && !nonEmptyTextureMirrorInfo){
+      nonEmptyTextureMirrorInfo = [];
+      if (childObj.hasMirrorS()){
+        nonEmptyTextureMirrorInfo.push(100);
+      }else{
+        nonEmptyTextureMirrorInfo.push(-100);
+      }
+      if (childObj.hasMirrorT()){
+        nonEmptyTextureMirrorInfo.push(100);
+      }else{
+        nonEmptyTextureMirrorInfo.push(-100);
+      }
     }
 
     if (childObj.hasDiffuseMap() && !nonEmptyDiffuseUV){
@@ -1143,6 +1158,9 @@ ObjectGroup.prototype.mergeInstanced = function(){
   }
   if (!nonEmptyAlphaUV){
     nonEmptyAlphaUV = [0, 0, 0, 0];
+  }
+  if (!nonEmptyTextureMirrorInfo){
+    nonEmptyTextureMirrorInfo = [-100, -100];
   }
 
   for (var objName in this.group){
@@ -1265,8 +1283,8 @@ ObjectGroup.prototype.mergeInstanced = function(){
         diffuseUVs.push(nonEmptyDiffuseUV[1]);
         diffuseUVs.push(nonEmptyDiffuseUV[2]);
         diffuseUVs.push(nonEmptyDiffuseUV[3]);
-        textureMirrorInfos.push(0);
-        textureMirrorInfos.push(0);
+        textureMirrorInfos.push(nonEmptyTextureMirrorInfo[0]);
+        textureMirrorInfos.push(nonEmptyTextureMirrorInfo[1]);
       }
       if (obj.hasDiffuseMap()){
         textureInfos.push(10);
