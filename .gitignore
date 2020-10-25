@@ -1,7 +1,7 @@
 node_modules/
 .DS_Store
 deploy/
-demo/
+demo/.DS_Store
 dynamic_textures/
 fonts/
 protocol_definitions/
