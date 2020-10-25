@@ -291,6 +291,11 @@ var Preconditions = function(){
   this.stateMachine = "stateMachine";
   this.stateName = "stateName";
   this.childStateMachineName = "childStateMachineName";
+  this.markedPointNames = "markedPointNames";
+  this.interpolationSpeed = "interpolationSpeed";
+  this.restart = "restart";
+  this.onFinished = "onFinished";
+
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -299,6 +304,25 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfArrayLengthGreaterThan = function(callerFunc, parameterName, ary, limit){
+  if (ary.length <= limit){
+    this.throw(callerFunc, "Length of " + parameterName + " array must be greater than " + limit);
+  }
+}
+
+Preconditions.prototype.checkIfArrayOfMarkedPointNamesInScene = function(callerFunc, markedPointNames){
+  for (var i = 0; i < markedPointNames.length; i ++){
+    var markedPointName = markedPointNames[i];
+    if (!markedPoints[markedPointName]){
+      this.throw(callerFunc, "No such marked point: " + markedPointName);
+    }
+
+    if (markedPoints[markedPointName].registeredSceneName != sceneHandler.getActiveSceneName()){
+      this.throw(callerFunc, "Marked point not in active scene: " + markedPointName);
+    }
+  }
 }
 
 Preconditions.prototype.checkIfStateMachineHasState = function(callerFunc, stateMachine, stateName){
@@ -1093,6 +1117,16 @@ Preconditions.prototype.checkIfInRange = function(callerFunc, parameterName, obj
 Preconditions.prototype.checkIfInRangeOnlyIfDefined = function(callerFunc, parameterName, obj, boundMin, boundMax){
   if (!(typeof obj == UNDEFINED) && (obj < boundMin || obj > boundMax)){
     this.throw(callerFunc, parameterName+" must be between ["+boundMin+", "+boundMax+"]");
+  }
+}
+
+Preconditions.prototype.checkIfInRangeMinInclusiveOnlyIfExists = function(callerFunc, parameterName, obj, boundMin, boundMax){
+  if (typeof obj == UNDEFINED){
+    return;
+  }
+
+  if (obj <= boundMin || obj > boundMax){
+    this.throw(callerFunc, parameterName+" must be between ]"+boundMin+", "+boundMax+"]")
   }
 }
 

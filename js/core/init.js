@@ -49,7 +49,7 @@ window.onload = function() {
 
   // CONTROLS TEST
   if (!isDeployment){
-    var controlClasses = [FreeControls, FPSControls, OrbitControls, CustomControls];
+    var controlClasses = [FreeControls, FPSControls, OrbitControls, CustomControls, PathFollowingControls];
     var mandatoryControlMethods = [
       "update", "onMouseWheel", "onMouseMove", "onMouseDown", "onMouseUp",
       "onPinch", "onSwipe", "onTap", "onClick", "onActivated", "onDeactivated",
