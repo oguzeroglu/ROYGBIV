@@ -189,7 +189,11 @@ ObjectGroup.prototype.refreshTextureRange = function(context){
       this.mesh.geometry.attributes[context.attrName].needsUpdate = true;
     }else{
       for (var childName in this.group){
-        var newRange = textureAtlasHandler.getRangesForTexturePack(this.group[childName].tpInfo[context.tpInfoName].texturePack, context.tpInfoName);
+        var tpInfo = this.group[childName].tpInfo[context.tpInfoName];
+        if (!tpInfo){
+          continue;
+        }
+        var newRange = textureAtlasHandler.getRangesForTexturePack(tpInfo.texturePack, context.tpInfoName);
         macroHandler.replaceCompressedVec4(this.mesh.material, context.attrName, newRange.startU, newRange.startV, newRange.endU, newRange.endV);
         break;
       }
