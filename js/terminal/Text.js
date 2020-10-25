@@ -1380,11 +1380,11 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_DEACTIVATESTATEMACHINE = "Deactivates a state machine for updates. Note that state machines are deactivated by default.";
   this.ROYGBIV_SCRIPTING_API_RESETKNOWLEDGE = "Resets a knowledge setting each information to their initial value.";
   this.ROYGBIV_SCRIPTING_API_GETCHILDSTATEMACHINE = "Returns a child state machine of given state machine or 0 if the child does not exist. This API is esepcially useful for\ncloned state machines for accessing to their children in order to add state change listeners to them.";
-  this.ROYGBIV_SCRIPTING_API_CREATEPATHFOLLOWINGCONTROL = "Creates a new PathFollowingControl object. In this control, camera automatically follows a given array of marked points while\nallowing users to view around via mouse drag or touch swipe. Configurations are:\n" +
+  this.ROYGBIV_SCRIPTING_API_CREATEPATHFOLLOWINGCONTROL = "Creates a new PathFollowingControl object. In this control, camera automatically follows a given array of marked points while\nallowing users to view around via mouse drag or touch swipe. Note that this API automatically requests pointer lock. Configurations are:\n" +
                                                           "markedPointNames (mandatory): An array of marked point names defining a path.\n" +
                                                           "interpolationSpeed (optional): A number between 0 and 1 indicating the camera speed. Default value is 0.001\n" +
                                                           "restart (optional): A boolean value indicating whether the movement should restart when the path is consumed. Default value is false.\n" +
                                                           "onFinished (optional): A callback function executed when the path is consumed. Note that this function is not executed if\nrestart parameter is on.\n" +
-                                                          "mouseDragSpeed (optional): The mouse drag speed for desktop devices. Default value is 15.\n" +
-                                                          "swipeSpeed (optional): The touch swipe speed for mobile devices. Default value is 0.002.\n"
+                                                          "mouseSpeed (optional): The mouse speed for desktop devices. Default value is 0.002.\n" +
+                                                          "swipeSpeed (optional): The touch swipe speed for mobile devices. Default value is 0.002."
 }

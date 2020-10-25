@@ -3229,13 +3229,13 @@ Roygbiv.prototype.createOrbitControl = function(parameters){
 
 // Creates a new PathFollowingControl object. In this control, camera automatically
 // follows a given array of marked points while allowing users to view around via
-// mouse drag or touch swipe.
+// mouse move or touch swipe. Note that this API automatically requests pointer lock.
 // Configurations are:
 // markedPointNames (mandatory): An array of marked point names defining a path.
 // interpolationSpeed (optional): A number between 0 and 1 indicating the camera speed. Default value is 0.001.
 // restart (optional): A boolean value indicating whether the movement should restart when the path is consumed. Default value is false.
 // onFinished (optional): A callback function executed when the path is consumed. Note that this function is not executed if restart parameter is on.
-// mouseDragSpeed (optional): The mouse drag speed for desktop devices. Default value is 15.
+// mouseSpeed (optional): The mouse speed for desktop devices. Default value is 0.002.
 // swipeSpeed (optional): The touch swipe speed for mobile devices. Default value is 0.002.
 Roygbiv.prototype.createPathFollowingControl = function(parameters){
   if (mode == 0){
@@ -3251,8 +3251,8 @@ Roygbiv.prototype.createPathFollowingControl = function(parameters){
   preConditions.checkIfInRangeMinInclusiveOnlyIfExists(ROYGBIV.createPathFollowingControl, preConditions.interpolationSpeed, parameters.interpolationSpeed, 0, 1);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createPathFollowingControl, preConditions.restart, parameters.restart);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createPathFollowingControl, preConditions.onFinished, parameters.onFinished);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createPathFollowingControl, preConditions.mouseDragSpeed, parameters.mouseDragSpeed);
-  preConditions.checkIfLessThanOnlyIfExists(ROYGBIV.createPathFollowingControl, preConditions.mouseDragSpeed, parameters.mouseDragRotationSpeed, 0);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createPathFollowingControl, preConditions.mouseSpeed, parameters.mouseSpeed);
+  preConditions.checkIfLessThanOnlyIfExists(ROYGBIV.createPathFollowingControl, preConditions.mouseSpeed, parameters.mouseSpeed, 0);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createPathFollowingControl, preConditions.swipeSpeed, parameters.swipeSpeed);
   preConditions.checkIfLessThanOnlyIfExists(ROYGBIV.createPathFollowingControl, preConditions.swipeSpeed, parameters.swipeSpeed, 0);
 
