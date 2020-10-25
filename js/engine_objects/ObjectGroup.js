@@ -1059,6 +1059,92 @@ ObjectGroup.prototype.mergeInstanced = function(){
 
   var count = 0;
 
+  var nonEmptyTextureMatrixInfo = null;
+  var nonEmptyDiffuseUV = null;
+  var nonEmptyEmissiveIntensity = null;
+  var nonEmptyEmissiveColor = null;
+  var nonEmptyEmissiveUV = null;
+  var nonEmptyAOIntensity = null;
+  var nonEmptyAOUV = null;
+  var nonEmptyDisplacementUV = null;
+  var nonEmptyAlphaUV = null;
+
+  for (var objName in this.group){
+    var childObj = this.group[objName];
+
+    if (childObj.hasTexture() && !nonEmptyTextureMatrixInfo){
+      nonEmptyTextureMatrixInfo = [
+        childObj.getTextureOffsetX(), childObj.getTextureOffsetY(),
+        childObj.getTextureRepeatX(), childObj.getTextureRepeatY()
+      ];
+    }
+
+    if (childObj.hasDiffuseMap() && !nonEmptyDiffuseUV){
+      var ranges = textureAtlasHandler.getRangesForTexturePack(childObj.tpInfo.diffuse.texturePack, "diffuse");
+      nonEmptyDiffuseUV = [ranges.startU, ranges.startV, ranges.endU, ranges.endV];
+    }
+
+    if (childObj.hasEmissiveMap() && nonEmptyEmissiveIntensity == null){
+      nonEmptyEmissiveIntensity = childObj.getEmissiveIntensity();
+    }
+
+    if (childObj.hasEmissiveMap() && !nonEmptyEmissiveColor){
+      nonEmptyEmissiveColor = childObj.getEmissiveColor().clone();
+    }
+
+    if (childObj.hasEmissiveMap() && !nonEmptyEmissiveUV){
+      var ranges = textureAtlasHandler.getRangesForTexturePack(childObj.tpInfo.emissive.texturePack, "emissive");
+      nonEmptyEmissiveUV = [ranges.startU, ranges.startV, ranges.endU, ranges.endV];
+    }
+
+    if (childObj.hasAOMap() && nonEmptyAOIntensity == null){
+      nonEmptyAOIntensity = childObj.getAOIntensity();
+    }
+
+    if (childObj.hasAOMap() && !nonEmptyAOUV){
+      var ranges = textureAtlasHandler.getRangesForTexturePack(childObj.tpInfo.ao.texturePack, "ao");
+      nonEmptyAOUV = [ranges.startU, ranges.startV, ranges.endU, ranges.endV];
+    }
+
+    if (childObj.hasDisplacementMap() && !nonEmptyDisplacementUV){
+      var ranges = textureAtlasHandler.getRangesForTexturePack(childObj.tpInfo.height.texturePack, "height");
+      nonEmptyDisplacementUV = [ranges.startU, ranges.startV, ranges.endU, ranges.endV];
+    }
+
+    if (childObj.hasAlphaMap() && !nonEmptyAlphaUV){
+      var ranges = textureAtlasHandler.getRangesForTexturePack(childObj.tpInfo.alpha.texturePack, "alpha");
+      nonEmptyAlphaUV = [ranges.startU, ranges.startV, ranges.endU, ranges.endV];
+    }
+  }
+
+  if (!nonEmptyTextureMatrixInfo){
+    nonEmptyTextureMatrixInfo = [0, 0, 0, 0];
+  }
+  if (!nonEmptyDiffuseUV){
+    nonEmptyDiffuseUV = [0, 0, 0, 0];
+  }
+  if (nonEmptyEmissiveIntensity == null){
+    nonEmptyEmissiveIntensity = 0;
+  }
+  if (!nonEmptyEmissiveColor){
+    nonEmptyEmissiveColor = WHITE_COLOR;
+  }
+  if (!nonEmptyEmissiveUV){
+    nonEmptyEmissiveUV = [0, 0, 0, 0];
+  }
+  if (nonEmptyAOIntensity == null){
+    nonEmptyAOIntensity = 0;
+  }
+  if (!nonEmptyAOUV){
+    nonEmptyAOUV = [0, 0, 0, 0];
+  }
+  if (!nonEmptyDisplacementUV){
+    nonEmptyDisplacementUV = [0, 0, 0, 0];
+  }
+  if (!nonEmptyAlphaUV){
+    nonEmptyAlphaUV = [0, 0, 0, 0];
+  }
+
   for (var objName in this.group){
     var obj = this.group[objName];
     positionOffsets.push(obj.mesh.position.x);
@@ -1084,14 +1170,14 @@ ObjectGroup.prototype.mergeInstanced = function(){
         emissiveUVs.push(ranges.endU);
         emissiveUVs.push(ranges.endV);
       }else{
-        emissiveIntensities.push(1);
-        emissiveColors.push(1);
-        emissiveColors.push(1);
-        emissiveColors.push(1);
-        emissiveUVs.push(0);
-        emissiveUVs.push(0);
-        emissiveUVs.push(0);
-        emissiveUVs.push(0);
+        emissiveIntensities.push(nonEmptyEmissiveIntensity);
+        emissiveColors.push(nonEmptyEmissiveColor.r);
+        emissiveColors.push(nonEmptyEmissiveColor.g);
+        emissiveColors.push(nonEmptyEmissiveColor.b);
+        emissiveUVs.push(nonEmptyEmissiveUV[0]);
+        emissiveUVs.push(nonEmptyEmissiveUV[1]);
+        emissiveUVs.push(nonEmptyEmissiveUV[2]);
+        emissiveUVs.push(nonEmptyEmissiveUV[3]);
       }
     }
     if (this.hasAOMap()){
@@ -1103,11 +1189,11 @@ ObjectGroup.prototype.mergeInstanced = function(){
         aoUVs.push(ranges.endU);
         aoUVs.push(ranges.endV);
       }else{
-        aoIntensities.push(1);
-        aoUVs.push(0);
-        aoUVs.push(0);
-        aoUVs.push(0);
-        aoUVs.push(0);
+        aoIntensities.push(nonEmptyAOIntensity);
+        aoUVs.push(nonEmptyAOUV[0]);
+        aoUVs.push(nonEmptyAOUV[1]);
+        aoUVs.push(nonEmptyAOUV[2]);
+        aoUVs.push(nonEmptyAOUV[3]);
       }
     }
     if (this.hasAlphaMap()){
@@ -1118,10 +1204,10 @@ ObjectGroup.prototype.mergeInstanced = function(){
         alphaUVs.push(ranges.endU);
         alphaUVs.push(ranges.endV);
       }else{
-        alphaUVs.push(0);
-        alphaUVs.push(0);
-        alphaUVs.push(0);
-        alphaUVs.push(0);
+        alphaUVs.push(nonEmptyAlphaUV[0]);
+        alphaUVs.push(nonEmptyAlphaUV[1]);
+        alphaUVs.push(nonEmptyAlphaUV[2]);
+        alphaUVs.push(nonEmptyAlphaUV[3]);
       }
     }
     if (this.hasDisplacementMap()){
@@ -1132,10 +1218,10 @@ ObjectGroup.prototype.mergeInstanced = function(){
         displacementUVs.push(ranges.endU);
         displacementUVs.push(ranges.endV);
       }else{
-        displacementUVs.push(0);
-        displacementUVs.push(0);
-        displacementUVs.push(0);
-        displacementUVs.push(0);
+        displacementUVs.push(nonEmptyDisplacementUV[0]);
+        displacementUVs.push(nonEmptyDisplacementUV[1]);
+        displacementUVs.push(nonEmptyDisplacementUV[2]);
+        displacementUVs.push(nonEmptyDisplacementUV[3]);
       }
       if (obj.customDisplacementTextureMatrixInfo){
         displacementTextureMatrixInfos.push(obj.customDisplacementTextureMatrixInfo.offsetX);
@@ -1171,14 +1257,14 @@ ObjectGroup.prototype.mergeInstanced = function(){
           textureMirrorInfos.push(-100);
         }
       }else{
-        textureMatrixInfos.push(0);
-        textureMatrixInfos.push(0);
-        textureMatrixInfos.push(0);
-        textureMatrixInfos.push(0);
-        diffuseUVs.push(0);
-        diffuseUVs.push(0);
-        diffuseUVs.push(0);
-        diffuseUVs.push(0);
+        textureMatrixInfos.push(nonEmptyTextureMatrixInfo[0]);
+        textureMatrixInfos.push(nonEmptyTextureMatrixInfo[1]);
+        textureMatrixInfos.push(nonEmptyTextureMatrixInfo[2]);
+        textureMatrixInfos.push(nonEmptyTextureMatrixInfo[3]);
+        diffuseUVs.push(nonEmptyDiffuseUV[0]);
+        diffuseUVs.push(nonEmptyDiffuseUV[1]);
+        diffuseUVs.push(nonEmptyDiffuseUV[2]);
+        diffuseUVs.push(nonEmptyDiffuseUV[3]);
         textureMirrorInfos.push(0);
         textureMirrorInfos.push(0);
       }
