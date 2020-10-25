@@ -109,5 +109,5 @@ Font.prototype.generateFontTexture = function(){
     var canvasTexture = new THREE.CanvasTexture(tmpCanvas);
     textureObjects[supportedFontAtlasChars[i]] = canvasTexture;
   }
-  this.textureMerger = new TextureMerger(textureObjects);
+  this.textureMerger = new TextureMerger(textureObjects, true);
 }

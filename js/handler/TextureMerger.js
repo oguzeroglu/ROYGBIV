@@ -1,6 +1,6 @@
 // This good old class turned into a separate library:
 // https://github.com/oguzeroglu/TextureMerger
-var TextureMerger = function(texturesObj){
+var TextureMerger = function(texturesObj, skipTextureBleedFix){
   if (!texturesObj){
     return;
   }
@@ -67,7 +67,7 @@ var TextureMerger = function(texturesObj){
     var imgWidth = texture.image.width;
     var imgHeight = texture.image.height;
 
-    var bleedingFixed = this.fixTextureBleeding(texture.image, TEXTURE_BLEEDING_FIX_PIXELS);
+    var bleedingFixed = skipTextureBleedFix? texture.image: this.fixTextureBleeding(texture.image, TEXTURE_BLEEDING_FIX_PIXELS);
 
     for (var y = offsetY; y<offsetY+imgHeight; y+=imgHeight){
       for (var x = offsetX; x<offsetX+imgWidth; x+=imgWidth){
@@ -81,10 +81,12 @@ var TextureMerger = function(texturesObj){
     range.startV = 1 - (offsetY / imgSize.height);
     range.endV = 1 - ((offsetY + imgHeight) / imgSize.height);
 
-    range.startU += (TEXTURE_BLEEDING_FIX_PIXELS) / imgSize.width;
-    range.endU -= (TEXTURE_BLEEDING_FIX_PIXELS ) / imgSize.width;
-    range.startV -= (TEXTURE_BLEEDING_FIX_PIXELS) / imgSize.height;
-    range.endV += (TEXTURE_BLEEDING_FIX_PIXELS ) / imgSize.height;
+    if (!skipTextureBleedFix){
+      range.startU += (TEXTURE_BLEEDING_FIX_PIXELS) / imgSize.width;
+      range.endU -= (TEXTURE_BLEEDING_FIX_PIXELS ) / imgSize.width;
+      range.startV -= (TEXTURE_BLEEDING_FIX_PIXELS) / imgSize.height;
+      range.endV += (TEXTURE_BLEEDING_FIX_PIXELS ) / imgSize.height;
+    }
 
     this.ranges[textureName] = range;
   }
