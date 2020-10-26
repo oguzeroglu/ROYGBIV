@@ -95,6 +95,9 @@ PhysicsWorker.prototype.setObjectCollisionCallback = function(obj){
   }
   if (!worker.objectsWithCollisionListeners.has(obj.name)){
     obj.collisionEvent = function(event){
+      if (!event.body.roygbivName){
+        return;
+      }
       if (!obj.physicsWorkerCollisionInfo){
         obj.physicsWorkerCollisionInfo = new CollisionInfo();
       }
