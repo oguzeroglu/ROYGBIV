@@ -44,6 +44,7 @@ var FPSControls = function(params){
   this.onPause = params.onPause;
   this.onResume = params.onResume;
   this.requestFullScreen = params.requestFullScreen;
+  this.yOffset = params.yOffset;
   if (typeof this.mouseSpeed == UNDEFINED){
     this.mouseSpeed = 0.002;
   }
@@ -101,6 +102,9 @@ var FPSControls = function(params){
   if (typeof this.requestFullScreen == UNDEFINED){
     this.requestFullScreen = true;
     fullScreenRequested = true;
+  }
+  if (typeof this.yOffset == UNDEFINED){
+    this.yOffset = 0;
   }
   this.init();
 }
@@ -471,6 +475,7 @@ FPSControls.prototype.update = function(){
     }
   }
   camera.position.copy(this.playerBodyObject.mesh.position);
+  camera.position.y += this.yOffset;
   var now = performance.now();
   if (!this.hasCustomXVelocity){
     this.playerBodyObject.setVelocityX(0);

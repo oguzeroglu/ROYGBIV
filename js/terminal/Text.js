@@ -1199,7 +1199,8 @@ var Text = function(){
                                               "shootableObjects (optional): An array of objects representing the objects that can be shot. This parameter is used inside the onShoot\nevent for mobile devices in order to decide if the object being looked at should trigger the onShoot function or not. Default value\nis an empty array.\n"+
                                               "onPause (optional): A callback function to be executed when the FPS controls are paused on mobile devices due to switching to Portrait\norientation. Default value is noop.\n"+
                                               "onResume (optional): A callback function to be executed on mobile devices when the FPS controls are resumed after switching back to the\nLandscape orientation. Default value is noop.\n"+
-                                              "requestFullScreen (optional): If true the FullScreen mode is requested if the screen is not on full screen. FPS Controls API\nalso automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value is true.";
+                                              "requestFullScreen (optional): If true the FullScreen mode is requested if the screen is not on full screen. FPS Controls API\nalso automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value is true.\n" +
+                                              "yOffset (optional): The offset value between the camera Y coordinate and the player body object Y coordinate. This may be used\nin order to place the camera below or above the player body object. Default value is 0.";
 
   this.ROYGBIV_SCRIPTING_API_SETSCREENDRAGLISTENER = "Sets a mouse drag listener for the screen. The callbackFunction is executed with x, y, movementX and movementY parameters.";
   this.ROYGBIV_SCRIPTING_API_REMOVESCREENDRAGLISTENER = "Removes the screen drag listener.";

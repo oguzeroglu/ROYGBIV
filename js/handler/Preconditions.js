@@ -295,7 +295,7 @@ var Preconditions = function(){
   this.interpolationSpeed = "interpolationSpeed";
   this.restart = "restart";
   this.onFinished = "onFinished";
-
+  this.yOffset = "yOffset";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
