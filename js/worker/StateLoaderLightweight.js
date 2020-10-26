@@ -426,6 +426,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     var mass = new Mass(massName, new CANNON.Vec3(), new CANNON.Vec3());
     mass.import(curMassExport);
     physicsWorld.addBody(mass.physicsBody);
+    masses[massName] = mass;
   }
 }
 
@@ -447,6 +448,7 @@ StateLoaderLightweight.prototype.resetPhysics = function(){
   dynamicObjectGroups = new Map();
   addedObjects = new Object();
   objectGroups = new Object();
+  masses = new Object();
 }
 
 StateLoaderLightweight.prototype.reset = function(){

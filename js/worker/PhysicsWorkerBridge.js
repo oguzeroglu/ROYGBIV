@@ -5,6 +5,7 @@ var PhysicsWorkerBridge = function(){
   this.ready = false;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
+  this.massesByID = new Object();
   this.updateBuffer = new Map();
   this.performanceLogs = {
     objectDescriptionBufferSize: 0, collisionDescriptionBufferSize: 0
@@ -27,6 +28,10 @@ var PhysicsWorkerBridge = function(){
     }else if (msg.data.isIDResponse){
       for (var i = 0; i<msg.data.ids.length; i++){
         var curIDInfo = msg.data.ids[i];
+        if (curIDInfo.isMass){
+          physicsWorld.massesByID[curIDInfo.id] = masses[curIDInfo.name];
+          continue;
+        }
         physicsWorld.idsByObjectName[curIDInfo.name] = curIDInfo.id;
         var obj = addedObjects[curIDInfo.name] || objectGroups[curIDInfo.name];
         if (!obj){
@@ -96,8 +101,11 @@ PhysicsWorkerBridge.prototype.handleCollisions = function(collisionDescription){
       if (collisionDescription[i] < 0){
         break;
       }
+
+      var targetID = collisionDescription[i+1];
+
       var sourceObject = physicsWorld.objectsByID[collisionDescription[i]];
-      var targetObject = physicsWorld.objectsByID[collisionDescription[i+1]];
+      var targetObject = physicsWorld.objectsByID[targetID] || physicsWorld.massesByID[targetID];
       var positionX = collisionDescription[i+2];
       var positionY = collisionDescription[i+3];
       var positionZ = collisionDescription[i+4];
@@ -199,6 +207,7 @@ PhysicsWorkerBridge.prototype.refresh = function(){
   }
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
+  this.massesByID = new Object();
   this.updateBuffer = new Map();
   this.ready = false;
   this.worker.postMessage(new LightweightState());

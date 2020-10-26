@@ -670,10 +670,11 @@ AddedObject.prototype.onPositionChange = function(from, to){
 }
 
 AddedObject.prototype.collisionCallback = function(collisionEvent){
-  if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
+  var body = collisionEvent.body;
+  if ((!body.addedObject && !body.roygbivMassID) || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
     return;
   }
-  var targetObjectName = collisionEvent.body.addedObject.name;
+  var targetObjectName = body.addedObject? collisionEvent.body.addedObject.name: body.roygbivMassID;
   var contact = collisionEvent.contact;
   var collisionInfo = reusableCollisionInfo.set(
     targetObjectName, contact.bi.position.x + contact.ri.x, contact.bi.position.y + contact.ri.y,

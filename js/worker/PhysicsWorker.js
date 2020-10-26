@@ -14,6 +14,7 @@ var THREE = { Matrix4: function(){} };
 var PhysicsWorker = function(){
   this.record = false;
   this.idsByObjectName = new Object();
+  this.idsByMassName = new Object();
   this.objectsByID = new Object();
   this.reusableVec1 = new CANNON.Vec3();
   this.reusableVec2 = new CANNON.Vec3();
@@ -31,6 +32,7 @@ PhysicsWorker.prototype.refresh = function(state){
   this.objectsWithCollisionListeners = new Map();
   this.collisionsBuffer = new Map();
   this.idsByObjectName = new Object();
+  this.idsByMassName = new Object();
   this.objectsByID = new Object();
   var stateLoader = new StateLoaderLightweight(state);
   stateLoader.resetPhysics();
@@ -64,6 +66,12 @@ PhysicsWorker.prototype.refresh = function(state){
     }
     idCtr ++;
   }
+  for (var massID in masses){
+    idResponse.ids.push({
+      name: massID, id: idCtr, isMass: true
+    });
+    this.idsByMassName[massID] = idCtr ++;
+  }
   postMessage(idResponse);
 }
 PhysicsWorker.prototype.initPhysics = function(){
@@ -95,15 +103,20 @@ PhysicsWorker.prototype.setObjectCollisionCallback = function(obj){
   }
   if (!worker.objectsWithCollisionListeners.has(obj.name)){
     obj.collisionEvent = function(event){
-      if (!event.body.roygbivName){
-        return;
+
+      var id;
+      if (event.body.roygbivName){
+        id = worker.idsByObjectName[event.body.roygbivName];
+      }else{
+        id = worker.idsByMassName[event.body.roygbivMassID];
       }
+
       if (!obj.physicsWorkerCollisionInfo){
         obj.physicsWorkerCollisionInfo = new CollisionInfo();
       }
       var contact = event.contact;
       obj.physicsWorkerCollisionInfo.set(
-        worker.idsByObjectName[event.body.roygbivName], contact.bi.position.x + contact.ri.x,
+        id, contact.bi.position.x + contact.ri.x,
         contact.bi.position.y + contact.ri.y, contact.bi.position.z + contact.ri.z, contact.getImpactVelocityAlongNormal(),
         this.physicsBody.quaternion.x, this.physicsBody.quaternion.y, this.physicsBody.quaternion.z, this.physicsBody.quaternion.w
       );
@@ -260,6 +273,7 @@ var dynamicAddedObjects = new Map();
 var dynamicObjectGroups = new Map();
 var addedObjects = new Object();
 var objectGroups = new Object();
+var masses = new Object();
 var physicsBodyGenerator = new PhysicsBodyGenerator();
 var physicsWorld;
 var quatNormalizeSkip, quatNormalizeFast, contactEquationStiffness, contactEquationRelaxation, friction;

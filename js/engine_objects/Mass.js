@@ -35,4 +35,5 @@ Mass.prototype.constructPhysicsBody = function(){
   });
 
   this.physicsBody.position.set(this.center.x, this.center.y, this.center.z);
+  this.physicsBody.roygbivMassID = this.name;
 }
