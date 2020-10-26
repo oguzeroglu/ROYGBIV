@@ -2,14 +2,15 @@ var PhysicsBodyGenerator = function(){
 
 }
 
-PhysicsBodyGenerator.prototype.addImpulseInfo = function(body){
+PhysicsBodyGenerator.prototype.prepare = function(body){
   body.impulseVec1 = new CANNON.Vec3();
   body.impulseVec2 = new CANNON.Vec3();
+  body.aabbNeedsUpdate = true;
   return body;
 }
 
 PhysicsBodyGenerator.prototype.generateBodyFromSameShape = function(sourceBody){
-  return this.addImpulseInfo(new CANNON.Body({
+  return this.prepare(new CANNON.Body({
       mass: 0,
       shape: sourceBody.shapes[0],
       material: new CANNON.Material()
@@ -19,7 +20,7 @@ PhysicsBodyGenerator.prototype.generateBodyFromSameShape = function(sourceBody){
 PhysicsBodyGenerator.prototype.generateEmptyBody = function(){
   var physicsMaterial = new CANNON.Material();
   var physicsBody = new CANNON.Body({mass: 0, material: physicsMaterial});
-  return this.addImpulseInfo(physicsBody);
+  return this.prepare(physicsBody);
 }
 
 PhysicsBodyGenerator.prototype.generateBoxBody = function(params){
@@ -40,7 +41,7 @@ PhysicsBodyGenerator.prototype.generateBoxBody = function(params){
     material = params.material;
   }
   var surfacePhysicsBody = new CANNON.Body({mass: mass, shape: surfacePhysicsShape, material: material});
-  return this.addImpulseInfo(surfacePhysicsBody);
+  return this.prepare(surfacePhysicsBody);
 }
 
 PhysicsBodyGenerator.prototype.generateCylinderBody = function(params){
@@ -105,7 +106,7 @@ PhysicsBodyGenerator.prototype.generateCylinderBody = function(params){
     mass = params.mass
   }
   var cylinderPhysicsBody = new CANNON.Body({mass: mass, shape: cylinderPhysicsShape, material: physicsMaterial});
-  return this.addImpulseInfo(cylinderPhysicsBody);
+  return this.prepare(cylinderPhysicsBody);
 }
 
 PhysicsBodyGenerator.prototype.generateSphereBody = function(params){
@@ -121,5 +122,5 @@ PhysicsBodyGenerator.prototype.generateSphereBody = function(params){
     mass = params.mass;
   }
   var spherePhysicsBody = new CANNON.Body({mass: mass, shape: spherePhysicsShape, material: physicsMaterial});
-  return this.addImpulseInfo(spherePhysicsBody);
+  return this.prepare(spherePhysicsBody);
 }
