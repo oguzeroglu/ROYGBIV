@@ -4550,6 +4550,8 @@ function parse(input){
           var count = 0;
           var addedObjectsInScene = sceneHandler.getAddedObjects();
           var objectGroupsInScene = sceneHandler.getObjectGroups();
+          var massesInScene = sceneHandler.getMasses();
+
           for (var objName in addedObjectsInScene){
             var addedObject = addedObjectsInScene[objName];
             if (!addedObject.noMass){
@@ -4562,6 +4564,9 @@ function parse(input){
               count += objectGroup.physicsBody.shapes.length;
             }
           }
+
+          count += Object.keys(massesInScene).length;
+          
           terminal.printHeader(Text.SHAPES);
           terminal.printInfo(Text.TREE.replace(Text.PARAM1, count));
           return true;
