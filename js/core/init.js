@@ -218,6 +218,10 @@ window.onload = function() {
   }
   // AUTO INSTANCING HANDLER
   autoInstancingHandler = new AutoInstancingHandler();
+
+  // IS IOS
+  isIOS = ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'].includes(navigator.platform) || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+
   // SHADER CONTENT
   ShaderContent = new ShaderContent();
   if (isDeployment){

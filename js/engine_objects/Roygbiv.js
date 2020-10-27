@@ -3135,7 +3135,7 @@ Roygbiv.prototype.setActiveControl = function(control){
 // after switching back to the Landscape orientation. Default value is noop.
 // requestFullScreen (optional): If true the FullScreen mode is requested if the screen is not on full screen. FPS Controls
 // API also automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value
-// is true.
+// is false.
 // yOffset (optional): The offset value between the camera Y coordinate and the player body object Y coordinate. This may
 // be used in order to place the camera below or above the player body object. Default value is 0.
 Roygbiv.prototype.createFPSControl = function(parameters){

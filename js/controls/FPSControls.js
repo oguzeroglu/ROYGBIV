@@ -100,8 +100,7 @@ var FPSControls = function(params){
     this.onResume = noop;
   }
   if (typeof this.requestFullScreen == UNDEFINED){
-    this.requestFullScreen = true;
-    fullScreenRequested = true;
+    this.requestFullScreen = false;
   }
   if (typeof this.yOffset == UNDEFINED){
     this.yOffset = 0;
@@ -165,6 +164,10 @@ FPSControls.prototype.init = function(){
     }
   }
   this.isShooting = false;
+
+  if (this.requestFullScreen){
+    fullScreenRequested = true;
+  }
 }
 
 FPSControls.prototype.onFullScreenChange = function(isFullScreen){
