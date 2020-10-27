@@ -759,9 +759,14 @@ FPSControls.prototype.onTrackingUpdate = function(){
 }
 
 FPSControls.prototype.onPlayerBodyCollision = function(event){
-  if (event.y < this.physicsBody.position.y){
-    activeControl.canJump = true;
-    activeControl.canDoubleJump = true;
+  var physicsPositionY = this.physicsBody.position.y;
+  if (event.y < physicsPositionY){
+    var playerBodyObject = activeControl.playerBodyObject;
+    var diff = Math.abs(playerBodyObject.metaData.radius - (physicsPositionY - event.y));
+    if (diff < 3){
+      activeControl.canJump = true;
+      activeControl.canDoubleJump = true;
+    }
   }
 }
 
