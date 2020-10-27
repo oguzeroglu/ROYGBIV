@@ -386,6 +386,7 @@ StateLoader.prototype.resetProject = function(){
   protocolDefinitionFileName = 0;
   serverWSURL = 0;
   fogHandler.reset();
+  ENABLE_ANTIALIAS = false;
   lightHandler.reset();
   masses = new Object();
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW

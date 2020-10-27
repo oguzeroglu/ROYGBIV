@@ -247,6 +247,7 @@ var jobHandlerShadowBakerRefresh = false;
 var geometryCache = new Object();
 var physicsShapeCache = new Object();
 var MAX_TEXTURE_COUNT = 8;
+var ENABLE_ANTIALIAS = false;
 var compressedTextureFallbackFormat = ".png";
 var webglCallbackHandler;
 var threejsRenderMonitoringHandler;

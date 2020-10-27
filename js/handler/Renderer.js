@@ -1,5 +1,9 @@
 var Renderer = function(){
-  this.webglRenderer = new THREE.WebGLRenderer({canvas: canvas});
+  if (!isDeployment){
+    this.webglRenderer = new THREE.WebGLRenderer({canvas: canvas});
+  }else{
+    this.webglRenderer = new THREE.WebGLRenderer({canvas: canvas, antialias: ENABLE_ANTIALIAS});
+  }
 }
 
 Renderer.prototype.initEffects = function(){

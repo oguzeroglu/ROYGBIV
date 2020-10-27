@@ -88,6 +88,7 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     "Accepted texture size": "" + ACCEPTED_TEXTURE_SIZE,
     "Texture margin in PX": "" + TEXTURE_BLEEDING_FIX_PIXELS,
     "Disable instancing": INSTANCING_DISABLED,
+    "Enable antialias": ENABLE_ANTIALIAS,
     "Shadow intensity": shadowBaker.intensity,
     "Skybox distance": "" + skyboxDistance
   };
@@ -213,6 +214,14 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
 
     INSTANCING_DISABLED = val;
     terminal.printInfo(val? Text.INSTANCING_DISABLED: Text.INSTANCING_ENABLED);
+  }).listen();
+
+  parentFolder.add(params, "Enable antialias").onChange(function(val){
+    terminal.clear();
+
+    ENABLE_ANTIALIAS = val;
+
+    terminal.printInfo(val? Text.ANTIALIAS_ENABLED: Text.ANTIALIAS_DISABLED);
   }).listen();
 
   parentFolder.add(params, "Shadow intensity").min(0.05).max(1).step(0.05).onFinishChange(function(val){

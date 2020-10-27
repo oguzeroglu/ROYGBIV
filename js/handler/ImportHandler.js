@@ -46,6 +46,7 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   LIGHTNING_WORKER_ON = (!(typeof obj.LIGHTNING_WORKER_ON == UNDEFINED))? obj.LIGHTNING_WORKER_ON: true;
   INSTANCING_DISABLED = !!obj.INSTANCING_DISABLED;
   TEXTURE_BLEEDING_FIX_PIXELS = obj.TEXTURE_BLEEDING_FIX_PIXELS || TEXTURE_BLEEDING_FIX_PIXELS;
+  ENABLE_ANTIALIAS = !!obj.ENABLE_ANTIALIAS;
   rayCaster = raycasterFactory.get();
   physicsWorld = physicsFactory.get();
   particleSystemRefHeight = obj.particleSystemRefHeight;

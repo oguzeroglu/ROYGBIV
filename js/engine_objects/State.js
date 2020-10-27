@@ -14,6 +14,8 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   this.LIGHTNING_WORKER_ON = LIGHTNING_WORKER_ON;
   // INSTANCING ****************************************************
   this.INSTANCING_DISABLED = INSTANCING_DISABLED;
+  // ANTIALIAS *****************************************************
+  this.ENABLE_ANTIALIAS = ENABLE_ANTIALIAS;
   // TEXTURE BLEEDING FIX PIXELS ***********************************
   this.TEXTURE_BLEEDING_FIX_PIXELS = TEXTURE_BLEEDING_FIX_PIXELS;
   // PS REF HEIGHT *************************************************

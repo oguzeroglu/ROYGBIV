@@ -40,7 +40,7 @@ app.post("/build", function(req, res){
       res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
       return;
     }
-    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author);
+    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS);
     fs.writeFileSync("deploy/"+req.body.projectName+"/js/roygbiv.js", handleScripts(req.body, engineScriptsConcatted));
     fs.writeFileSync("deploy/"+req.body.projectName+"/js/application.json", JSON.stringify(req.body));
     copyAssets(req.body);
@@ -598,7 +598,7 @@ function generateDeployDirectory(projectName, application){
   return true;
 }
 
-function readEngineScripts(projectName, author){
+function readEngineScripts(projectName, author, enableAntialias){
   var content = "";
   var htmlContent = fs.readFileSync("roygbiv.html", "utf8");
   htmlContent = htmlContent.replace("three.js", "three.min.js");
@@ -611,6 +611,7 @@ function readEngineScripts(projectName, author){
         scriptContent = scriptContent.replace("var isDeployment = false;", "var isDeployment = true;");
         scriptContent = scriptContent.replace("var projectName = \"@@1\"", "var projectName = \""+projectName+"\"");
         scriptContent = scriptContent.replace("var author = \"@@2\"", "var author = \""+author+"\"");
+        scriptContent = scriptContent.replace("var ENABLE_ANTIALIAS = false;", "var ENABLE_ANTIALIAS = @@1;".replace("@@1", enableAntialias));
         console.log("[*] isDeployment flag injected into globalVariables.");
       }
       if (scriptPath.includes("Roygbiv.js")){
