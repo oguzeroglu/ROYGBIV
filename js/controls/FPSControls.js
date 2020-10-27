@@ -331,11 +331,14 @@ FPSControls.prototype.onRightHandFinger = function(touch){
   if (activeControl.pausedDueToScreenOrientation){
     return;
   }
+
+  var coef = isIOS? 1.6: 1;
+
   var oldTouch = activeControl.touchTrack.get(touch.identifier);
   var movementX = (touch.pageX - oldTouch.pageX);
   var movementY = (touch.pageY - oldTouch.pageY);
   var dx = -(movementX * activeControl.touchLookSpeed);
-  camera.rotation.y += dx;
+  camera.rotation.y += dx / coef;
   if (activeControl.hasWeapon1){
     var randomness = 0;
     if (activeControl.weaponRotationRandomnessOn){
@@ -352,10 +355,10 @@ FPSControls.prototype.onRightHandFinger = function(touch){
     }
     activeControl.weaponObject2.handleRotation(activeControl.axisY, dx + randomness);
   }
-  activeControl.alpha -= dx;
+  activeControl.alpha -= dx / coef;
   var dy = -movementY * activeControl.touchLookSpeed;
   if (!(dy > 0 && (activeControl.totalXRotation + dy >= 1.10)) && !(dy <0 && (activeControl.totalXRotation + dy <= -1.10))){
-    camera.rotation.x += dy;
+    camera.rotation.x += dy / coef;
     if (activeControl.hasWeapon1){
       var randomness = 0;
       if (activeControl.weaponRotationRandomnessOn){
@@ -372,7 +375,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
       }
       activeControl.weaponObject2.handleRotation(activeControl.axisX, dy + randomness);
     }
-    activeControl.totalXRotation += dy;
+    activeControl.totalXRotation += dy / coef;
   }
 }
 
