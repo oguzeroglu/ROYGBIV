@@ -641,6 +641,13 @@ function parse(input){
                 terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
               });
             }
+
+            if (physicsDebugMode){
+              terminal.skip = true;
+              parseCommand("switchPhysicsDebugMode");
+              parseCommand("switchPhysicsDebugMode");
+              terminal.skip = false;
+            }
           }else{
             jobHandlerRaycasterRefresh = true;
             if (hasShadowMap){
@@ -4566,7 +4573,7 @@ function parse(input){
           }
 
           count += Object.keys(massesInScene).length;
-          
+
           terminal.printHeader(Text.SHAPES);
           terminal.printInfo(Text.TREE.replace(Text.PARAM1, count));
           return true;

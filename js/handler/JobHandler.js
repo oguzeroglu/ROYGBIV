@@ -1316,6 +1316,13 @@ JobHandler.prototype.handleDestroyObjectCommand = function(){
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
+
+    if (physicsDebugMode){
+      terminal.skip = true;
+      parseCommand("switchPhysicsDebugMode");
+      parseCommand("switchPhysicsDebugMode");
+      terminal.skip = false;
+    }
   }
 }
 
