@@ -166,6 +166,7 @@ var Text = function(){
   this.TEXTURE_CREATED = "Texture created.";
   this.SPRITE_NOT_IN_ACTIVE_SCENE = "Sprite not in active scene.";
   this.SPRITE_SELECTED = "Sprite selected.";
+  this.BLUR_AMOUNT_SET = "Blur amount set.";
   this.SOURCE_TEXT_IS_NOT_DEFINED = "Source text is not defined.";
   this.TARGET_TEXT_IS_NOT_DEFINED = "Target text is not defined.";
   this.CONTAINER_CREATED = "Container created.";

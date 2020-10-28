@@ -8,6 +8,7 @@ ShadowBaker.prototype.export = function(isBuildingForDeploymentMode){
   var exportObj = {
     intensity: this.intensity,
     textureRangesByObjectName: JSON.parse(JSON.stringify(this.textureRangesByObjectName)),
+    blurAmount: this.blurAmount,
     dataURLsByTextureID: {},
     textureIDsByObjName: {}
   };
@@ -37,6 +38,7 @@ ShadowBaker.prototype.export = function(isBuildingForDeploymentMode){
 ShadowBaker.prototype.import = function(exportObj, onReady){
   this.reset();
   this.intensity = exportObj.intensity;
+  this.blurAmount = exportObj.blurAmount;
 
   if (Object.keys(exportObj.textureRangesByObjectName).length == 0){
     return;
@@ -122,6 +124,7 @@ ShadowBaker.prototype.reset = function(){
   this.texturesByObjName = {};
   this.textureRangesByObjectName = {};
   this.intensity = 0.5;
+  this.blurAmount = null;
 }
 
 ShadowBaker.prototype.getBakingCanvas = function(){
@@ -372,7 +375,27 @@ ShadowBaker.prototype.refreshTextures = function(onSuccess, onErr){
     onSuccess();
     return;
   }
-  var textureMerger = new TextureMerger(this.texturesByObjName);
+
+  var textureMerger;
+  if (this.blurAmount == null){
+    textureMerger = new TextureMerger(this.texturesByObjName);
+  }else{
+    var blurredTexturesByObjName = {};
+    for (var objName in this.texturesByObjName){
+      var textureCanvas = this.texturesByObjName[objName].image;
+      var tmpCanvas = document.createElement("canvas");
+      tmpCanvas.width = textureCanvas.width;
+      tmpCanvas.height = textureCanvas.height;
+      var tmpContext = tmpCanvas.getContext("2d");
+      tmpContext.filter = "blur(@@1px)".replace("@@1", this.blurAmount);
+      tmpContext.drawImage(textureCanvas, 0, 0);
+      blurredTexturesByObjName[objName] = new THREE.CanvasTexture(tmpCanvas);
+    }
+
+    textureMerger = new TextureMerger(blurredTexturesByObjName);
+  }
+
+
   this.textureRangesByObjectName = {};
   var texturesByObjName = this.texturesByObjName;
   this.compressTexture(textureMerger.mergedTexture.image.toDataURL(), function(atlas){

@@ -90,6 +90,7 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     "Disable instancing": INSTANCING_DISABLED,
     "Enable antialias": ENABLE_ANTIALIAS,
     "Shadow intensity": shadowBaker.intensity,
+    "Shadow blur in PX": shadowBaker.blurAmount || 0,
     "Skybox distance": "" + skyboxDistance
   };
 
@@ -136,6 +137,11 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
   }
 
   parentFolder.add(params, "Accepted texture size").onFinishChange(function(val){
+
+    if (val == "" + ACCEPTED_TEXTURE_SIZE){
+      return;
+    }
+
     terminal.clear();
     if (Object.keys(texturePacks).length){
       terminal.printError(Text.CANNOT_SET_TEXTURE_SIZE_AFTER);
@@ -163,6 +169,11 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
   });
 
   parentFolder.add(params, "Texture margin in PX").onFinishChange(function(val){
+
+    if (val == "" + TEXTURE_BLEEDING_FIX_PIXELS){
+      return;
+    }
+
     terminal.clear();
     var margin = parseFloat(val);
 
@@ -228,6 +239,36 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     terminal.clear();
     shadowBaker.updateIntensity(val);
     terminal.printInfo(Text.SHADOW_INTENSITY_UPDATED);
+  });
+
+  parentFolder.add(params, "Shadow blur in PX").onFinishChange(function(val){
+
+    var existingVal = "" + (shadowBaker.blurAmount || 0);
+
+    if (val == existingVal){
+      return;
+    }
+
+    terminal.clear();
+    var parsed = parseFloat(val);
+
+    if (isNaN(parsed)){
+      terminal.printError(Text.INVALID_NUMERICAL_VALUE);
+      return;
+    }
+
+    if (parsed < 0){
+      parsed = 0;
+    }
+
+    shadowBaker.blurAmount = parsed;
+    terminal.printInfo(Text.REFRESHING_SHADOW_MAPS);
+    terminal.disable();
+    shadowBaker.refreshTextures(function(){
+      terminal.clear();
+      terminal.printInfo(Text.BLUR_AMOUNT_SET);
+      terminal.enable();
+    }, noop);
   });
 
   parentFolder.add(params, "Skybox distance").onFinishChange(function(val){
