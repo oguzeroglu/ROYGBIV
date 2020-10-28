@@ -61,6 +61,13 @@ Area.prototype.destroy = function(){
       }
     }
   }
+  for (var textName in addedTexts){
+    if (addedTexts[textName].areaVisibilityConfigurations){
+      if (!(typeof addedTexts[textName].areaVisibilityConfigurations[this.name] == UNDEFINED)){
+        delete addedTexts[textName].areaVisibilityConfigurations[this.name];
+      }
+    }
+  }
 }
 
 Area.prototype.renderToScreen = function(){
