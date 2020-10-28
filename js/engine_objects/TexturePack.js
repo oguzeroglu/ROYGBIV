@@ -86,6 +86,8 @@ TexturePack.prototype.loadTexture = function(forcePNG, filePath, textureAttrName
     this[textureAttrName] = textureData;
     this[textureAttrName].wrapS = THREE.RepeatWrapping;
     this[textureAttrName].wrapT = THREE.RepeatWrapping;
+    this[textureAttrName].minFilter = THREE.LinearFilter;
+    this[textureAttrName].magFilter = THREE.LinearFilter;
     this[textureAttrName].needsUpdate = true;
     this.onTextureLoaded(onLoaded);
   }.bind(this),

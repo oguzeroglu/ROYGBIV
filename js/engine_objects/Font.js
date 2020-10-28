@@ -36,10 +36,19 @@ Font.prototype.loadCompressedTexture = function(onLoaded){
   var textureLoader = textureLoaderFactory.get();
   var texturePostfix = textureLoaderFactory.getFilePostfix();
   var that = this;
-  textureLoader.load("./texture_atlas/fonts/"+that.name+"/pack"+texturePostfix, function(textureData){
+
+  var src = "./texture_atlas/fonts/"+that.name+"/pack"+texturePostfix;
+
+  if (!textureLoaderFactory.isCompressionSupported()){
+    src += "?disableCache=" + generateUUID();
+  }
+
+  textureLoader.load(src, function(textureData){
     that.texture = textureData;
     that.texture.wrapS = THREE.RepeatWrapping;
     that.texture.wrapT = THREE.RepeatWrapping;
+    that.texture.minFilter = THREE.LinearFilter;
+    that.texture.magFilter = THREE.LinearFilter;
     that.texture.needsUpdate = true;
     onLoaded(that);
   });
