@@ -27,12 +27,18 @@ AreaConfigurationsHandler.prototype.onAfterSceneChange = function(){
     for (var objName in sceneHandler.getObjectGroups()){
       objectGroups[objName].applyAreaConfiguration(result);
     }
+    for (var textName in sceneHandler.getAddedTexts()){
+      addedTexts[textName].applyAreaConfiguration(result);
+    }
   }else{
     for (var objName in sceneHandler.getAddedObjects()){
       addedObjects[objName].applyAreaConfiguration("default");
     }
     for (var objName in sceneHandler.getObjectGroups()){
       objectGroups[objName].applyAreaConfiguration("default");
+    }
+    for (var textName in sceneHandler.getAddedTexts()){
+      addedTexts[textName].applyAreaConfiguration("default");
     }
   }
 }
@@ -92,6 +98,15 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
         "Side": obj.getSideInArea(areaName)
       };
     }
+    for (var textName in sceneHandler.getAddedTexts()){
+      var addedText = addedTexts[textName];
+      if (addedText.is2D){
+        continue;
+      }
+      this.visibilityConfigurations[areaName][textName] = {
+        "Visible": addedText.getVisibilityInArea(areaName)
+      }
+    }
   }
 
   if (!singleAreaName || (singleAreaName && singleAreaName.toLowerCase() == "default")){
@@ -114,6 +129,15 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
       this.sideConfigurations["default"][objName] = {
         "Side": obj.getSideInArea("default")
       };
+    }
+    for (var textName in sceneHandler.getAddedTexts()){
+      var addedText = addedTexts[textName];
+      if (addedText.is2D){
+        continue;
+      }
+      this.visibilityConfigurations["default"][textName] = {
+        "Visible": addedText.getVisibilityInArea("default")
+      }
     }
   }
 }
@@ -182,6 +206,20 @@ AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){
         delete areaConfigurationsHandlerContext.currentArea;
       }
     }.bind({object: objectGroups[objName], areaName: areaName}));
+  }
+  for (var textName in sceneHandler.getAddedTexts()){
+    var addedText = addedTexts[textName];
+    if (addedText.is2D){
+      continue;
+    }
+    var textFolder = folder.addFolder(textName);
+    var visibilityController = textFolder.add(this.visibilityConfigurations[areaName][textName], "Visible");
+    visibilityController.onChange(function(val){
+      this.addedText.setVisibilityInArea(this.areaName, val);
+      if (areaConfigurationsHandlerContext.currentArea){
+        delete areaConfigurationsHandlerContext.currentArea;
+      }
+    }.bind({addedText: addedText, areaName: areaName}));
   }
 }
 

@@ -1077,6 +1077,8 @@ ImportHandler.prototype.importAddedTexts = function(obj){
       var curAnimationExport = curTextExport.animations[animationName];
       addedTextInstance.addAnimation(new Animation(animationName, curAnimationExport.type, addedTextInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
     }
+
+    addedTextInstance.areaVisibilityConfigurations = curTextExport.areaVisibilityConfigurations;
   }
 }
 

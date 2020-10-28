@@ -1520,6 +1520,9 @@ function WebGLRenderer( parameters ) {
 					var objGroup = window.objectGroups[child.objectGroupName];
 					objGroup.applyAreaConfiguration(window.areaConfigurationsHandler.currentArea);
 				}
+				if (child.addedText){
+					child.addedText.applyAreaConfiguration(window.areaConfigurationsHandler.currentArea);
+				}
 			}
 			if (child.visible){
 				projectObject( child, camera, sortObjects );

@@ -70,6 +70,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.constructText();
   this.handleUVUniform();
   this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.addedText = this;
   this.mesh.renderOrder = renderOrders.TEXT_3D;
   this.mesh.position.copy(position);
   this.mesh.frustumCulled = false;
@@ -96,6 +97,39 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.animations = new Object();
 
   webglCallbackHandler.registerEngineObject(this);
+}
+
+AddedText.prototype.getVisibilityInArea = function(areaName){
+  if (this.areaVisibilityConfigurations){
+    if (!(typeof this.areaVisibilityConfigurations[areaName] == UNDEFINED)){
+      return this.areaVisibilityConfigurations[areaName];
+    }
+  }
+  return true;
+}
+
+AddedText.prototype.setVisibilityInArea = function(areaName, isVisible){
+  if (!this.areaVisibilityConfigurations){
+    this.areaVisibilityConfigurations = new Object();
+  }
+  this.areaVisibilityConfigurations[areaName] = isVisible;
+}
+
+AddedText.prototype.applyAreaConfiguration = function(areaName){
+  if (sceneHandler.getActiveSceneName() != this.registeredSceneName){
+    return;
+  }
+  if (this.is2D){
+    return;
+  }
+  if (this.areaVisibilityConfigurations){
+    var configurations = this.areaVisibilityConfigurations[areaName];
+    if (!(typeof configurations == UNDEFINED)){
+      this.mesh.visible = configurations;
+    }else{
+      this.mesh.visible = true;
+    }
+  }
 }
 
 AddedText.prototype.showInDesignMode = function(){
@@ -428,6 +462,11 @@ AddedText.prototype.export = function(){
   for (var animationName in this.animations){
     exportObj.animations[animationName] = this.animations[animationName].export();
   }
+
+  if (this.areaVisibilityConfigurations){
+    exportObj.areaVisibilityConfigurations = this.areaVisibilityConfigurations;
+  }
+
   return exportObj;
 }
 

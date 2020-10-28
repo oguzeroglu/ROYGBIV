@@ -2826,8 +2826,15 @@ function parse(input){
             count ++;
             break;
           }
+          for (var textName in sceneHandler.getAddedTexts()){
+            if (addedTexts[textName].is2D){
+              continue;
+            }
+            count ++;
+            break;
+          }
           if (count == 0){
-            terminal.printError(Text.NO_OBJECT_ADDED_TO_THE_SCENE);
+            terminal.printError(Text.NO_OBJECT_OR_TEXT_ADDED_TO_THE_SCNENE);
             return true;
           }
           if (acMode == "show"){
