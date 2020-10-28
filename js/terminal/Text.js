@@ -138,6 +138,7 @@ var Text = function(){
   this.NAME_USED_AS_A_REFERENCE = "Name used as a copy reference name in an object. Cannot use this name.";
   this.NAME_USED_IN_AN_OBJECT_GROUP = "Name used in an object group.";
   this.NO_SUCH_SPRITE = "No such sprite.";
+  this.AREA_CONFIGURATIONS_GUI_INITIALIZED = "Area configurations GUI initialized.";
   this.NO_SPRITES_CREATED = "No sprites created.";
   this.OBJECT_ADDED = "Object added.";
   this.X_GRIDS_SELECTED = "@@1 grids selected.";

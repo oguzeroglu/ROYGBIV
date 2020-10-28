@@ -134,7 +134,7 @@ var CommandDescriptor = function(){
       2, //newArea
       0, //toggleAreas
       1, //destroyArea
-      1, //areaConfigurations
+      0, //areaConfigurations
       1, //setResolution
       1, //configureArea
       4, //newAreaConfiguration
@@ -413,7 +413,7 @@ var CommandDescriptor = function(){
     "newArea areaName height",
     "toggleAreas",
     "destroyArea areaName",
-    "areaConfigurations show/hide",
+    "areaConfigurations",
     "setResolution resolution",
     "configureArea areaName",
     "newAreaConfiguration areaName objectName isVisible sides",
@@ -971,7 +971,7 @@ var CommandDescriptor = function(){
     "newArea: Creates a new area.",
     "toggleAreas: Show/hides the areas.",
     "destroyArea: Destroys an area.",
-    "areaConfigurations: Show/hides the area configuration window.",
+    "areaConfigurations: Show the area configuration window.",
     "setResolution: Sets the screen resolution. Use ORIGINAL_RESOLUTION parameter to use device pixel ratio.",
     "configureArea: Shows the area configuration window for a certain area.",
     "newAreaConfiguration: Creates a new area configuration for an area and object.",
@@ -1541,11 +1541,6 @@ var CommandDescriptor = function(){
   this.destroyArea = new Object();
   this.destroyArea.types = [];
   this.destroyArea.types.push(this.AREA_NAME); // areaName
-
-  // areaConfiguration
-  this.areaConfigurations = new Object();
-  this.areaConfigurations.types = [];
-  this.areaConfigurations.types.push(this.HIDE_SHOW); // show/hide
 
   // configureArea
   this.configureArea = new Object();

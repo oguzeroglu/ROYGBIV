@@ -2812,45 +2812,19 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          var acMode = splitted[1].toLowerCase();
-          if (acMode != "show" && acMode != "hide"){
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-            return true;
-          }
-          var count = 0;
-          for (var objName in sceneHandler.getAddedObjects()){
-            count ++;
-            break;
-          }
-          for (var objName in sceneHandler.getObjectGroups()){
-            count ++;
-            break;
-          }
-          for (var textName in sceneHandler.getAddedTexts()){
-            if (addedTexts[textName].is2D){
-              continue;
-            }
-            count ++;
-            break;
-          }
+          var count = Object.keys(sceneHandler.getAddedObjects()).length + Object.keys(sceneHandler.getObjectGroups());
+          count += Object.keys(sceneHandler.getAddedTexts()) - Object.keys(sceneHandler.getAddedTexts2D());
           if (count == 0){
             terminal.printError(Text.NO_OBJECT_OR_TEXT_ADDED_TO_THE_SCNENE);
             return true;
           }
-          if (acMode == "show"){
-            if (areaConfigurationsVisible){
-              terminal.printError(Text.AREA_CONFIGURATION_WINDOW_IS_ALREADY_VISIBLE);
-              return true;
-            }
-            areaConfigurationsHandler.show();
-          }else if (acMode == "hide"){
-            if (!areaConfigurationsVisible){
-              terminal.printError(Text.AREA_CONFIGURATION_WINDOW_IS_ALREADY_HIDDEN);
-              return true;
-            }
-            guiHandler.hide(guiHandler.guiTypes.AREA);
+          if (areaConfigurationsVisible){
+            terminal.printError(Text.AREA_CONFIGURATION_WINDOW_IS_ALREADY_VISIBLE);
+            return true;
           }
-          terminal.printInfo(Text.OK);
+          areaConfigurationsHandler.show();
+          terminal.printInfo(Text.AREA_CONFIGURATIONS_GUI_INITIALIZED);
+          return true;
         break;
         case 134: //setResolution
           // DEPRECATED

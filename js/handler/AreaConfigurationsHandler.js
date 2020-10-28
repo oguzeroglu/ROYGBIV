@@ -161,6 +161,14 @@ AreaConfigurationsHandler.prototype.show = function(singleAreaName){
     var defaultFolder = guiHandler.datGuiAreaConfigurations.addFolder("default");
     this.addSubFolder("default", defaultFolder);
   }
+
+  guiHandler.datGuiAreaConfigurations.add({
+    "Done": function(){
+      guiHandler.hide(guiHandler.guiTypes.AREA);
+      terminal.clear();
+      terminal.printInfo(Text.GUI_CLOSED);
+    }
+  }, "Done");
 }
 
 AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){
