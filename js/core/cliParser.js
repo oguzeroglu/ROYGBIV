@@ -2812,8 +2812,8 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          var count = Object.keys(sceneHandler.getAddedObjects()).length + Object.keys(sceneHandler.getObjectGroups());
-          count += Object.keys(sceneHandler.getAddedTexts()) - Object.keys(sceneHandler.getAddedTexts2D());
+          var count = Object.keys(sceneHandler.getAddedObjects()).length + Object.keys(sceneHandler.getObjectGroups()).length;
+          count += Object.keys(sceneHandler.getAddedTexts()).length - Object.keys(sceneHandler.getAddedTexts2D()).length;
           if (count == 0){
             terminal.printError(Text.NO_OBJECT_OR_TEXT_ADDED_TO_THE_SCNENE);
             return true;
