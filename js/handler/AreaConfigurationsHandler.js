@@ -10,11 +10,23 @@ AreaConfigurationsHandler.prototype.onCurrentAreaChange = function(enteredAreaNa
   }
   var enterCallbackFunc = areaEnterCallbacks[enteredAreaName];
   var exitCallbackFunc = areaExitCallbacks[exitedAreaName];
-  if (enterCallbackFunc && areas[enteredAreaName].registeredSceneName == sceneHandler.getActiveSceneName()){
-    enterCallbackFunc(exitedAreaName);
+  if (enteredAreaName != this.areaDefault){
+    if (enterCallbackFunc && areas[enteredAreaName].registeredSceneName == sceneHandler.getActiveSceneName()){
+      enterCallbackFunc(exitedAreaName);
+    }
+  }else{
+    if (enterCallbackFunc){
+      enterCallbackFunc(exitedAreaName);
+    }
   }
-  if (exitCallbackFunc && areas[exitedAreaName].registeredSceneName == sceneHandler.getActiveSceneName()){
-    exitCallbackFunc(enteredAreaName);
+  if (exitedAreaName != this.areaDefault){
+    if (exitCallbackFunc && areas[exitedAreaName].registeredSceneName == sceneHandler.getActiveSceneName()){
+      exitCallbackFunc(enteredAreaName);
+    }
+  }else{
+    if (exitCallbackFunc){
+      exitCallbackFunc(enteredAreaName);
+    }
   }
 }
 
