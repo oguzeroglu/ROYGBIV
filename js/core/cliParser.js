@@ -3200,6 +3200,11 @@ function parse(input){
               gridSelections = new Object();
             }
           }
+
+          if (areaConfigurationsVisible){
+            guiHandler.hide(guiHandler.guiTypes.AREA);
+          }
+
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_COPIED);
           }else{

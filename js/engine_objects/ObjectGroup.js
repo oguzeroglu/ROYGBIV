@@ -3431,6 +3431,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var physicsPositionBeforeDetached = this.physicsBody.position.clone();
   var physicsQuaternionBeforeDetached = this.physicsBody.quaternion.clone();
   var initQuaternionBeforeDetached = this.initQuaternion.clone();
+  var visibilityBeforeDetached = this.mesh.visible;
   var massWhenDetached = this.physicsBody.mass;
   var noMass = this.noMass;
   var slippery = this.isSlippery;
@@ -3586,6 +3587,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }
 
   this.mesh.material = oldMaterial;
+  this.mesh.visible = visibilityBeforeDetached;
 
   if (!isHardCopy){
     newObjGroup.mesh.material = this.mesh.material;
