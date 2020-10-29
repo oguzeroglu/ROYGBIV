@@ -433,6 +433,10 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
   steeringHandler.onAfterSceneChange();
   decisionHandler.onAfterSceneChange();
 
+  if (mode == 1){
+    delayedExecutionHandler.reset();
+  }
+
   if (mode == 0 && !isDeployment){
     $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
   }
