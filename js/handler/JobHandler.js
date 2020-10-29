@@ -62,10 +62,6 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleSyncCommand();
     }else if (this.splitted[0] == "selectallgrids"){
       this.handleSelectAllGridsCommand();
-    }else if (this.splitted[0] == "newareaconfiguration"){
-      this.handleNewAreaConfigurationCommand();
-    }else if (this.splitted[0] == "autoconfigurearea"){
-      this.handleAutoConfigureAreaCommand();
     }else if (this.splitted[0] == "newcylinder"){
       this.handleNewCylinderCommand();
     }else if (this.splitted[0] == "setrotationpivot"){
@@ -155,13 +151,11 @@ JobHandler.prototype.handle = function(previewModeCommand){
         terminal.printError(Text.ERROR_HAPPENED_BAKING_SHADOW);
       });
     }
-  }catch (err){
+  } catch (err){
     console.error(err);
   }
-  // because async
-  if (this.splitted[0] != "autoconfigurearea"){
-    jobHandlerWorking = false;
-  }
+
+  jobHandlerWorking = false;
 }
 
 JobHandler.prototype.handleUnbakeStaticLightsCommand = function(){
@@ -843,88 +837,6 @@ JobHandler.prototype.handleNewCylinderCommand = function(){
     terminal.printInfo(Text.CREATED_X_CYLINDERS.replace(Text.PARAM1, ctr));
   }else{
     terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
-  }
-}
-
-JobHandler.prototype.handleAutoConfigureAreaCommand = function(){
-  var areaNamePrefix = this.splitted[1].split("*")[0];
-  var areaCount = 0;
-  terminal.printInfo(Text.CONFIGURING_AREAS);
-  canvas.style.visibility = "hidden";
-  terminal.disable();
-  setTimeout(function(){
-    for (var areaName in sceneHandler.getAreas()){
-      if (areaName.startsWith(areaNamePrefix)){
-        areaCount ++;
-      }
-    }
-    jobHandlerInternalMaxExecutionCount = areaCount;
-    for (var areaName in sceneHandler.getAreas()){
-      if (areaName.startsWith(areaNamePrefix)){
-        parseCommand(
-          "autoConfigureArea "+areaName
-        );
-      }
-    }
-    if (areaCount == 0){
-      jobHandlerWorking = false;
-      terminal.printError(Text.NO_AREAS_FOUND);
-    }
-  });
-}
-
-JobHandler.prototype.handleNewAreaConfigurationCommand = function(){
-  var objNamePrefix = this.splitted[2].split("*")[0];
-  var areaNamePrefix = this.splitted[1].split("*")[0];
-  var areaCount = 0, objCount = 0;
-  for (var areaName in sceneHandler.getAreas()){
-    areaCount ++;
-    if (areaName.startsWith(areaNamePrefix)){
-      for (var objName in sceneHandler.getAddedObjects()){
-        if (objName.startsWith(objNamePrefix)){
-          parseCommand(
-            "newAreaConfiguration "+areaName+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
-          );
-          objCount ++;
-        }
-      }
-      for (var objName in sceneHandler.getObjectGroups()){
-        if (objName.startsWith(objNamePrefix)){
-          parseCommand(
-            "newAreaConfiguration "+areaName+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
-          );
-          objCount ++;
-        }
-      }
-    }
-  }
-  if ("default".startsWith(areaNamePrefix)){
-    areaCount ++;
-    for (var objName in sceneHandler.getAddedObjects()){
-      if (objName.startsWith(objNamePrefix)){
-        parseCommand(
-          "newAreaConfiguration default"+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
-        );
-        objCount ++;
-      }
-    }
-    for (var objName in sceneHandler.getObjectGroups()){
-      if (objName.startsWith(objNamePrefix)){
-        parseCommand(
-          "newAreaConfiguration default"+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
-        );
-        objCount ++;
-      }
-    }
-  }
-  if (areaCount == 0){
-    terminal.printError(Text.NO_AREAS_FOUND);
-  }else if (objCount == 0){
-    terminal.printError(Text.NO_OBJECT_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_AREAS.replace(
-      Text.PARAM1, areaCount
-    ));
   }
 }
 
