@@ -67,17 +67,11 @@ AreaConfigurationsHandler.prototype.handle = function(){
   }
 }
 
-AreaConfigurationsHandler.prototype.generateConfigurations = function(singleAreaName){
+AreaConfigurationsHandler.prototype.generateConfigurations = function(){
   this.visibilityConfigurations = new Object();
   this.sideConfigurations = new Object();
-  var pseudoAreas = areas;
-  if (singleAreaName){
-    pseudoAreas = new Object();
-    if (singleAreaName.toLowerCase() != "default"){
-      pseudoAreas[singleAreaName] = areas[singleAreaName];
-    }
-  }
-  for (var areaName in pseudoAreas){
+
+  for (var areaName in sceneHandler.getAreas()){
     this.visibilityConfigurations[areaName] = new Object();
     this.sideConfigurations[areaName] = new Object();
     for (var objName in sceneHandler.getAddedObjects()){
@@ -109,58 +103,49 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
     }
   }
 
-  if (!singleAreaName || (singleAreaName && singleAreaName.toLowerCase() == "default")){
-    this.visibilityConfigurations["default"] = new Object();
-    this.sideConfigurations["default"] = new Object();
-    for (var objName in sceneHandler.getAddedObjects()){
-      var obj = addedObjects[objName];
-      this.visibilityConfigurations["default"][objName] = {
-        "Visible": obj.getVisibilityInArea("default")
-      };
-      this.sideConfigurations["default"][objName] = {
-        "Side": obj.getSideInArea("default")
-      };
+  this.visibilityConfigurations["default"] = new Object();
+  this.sideConfigurations["default"] = new Object();
+  for (var objName in sceneHandler.getAddedObjects()){
+    var obj = addedObjects[objName];
+    this.visibilityConfigurations["default"][objName] = {
+      "Visible": obj.getVisibilityInArea("default")
+    };
+    this.sideConfigurations["default"][objName] = {
+      "Side": obj.getSideInArea("default")
+    };
+  }
+  for (var objName in sceneHandler.getObjectGroups()){
+    var obj = objectGroups[objName];
+    this.visibilityConfigurations["default"][objName] = {
+      "Visible": obj.getVisibilityInArea("default")
+    };
+    this.sideConfigurations["default"][objName] = {
+      "Side": obj.getSideInArea("default")
+    };
+  }
+  for (var textName in sceneHandler.getAddedTexts()){
+    var addedText = addedTexts[textName];
+    if (addedText.is2D){
+      continue;
     }
-    for (var objName in sceneHandler.getObjectGroups()){
-      var obj = objectGroups[objName];
-      this.visibilityConfigurations["default"][objName] = {
-        "Visible": obj.getVisibilityInArea("default")
-      };
-      this.sideConfigurations["default"][objName] = {
-        "Side": obj.getSideInArea("default")
-      };
-    }
-    for (var textName in sceneHandler.getAddedTexts()){
-      var addedText = addedTexts[textName];
-      if (addedText.is2D){
-        continue;
-      }
-      this.visibilityConfigurations["default"][textName] = {
-        "Visible": addedText.getVisibilityInArea("default")
-      }
+    this.visibilityConfigurations["default"][textName] = {
+      "Visible": addedText.getVisibilityInArea("default")
     }
   }
 }
 
-AreaConfigurationsHandler.prototype.show = function(singleAreaName){
-  this.generateConfigurations(singleAreaName);
+AreaConfigurationsHandler.prototype.show = function(){
+  this.generateConfigurations();
   guiHandler.datGuiAreaConfigurations = new dat.GUI({hideable: false});
   areaConfigurationsVisible = true;
-  var pseudoAreas = sceneHandler.getAreas();
-  if (singleAreaName){
-    pseudoAreas = new Object();
-    if (singleAreaName.toLowerCase() != "default"){
-      pseudoAreas[singleAreaName] = areas[singleAreaName];
-    }
-  }
-  for (var areaName in pseudoAreas){
+
+  for (var areaName in sceneHandler.getAreas()){
     var areaFolder = guiHandler.datGuiAreaConfigurations.addFolder(areaName);
     this.addSubFolder(areaName, areaFolder);
   }
-  if (!singleAreaName || (singleAreaName && singleAreaName.toLowerCase() == "default")){
-    var defaultFolder = guiHandler.datGuiAreaConfigurations.addFolder("default");
-    this.addSubFolder("default", defaultFolder);
-  }
+
+  var defaultFolder = guiHandler.datGuiAreaConfigurations.addFolder("default");
+  this.addSubFolder("default", defaultFolder);
 
   guiHandler.datGuiAreaConfigurations.add({
     "Done": function(){

@@ -2830,38 +2830,7 @@ function parse(input){
           // DEPRECATED
         break;
         case 135: //configureArea
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var areaName = splitted[1];
-          if (!areas[areaName] && areaName.toLowerCase() != "default"){
-            terminal.printError(Text.NO_SUCH_AREA);
-            return true;
-          }
-          if (areaName.toLowerCase() != "default" && areas[areaName].registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.AREA_NOT_IN_SCENE);
-            return true;
-          }
-          var count = 0;
-          for (var objName in sceneHandler.getAddedObjects()){
-            count ++;
-            break;
-          }
-          for (var objName in sceneHandler.getObjectGroups()){
-            count ++;
-            break;
-          }
-          if (count == 0){
-            terminal.printError(Text.NO_OBJECT_ADDED_TO_THE_SCENE);
-            return true;
-          }
-          if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.guiTypes.AREA);
-          }
-          areaConfigurationsHandler.show(areaName);
-          terminal.printInfo(Text.OK);
-          return true;
+          // DEPRECATED
         break;
         case 136: //newAreaConfiguration
           if (mode != 0){
