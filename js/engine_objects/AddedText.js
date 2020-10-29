@@ -123,6 +123,11 @@ AddedText.prototype.applyAreaConfiguration = function(areaName){
     return;
   }
   if (this.areaVisibilityConfigurations){
+
+    if (mode == 0 && this.hiddenInDesignMode){
+      return;
+    }
+
     var configurations = this.areaVisibilityConfigurations[areaName];
     if (!(typeof configurations == UNDEFINED)){
       this.mesh.visible = configurations;
