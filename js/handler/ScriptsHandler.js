@@ -87,6 +87,7 @@ ScriptsHandler.prototype.refreshFolder = function(parent){
 
 ScriptsHandler.prototype.onConfigurationsRefreshed = function(){
   this.includedScripts = [];
+  scripts = new Object();
   this.refreshFolder(this.configurations);
 }
 
