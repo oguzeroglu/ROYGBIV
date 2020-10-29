@@ -78,6 +78,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   activeControl = new FreeControls({});
   raycasterFactory.refresh();
   physicsFactory.refresh();
+  areaConfigurationsHandler.onAfterSceneChange();
   if (oldIsPaused){
     render();
   }
