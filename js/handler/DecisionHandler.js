@@ -144,6 +144,7 @@ DecisionHandler.prototype.onSwitchFromDesignToPreview = function(){
       var stateMachine = this.constructedStateMachines[sceneName][cloneInfo.refName].clone(decisionHandler.knowledgesBySceneName[sceneName][cloneInfo.knowledgeName]);
       stateMachine.registeredSceneName = sceneName;
       stateMachine.isDirty = false;
+      stateMachine._name = smName;
       this.constructedStateMachines[sceneName][smName] = stateMachine;
       this.stateEntryCallbacks[sceneName][stateMachine.getID()] = {};
       stateMachine.onStateChanged(function(newState){
@@ -1012,7 +1013,7 @@ DecisionHandler.prototype.prepareClonedSMChildren = function(stateMachine, scene
           callback();
         }
       });
-      
+
       this.prepareClonedSMChildren(state, sceneName);
     }
   }
