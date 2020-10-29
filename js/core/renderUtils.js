@@ -13,6 +13,7 @@ function render(){
 
   activeControl.update();
   cpuOperationsHandler.handleSkybox();
+  cpuOperationsHandler.handleAreaConfigurations();
 
   if (physicsDebugMode){
     debugRenderer.update();

@@ -992,6 +992,10 @@ AddedText.prototype.set2DStatus = function(is2D){
     this.mesh.material.uniforms.inputLineInfo = new THREE.Uniform(new THREE.Vector2(-500, -500));
     this.mesh.material.uniforms.currentViewport = GLOBAL_VIEWPORT_UNIFORM;
     this.mesh.renderOrder = renderOrders.TEXT_2D;
+    this.mesh.addedText = this;
+
+    delete this.areaVisibilityConfigurations;
+    this.mesh.visible = true;
   }else{
     macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, true);
     this.mesh.material.uniforms.cameraQuaternion = GLOBAL_CAMERA_QUATERNION_UNIFORM;
@@ -1015,6 +1019,7 @@ AddedText.prototype.set2DStatus = function(is2D){
       delete addedTexts2D[this.name];
     }
     this.mesh.renderOrder = renderOrders.TEXT_3D;
+    this.mesh.addedText = this;
   }
   if (is2D){
     if (this.bbHelper){

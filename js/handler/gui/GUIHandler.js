@@ -2494,6 +2494,9 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     var obj = selectionHandler.getSelectedObject();
     selectionHandler.resetCurrentSelection();
     selectionHandler.select(obj);
+    if (areaConfigurationsVisible){
+      guiHandler.hide(guiHandler.guiTypes.AREA);
+    }
   }).listen();
   guiHandler.textManipulationMarginModeController = folder2D.add(guiHandler.textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right", "Center"]).onChange(function(val){
     if (val == "Top/Left"){
