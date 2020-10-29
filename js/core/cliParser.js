@@ -2839,30 +2839,10 @@ function parse(input){
           // DEPRECATED
         break;
         case 138: //stopAreaConfigurations
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (stopAreaConfigurationsHandler){
-            terminal.printError(Text.AREA_CONFIGURATIONS_ARE_ALREADY_STOPPED);
-          }else{
-            stopAreaConfigurationsHandler = true;
-            terminal.printInfo(Text.AREA_CONFIGURATIONS_ARE_STOPPED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 139: //startAreaConfigurations
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (stopAreaConfigurationsHandler){
-            stopAreaConfigurationsHandler = false;
-            terminal.printInfo(Text.AREA_CONFIGURATIONS_ARE_STARTED);
-          }else{
-            terminal.printError(Text.AREA_CONFIGURATIONS_ARE_ALREADY_STARTED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 140: //newCylinder
           if (mode != 0){

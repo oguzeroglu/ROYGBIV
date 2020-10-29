@@ -270,7 +270,6 @@ var objectPicker2D;
 var intersectionPoint = 0;
 var intersectionObject = 0;
 var projectLoaded = true;
-var stopAreaConfigurationsHandler = false;
 var jobHandlerInternalCounter = 0;
 var jobHandlerInternalMaxExecutionCount = 0;
 var screenClickCallbackFunction = 0;

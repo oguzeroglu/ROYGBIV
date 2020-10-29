@@ -14,10 +14,6 @@ function render(){
   activeControl.update();
   cpuOperationsHandler.handleSkybox();
 
-  if (!stopAreaConfigurationsHandler){
-    cpuOperationsHandler.handleAreaConfigurations();
-  }
-
   if (physicsDebugMode){
     debugRenderer.update();
   }

@@ -1200,6 +1200,8 @@ var CommandDescriptor = function(){
     135, //configureArea -> Deprecated in favor of areaConfigurations command.
     136, //newAreaConfiguration -> Deprecated in favor of areaConfigurations command.
     137, //autoConfigureArea -> Deprecated due to lack of use cases.
+    138, //stopAreaConfigurations -> Deprecated due to lack of use cases.
+    139, //startAreaConfigurations -> Deprecated due to lack of use cases.
     146, //skyboxConfigurations -> Deprecated due to architectural changes in Skybox creation process.
     147, //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
     148, //noMobile -> Deprecated because the engine is good enough to deal with mobile devices at this point.
