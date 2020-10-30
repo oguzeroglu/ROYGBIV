@@ -488,6 +488,34 @@ Container2D.prototype.showInDesignMode = function(){
   refreshRaycaster(Text.CONTAINER_SHOWN);
 }
 
+Container2D.prototype.show = function(){
+  this.showVisually();
+  if (this.sprite){
+    this.sprite.show();
+  }
+  if (this.addedText){
+    this.addedText.show();
+  }
+  this.isHidden = false;
+  if (this.isClickable){
+    rayCaster.show(this);
+  }
+}
+
+Container2D.prototype.hide = function(){
+  this.hideVisually();
+  if (this.sprite){
+    this.sprite.hide();
+  }
+  if (this.addedText){
+    this.addedText.hide();
+  }
+  this.isHidden = true;
+  if (this.isClickable){
+    rayCaster.hide(this);
+  }
+}
+
 Container2D.prototype.hideInDesignMode = function(skipRaycasterRefresh){
   if (isDeployment){
     return;
