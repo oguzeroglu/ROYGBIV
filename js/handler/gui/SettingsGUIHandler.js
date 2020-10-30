@@ -31,7 +31,8 @@ SettingsGUIHandler.prototype.show = function(){
 SettingsGUIHandler.prototype.initializeWebSocketFolder = function(parentFolder){
   var params = {
     "Protocol definition file": protocolDefinitionFileName || "",
-    "WS server URL": serverWSURL || ""
+    "WS server URL": serverWSURL || "",
+    "Development WS server URL": developmentServerWSURL || ""
   };
 
   parentFolder.add(params, "Protocol definition file").onFinishChange(function(val){
@@ -78,6 +79,18 @@ SettingsGUIHandler.prototype.initializeWebSocketFolder = function(parentFolder){
 
     serverWSURL = val;
     terminal.printInfo(Text.SERVER_WS_URL_SET);
+  });
+
+  parentFolder.add(params, "Development WS server URL").onFinishChange(function(val){
+    terminal.clear();
+    if (!val){
+      serverWSURL = 0;
+      terminal.printInfo(Text.DEV_SERVER_WS_URL_RESET);
+      return;
+    }
+
+    developmentServerWSURL = val;
+    terminal.printInfo(Text.DEV_SERVER_WS_URL_SET);
   });
 }
 

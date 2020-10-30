@@ -105,6 +105,7 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   }
   protocolDefinitionFileName = obj.protocolDefinitionFileName;
   serverWSURL = obj.serverWSURL;
+  developmentServerWSURL = obj.developmentServerWSURL;
   skyboxDistance = obj.skyboxDistance || skyboxDistance;
 }
 

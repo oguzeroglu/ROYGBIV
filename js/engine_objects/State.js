@@ -184,6 +184,7 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   this.protocolDefinitionFileName = protocolDefinitionFileName;
   // WS SERVER URL *************************************************
   this.serverWSURL = serverWSURL;
+  this.developmentServerWSURL = developmentServerWSURL;
   // STEERING HANDLER **********************************************
   this.steeringHandler = steeringHandler.export();
   // DECISION HANDLER **********************************************

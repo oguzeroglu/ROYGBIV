@@ -384,6 +384,7 @@ StateLoader.prototype.resetProject = function(){
   dynamicTextureFolders = new Object();
   protocolDefinitionFileName = 0;
   serverWSURL = 0;
+  developmentServerWSURL = 0;
   fogHandler.reset();
   ENABLE_ANTIALIAS = false;
   lightHandler.reset();

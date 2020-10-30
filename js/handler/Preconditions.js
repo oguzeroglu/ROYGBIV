@@ -511,11 +511,11 @@ Preconditions.prototype.checkIfDynamicLight = function(callerFunc, light){
 }
 
 Preconditions.prototype.checkMultiplayerContext = function(callerFunc){
-  if (!serverWSURL){
-    this.throw(callerFunc, "Server WS URL not set. Use setWSServerURL CLI command.");
+  if (!developmentServerWSURL){
+    this.throw(callerFunc, "Server WS URL not set.");
   }
   if (!protocolDefinitionFileName){
-    this.throw(callerFunc, "Protocol definition file not set. Use setProtocolDefinition CLI command.");
+    this.throw(callerFunc, "Protocol definition file not set.");
   }
 }
 

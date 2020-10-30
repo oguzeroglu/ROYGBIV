@@ -973,6 +973,10 @@ function checkForUnusedTexturePacks(){
   return false;
 }
 
+function checkWSServerURLs(){
+  return developmentServerWSURL && !serverWSURL;
+}
+
 //******************************************************************
 // WARNING: FOR TEST PURPOSES
 function debugTexture(texture){

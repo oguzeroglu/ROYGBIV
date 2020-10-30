@@ -3253,13 +3253,16 @@ function parse(input){
             break;
           }
           if (hasParticleSystems && !particleSystemRefHeight){
-            terminal.printError("[!] Consider using makeParticleSystemsResponsive CLI command.")
+            terminal.printError(Text.BUILD_WARN_CONSIDER_USING_RESPONSIVE_PS)
           }
           if (checkForTextureBleedingInIOS()){
-            terminal.printError("[!] Some of the objects contain custom texture offset, repeat properties or a texture offset animation.\nThis may cause rendering problems in iOS devices.");
+            terminal.printError(Text.BUILD_WARN_IOS_TEXTURE_BLEEDING);
           }
           if (checkForUnusedTexturePacks()){
-            terminal.printError("[!] There are unused texture packs. Run \"destroyTexturePack *\" command to get rid of them.");
+            terminal.printError(Text.BUILD_WARN_UNSUED_TEXTURE_PACK);
+          }
+          if (checkWSServerURLs()){
+            terminal.printError(Text.BUILD_WARN_WS_SERVER_URL);
           }
           return true;
         break;

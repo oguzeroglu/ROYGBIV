@@ -429,6 +429,7 @@ var dynamicTextureFolders = new Object();
 var dynamicallyLoadedTextures = new Object();
 var protocolDefinitionFileName = 0;
 var serverWSURL = 0;
+var developmentServerWSURL = 0;
 var objectExportImportHandler;
 var DUMMY_TEXTURE = new THREE.Texture();
 var masses = new Object();
