@@ -340,7 +340,9 @@ Container2D.prototype.setCenter = function(centerXPercent, centerYPercent){
     this.insertAddedText(this.addedText);
   }
   if (!this.virtualKeyboardParent){
-    rayCaster.updateObject(this);
+    if (mode == 0 || (mode == 1 && this.isClickable)){
+      rayCaster.updateObject(this);
+    }
   }
 }
 

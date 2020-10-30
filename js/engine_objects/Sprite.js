@@ -202,7 +202,9 @@ Sprite.prototype.setCropCoefficient = function(coefX, coefY){
   this.cropCoefficientX = coefX;
   this.cropCoefficientY = coefY;
   this.handleRectangle();
-  rayCaster.updateObject(this);
+  if (mode == 0 || this.isClickable){
+    rayCaster.updateObject(this);
+  }
 }
 
 Sprite.prototype.handleResize = function(){
@@ -477,7 +479,9 @@ Sprite.prototype.setScale = function(scaleX, scaleY){
   this.mesh.material.uniforms.scale.value.set(scaleX, scaleY);
   this.handleRectangle();
   this.set2DCoordinates(this.marginPercentX, this.marginPercentY);
-  rayCaster.updateObject(this);
+  if (mode == 0 || this.isClickable){
+    rayCaster.updateObject(this);
+  }
 }
 
 Sprite.prototype.setRotation = function(angleInDegrees){
