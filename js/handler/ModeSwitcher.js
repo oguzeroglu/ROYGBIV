@@ -82,6 +82,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   if (oldIsPaused){
     render();
   }
+  fpsHandler.reset();
 }
 
 ModeSwitcher.prototype.switchFromDesignToPreview = function(){
@@ -324,6 +325,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
   camera.rotation.set(0, 0, 0);
+  roygbivScoreUpdateCallbackFunction = 0;
   screenClickCallbackFunction = 0;
   screenMouseDownCallbackFunction = 0;
   screenMouseUpCallbackFunction = 0;
@@ -341,7 +343,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   screenPinchCallbackFunction = 0;
   screenOrientationChangeCallbackFunction = 0;
   hashChangeCallbackFunction = 0;
-  fpsHandler.reset();
   pointerLockRequested = false;
   fullScreenRequested = false;
   activeVirtualKeyboard = 0;

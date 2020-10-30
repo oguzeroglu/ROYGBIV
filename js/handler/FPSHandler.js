@@ -55,6 +55,9 @@ FPSHandler.prototype.onUpdate = function(newFPS){
   }
   if (this.roygbivScore.counter > this.roygbivScore.score){
     this.roygbivScore.score = this.roygbivScore.counter;
+    if (roygbivScoreUpdateCallbackFunction){
+      roygbivScoreUpdateCallbackFunction(this.roygbivScore.score);
+    }
   }
 }
 

@@ -38,6 +38,8 @@ var Roygbiv = function(){
     MINUS_Z: "-z"
   };
 
+  this.noop = noop;
+
   this.functionNames = [
     "getObject",
     "getParticleSystem",
@@ -332,7 +334,9 @@ var Roygbiv = function(){
     "resetKnowledge",
     "getChildStateMachine",
     "createPathFollowingControl",
-    "getClientDetails"
+    "getClientDetails",
+    "onROYGBIVScoreUpdated",
+    "removeROYGBIVScoreUpdateListener"
   ];
 
   this.globals = new Object();
@@ -2799,6 +2803,29 @@ Roygbiv.prototype.removeStateEntryListener = function(stateMachine, stateName){
   preConditions.checkIfStateMachineInActiveScene(ROYGBIV.removeStateEntryListener, stateMachine);
 
   decisionHandler.removeStateEntryListener(stateMachine, stateName);
+}
+
+// Executes the callback function with newScore parameter everytime the ROYGBIV score
+// of the project is updated. ROYGBIV score represents the amount of consecutive
+// seconds without a frame drop.
+Roygbiv.prototype.onROYGBIVScoreUpdated = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.onROYGBIVScoreUpdated, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onROYGBIVScoreUpdated, preConditions.callbackFunction, callbackFunction);
+
+  roygbivScoreUpdateCallbackFunction = callbackFunction;
+}
+
+// Removes the ROYGBIV score update listener set via onROYGBIVScoreUpdated API.
+Roygbiv.prototype.removeROYGBIVScoreUpdateListener = function(){
+  if (mode == 0){
+    return;
+  }
+  
+  roygbivScoreUpdateCallbackFunction = noop;
 }
 
 // TEXT FUNCTIONS **************************************************************

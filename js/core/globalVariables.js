@@ -274,6 +274,7 @@ var intersectionObject = 0;
 var projectLoaded = true;
 var jobHandlerInternalCounter = 0;
 var jobHandlerInternalMaxExecutionCount = 0;
+var roygbivScoreUpdateCallbackFunction = 0;
 var screenClickCallbackFunction = 0;
 var screenMouseDownCallbackFunction = 0;
 var screenMouseUpCallbackFunction = 0;

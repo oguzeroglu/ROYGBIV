@@ -1407,4 +1407,6 @@ var Text = function(){
                                                 "pvrtcSupported: Whether the PVRTC format is supported or not\n" +
                                                 "highPrecisionSupported: Whether HIGHP is supported in shaders or not\n" +
                                                 "browser: The browser name. Can be one of: Opera, Chrome, Safari, Firefox, IE or Unknown. Good luck if it's IE"
+  this.ROYGBIV_SCRIPTING_API_ONROYGBIVSCOREUPDATED = "Executes the callback function with newScore parameter everytime the ROYGBIV score of the project is updated.\nROYGBIV score represents the amount of consecutive seconds without a frame drop.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEROYGBIVSCOREUPDATELISTENER = "Removes the ROYGBIV score update listener set via onROYGBIVScoreUpdated API.";
 }

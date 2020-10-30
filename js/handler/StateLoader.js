@@ -341,6 +341,7 @@ StateLoader.prototype.resetProject = function(){
   renderer.setPixelRatio(screenResolution);
   fogConfigurationsVisible = false;
   skyboxDistance = 4000;
+  roygbivScoreUpdateCallbackFunction = 0;
   screenClickCallbackFunction = 0;
   screenMouseDownCallbackFunction = 0;
   screenMouseUpCallbackFunction = 0;
