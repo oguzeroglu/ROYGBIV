@@ -742,7 +742,7 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Objects/Sprites]: ";
 			break;
-			case commandDescriptor.OBJECT_TEXT_SPRITE_NAME:
+			case commandDescriptor.OBJECT_TEXT_SPRITE_CONTAINER_NAME:
 				for (var objName in sceneHandler.getAddedObjects()){
 					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(objName);
@@ -761,6 +761,11 @@ Terminal.prototype.autocomplete = function(command){
 				for (var spriteName in sceneHandler.getSprites()){
 					if (spriteName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(spriteName);
+					}
+				}
+				for (var containerName in sceneHandler.getContainers()){
+					if (containerName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(containerName);
 					}
 				}
 				helpString = "[Objects]: ";

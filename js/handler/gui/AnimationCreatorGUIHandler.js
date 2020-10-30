@@ -240,6 +240,10 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
     for (var key in animationHandler.actionTypes.SPRITE){
       this.objectAnimationActionsAry.push(animationHandler.actionTypes.SPRITE[key]);
     }
+  }else if (object.isContainer){
+    for (var key in animationHandler.actionTypes.CONTAINER){
+      this.objectAnimationActionsAry.push(animationHandler.actionTypes.CONTAINER[key]);
+    }
   }else{
     throw new Error("Not implemented.");
   }
@@ -277,7 +281,9 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
         animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.TEXT.TRANSPARENCY, 3, -1, false, "#ffffff", false, 0);
       } else if (object.isSprite){
         animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.SPRITE.TRANSPARENCY, 3, -1, false, "#ffffff", false, 0);
-      } else {
+      } else if (object.isContainer){
+        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.CONTAINER.POSITION_X, 3, -50, false, "#ffffff", false, 0);
+      }else {
         throw new Error("Not implemented.");
       }
       animationCreatorGUIHandler.addAnimationFolder(animation, object);
@@ -366,11 +372,13 @@ AnimationCreatorGUIHandler.prototype.close = function(object){
       this.hiddenEngineObjects[i].visible = true;
     }
   }
-  if (!object.isFPSWeapon){
-    object.mesh.position.copy(object.beforeAnimationCreatorGUIHandlerPosition);
-    delete object.beforeAnimationCreatorGUIHandlerPosition;
-  }else{
-    object.revertPositionAfterFPSWeaponConfigurations();
+  if (!object.isContainer){
+    if (!object.isFPSWeapon){
+      object.mesh.position.copy(object.beforeAnimationCreatorGUIHandlerPosition);
+      delete object.beforeAnimationCreatorGUIHandlerPosition;
+    }else{
+      object.revertPositionAfterFPSWeaponConfigurations();
+    }
   }
   terminal.clear();
   terminal.enable();
@@ -393,12 +401,26 @@ AnimationCreatorGUIHandler.prototype.show = function(object){
   this.commonStartFunctions(object);
   this.createGUI(object);
   this.handleTerminal(null, null, object);
-  object.mesh.visible = true;
-  if (!object.isFPSWeapon){
-    object.beforeAnimationCreatorGUIHandlerPosition = object.mesh.position.clone();
-    object.mesh.position.set(0, 0, 0);
+
+  if (!object.isContainer){
+    object.mesh.visible = true;
+    if (!object.isFPSWeapon){
+      object.beforeAnimationCreatorGUIHandlerPosition = object.mesh.position.clone();
+      object.mesh.position.set(0, 0, 0);
+    }else{
+      camera.quaternion.set(0, 0, 0, 1);
+    }
   }else{
-    camera.quaternion.set(0, 0, 0, 1);
+    object.rectangle.mesh.visible = true;
+    if (object.hasBackground){
+      object.backgroundSprite.mesh.visible = true;
+    }
+    if (object.sprite){
+      object.sprite.mesh.visible = true;
+    }
+    if (object.addedText){
+      object.addedText.mesh.visible = true;
+    }
   }
   this.refreshAnimations(object);
 }

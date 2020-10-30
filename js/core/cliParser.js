@@ -4178,19 +4178,10 @@ function parse(input){
             return true;
           }
           var objName = splitted[1];
-          var obj = addedObjects[objName];
+          var obj = addedObjects[objName] || objectGroups[objName] || addedTexts[objName] || sprites[objName] || containers[objName];
           if (!obj){
-            obj = objectGroups[objName];
-            if (!obj){
-              obj = addedTexts[objName];
-              if (!obj){
-                obj = sprites[objName];
-                if (!obj){
-                  terminal.printError(Text.NO_SUCH_OBJECT);
-                  return true;
-                }
-              }
-            }
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
           }
           if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
             if (obj.isAddedObject || obj.isObjectGroup){

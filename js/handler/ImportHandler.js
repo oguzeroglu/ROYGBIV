@@ -1435,6 +1435,11 @@ ImportHandler.prototype.importContainers = function(obj){
     if (curExport.hiddenInDesignMode){
       container.hideInDesignMode(true);
     }
+
+    for (var animationName in curExport.animations){
+      var curAnimationExport = curExport.animations[animationName];
+      container.addAnimation(new Animation(animationName, curAnimationExport.type, container, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
+    }
   }
   for (var containerName in obj.containers){
     var curExport = obj.containers[containerName];

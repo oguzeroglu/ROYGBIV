@@ -17,6 +17,16 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
     }
   }
   this.virtualKeyboardParent = virtualKeyboardParent;
+
+  this.animations = new Object();
+}
+
+Container2D.prototype.addAnimation = function(animation){
+  this.animations[animation.name] = animation;
+}
+
+Container2D.prototype.removeAnimation = function(animation){
+  delete this.animations[animation.name];
 }
 
 Container2D.prototype.removeBackground = function(){
@@ -282,6 +292,11 @@ Container2D.prototype.export = function(){
     exportObj.backgroundColor = this.backgroundColor;
     exportObj.backgroundAlpha = this.backgroundAlpha;
     exportObj.backgroundTextureName = this.backgroundTextureName;
+  }
+
+  exportObj.animations = new Object();
+  for (var animationName in this.animations){
+    exportObj.animations[animationName] = this.animations[animationName].export();
   }
   return exportObj;
 }

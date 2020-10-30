@@ -33,6 +33,9 @@ var AnimationHandler = function(){
       COLOR: "SPRITE_COLOR", POSITION_X: "SPRITE_POSITION_X", POSITION_Y: "SPRITE_POSITION_Y", TARGET_POSITION_X: "SPRITE_TARGET_POSITION_X",
       TARGET_POSITION_Y: "SPRITE_TARGET_POSITION_Y", TARGET_ROTATION: "SPRITE_TARGET_ROTATION", TARGET_SCALE_X: "SPRITE_TARGET_SCALE_X",
       TARGET_SCALE_Y: "SPRITE_TARGET_SCALE_Y"
+    },
+    CONTAINER: {
+      POSITION_X: "CONTAINER_POSITION_X", POSITION_Y: "CONTAINER_POSITION_Y"
     }
   };
   // INITIAL VALUE GETTERS
@@ -186,6 +189,12 @@ var AnimationHandler = function(){
   }
   this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TARGET_SCALE_Y] = function(object){
     return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.CONTAINER.POSITION_X] = function(object){
+    return object.centerXPercent;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.CONTAINER.POSITION_Y] = function(object){
+    return object.centerYPercent;
   }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
@@ -427,6 +436,12 @@ var AnimationHandler = function(){
       animation.attachedObject.setHeightPercent(animation.params.fixedHeight);
     }
   }
+  this.afterAnimationSettersByType[this.actionTypes.CONTAINER.POSITION_X] = function(animation){
+    animation.attachedObject.setCenter(animation.initialValue, animation.attachedObject.centerYPercent);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.CONTAINER.POSITION_Y] = function(animation){
+    animation.attachedObject.setCenter(animation.attachedObject.centerXPercent, animation.initialValue);
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -473,6 +488,8 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_ROTATION] = this.updateSpriteTargetRotationFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_SCALE_X] = this.updateSpriteTargetScaleXFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_SCALE_Y] = this.updateSpriteTargetScaleYFunc;
+  this.actionFunctionsByType[this.actionTypes.CONTAINER.POSITION_X] = this.updateContainerPositionXFunc;
+  this.actionFunctionsByType[this.actionTypes.CONTAINER.POSITION_Y] = this.updateContainerPositionYFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -874,6 +891,12 @@ AnimationHandler.prototype.updateSpriteTargetScaleYFunc = function(params){
   }else{
     params.object.setHeightPercent(newVal);
   }
+}
+AnimationHandler.prototype.updateContainerPositionXFunc = function(params){
+  params.object.setCenter(params.value, params.object.centerYPercent);
+}
+AnimationHandler.prototype.updateContainerPositionYFunc = function(params){
+  params.object.setCenter(params.object.centerXPercent, params.value);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
