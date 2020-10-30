@@ -336,7 +336,9 @@ var Roygbiv = function(){
     "createPathFollowingControl",
     "getClientDetails",
     "onROYGBIVScoreUpdated",
-    "removeROYGBIVScoreUpdateListener"
+    "removeROYGBIVScoreUpdateListener",
+    "hideContainer",
+    "showContainer"
   ];
 
   this.globals = new Object();
@@ -2824,7 +2826,7 @@ Roygbiv.prototype.removeROYGBIVScoreUpdateListener = function(){
   if (mode == 0){
     return;
   }
-  
+
   roygbivScoreUpdateCallbackFunction = noop;
 }
 
@@ -3810,6 +3812,26 @@ Roygbiv.prototype.showContainerBackground = function(container){
   preConditions.checkIfContainerInsideActiveScene(ROYGBIV.showContainerBackground, container);
   preConditions.checkIfContainerHasBackground(ROYGBIV.showContainerBackground, container);
   container.backgroundSprite.mesh.visible = true;
+}
+
+// Hides a container and its children. Does nothing if the container is already hidden.
+Roygbiv.prototype.hideContainer = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.hideContainer, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.hideContainer, container);
+  container.hide();
+}
+
+// Shows a container and its children. Does nothing if the container is already shown.
+Roygbiv.prototype.showContainer = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.hideContainer, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.hideContainer, container);
+  container.show();
 }
 
 // VIRTUAL KEYBOARD FUNCTIONS **************************************************

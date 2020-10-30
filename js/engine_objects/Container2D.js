@@ -489,6 +489,9 @@ Container2D.prototype.showInDesignMode = function(){
 }
 
 Container2D.prototype.show = function(){
+  if (!this.isHidden){
+    return;
+  }
   this.showVisually();
   if (this.sprite){
     this.sprite.show();
@@ -503,6 +506,9 @@ Container2D.prototype.show = function(){
 }
 
 Container2D.prototype.hide = function(){
+  if (this.isHidden){
+    return;
+  }
   this.hideVisually();
   if (this.sprite){
     this.sprite.hide();

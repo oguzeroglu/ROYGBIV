@@ -1409,4 +1409,6 @@ var Text = function(){
                                                 "browser: The browser name. Can be one of: Opera, Chrome, Safari, Firefox, IE or Unknown. Good luck if it's IE"
   this.ROYGBIV_SCRIPTING_API_ONROYGBIVSCOREUPDATED = "Executes the callback function with newScore parameter everytime the ROYGBIV score of the project is updated.\nROYGBIV score represents the amount of consecutive seconds without a frame drop.";
   this.ROYGBIV_SCRIPTING_API_REMOVEROYGBIVSCOREUPDATELISTENER = "Removes the ROYGBIV score update listener set via onROYGBIVScoreUpdated API.";
+  this.ROYGBIV_SCRIPTING_API_HIDECONTAINER = "Hides a container and its children. Does nothing if the container is already hidden.";
+  this.ROYGBIV_SCRIPTING_API_SHOWCONTAINER = "Shows a container and its children. Does nothing if the container is already shown.";
 }
