@@ -5098,8 +5098,8 @@ function parse(input){
             new JobHandler(splitted).handle();
             return true;
           }
-          var sourceObj = addedObjects[sourceName] || objectGroups[sourceName] || addedTexts[sourceName] || sprites[sourceName];
-          var targetObj = addedObjects[targetName] || objectGroups[targetName] || addedTexts[targetName] || sprites[targetName];
+          var sourceObj = addedObjects[sourceName] || objectGroups[sourceName] || addedTexts[sourceName] || sprites[sourceName] || containers[sourceName];
+          var targetObj = addedObjects[targetName] || objectGroups[targetName] || addedTexts[targetName] || sprites[targetName] || containers[targetName];
           if (!sourceObj){
             terminal.printError(Text.SOURCE_OBJECT_NOT_DEFINED);
             return true;
@@ -5125,6 +5125,10 @@ function parse(input){
             return true;
           }
           if (sourceObj.isSprite && !targetObj.isSprite){
+            terminal.printError(Text.OBJECTS_HAVE_DIFFERENT_TYPES);
+            return true;
+          }
+          if (sourceObj.isContainer && !targetObj.isContainer){
             terminal.printError(Text.OBJECTS_HAVE_DIFFERENT_TYPES);
             return true;
           }

@@ -1241,10 +1241,10 @@ var Text = function(){
                                            "parentdir1_parentdir2_....._parentdirX_scriptFileName\n"+
                                            "For example in order to get a script under the scripts/ root folder example.js, the scriptName parameter should be example. However,\nto get a script under scripts/testFolder/test.js, the scriptName parameter should be testFolder_test.";
   this.ROYGBIV_SCRIPTING_API_STOPSCRIPT = "Stops a script. The scriptName parameter is explained with startScript API.";
-  this.ROYGBIV_SCRIPTING_API_STARTANIMATION = "Starts an animation of given object, object group, text or sprite.";
-  this.ROYGBIV_SCRIPTING_API_STOPANIMATION = "Stops an animation of given object, object group or text.";
-  this.ROYGBIV_SCRIPTING_API_ONANIMATIONFINISHED = "Sets a finish listener for an animation of given object, object group or text. For repeating animations the callbackFunction is\nexecuted before each repeat. For rewinding animations the callbackFunction is executed when the rewind is finished.";
-  this.ROYGBIV_SCRIPTING_API_REMOVEANIMATIONFINISHLISTENER = "Removes the finish listener for an animation of given object, object group or text.";
+  this.ROYGBIV_SCRIPTING_API_STARTANIMATION = "Starts an animation of given object, object group, text, sprite or container.";
+  this.ROYGBIV_SCRIPTING_API_STOPANIMATION = "Stops an animation of given object, object group, text, sprite or container.";
+  this.ROYGBIV_SCRIPTING_API_ONANIMATIONFINISHED = "Sets a finish listener for an animation of given object, object group, text, sprite or container. For repeating animations\nthe callbackFunction is executed before each repeat. For rewinding animations the callbackFunction is executed when\nthe rewind is finished.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEANIMATIONFINISHLISTENER = "Removes the finish listener for an animation of given object, object group, text, sprite or container.";
   this.ROYGBIV_SCRIPTING_API_SHOWMUZZLEFLASH = "Shows a muzzle flash. This function may be called each time a FPS weapon is shooting. The optional animationTimeInMS\nparameter can be used to start the muzzle flash with a scale animation. This can be useful for flame-like muzzle flashes.";
   this.ROYGBIV_SCRIPTING_API_EXECUTEDELAYED = "Runs a function after delayInMS milliseconds. If the repeat parameter is set to true runs the function in every delayInMS milliseconds.\nThis function returns a delayedExecutionID. This ID may provided to stopDelayedExecution API\nin order to stop a function to get executed.";
   this.ROYGBIV_SCRIPTING_API_STOPDELAYEDEXECUTION = "Stops a function to get executed with executeDelayed API. The delayedExecutionID parameter should be the return value of\nexecuteDelayed API. This API returns true if a function is found associated with the provided delayedExecutionID parameter,\nreturns false otherwise.";
@@ -1368,7 +1368,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVEPATHFINISHLISTENER = "Removes a path finish listener for PathFollowingBehavior of given steerable object.";
   this.ROYGBIV_SCRIPTING_API_SETOBJECTMOUSEMOVELISTENER = "Sets a mouse move listener for given object. The callbackFunction is executed with x, y, z parameters every frame\nthe mouse is on given object.";
   this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTMOUSEMOVELISTENER = "Removes the mouse move listener from given object.";
-  this.ROYGBIV_SCRIPTING_API_STARTALLANIMATIONS = "Starts all animations of given object, object group, text or sprite.";
+  this.ROYGBIV_SCRIPTING_API_STARTALLANIMATIONS = "Starts all animations of given object, object group, text, sprite or container.";
   this.ROYGBIV_SCRIPTING_API_SETPOSITIONCHANGELISTENER = "Sets a position change listener to given object or object group. The callbackFunction is executed with\nx, y, z coordinates everytime the position of the object changes.";
   this.ROYGBIV_SCRIPTING_API_REMOVEPOSITIONCHANGELISTENER = "Removes a position change listener from given object.";
   this.ROYGBIV_SCRIPTING_API_EXECUTEFOREACHWAYPOINT = "Executes func parameter with x, y, z coordinates for each waypoint of the path of given AStar object.\nNote that paths of AStar objects are reconstructed after finding the shortest distance, either manually\nor automatically by RandomPathBehavior.";

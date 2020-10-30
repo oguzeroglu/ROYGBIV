@@ -21,6 +21,14 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.animations = new Object();
 }
 
+Container2D.prototype.copyAnimationsFromObject = function(object){
+  this.animations = new Object();
+
+  for (var animName in object.animations){
+    this.addAnimation(object.animations[animName].copyWithAnotherObject(this));
+  }
+}
+
 Container2D.prototype.addAnimation = function(animation){
   this.animations[animation.name] = animation;
 }
