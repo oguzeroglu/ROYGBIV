@@ -1393,4 +1393,13 @@ var Text = function(){
                                                           "onFinished (optional): A callback function executed when the path is consumed. Note that this function is not executed if\nrestart parameter is on.\n" +
                                                           "mouseSpeed (optional): The mouse speed for desktop devices. Default value is 0.002.\n" +
                                                           "swipeSpeed (optional): The touch swipe speed for mobile devices. Default value is 0.002."
+  this.ROYGBIV_SCRIPTING_API_GETCLIENTDETAILS = "Returns an object of client details. Included fields are:\n" +
+                                                "isMobile: Whether the device is mobile or not\n" +
+                                                "isIOS: Whether the device is an IOS device or not\n" +
+                                                "isWebGLFriendly: Whether the device is WebGL friendly or not. ROYGBIV decides if a device is WebGL friendly by comparing\nMAX_VERTEX_UNIFORM_VECTORS to 1024\n" +
+                                                "astcSupported: Whether the ASTC format is supported or not\n" +
+                                                "s3tcSupported: Whether the S3TC format is supported or not\n" +
+                                                "pvrtcSupported: Whether the PVRTC format is supported or not\n" +
+                                                "highPrecisionSupported: Whether HIGHP is supported in shaders or not\n" +
+                                                "browser: The browser name. Can be one of: Opera, Chrome, Safari, Firefox, IE or Unknown. Good luck if it's IE"
 }

@@ -331,7 +331,8 @@ var Roygbiv = function(){
     "deactivateStateMachine",
     "resetKnowledge",
     "getChildStateMachine",
-    "createPathFollowingControl"
+    "createPathFollowingControl",
+    "getClientDetails"
   ];
 
   this.globals = new Object();
@@ -5063,4 +5064,35 @@ Roygbiv.prototype.getFromVectorPool = function(vectorPool){
   preConditions.checkIfTrue(ROYGBIV.getFromVectorPool, "Object is not a vector pool", !vectorPool.isVectorPool);
 
   return vectorPool.get();
+}
+
+// Returns an object of client details. Included fields are:
+// isMobile: Whether the device is mobile or not
+// isIOS: Whether the device is an IOS device or not
+// isWebGLFriendly: Whether the device is WebGL friendly or not. ROYGBIV decides if a device is WebGL friendly
+// by comparing MAX_VERTEX_UNIFORM_VECTORS to 1024.
+// astcSupported: Whether the ASTC format is supported or not.
+// s3tcSupported: Whether the S3TC format is supported or not.
+// pvrtcSupported: Whether the PVRTC format is supported or not.
+// highPrecisionSupported: Whether HIGHP is supported in shaders or not.
+// browser: The browser name. Can be one of: Opera, Chrome, Safari, Firefox, IE or Unknown. Good luck if it's IE.
+Roygbiv.prototype.getClientDetails = function(){
+  if (mode == 0){
+    return;
+  }
+
+  if (!CLIENT_DETAILS){
+    CLIENT_DETAILS = {
+      isMobile: isMobile,
+      isIOS: isIOS,
+      isWebGLFriendly: isWebGLFriendly,
+      astcSupported: ASTC_SUPPORTED,
+      s3tcSupported: S3TC_SUPPORTED,
+      pvrtcSupported: PVRTC_SUPPORTED,
+      highPrecisionSupported: HIGH_PRECISION_SUPPORTED,
+      browser: BROWSER_NAME
+    };
+  }
+
+  return CLIENT_DETAILS;
 }
