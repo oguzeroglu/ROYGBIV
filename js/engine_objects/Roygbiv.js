@@ -339,7 +339,8 @@ var Roygbiv = function(){
     "removeROYGBIVScoreUpdateListener",
     "hideContainer",
     "showContainer",
-    "getCurrentArea"
+    "getCurrentArea",
+    "boundingBoxIntersectionTest"
   ];
 
   this.globals = new Object();
@@ -5141,7 +5142,6 @@ Roygbiv.prototype.getClientDetails = function(){
   if (mode == 0){
     return;
   }
-
   if (!CLIENT_DETAILS){
     CLIENT_DETAILS = {
       isMobile: isMobile,
@@ -5154,6 +5154,21 @@ Roygbiv.prototype.getClientDetails = function(){
       browser: BROWSER_NAME
     };
   }
-
   return CLIENT_DETAILS;
+}
+
+// Performs an intersection test with the bounding boxes of given objects or
+// object groups and returns true if they intersect with each other, false otherwise.
+Roygbiv.prototype.boundingBoxIntersectionTest = function(object1, object2){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.boundingBoxIntersectionTest, preConditions.object1, object1);
+  preConditions.checkIfDefined(ROYGBIV.boundingBoxIntersectionTest, preConditions.object2, object2);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.boundingBoxIntersectionTest, preConditions.object1, object1);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.boundingBoxIntersectionTest, preConditions.object2, object2);
+  preConditions.checkIfIntersectable(ROYGBIV.boundingBoxIntersectionTest, preConditions.object1, object1);
+  preConditions.checkIfIntersectable(ROYGBIV.boundingBoxIntersectionTest, preConditions.object2, object2);
+
+  return object1.intersectsObject(object2);
 }

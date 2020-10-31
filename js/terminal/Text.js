@@ -1414,4 +1414,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_HIDECONTAINER = "Hides a container and its children. Does nothing if the container is already hidden.";
   this.ROYGBIV_SCRIPTING_API_SHOWCONTAINER = "Shows a container and its children. Does nothing if the container is already shown.";
   this.ROYGBIV_SCRIPTING_API_GETCURRENTAREA = "Returns the name of current area in which the camera is.";
+  this.ROYGBIV_SCRIPTING_API_BOUNDINGBOXINTERSECTIONTEST = "Performs an intersection test with the bounding boxes of given objects or object groups and returns true if they intersect\nwith each other, false otherwise.";
 }

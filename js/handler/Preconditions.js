@@ -296,6 +296,8 @@ var Preconditions = function(){
   this.restart = "restart";
   this.onFinished = "onFinished";
   this.yOffset = "yOffset";
+  this.object1 = "object1";
+  this.object2 = "object2";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -309,6 +311,12 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
 Preconditions.prototype.checkIfArrayLengthGreaterThan = function(callerFunc, parameterName, ary, limit){
   if (ary.length <= limit){
     this.throw(callerFunc, "Length of " + parameterName + " array must be greater than " + limit);
+  }
+}
+
+Preconditions.prototype.checkIfIntersectable = function(callerFunc, objectName, object){
+  if (!object.isIntersectable){
+    this.throw(callerFunc, objectName + " is not marked as intersectable.");
   }
 }
 

@@ -77,6 +77,31 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedObject.prototype.intersectsObject = function(object){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+  if (!object.boundingBoxes){
+    object.generateBoundingBoxes();
+  }
+  if (this.boundingBoxesNeedUpdate()){
+    this.updateBoundingBoxes();
+  }
+  if (object.boundingBoxesNeedUpdate()){
+    object.updateBoundingBoxes();
+  }
+
+  for (var i = 0; i < this.boundingBoxes.length; i ++){
+    for (var i2 = 0; i2 < object.boundingBoxes.length; i2 ++){
+      if (this.boundingBoxes[i].intersectsBox(object.boundingBoxes[i2])){
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 AddedObject.prototype.showInDesignMode = function(){
   if (isDeployment){
     return;
@@ -2720,24 +2745,6 @@ AddedObject.prototype.getBlendingText = function(){
   }
 }
 
-AddedObject.prototype.intersectsBox = function(box){
-  for (var i = 0; i< this.trianglePlanes.length; i+=2){
-    var plane = this.trianglePlanes[i];
-    if (plane.intersectLine(line, REUSABLE_VECTOR)){
-      var triangle1 = this.triangles[i];
-      var triangle2 = this.triangles[i+1];
-      if (triangle1.containsPoint(REUSABLE_VECTOR)){
-        INTERSECTION_NORMAL.set(plane.normal.x, plane.normal.y, plane.normal.z);
-        return REUSABLE_VECTOR;
-      }else if (triangle2.containsPoint(REUSABLE_VECTOR)){
-        INTERSECTION_NORMAL.set(plane.normal.x, plane.normal.y, plane.normal.z);
-        return REUSABLE_VECTOR;
-      }
-    }
-  }
-  return false;
-}
-
 AddedObject.prototype.intersectsLine = function(line){
   for (var i = 0; i< this.trianglePlanes.length; i+=2){
     var plane = this.trianglePlanes[i];
@@ -2772,7 +2779,6 @@ AddedObject.prototype.correctBoundingBox = function(bb){
 }
 
 AddedObject.prototype.updateBoundingBoxes = function(parentAry){
-
   var bb = this.boundingBoxes[0];
 
   if (this.bbMatrixCache.equals(this.mesh.matrixWorld)){

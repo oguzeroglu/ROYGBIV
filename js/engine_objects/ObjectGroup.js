@@ -40,6 +40,31 @@ var ObjectGroup = function(name, group){
   this.rotationMode = rotationModes.WORLD;
 }
 
+ObjectGroup.prototype.intersectsObject = function(object){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+  if (!object.boundingBoxes){
+    object.generateBoundingBoxes();
+  }
+  if (this.boundingBoxesNeedUpdate()){
+    this.updateBoundingBoxes();
+  }
+  if (object.boundingBoxesNeedUpdate()){
+    object.updateBoundingBoxes();
+  }
+
+  for (var i = 0; i < this.boundingBoxes.length; i ++){
+    for (var i2 = 0; i2 < object.boundingBoxes.length; i2 ++){
+      if (this.boundingBoxes[i].intersectsBox(object.boundingBoxes[i2])){
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 ObjectGroup.prototype.unbakeLights = function(){
   var colorsAttribute = this.mesh.geometry.attributes.color;
   var existingColors = colorsAttribute.array;
