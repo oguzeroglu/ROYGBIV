@@ -308,6 +308,18 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
 }
 
+Preconditions.prototype.checkIfSpriteHasFixedHeight = function(callerFunc, sprite){
+  if (!(typeof sprite.fixedHeight == UNDEFINED)){
+    this.throw(callerFunc, "Sprite has fixed height.");
+  }
+}
+
+Preconditions.prototype.checkIfSpriteHasFixedWidth = function(callerFunc, sprite){
+  if (!(typeof sprite.fixedWidth == UNDEFINED)){
+    this.throw(callerFunc, "Sprite has fixed width.");
+  }
+}
+
 Preconditions.prototype.checkIfArrayLengthGreaterThan = function(callerFunc, parameterName, ary, limit){
   if (ary.length <= limit){
     this.throw(callerFunc, "Length of " + parameterName + " array must be greater than " + limit);

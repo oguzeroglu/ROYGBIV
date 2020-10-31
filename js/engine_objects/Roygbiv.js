@@ -340,7 +340,9 @@ var Roygbiv = function(){
     "hideContainer",
     "showContainer",
     "getCurrentArea",
-    "boundingBoxIntersectionTest"
+    "boundingBoxIntersectionTest",
+    "setSpriteWidth",
+    "setSpriteHeight"
   ];
 
   this.globals = new Object();
@@ -3734,6 +3736,32 @@ Roygbiv.prototype.cancelSpriteDrag = function(){
     draggingSprite = false;
   }
   dragCandidate = false;
+}
+
+// Sets the width of given sprite.
+Roygbiv.prototype.setSpriteWidth = function(sprite, widthPercent){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSpriteWidth, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.setSpriteWidth, preConditions.sprite, sprite);
+  preConditions.checkIfDefined(ROYGBIV.setSpriteWidth, preConditions.widthPercent, widthPercent);
+  preConditions.checkIfNumber(ROYGBIV.setSpriteWidth, preConditions.widthPercent, widthPercent);
+  preConditions.checkIfSpriteHasFixedWidth(ROYGBIV.setSpriteWidth, sprite);
+  sprite.setWidthPercent(widthPercent);
+}
+
+// Sets the height of given sprite.
+Roygbiv.prototype.setSpriteHeight = function(sprite, heightPercent){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSpriteHeight, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.setSpriteHeight, preConditions.sprite, sprite);
+  preConditions.checkIfDefined(ROYGBIV.setSpriteHeight, preConditions.heightPercent, heightPercent);
+  preConditions.checkIfNumber(ROYGBIV.setSpriteHeight, preConditions.heightPercent, heightPercent);
+  preConditions.checkIfSpriteHasFixedHeight(ROYGBIV.setSpriteHeight, sprite);
+  sprite.setHeightPercent(heightPercent);
 }
 
 // CONTAINER FUNCTIONS *********************************************************
