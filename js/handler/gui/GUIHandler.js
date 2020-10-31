@@ -2024,10 +2024,10 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
   var backgroundFolder = guiHandler.datGuiContainerManipulation.addFolder("Background");
 
   // POSITION
-  guiHandler.containerManipulationCenterXController = positionFolder.add(guiHandler.containerManipulationParameters, "Center X").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.containerManipulationCenterXController = positionFolder.add(guiHandler.containerManipulationParameters, "Center X").min(-100).max(200).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setCenter(val, selectionHandler.getSelectedObject().centerYPercent);
   }).listen();
-  guiHandler.containerManipulationCenterYController = positionFolder.add(guiHandler.containerManipulationParameters, "Center Y").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.containerManipulationCenterYController = positionFolder.add(guiHandler.containerManipulationParameters, "Center Y").min(-100).max(200).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setCenter(selectionHandler.getSelectedObject().centerXPercent, val);
   }).listen();
 

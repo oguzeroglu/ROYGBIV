@@ -3749,6 +3749,7 @@ Roygbiv.prototype.setSpriteWidth = function(sprite, widthPercent){
   preConditions.checkIfNumber(ROYGBIV.setSpriteWidth, preConditions.widthPercent, widthPercent);
   preConditions.checkIfSpriteHasFixedWidth(ROYGBIV.setSpriteWidth, sprite);
   sprite.setWidthPercent(widthPercent);
+  sprite.previewModeWidth = widthPercent;
 }
 
 // Sets the height of given sprite.
@@ -3762,6 +3763,7 @@ Roygbiv.prototype.setSpriteHeight = function(sprite, heightPercent){
   preConditions.checkIfNumber(ROYGBIV.setSpriteHeight, preConditions.heightPercent, heightPercent);
   preConditions.checkIfSpriteHasFixedHeight(ROYGBIV.setSpriteHeight, sprite);
   sprite.setHeightPercent(heightPercent);
+  sprite.previewModeHeight = heightPercent;
 }
 
 // CONTAINER FUNCTIONS *********************************************************
@@ -3869,8 +3871,8 @@ Roygbiv.prototype.showContainer = function(container){
   if (mode == 0){
     return;
   }
-  preConditions.checkIfDefined(ROYGBIV.hideContainer, preConditions.container, container);
-  preConditions.checkIfContainer(ROYGBIV.hideContainer, container);
+  preConditions.checkIfDefined(ROYGBIV.showContainer, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.showContainer, container);
   container.show();
 }
 

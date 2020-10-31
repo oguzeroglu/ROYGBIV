@@ -421,6 +421,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete sprites[spriteName].originalColor;
     sprites[spriteName].setAlpha(sprites[spriteName].originalAlpha);
     delete sprites[spriteName].originalAlpha;
+    delete sprites[spriteName].previewModeWidth;
+    delete sprites[spriteName].previewModeHeight;
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();

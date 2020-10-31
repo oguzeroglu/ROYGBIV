@@ -217,6 +217,14 @@ Sprite.prototype.handleResize = function(){
   if (!(typeof this.fixedHeight == UNDEFINED)){
     this.setHeightPercent(this.fixedHeight);
   }
+  if (mode == 1){
+    if (!(typeof this.previewModeWidth == UNDEFINED)){
+      this.setWidthPercent(this.previewModeWidth);
+    }
+    if (!(typeof this.previewModeHeight == UNDEFINED)){
+      this.setHeightPercent(this.previewModeHeight);
+    }
+  }
   if (this.rectangle && !(typeof this.rectangle.thicknessOffset == UNDEFINED)){
     this.rectangle.updateMesh(this.rectangle.thicknessOffset);
   }
