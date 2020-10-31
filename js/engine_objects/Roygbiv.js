@@ -3168,6 +3168,7 @@ Roygbiv.prototype.setActiveControl = function(control){
 // is false.
 // yOffset (optional): The offset value between the camera Y coordinate and the player body object Y coordinate. This may
 // be used in order to place the camera below or above the player body object. Default value is 0.
+// onUpdate (optional): Function to be executed on each frame. Default value is noop.
 Roygbiv.prototype.createFPSControl = function(parameters){
   if (mode == 0){
     return;
@@ -3215,6 +3216,7 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfObjectInsideActiveSceneOnlyIfExists(ROYGBIV.createFPSControl, parameters.weaponObject2);
   preConditions.checkIfCrosshairInsideActiveSceneOnlyIfNameExists(ROYGBIV.createFPSControl, parameters.crosshairName);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.yOffset, parameters.yOffset);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onUpdate, parameters.onUpdate);
   return new FPSControls(parameters);
 }
 

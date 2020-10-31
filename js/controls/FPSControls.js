@@ -45,6 +45,8 @@ var FPSControls = function(params){
   this.onResume = params.onResume;
   this.requestFullScreen = params.requestFullScreen;
   this.yOffset = params.yOffset;
+  this.onUpdate = params.onUpdate;
+
   if (typeof this.mouseSpeed == UNDEFINED){
     this.mouseSpeed = 0.002;
   }
@@ -105,6 +107,10 @@ var FPSControls = function(params){
   if (typeof this.yOffset == UNDEFINED){
     this.yOffset = 0;
   }
+  if (typeof this.onUpdate == UNDEFINED){
+    this.onUpdate = noop;
+  }
+
   this.init();
 }
 
@@ -567,6 +573,7 @@ FPSControls.prototype.update = function(){
     this.weaponObject2.handleRotation(activeControl.axisZ, Math.sin(this.weapon2IdleAnimationInfo.z) / 1000 * Math.random());
   }
   this.lookIntersectionTest();
+  this.onUpdate();
 }
 
 FPSControls.prototype.onlookRaycasterComplete = function(x, y, z, objName){
