@@ -4946,6 +4946,7 @@ Roygbiv.prototype.isOrientationLandscape = function(){
 // Runs a function after delayInMS milliseconds. If the repeat parameter is set to true runs
 // the function in every delayInMS milliseconds. This function returns a delayedExecutionID.
 // This ID may provided to stopDelayedExecution API in order to stop a function to get executed.
+// Note that the IDs are recycled after a delayed execution is completed.
 Roygbiv.prototype.executeDelayed = function(func, delayInMS, repeat){
   if (mode == 0){
     return;
