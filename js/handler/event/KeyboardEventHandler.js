@@ -133,13 +133,15 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
       var currentSelection = selectionHandler.getSelectedObject();
       if (currentSelection.isAddedObject || currentSelection.isObjectGroup){
         terminal.clear();
-        parseCommand("destroyObject "+currentSelection.name);
+        parseCommand("destroyObject " + currentSelection.name);
       }else if (currentSelection.isAddedText){
         terminal.clear();
-        parseCommand("destroyText "+currentSelection.name);
+        parseCommand("destroyText " + currentSelection.name);
       }else if (currentSelection.isSprite){
         terminal.clear();
-        parseCommand("destroySprite "+currentSelection.name);
+        parseCommand("destroySprite " + currentSelection.name);
+      }else if (currentSelection.isContainer){
+        parseCommand("destroyContainer " + currentSelection.name);
       }
       guiHandler.afterObjectSelection();
     break;
