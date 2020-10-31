@@ -24,6 +24,7 @@ PointerLockEventHandler.prototype.onPointerLock = function(event){
   if (mode == 1 && screenPointerLockChangedCallbackFunction){
     if (isPointerLocked){
       screenPointerLockChangedCallbackFunction(true);
+      pointerLockRequested = false;
     }else{
       screenPointerLockChangedCallbackFunction(false);
     }

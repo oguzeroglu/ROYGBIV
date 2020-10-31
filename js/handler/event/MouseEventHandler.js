@@ -237,7 +237,6 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
     }
     if (mode == 1 && pointerLockSupported && pointerLockRequested){
       canvas.requestPointerLock();
-      pointerLockRequested = false;
     }
     if (mode == 1 && fullScreenRequested){
       if (canvas.requestFullscreen){
