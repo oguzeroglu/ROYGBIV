@@ -338,7 +338,8 @@ var Roygbiv = function(){
     "onROYGBIVScoreUpdated",
     "removeROYGBIVScoreUpdateListener",
     "hideContainer",
-    "showContainer"
+    "showContainer",
+    "getCurrentArea"
   ];
 
   this.globals = new Object();
@@ -870,6 +871,15 @@ Roygbiv.prototype.getChildStateMachine = function(stateMachine, childStateMachin
   preConditions.checkIfStateMachine(ROYGBIV.getChildStateMachine, stateMachine);
 
   return decisionHandler.getChildStateMachine(stateMachine, childStateMachineName) || 0;
+}
+
+// Returns the name of current area in which the camera is.
+Roygbiv.prototype.getCurrentArea = function(){
+  if (mode == 0){
+    return;
+  }
+
+  return areaConfigurationsHandler.currentArea;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************

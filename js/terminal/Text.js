@@ -1413,4 +1413,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVEROYGBIVSCOREUPDATELISTENER = "Removes the ROYGBIV score update listener set via onROYGBIVScoreUpdated API.";
   this.ROYGBIV_SCRIPTING_API_HIDECONTAINER = "Hides a container and its children. Does nothing if the container is already hidden.";
   this.ROYGBIV_SCRIPTING_API_SHOWCONTAINER = "Shows a container and its children. Does nothing if the container is already shown.";
+  this.ROYGBIV_SCRIPTING_API_GETCURRENTAREA = "Returns the name of current area in which the camera is.";
 }
