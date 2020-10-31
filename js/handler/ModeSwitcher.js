@@ -610,6 +610,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     }
     steeringHandler.updateObject(object);
     delete object.constructedSteeringBehaviors;
+
+    object.mesh.updateMatrixWorld();
+    object.updateBoundingBoxes();
   }
 
   for (var sceneName in sceneHandler.scenes){
