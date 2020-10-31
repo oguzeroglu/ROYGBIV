@@ -342,7 +342,8 @@ var Roygbiv = function(){
     "getCurrentArea",
     "boundingBoxIntersectionTest",
     "setSpriteWidth",
-    "setSpriteHeight"
+    "setSpriteHeight",
+    "cancelPointerLockRequests"
   ];
 
   this.globals = new Object();
@@ -5201,4 +5202,12 @@ Roygbiv.prototype.boundingBoxIntersectionTest = function(object1, object2){
   preConditions.checkIfIntersectable(ROYGBIV.boundingBoxIntersectionTest, preConditions.object2, object2);
 
   return object1.intersectsObject(object2);
+}
+
+// Cancels existing pointer lock requests.
+Roygbiv.prototype.cancelPointerLockRequests = function(){
+  if (mode == 0){
+    return;
+  }
+  pointerLockRequested = false;
 }

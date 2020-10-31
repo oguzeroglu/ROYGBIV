@@ -1417,4 +1417,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_BOUNDINGBOXINTERSECTIONTEST = "Performs an intersection test with the bounding boxes of given objects or object groups and returns true if they intersect\nwith each other, false otherwise.";
   this.ROYGBIV_SCRIPTING_API_SETSPRITEWIDTH = "Sets the width of given sprite.";
   this.ROYGBIV_SCRIPTING_API_SETSPRITEHEIGHT = "Sets the height of given sprite.";
+  this.ROYGBIV_SCRIPTING_API_CANCELPOINTERLOCKREQUESTS = "Cancels existing pointer lock requests.";
 }
