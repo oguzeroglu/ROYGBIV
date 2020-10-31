@@ -337,6 +337,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       if (container.hiddenInDesignMode){
         container.hideInDesignMode(true);
       }
+      container.isHidden = false;
     }
     for (var vkName in this.scenes[sceneName].virtualKeyboards){
       virtualKeyboards[vkName].resetColors();
@@ -405,6 +406,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       if (container.hasBackground){
         container.backgroundSprite.showVisually();
       }
+      container.isHidden = false;
     }
     for (var vkName in this.scenes[sceneName].virtualKeyboards){
       virtualKeyboards[vkName].resetColors();

@@ -258,6 +258,7 @@ Container2D.prototype.handleResize = function(){
     this.backgroundSprite.handleRectangle();
     this.setBackground(this.backgroundColor, this.backgroundAlpha, this.backgroundTextureName);
   }
+  this.setCenter(this.centerXPercent, this.centerYPercent);
   if (!this.virtualKeyboardParent){
     rayCaster.updateObject(this);
   }

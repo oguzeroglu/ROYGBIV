@@ -363,6 +363,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     scene.add(gridSelections[gridName].dot);
   }
   for (var containerName in containers){
+    containers[containerName].isHidden = false;
     containers[containerName].rectangle.mesh.visible = true;
     if (containers[containerName].hasBorder){
       containers[containerName].setBorder(containers[containerName].originalBorderColor, containers[containerName].borderThickness);
