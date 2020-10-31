@@ -559,14 +559,18 @@ Container2D.prototype.hideInDesignMode = function(skipRaycasterRefresh){
 }
 
 Container2D.prototype.hideVisually = function(){
-  this.rectangle.mesh.visible = false;
+  if (!isDeployment){
+    this.rectangle.mesh.visible = false;
+  }
   if (this.hasBackground){
     this.backgroundSprite.mesh.visible = false;
   }
 }
 
 Container2D.prototype.showVisually = function(){
-  this.rectangle.mesh.visible = true;
+  if (!isDeployment){
+    this.rectangle.mesh.visible = true;
+  }
   if (this.hasBackground){
     this.backgroundSprite.mesh.visible = true;
   }

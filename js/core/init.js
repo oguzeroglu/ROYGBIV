@@ -964,6 +964,12 @@ function checkForUnusedTexturePacks(){
         }
       }
     }
+    for (var spriteName in sprites){
+      if (sprites[spriteName].mappedTexturePackName == tpName){
+        isUsed = true;
+        break;
+      }
+    }
 
     if (!isUsed){
       return true;
