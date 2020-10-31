@@ -376,6 +376,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       containers[containerName].setBackground(containers[containerName].backgroundColor, containers[containerName].backgroundAlpha, containers[containerName].backgroundTextureName);
       containers[containerName].backgroundSprite.mesh.visible = true;
     }
+    for (var animationName in containers[containerName].animations){
+      animationHandler.forceFinish(containers[containerName].animations[animationName]);
+      containers[containerName].animations[animationName].finishCallbackFunction = 0;
+    }
   }
   for (var textName in sceneHandler.getAddedTexts()){
     var addedText = addedTexts[textName];
