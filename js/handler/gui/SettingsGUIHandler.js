@@ -104,7 +104,8 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     "Enable antialias": ENABLE_ANTIALIAS,
     "Shadow intensity": shadowBaker.intensity,
     "Shadow blur in PX": shadowBaker.blurAmount || 0,
-    "Skybox distance": "" + skyboxDistance
+    "Skybox distance": "" + skyboxDistance,
+    "Camera FOV": "" + camera.fov
   };
 
   var resolutionController = parentFolder.add(params, "Resolution").onFinishChange(function(val){
@@ -304,6 +305,20 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     }
 
     terminal.printInfo(Text.SKYBOX_DISTANCE_UPDATED);
+  });
+
+  parentFolder.add(params, "Camera FOV").onFinishChange(function(val){
+    terminal.clear();
+    var valParsed = parseFloat(val);
+
+    if (isNaN(valParsed)){
+      terminal.printError(Text.INVALID_NUMERICAL_VALUE);
+      return;
+    }
+
+    camera.fov = valParsed;
+    camera.updateProjectionMatrix();
+    terminal.printInfo(Text.FOV_UPDATED);
   });
 
   var shaderPrecisionFolder = parentFolder.addFolder("Shader precision");

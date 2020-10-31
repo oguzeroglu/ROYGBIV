@@ -51,6 +51,8 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   physicsWorld = physicsFactory.get();
   particleSystemRefHeight = obj.particleSystemRefHeight;
   shaderPrecisionHandler.load(obj.shaderPrecisions);
+  camera.fov = obj.cameraFOV || 45;
+  camera.updateProjectionMatrix();
   var octreeLimitInfo = obj.octreeLimit
   var octreeLimitInfoSplitted = octreeLimitInfo.split(",");
   for (var i = 0; i<octreeLimitInfoSplitted.length; i++){

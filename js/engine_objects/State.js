@@ -24,6 +24,8 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   this.textureAtlas = textureAtlasHandler.export();
   // SHADER PRECISIONS *********************************************
   this.shaderPrecisions = shaderPrecisionHandler.export();
+  // CAMERA FOV ****************************************************
+  this.cameraFOV = camera.fov;
   // GRID SYSTEMS **************************************************
   var gridSystemsExport = new Object();
   for (var gridSystemName in gridSystems){

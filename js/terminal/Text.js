@@ -189,6 +189,7 @@ var Text = function(){
   this.COMPRESSED_TEXTURES_DO_NOT_SUPPORT = "Compressed textures do not support this function.";
   this.TEXTURE_CLONED = "Texture cloned for optimization.";
   this.TREE_TEXTURE = "|____@@1 @@2 -> @@3"
+  this.FOV_UPDATED = "FOV updated";
   this.THERE_ARE_NO_TEXTURES = "There are no textures.";
   this.NO_SUCH_LIGHTNING = "No such lightning.";
   this.NO_SUCH_LIGHT = "No such light.";
