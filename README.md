@@ -5,7 +5,7 @@ ROYGBIV is a WebGL game engine for motivated programmers who do not have the bud
 ![](/screen_shots/roygbiv.gif?raw=true)   
 
 ## Demos  
-* [Villeneuve d'Ascq](https://oguzeroglu.github.io/ROYGBIV/demo/villeneuvedascq/application.html)  
+* [Villeneuve d'Ascq](https://oguzeroglu.github.io/ROYGBIV/demo/villeneuvedascq2/application.html)  
 * [Autonomous Battle](https://oguzeroglu.github.io/kompute-demos-with-roygbiv/autonomousBattle/application.html)    
 * [Blaster](https://oguzeroglu.github.io/ROYGBIV/demo/blaster/application.html)    
 * [Cooking space kebab with a flamethrower](https://oguzeroglu.github.io/ROYGBIV/demo/spaceKebab/application.html)    
