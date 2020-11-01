@@ -1,0 +1,18 @@
+{
+  "clientInfo": {
+    "isMobile": "char_1",
+    "isIOS": "char_1",
+    "isWebGLFriendly": "char_1",
+    "astcSupported": "char_1",
+    "s3tcSupported": "char_1",
+    "pvrtcSupported": "char_1",
+    "highPrecisionSupported": "char_1",
+    "browser": "char_7"
+  },
+  "roomSeen": {
+    "roomName": "char_5"
+  },
+  "roygbivScoreUpdated": {
+    "newScore": "numerical"
+  }
+}
