@@ -7474,9 +7474,10 @@ var handleControls = function(){
   ROYGBIV.setActiveControl(ROYGBIV.createFPSControl({
     playerBodyObject: playerBodyObject,
     initialPosition: ROYGBIV.vector(-439, 510, 660),
-    mouseSpeed: 0.003,
+    mouseSpeed: 0.0035,
+    touchLookSpeed: 0.0035,
     hasDoubleJump: false,
-    speed: 400,
+    speed: 450,
     yOffset: 170,
     requestFullScreen: ROYGBIV.isMobile() && !ROYGBIV.getClientDetails().isIOS,
     onUpdate: function(){
