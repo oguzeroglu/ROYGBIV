@@ -7475,7 +7475,6 @@ var handleControls = function(){
     playerBodyObject: playerBodyObject,
     initialPosition: ROYGBIV.vector(-439, 510, 660),
     mouseSpeed: 0.0035,
-    touchLookSpeed: 0.025,
     hasDoubleJump: false,
     speed: 450,
     yOffset: 170,
