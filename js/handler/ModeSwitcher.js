@@ -234,7 +234,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       that.enableTerminal();
       terminal.printInfo(Text.SWITCHED_TO_PREVIEW_MODE);
     }else{
-      removeCLIDom();
       if (screenResolution != 1){
         canvas.style.oldPosition = canvas.style.position;
         canvas.style.position = "absolute";

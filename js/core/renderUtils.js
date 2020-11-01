@@ -67,6 +67,9 @@ function render(){
 
 
 function renderScene(){
+  if (!sceneHandler.ready || (mode == 0  && isDeployment)){
+    return;
+  }
   threejsRenderMonitoringHandler.currentRenderCallCountPerFrame = 0;
   renderer.render(scene, camera);
   if (threejsRenderMonitoringHandler.currentRenderCallCountPerFrame > threejsRenderMonitoringHandler.maxRenderCallCountPerFrame){
