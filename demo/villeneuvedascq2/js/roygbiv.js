@@ -19753,7 +19753,7 @@ Roygbiv.prototype.connectToServer = function(onReady, onError){
     return;
   }
   Rhubarb.init({
-    protocolDefinitionPath: "/protocol_definitions/" + protocolDefinitionFileName,
+    protocolDefinitionPath: "./protocol_definitions/" + protocolDefinitionFileName,
     workerPath: (isDeployment? "./js/worker/RhubarbWorker.min.js": "/js/third_party/RhubarbWorker.min.js"),
     serverAddress: isDeployment? serverWSURL: developmentServerWSURL,
     onReady: onReady,
