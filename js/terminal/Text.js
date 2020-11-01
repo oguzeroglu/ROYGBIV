@@ -251,6 +251,7 @@ var Text = function(){
   this.OBJECT_CANNOT_SET_MASS = "This object does not have a physics body as none of its children has a physics body.";
   this.PHYSICS_SIMPLIFIED = "Physics simplified.";
   this.PHYSICS_DESIMPLIFIED = "Physics desimplified.";
+  this.MOBILE_SIMULATION_GUI_OPENED = "Mobile simulation GUI opened.";
   this.NO_IMAGES_FOUND = "No images found.";
   this.COMMAND_EXECUTED_FOR_X_IMAGES = "Command executed for @@1 images.";
   this.NO_TEXTURE_FOUND = "No texture found.";

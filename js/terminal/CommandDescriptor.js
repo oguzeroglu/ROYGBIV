@@ -276,7 +276,8 @@ var CommandDescriptor = function(){
       1, //unbakeStaticLights
       0, //settings
       2, //bakeShadow
-      1 //unbakeShadow
+      1, //unbakeShadow
+      0 //mobileSimulation
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -555,7 +556,8 @@ var CommandDescriptor = function(){
     "unbakeStaticLights objectName",
     "settings",
     "bakeShadow objectName[1],objectName[2],...objectName[n] lightName",
-    "unbakeShadow objectName[1],objectName[2],...objectName[n]"
+    "unbakeShadow objectName[1],objectName[2],...objectName[n]",
+    "mobileSimulation"
   ];
 
   this.commands = [
@@ -834,7 +836,8 @@ var CommandDescriptor = function(){
     "unbakeStaticLights",
     "settings",
     "bakeShadow",
-    "unbakeShadow"
+    "unbakeShadow",
+    "mobileSimulation"
   ];
 
   this.commandInfo = [
@@ -1113,7 +1116,8 @@ var CommandDescriptor = function(){
     "unbakeStaticLights: Unbakes static lights for given object which has baked static lights.",
     "settings: Shows the project settings GUI.",
     "bakeShadow: Bakes shadows from given light on given objects.",
-    "unbakeShadow: Unbakes shadows on given objects."
+    "unbakeShadow: Unbakes shadows on given objects.",
+    "mobileSimulation: Opens the mobile simulation GUI."
   ];
 
   this.keyboardInfo = [

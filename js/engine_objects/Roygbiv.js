@@ -2247,7 +2247,7 @@ Roygbiv.prototype.removeScreenDragListener = function(){
 // Sets a listener for orientation change events. For mobile devices, the callbackFunction is executed with
 // isLandscape parameter when the orientation is changed.
 Roygbiv.prototype.setScreenOrientationChangeListener = function(callbackFunction){
-  if (mode == 0 || !isMobile){
+  if (mode == 0 || (!isMobile && !mobileSimulation.isActive)){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.setScreenOrientationChangeListener, preConditions.callbackFunction, callbackFunction);
@@ -2257,7 +2257,7 @@ Roygbiv.prototype.setScreenOrientationChangeListener = function(callbackFunction
 
 // Removes the listener for orientation change events.
 Roygbiv.prototype.removeScreenOrientationChangeListener = function(){
-  if (mode == 0 || !isMobile){
+  if (mode == 0 || (!isMobile && !mobileSimulation.isActive)){
     return;
   }
   screenOrientationChangeCallbackFunction = noop;
@@ -4874,7 +4874,7 @@ Roygbiv.prototype.isMobile = function(){
   if (mode == 0){
     return;
   }
-  return isMobile;
+  return isMobile || mobileSimulation.isActive;
 }
 
 // Linearly interpolate between vector1 and vector2. The result is vector1 if
@@ -4968,6 +4968,11 @@ Roygbiv.prototype.isOrientationLandscape = function(){
   if (mode == 0){
     return;
   }
+
+  if (mobileSimulation.isActive){
+    return mobileSimulation.orientation == "landscape";
+  }
+
   if (!isMobile){
     return false;
   }
@@ -5175,8 +5180,8 @@ Roygbiv.prototype.getClientDetails = function(){
   }
   if (!CLIENT_DETAILS){
     CLIENT_DETAILS = {
-      isMobile: isMobile,
-      isIOS: isIOS,
+      isMobile: isMobile || mobileSimulation.isActive,
+      isIOS: isIOS || (mobileSimulation.isActive && mobileSimulation.isIOS),
       isWebGLFriendly: isWebGLFriendly,
       astcSupported: ASTC_SUPPORTED,
       s3tcSupported: S3TC_SUPPORTED,
@@ -5184,6 +5189,9 @@ Roygbiv.prototype.getClientDetails = function(){
       highPrecisionSupported: HIGH_PRECISION_SUPPORTED,
       browser: BROWSER_NAME
     };
+  }else{
+    CLIENT_DETAILS.isMobile = isMobile || mobileSimulation.isActive;
+    CLIENT_DETAILS.isIOS = isIOS || (mobileSimulation.isActive && mobileSimulation.isIOS);
   }
   return CLIENT_DETAILS;
 }

@@ -393,6 +393,11 @@ StateLoader.prototype.resetProject = function(){
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;
   INSTANCING_DISABLED = false;
+  mobileSimulation = {
+    isActive: false,
+    isIOS: false,
+    orientation: 'portrait'
+  };
   if (!isDeployment){
     selectionHandler.resetCurrentSelection();
   }

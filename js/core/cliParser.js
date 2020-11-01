@@ -6615,6 +6615,14 @@ function parse(input){
           shadowBaker.batchUnbake(objAry);
           return true;
         break;
+        case 276: //mobileSimulation
+          if (guiHandler.datGuiMobileSimulation){
+            terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
+            return true;
+          }
+          mobileSimulationGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){
