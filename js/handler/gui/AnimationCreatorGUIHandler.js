@@ -387,6 +387,10 @@ AnimationCreatorGUIHandler.prototype.close = function(object){
   activeControl.onActivated();
   camera.quaternion.set(0, 0, 0, 1);
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
+
+  if (object.hiddenInDesignMode){
+    object.hideInDesignMode(true);
+  }
 }
 
 AnimationCreatorGUIHandler.prototype.show = function(object){
