@@ -3750,6 +3750,7 @@ Roygbiv.prototype.setSpriteWidth = function(sprite, widthPercent){
   preConditions.checkIfNumber(ROYGBIV.setSpriteWidth, preConditions.widthPercent, widthPercent);
   preConditions.checkIfSpriteHasFixedWidth(ROYGBIV.setSpriteWidth, sprite);
   preConditions.checkIfLessThan(ROYGBIV.setSpriteWidth, preConditions.widthPercent, widthPercent, 0);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteWidth, sprite);
   sprite.setWidthPercent(widthPercent);
   sprite.previewModeWidth = widthPercent;
 }
@@ -3765,6 +3766,7 @@ Roygbiv.prototype.setSpriteHeight = function(sprite, heightPercent){
   preConditions.checkIfNumber(ROYGBIV.setSpriteHeight, preConditions.heightPercent, heightPercent);
   preConditions.checkIfSpriteHasFixedHeight(ROYGBIV.setSpriteHeight, sprite);
   preConditions.checkIfLessThan(ROYGBIV.setSpriteHeight, preConditions.heightPercent, heightPercent, 0);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteHeight, sprite);
   sprite.setHeightPercent(heightPercent);
   sprite.previewModeHeight = heightPercent;
 }
@@ -3866,6 +3868,7 @@ Roygbiv.prototype.hideContainer = function(container){
   }
   preConditions.checkIfDefined(ROYGBIV.hideContainer, preConditions.container, container);
   preConditions.checkIfContainer(ROYGBIV.hideContainer, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.hideContainer, container);
   container.hide();
 }
 
@@ -3876,6 +3879,7 @@ Roygbiv.prototype.showContainer = function(container){
   }
   preConditions.checkIfDefined(ROYGBIV.showContainer, preConditions.container, container);
   preConditions.checkIfContainer(ROYGBIV.showContainer, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.showContainer, container);
   container.show();
 }
 
