@@ -4,7 +4,8 @@ var bodyParser = require("body-parser");
 var fs = require("fs");
 var path = require("path");
 var childProcess = require("child_process");
-var sizeOf = require('image-size');
+var sizeOf = require("image-size");
+var minify = require("minify");
 
 console.log("*******************************************")
 console.log( " ____   _____   ______ ____ _____     __ ");
@@ -41,17 +42,27 @@ app.post("/build", function(req, res){
       return;
     }
     var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS);
-    fs.writeFileSync("deploy/"+req.body.projectName+"/js/roygbiv.js", handleScripts(req.body, engineScriptsConcatted));
-    fs.writeFileSync("deploy/"+req.body.projectName+"/js/application.json", JSON.stringify(req.body));
-    copyAssets(req.body);
-    copyWorkers(req.body);
-    copyProtocolDefinitionFile(req.body);
+    var roygbivPath = "deploy/"+req.body.projectName+"/js/roygbiv.js";
+    fs.writeFileSync(roygbivPath, handleScripts(req.body, engineScriptsConcatted));
+    minify(roygbivPath).then(function(minified){
+      fs.unlinkSync(roygbivPath);
+      fs.writeFileSync(roygbivPath, minified);
+      fs.writeFileSync("deploy/"+req.body.projectName+"/js/application.json", JSON.stringify(req.body));
+      copyAssets(req.body);
+      copyWorkers(req.body);
+      copyProtocolDefinitionFile(req.body);
+      res.send(JSON.stringify({"path": __dirname+"/deploy/"+req.body.projectName+"/"}));
+      return;
+    }).catch(function(err){
+      res.send(JSON.stringify({"error": "Build error: "+err.message}));
+      throw new Error(err);
+      return;
+    });
   }catch (err){
     res.send(JSON.stringify({"error": "Build error: "+err.message}));
     throw new Error(err);
     return;
   }
-  res.send(JSON.stringify({"path": __dirname+"/deploy/"+req.body.projectName+"/"}));
 });
 
 app.post("/getTexturePackFolders", function(req, res){
@@ -705,7 +716,6 @@ function copyFolderRecursiveSync( source, target ) {
     } );
   }
 }
-
 
 function runScript(scriptPath, params, callback) {
   var invoked = false;
