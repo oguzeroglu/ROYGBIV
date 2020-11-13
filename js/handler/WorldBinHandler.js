@@ -211,6 +211,8 @@ WorldBinHandler.prototype.query = function(point){
                 results[objName] = 10;
               }else if (addedTexts[objName]){
                 results[objName] = 20;
+              }else if (masses[objName]){
+                results[objName] = 30;
               }
             }
           }

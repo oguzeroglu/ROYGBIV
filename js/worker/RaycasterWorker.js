@@ -20,6 +20,7 @@ importScripts("../engine_objects/Rectangle.js");
 importScripts("../engine_objects/Sprite.js");
 importScripts("../engine_objects/Container2D.js");
 importScripts("../engine_objects/VirtualKeyboard.js");
+importScripts("../engine_objects/Mass.js");
 
 var IS_WORKER_CONTEXT = true;
 var objectPicker2D = new ObjectPicker2D();
@@ -46,6 +47,7 @@ RaycasterWorker.prototype.refresh = function(state){
   stateLoader.loadRenderer();
   stateLoader.loadBoundingBoxes();
   stateLoader.loadParticleSystems();
+
   var idCounter = 0;
   var psIDCounter = 0;
   var idResponse = [];
@@ -97,6 +99,12 @@ RaycasterWorker.prototype.refresh = function(state){
       this.workerIDsByObjectName[containerName] = container.workerID;
       this.objectsByWorkerID[container.workerID] = container;
     }
+  }
+  for (var massName in masses){
+    masses[massName].workerID = idCounter ++;
+    idResponse.push({type: "mass", name: massName, id: masses[massName].workerID});
+    this.workerIDsByObjectName[massName] = masses[massName].workerID;
+    this.objectsByWorkerID[masses[massName].workerID] = masses[massName];
   }
   for (var psName in particleSystemPool){
     particleSystemPool[psName].workerID = psIDCounter ++;

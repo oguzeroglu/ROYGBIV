@@ -58,6 +58,8 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   var spriteExports = this.state.sprites;
   var containerExports = this.state.containers;
   var virtualKeyboardExports = this.state.virtualKeyboards;
+  var massesExports = this.state.masses;
+
   var addedTextExports = new Object();
   for (var key in this.state.addedTexts3D){
     addedTextExports[key] = this.state.addedTexts3D[key];
@@ -253,6 +255,11 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   for (var virtualKeyboardName in virtualKeyboardExports){
     this.virtualKeyboardImportFunc(virtualKeyboardName, virtualKeyboardExports[virtualKeyboardName]);
   }
+  for (var massName in massesExports){
+    var mass = new Mass(massName, new THREE.Vector3(), new THREE.Vector3());
+    mass.import(massesExports[massName], true);
+    masses[massName] = mass;
+  }
 }
 
 StateLoaderLightweight.prototype.virtualKeyboardImportFunc = function(virtualKeyboardName, curExport){
@@ -420,7 +427,6 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
       objectGroups[objName].setSlippery(true);
     }
   }
-
   for (var massName in massExports){
     var curMassExport = massExports[massName];
     var mass = new Mass(massName, new CANNON.Vec3(), new CANNON.Vec3());
@@ -467,6 +473,7 @@ StateLoaderLightweight.prototype.reset = function(){
   containers = new Object();
   childContainers = new Object();
   virtualKeyboards = new Object();
+  masses = new Object();
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;

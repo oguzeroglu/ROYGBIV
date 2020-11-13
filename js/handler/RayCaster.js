@@ -102,6 +102,12 @@ RayCaster.prototype.refresh = function(){
         this.binHandler.insert(addedText.boundingBox, txtName);
       }
     }
+    for (var massName in this.getMasses()){
+      var mass = masses[massName];
+      if (mass.isIntersectable){
+        this.binHandler.insert(mass.getBoundingBox(), massName);
+      }
+    }
   }
   this.onReady();
 }
@@ -177,6 +183,16 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
         var addedText = addedTexts[objName];
         if (addedText && addedText.plane){
           intersectionPoint = addedText.intersectsLine(REUSABLE_LINE);
+          if (intersectionPoint){
+            intersectionObject = objName;
+            callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
+            return;
+          }
+        }
+      }else if (result == 30){
+        var mass = masses[objName];
+        if (mass){
+          intersectionPoint = mass.intersectsLine(REUSABLE_LINE);
           if (intersectionPoint){
             intersectionObject = objName;
             callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
@@ -260,6 +276,13 @@ RayCaster.prototype.getAddedTexts = function(){
     return addedTexts;
   }
   return sceneHandler.getAddedTexts();
+}
+
+RayCaster.prototype.getMasses = function(){
+  if (IS_WORKER_CONTEXT){
+    return masses;
+  }
+  return sceneHandler.getMasses();
 }
 
 RayCaster.prototype.onActiveVirtualKeyboardChanged = noop;

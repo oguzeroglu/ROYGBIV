@@ -624,6 +624,9 @@ function onRaycasterIntersection(){
      if (!object){
        object = childContainers[intersectionObject];
      }
+     if (!object){
+       object = masses[intersectionObject];
+     }
      if (object.isAddedObject || object.isObjectGroup){
        if (!isDeployment && mode == 0){
          terminal.clear();
