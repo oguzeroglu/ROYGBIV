@@ -1495,6 +1495,10 @@ ImportHandler.prototype.importSprites = function(obj){
       var curAnimationExport = curExport.animations[animationName];
       sprite.addAnimation(new Animation(animationName, curAnimationExport.type, sprite, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
     }
+
+    if ((typeof curExport.customRenderOrder) != UNDEFINED){
+      sprite.setCustomRenderOrder(curExport.customRenderOrder);
+    }
   }
 }
 

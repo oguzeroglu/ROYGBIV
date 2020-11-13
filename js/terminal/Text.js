@@ -181,6 +181,7 @@ var Text = function(){
   this.INVALID_NUMERICAL_VALUE = "Invalid numerical value.";
   this.INVALID_VECTOR_VALUE = "Invalid vector value.";
   this.CONTAINER_SELECTED = "Container selected.";
+  this.RENDER_ORDER_SET = "Render order set.";
   this.VIRTUAL_KEYBOARD_SELECTED = "Virtual keyboard selected.";
   this.TEXTS_HAVE_DIFFERENT_DIMENSIONS = "Texts have different dimensions.";
   this.TEXTS_ARE_THE_SAME = "Texts are the same.";

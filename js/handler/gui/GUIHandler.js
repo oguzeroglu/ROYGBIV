@@ -117,7 +117,8 @@ var GUIHandler = function(){
     "Draggable": false,
     "Crop X": 0.01,
     "Crop Y": 0.01,
-    "Hidden": false
+    "Hidden": false,
+    "Render order": "" + renderOrders.SPRITE
   };
   this.containerManipulationParameters = {
     "Container": "containerName",
@@ -401,6 +402,7 @@ GUIHandler.prototype.afterSpriteSelection = function(){
     guiHandler.spriteManipulationParameters["Height %"] = (!(typeof curSelection.fixedHeight == UNDEFINED)) ? (curSelection.fixedHeight) : 50;
     guiHandler.spriteManipulationParameters["Height fixed"] = !(typeof curSelection.fixedHeight == UNDEFINED);
     guiHandler.spriteManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
+    guiHandler.spriteManipulationParameters["Render order"] = "" + ((typeof curSelection.customRenderOrder == UNDEFINED)? renderOrders.SPRITE: curSelection.customRenderOrder);
     if (!curSelection.isTextured){
       guiHandler.disableController(guiHandler.spriteManipulationTextureController);
     }
@@ -2193,6 +2195,16 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
   }).listen();
   guiHandler.spriteManipulationAlphaController = graphicsFolder.add(guiHandler.spriteManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setAlpha(val);
+  }).listen();
+  graphicsFolder.add(guiHandler.spriteManipulationParameters, "Render order").onFinishChange(function(val){
+    terminal.clear();
+    var parsed = parseFloat(val);
+    if (isNaN(parsed)){
+      terminal.printError(Text.INVALID_NUMERICAL_VALUE);
+      return;
+    }
+    selectionHandler.getSelectedObject().setCustomRenderOrder(parsed);
+    terminal.printInfo(Text.RENDER_ORDER_SET);
   }).listen();
 
   // MARGIN

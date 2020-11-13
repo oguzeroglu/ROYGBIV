@@ -26,6 +26,11 @@ var Sprite = function(name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+Sprite.prototype.setCustomRenderOrder = function(customRenderOrder){
+  this.customRenderOrder = customRenderOrder;
+  this.mesh.renderOrder = customRenderOrder;
+}
+
 Sprite.prototype.showInDesignMode = function(){
   if (isDeployment){
     return;
@@ -273,7 +278,8 @@ Sprite.prototype.export = function(){
     originalWidthReference: this.originalWidthReference,
     originalHeightReference: this.originalHeightReference,
     originalScreenResolution: this.originalScreenResolution,
-    hiddenInDesignMode: !!this.hiddenInDesignMode
+    hiddenInDesignMode: !!this.hiddenInDesignMode,
+    customRenderOrder: this.customRenderOrder
   };
 }
 
