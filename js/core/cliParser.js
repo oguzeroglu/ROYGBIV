@@ -6165,8 +6165,7 @@ function parse(input){
 
           var height = parseFloat(splitted[2]);
 
-          if (masses[massID]){
-            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+          if (!checkIfNameUnique(massID, Text.ID_MUST_BE_UNIQUE)){
             return true;
           }
 
@@ -6795,7 +6794,7 @@ function isNameUsedAsSoftCopyParentName(name){
 }
 
 function checkIfNameUnique(name, errorMsg){
-  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name] || virtualKeyboards[name]){
+  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name] || virtualKeyboards[name] || masses[name]){
     terminal.printError(errorMsg);
     return false;
   }
