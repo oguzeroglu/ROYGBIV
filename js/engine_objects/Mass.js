@@ -1,4 +1,5 @@
 var Mass = function(name, center, size){
+  this.isMass = true;
   this.name = name;
   this.center = center.clone();
   this.size= size.clone();
@@ -6,6 +7,22 @@ var Mass = function(name, center, size){
   if (!(this.size.x == 0 && this.size.y == 0 && this.size.z == 0)){
     this.constructPhysicsBody();
   }
+}
+
+Mass.prototype.visualise = function(){
+  if (!this.bbHelper){
+    var bbHelper = new THREE.Box3Helper(this.getBoundingBox(), LIME_COLOR);
+    this.bbHelper = bbHelper;
+  }
+
+  scene.add(this.bbHelper);
+}
+
+Mass.prototype.unVisualise = function(){
+  if (!this.bbHelper){
+    return;
+  }
+  scene.remove(this.bbHelper);
 }
 
 Mass.prototype.intersectsLine = function(line){

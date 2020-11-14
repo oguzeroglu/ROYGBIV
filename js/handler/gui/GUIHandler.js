@@ -143,7 +143,11 @@ var GUIHandler = function(){
   this.virtualKeyboardManipulationParameters = {
     "Virtual Keyboard": "virtualKeyboardName",
     "Hidden": false
-  }
+  };
+  this.massManipulationParameters = {
+    "Mass": "",
+    "Intersectable": false
+  };
   this.bloomParameters = {
     "Threshold": 0.0,
     "Active": false,
@@ -168,7 +172,7 @@ var GUIHandler = function(){
     CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
     JUMP_DESCRIPTOR_CREATION: 23, KNOWLEDGE_CREATION: 24, DECISION_CREATION: 25, DECISION_TREE_CREATION: 26,
     STATE_CREATION: 27, TRANSITION_CREATION: 28, STATE_MACHINE_CREATION: 29, VIRTUAL_KEYBOARD: 30, SETTINGS: 31,
-    MOBILE_SIMULATION: 32
+    MOBILE_SIMULATION: 32, MASS: 33
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -371,6 +375,22 @@ GUIHandler.prototype.afterVirtualKeyboardSelection = function(){
     guiHandler.virtualKeyboardManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
   }else{
     guiHandler.hide(guiHandler.guiTypes.VIRTUAL_KEYBOARD);
+  }
+  guiHandler.afterMassSelection();
+}
+
+GUIHandler.prototype.afterMassSelection = function(){
+  if (mode != 0){
+    return;
+  }
+
+  var curSelection = selectionHandler.getSelectedObject();
+  if (curSelection && curSelection.isMass){
+    guiHandler.show(guiHandler.guiTypes.MASS);
+    guiHandler.massManipulationParameters["Mass"] = curSelection.name;
+    guiHandler.massManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
+  }else{
+    guiHandler.hide(guiHandler.guiTypes.MASS);
   }
 }
 
@@ -1033,6 +1053,11 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeVirtualKeyboardGUI();
       }
     return;
+    case this.guiTypes.MASS:
+      if (!this.datGuiMassManipulation){
+        this.initializeMassManipulationGUI();
+      }
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -1251,6 +1276,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiMobileSimulation){
         this.destroyGUI(this.datGuiMobileSimulation);
         this.datGuiMobileSimulation = 0;
+      }
+    return;
+    case this.guiTypes.MASS:
+      if (this.datGuiMassManipulation){
+        this.destroyGUI(this.datGuiMassManipulation);
+        this.datGuiMassManipulation = 0;
       }
     return;
   }
@@ -2000,13 +2031,25 @@ GUIHandler.prototype.initializeVirtualKeyboardGUI = function(){
     vkGUIFocused = true;
   });
 
-  guiHandler.datGuiVirtualKeyboard.add(guiHandler.virtualKeyboardManipulationParameters, "Virtual Keyboard").listen();
+  guiHandler.disableController(guiHandler.datGuiVirtualKeyboard.add(guiHandler.virtualKeyboardManipulationParameters, "Virtual Keyboard").listen());
   guiHandler.datGuiVirtualKeyboard.add(guiHandler.virtualKeyboardManipulationParameters, "Hidden").onChange(function(val){
     if (val){
       selectionHandler.getSelectedObject().hideInDesignMode();
     }else{
       selectionHandler.getSelectedObject().showInDesignMode();
     }
+  }).listen();
+}
+
+GUIHandler.prototype.initializeMassManipulationGUI = function(){
+  guiHandler.datGuiMassManipulation = new dat.GUI({hideable: false, width: 420});
+  guiHandler.datGuiMassManipulation.domElement.addEventListener("mousedown", function(e){
+    mmGUIFocused = true;
+  });
+
+  guiHandler.disableController(guiHandler.datGuiMassManipulation.add(guiHandler.massManipulationParameters, "Mass").listen());
+  guiHandler.datGuiMassManipulation.add(guiHandler.massManipulationParameters, "Intersectable").onChange(function(val){
+    selectionHandler.getSelectedObject().setIntersectable(val);
   }).listen();
 }
 

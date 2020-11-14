@@ -38,6 +38,10 @@ SelectionHandler.prototype.select = function(object){
   if (object.isVirtualKeyboard){
     selectedVirtualKeyboard = object;
   }
+  if (object.isMass){
+    object.visualise();
+    selectedMass = object;
+  }
   this.currentSelection = object;
 }
 
@@ -59,6 +63,9 @@ SelectionHandler.prototype.getSelectedObject = function(){
   }
   if (selectedVirtualKeyboard){
     return selectedVirtualKeyboard;
+  }
+  if (selectedMass){
+    return selectedMass;
   }
   return 0;
 }
@@ -93,6 +100,9 @@ SelectionHandler.prototype.resetCurrentSelection = function(){
     }
   }else if (this.currentSelection.isVirtualKeyboard){
     selectedVirtualKeyboard = 0;
+  }else if (this.currentSelection.isMass){
+    selectedMass.unVisualise();
+    selectedMass = 0;
   }
   this.currentSelection = 0;
   if (!isDeployment){

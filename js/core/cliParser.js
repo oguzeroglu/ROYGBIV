@@ -6247,31 +6247,27 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
           var massID = splitted[1];
-
           if (!(massID.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
           }
-
           var mass = masses[massID];
-
           if (!mass){
             terminal.printError(Text.NO_SUCH_MASS);
             return true;
           }
-
+          if (mass.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.MASS_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
           delete masses[massID];
           sceneHandler.onMassDeletion(mass);
-
           if (physicsDebugMode){
             parseCommand("switchPhysicsDebugMode");
             parseCommand("switchPhysicsDebugMode");
           }
-
           terminal.clear();
-
           if (!jobHandlerWorking){
             terminal.printInfo(Text.MASS_DESTROYED);
           }
@@ -6621,6 +6617,25 @@ function parse(input){
             return true;
           }
           mobileSimulationGUIHandler.show();
+          return true;
+        break;
+        case 277: //selectMass
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var massName = splitted[1];
+          if (!masses[massName]){
+            terminal.printError(Text.NO_SUCH_MASS);
+            return true;
+          }
+          if (masses[massName].registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.MASS_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          selectionHandler.select(masses[massName]);
+          guiHandler.afterObjectSelection();
+          terminal.printInfo(Text.MASS_SELECTED);
           return true;
         break;
       }
