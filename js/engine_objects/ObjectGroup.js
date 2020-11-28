@@ -582,9 +582,6 @@ ObjectGroup.prototype.handleRotation = function(axis, radians){
   }
   this.rotate(axis, radians, true);
   physicsWorld.updateObject(this, false, true);
-  if (this.autoInstancedParent){
-    this.autoInstancedParent.updateObject(this);
-  }
 }
 
 ObjectGroup.prototype.untrackObjectPosition = function(){
@@ -2757,6 +2754,24 @@ ObjectGroup.prototype.resetRotation = function(){
   if (this.autoInstancedParent){
     this.autoInstancedParent.updateObject(this);
   }
+
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
+  }
+}
+
+ObjectGroup.prototype.lookAt = function(x, y, z){
+  this.mesh.lookAt(x, y, z);
+
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  }else{
+    this.updateSimplifiedPhysicsBody();
+  }
+
+  physicsWorld.updateObject(this, false, true);
 
   if (this.mesh.visible){
     rayCaster.updateObject(this);

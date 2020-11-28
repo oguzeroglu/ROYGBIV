@@ -1381,7 +1381,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ONSCENEEXIT = "Sets an exit callback function for given scene. The callback function is executed before the scene changes.";
   this.ROYGBIV_SCRIPTING_API_REMOVESCENEEXITLISTENER = "Removes a scene exit listener for given scene.";
   this.ROYGBIV_SCRIPTING_API_SETSTEERABLELOOKDIRECTION = "Sets the look direction of given steerable. Unlike setSteerableLookTarget API which eventually makes a steerable\ngradually look at given target depending on the lookSpeed of the steerable, this API immediately modifies the look\ndirection.";
-  this.ROYGBIV_SCRIPTING_API_GETSTEERABLELOOKDIRECTION = "Fills the targetVectot with the look direction of given steerable object and returns it.";
+  this.ROYGBIV_SCRIPTING_API_GETSTEERABLELOOKDIRECTION = "Fills the targetVector with the look direction of given steerable object and returns it.";
   this.ROYGBIV_SCRIPTING_API_SETOBJECTROTATIONMODE = "Sets the rotation mode of given object. rotationMode parameter may be either ROYGBIV.rotationModes.LOCAL or ROYGBIV.rotationModes.WORLD.\nLocal rotation mode indicates objects rotating around their own local axis unlike the world axis.";
   this.ROYGBIV_SCRIPTING_API_RESETOBJECTROTATION = "Resets all the rotations applied to given object.";
   this.ROYGBIV_SCRIPTING_API_RESETRANDOMPATHBEHAVIOR = "Ensures the RandomPathBehavior tries to start from the closest graph vertex to given steerable. This API may be useful\nwhen the random path behavior of object is changed to some other behavior before the object reaches to the destination vertex,\nand then the random path behavior is activated again. If given behavior is a blended or a priority steering behavior,\nthe child random path behaviors are reset.";
@@ -1422,4 +1422,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETSPRITEWIDTH = "Sets the width of given sprite.";
   this.ROYGBIV_SCRIPTING_API_SETSPRITEHEIGHT = "Sets the height of given sprite.";
   this.ROYGBIV_SCRIPTING_API_CANCELPOINTERLOCKREQUESTS = "Cancels existing pointer lock requests.";
+  this.ROYGBIV_SCRIPTING_API_MAKEOBJECTLOOKAT = "Rotates an object and makes it look at given (x, y, z) coordinate.";
 }

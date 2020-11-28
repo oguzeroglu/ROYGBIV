@@ -343,7 +343,8 @@ var Roygbiv = function(){
     "boundingBoxIntersectionTest",
     "setSpriteWidth",
     "setSpriteHeight",
-    "cancelPointerLockRequests"
+    "cancelPointerLockRequests",
+    "makeObjectLookAt"
   ];
 
   this.globals = new Object();
@@ -1316,6 +1317,25 @@ Roygbiv.prototype.resetObjectRotation = function(object){
   preConditions.checkIfChangeable(ROYGBIV.rotate, preConditions.object, object);
 
   object.resetRotation();
+}
+
+// Rotates an object and makes it look at given (x, y, z) coordinate.
+Roygbiv.prototype.makeObjectLookAt = function(object, x, y, z){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.makeObjectLookAt, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.makeObjectLookAt, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.makeObjectLookAt, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.makeObjectLookAt, preConditions.z, z);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.makeObjectLookAt, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.makeObjectLookAt, object);
+  preConditions.checkIfChangeable(ROYGBIV.makeObjectLookAt, preConditions.object, object);
+  preConditions.checkIfNumber(ROYGBIV.makeObjectLookAt, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.makeObjectLookAt, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.makeObjectLookAt, preConditions.z, z);
+
+  object.lookAt(x, y, z);
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************
@@ -4301,7 +4321,7 @@ Roygbiv.prototype.setSteerableLookDirection = function(object, lookDirectionVect
   steeringHandler.setLookDirection(object, lookDirectionVector);
 }
 
-// Fills the targetVectot with the look direction of given steerable object and returns it.
+// Fills the targetVector with the look direction of given steerable object and returns it.
 Roygbiv.prototype.getSteerableLookDirection = function(object, targetVector){
   if (mode == 0){
     return;
