@@ -134,6 +134,18 @@ app.post("/getScripts", function(req, res){
   res.send(JSON.stringify(scriptDescription));
 });
 
+app.post("/getModules", function(req, res){
+  console.log("[*] Getting modules.");
+  res.setHeader("Content-Type", "application/json");
+  var modules = [];
+  fs.readdirSync("./modules/").forEach(file => {
+    if (file.endsWith(".js")){
+      modules.push(file.split(".").slice(0, -1).join("."));
+    }
+  });
+  res.send(JSON.stringify(modules));
+});
+
 app.post("/getTexturePackInfo", async function(req, res){
   res.setHeader('Content-Type', 'application/json');
   var mainPath = "./texture_packs/"+req.body.texturePackName;
@@ -660,7 +672,7 @@ function readEngineScripts(projectName, author, enableAntialias, modules){
         console.log("[*] Skipping SelectionHandler.");
         continue;
       }else if (scriptPath.includes("GUIHandler.js")){
-        console.log("[*] Skipping GUI handlers.");
+        console.log("[*] Skipping a GUI handler.");
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");

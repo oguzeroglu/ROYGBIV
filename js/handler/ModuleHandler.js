@@ -48,3 +48,15 @@ ModuleHandler.prototype.removeModule = function(fileName){
   document.head.removeChild(scriptTag);
   delete this.includedModules[fileName];
 }
+
+ModuleHandler.prototype.getFiles = function(callback){
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/getModules", true);
+  xhr.setRequestHeader("Content-type", "application/json");
+  xhr.onreadystatechange = function (){
+    if (xhr.readyState == 4 && xhr.status == 200){
+      callback(JSON.parse(xhr.responseText));
+    }
+  }
+  xhr.send();
+}

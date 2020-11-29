@@ -74,6 +74,7 @@ window.onload = function() {
   if (!isDeployment){
     objectExportImportHandler = new ObjectExportImportHandler();
     selectionHandler = new SelectionHandler();
+    moduleHandler = new ModuleHandler();
     particleSystemCreatorGUIHandler = new ParticleSystemCreatorGUIHandler();
     muzzleFlashCreatorGUIHandler = new MuzzleFlashCreatorGUIHandler();
     fpsWeaponGUIHandler = new FPSWeaponGUIHandler();
@@ -98,8 +99,7 @@ window.onload = function() {
     stateMachineCreatorGUIHandler = new StateMachineCreatorGUIHandler();
     settingsGUIHandler = new SettingsGUIHandler();
     mobileSimulationGUIHandler = new MobileSimulationGUIHandler();
-
-    moduleHandler = new ModuleHandler();
+    moduleCreatorGUIHandler = new ModuleCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
