@@ -6637,6 +6637,14 @@ function parse(input){
           terminal.printInfo(Text.MASS_SELECTED);
           return true;
         break;
+        case 278: //modules
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          moduleCreatorGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){
