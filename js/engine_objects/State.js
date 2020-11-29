@@ -193,4 +193,6 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   this.decisionHandler = decisionHandler.export();
   // SHADOW BAKER **************************************************
   this.shadowBaker = shadowBaker.export(isBuildingForDeploymentMode);
+  // MODULE HANDLER ************************************************
+  this.modules = moduleHandler.export();
 }

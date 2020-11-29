@@ -41,7 +41,7 @@ app.post("/build", function(req, res){
       res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
       return;
     }
-    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS);
+    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS, req.body.modules);
     var roygbivPath = "deploy/"+req.body.projectName+"/js/roygbiv.js";
     fs.writeFileSync(roygbivPath, handleScripts(req.body, engineScriptsConcatted));
     minify(roygbivPath).then(function(minified){
@@ -609,7 +609,7 @@ function generateDeployDirectory(projectName, application){
   return true;
 }
 
-function readEngineScripts(projectName, author, enableAntialias){
+function readEngineScripts(projectName, author, enableAntialias, modules){
   var content = "";
   var htmlContent = fs.readFileSync("roygbiv.html", "utf8");
   htmlContent = htmlContent.replace("three.js", "three.min.js");
@@ -674,9 +674,17 @@ function readEngineScripts(projectName, author, enableAntialias){
       }else if (scriptPath.includes("mermaid.min.js")){
         console.log("[*] Skipping mermaid.");
         continue;
+      }else if (scriptPath.includes("ModuleHandler.js")){
+        console.log("[*] Skipping ModuleHandler");
+        continue;
       }
       content += scriptContent +"\n";
     }
+  }
+  for (var i = 0; i < modules.length; i ++){
+    var modulePath = "./modules/" + modules[i] + ".js";
+    var moduleContent = fs.readFileSync(modulePath, "utf8");
+    content += moduleContent + "\n";
   }
   return content;
 }

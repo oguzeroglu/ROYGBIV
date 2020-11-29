@@ -1,2 +1,2 @@
-This folder contains the injected modules for a project. Use "injectModule" CLI
+This folder contains the injected modules for a project. Use "modules" CLI
 command to include modules to your project from this folder.

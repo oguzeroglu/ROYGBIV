@@ -98,6 +98,8 @@ window.onload = function() {
     stateMachineCreatorGUIHandler = new StateMachineCreatorGUIHandler();
     settingsGUIHandler = new SettingsGUIHandler();
     mobileSimulationGUIHandler = new MobileSimulationGUIHandler();
+
+    moduleHandler = new ModuleHandler();
   }
 
   // PHYSICS BODY GENERATOR

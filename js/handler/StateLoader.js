@@ -42,6 +42,11 @@ StateLoader.prototype.onShadowsLoaded = function(){
   this.finalize();
 }
 
+StateLoader.prototype.onModulesLoaded = function(){
+  this.modulesReady = true;
+  this.finalize();
+}
+
 StateLoader.prototype.load = function(){
   try{
     projectLoaded = false;
@@ -52,8 +57,10 @@ StateLoader.prototype.load = function(){
     this.hasSkyboxes = this.stateObj.totalSkyboxCount > 0;
     this.hasFonts = this.stateObj.totalFontCount > 0;
     this.hasShadows = Object.keys(this.stateObj.shadowBaker.textureRangesByObjectName).length > 0;
+    this.hasModules = !isDeployment && this.stateObj.modules.length > 0;
     this.textureAtlasReady = false;
     this.shadowReady = false;
+    this.modulesReady = false;
 
     this.importHandler.importEngineVariables(obj);
     this.importHandler.importGridSystems(obj);
@@ -67,7 +74,11 @@ StateLoader.prototype.load = function(){
     this.importHandler.importFonts(obj, this.onFontLoaded.bind(this));
     this.importHandler.importShadowBaker(obj, this.onShadowsLoaded.bind(this));
 
-    if (!this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts && !this.hasTextureAtlas && !this.hasShadows){
+    if (!isDeployment){
+      this.importHandler.importModules(obj, this.onModulesLoaded.bind(this));
+    }
+
+    if (!this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts && !this.hasTextureAtlas && !this.hasShadows && !this.hasModules){
       this.finalize();
     }
     return true;
@@ -85,7 +96,8 @@ StateLoader.prototype.shouldFinalize = function(){
     (this.hasTexturePacks && parseInt(this.totalLoadedTexturePackCount) < parseInt(this.stateObj.totalTexturePackCount)) ||
     (this.hasSkyboxes && parseInt(this.totalLoadedSkyboxCount) < parseInt(this.stateObj.totalSkyboxCount)) ||
     (this.hasFonts && parseInt(this.totalLoadedFontCount) < parseInt(this.stateObj.totalFontCount)) ||
-    (this.hasShadows && !this.shadowReady)
+    (this.hasShadows && !this.shadowReady) ||
+    (this.hasModules && !this.modulesReady)
   )
   return res;
 }
@@ -326,6 +338,9 @@ StateLoader.prototype.resetProject = function(){
   raycasterFactory.reset();
   physicsFactory.reset();
   shadowBaker.reset();
+  if (!isDeployment){
+    moduleHandler.reset();
+  }
   rayCaster = raycasterFactory.get();
   physicsWorld = physicsFactory.get();
   anchorGrid = 0;
