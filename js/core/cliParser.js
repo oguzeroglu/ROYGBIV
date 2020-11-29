@@ -1733,7 +1733,7 @@ function parse(input){
                   var stateLoader = new StateLoader(loadedState);
                   var result = stateLoader.load();
                   if (result){
-                    if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasShadows){
+                    if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasShadows || stateLoader.hasModules){
                       terminal.printInfo(Text.LOADING_PROJECT);
                       canvas.style.visibility = "hidden";
                       terminal.disable();
@@ -6635,6 +6635,14 @@ function parse(input){
           selectionHandler.select(masses[massName]);
           guiHandler.afterObjectSelection();
           terminal.printInfo(Text.MASS_SELECTED);
+          return true;
+        break;
+        case 278: //modules
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          moduleCreatorGUIHandler.show();
           return true;
         break;
       }

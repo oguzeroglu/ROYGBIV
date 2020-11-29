@@ -278,7 +278,8 @@ var CommandDescriptor = function(){
       2, //bakeShadow
       1, //unbakeShadow
       0, //mobileSimulation
-      1 //selectMass
+      1, //selectMass
+      0 //modules
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -559,7 +560,8 @@ var CommandDescriptor = function(){
     "bakeShadow objectName[1],objectName[2],...objectName[n] lightName",
     "unbakeShadow objectName[1],objectName[2],...objectName[n]",
     "mobileSimulation",
-    "selectMass massName"
+    "selectMass massName",
+    "modules"
   ];
 
   this.commands = [
@@ -840,7 +842,8 @@ var CommandDescriptor = function(){
     "bakeShadow",
     "unbakeShadow",
     "mobileSimulation",
-    "selectMass"
+    "selectMass",
+    "modules"
   ];
 
   this.commandInfo = [
@@ -1121,7 +1124,8 @@ var CommandDescriptor = function(){
     "bakeShadow: Bakes shadows from given light on given objects.",
     "unbakeShadow: Unbakes shadows on given objects.",
     "mobileSimulation: Opens the mobile simulation GUI.",
-    "selectMass: Selects a mass"
+    "selectMass: Selects a mass",
+    "modules: Opens module creation GUI."
   ];
 
   this.keyboardInfo = [

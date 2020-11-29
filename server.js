@@ -41,7 +41,7 @@ app.post("/build", function(req, res){
       res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
       return;
     }
-    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS);
+    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS, req.body.modules);
     var roygbivPath = "deploy/"+req.body.projectName+"/js/roygbiv.js";
     fs.writeFileSync(roygbivPath, handleScripts(req.body, engineScriptsConcatted));
     minify(roygbivPath).then(function(minified){
@@ -132,6 +132,18 @@ app.post("/getScripts", function(req, res){
   var scriptDescription = new Object();
   getScriptsInFolder("./scripts/", scriptDescription);
   res.send(JSON.stringify(scriptDescription));
+});
+
+app.post("/getModules", function(req, res){
+  console.log("[*] Getting modules.");
+  res.setHeader("Content-Type", "application/json");
+  var modules = [];
+  fs.readdirSync("./modules/").forEach(file => {
+    if (file.endsWith(".js")){
+      modules.push(file.split(".").slice(0, -1).join("."));
+    }
+  });
+  res.send(JSON.stringify(modules));
 });
 
 app.post("/getTexturePackInfo", async function(req, res){
@@ -609,7 +621,7 @@ function generateDeployDirectory(projectName, application){
   return true;
 }
 
-function readEngineScripts(projectName, author, enableAntialias){
+function readEngineScripts(projectName, author, enableAntialias, modules){
   var content = "";
   var htmlContent = fs.readFileSync("roygbiv.html", "utf8");
   htmlContent = htmlContent.replace("three.js", "three.min.js");
@@ -660,7 +672,7 @@ function readEngineScripts(projectName, author, enableAntialias){
         console.log("[*] Skipping SelectionHandler.");
         continue;
       }else if (scriptPath.includes("GUIHandler.js")){
-        console.log("[*] Skipping GUI handlers.");
+        console.log("[*] Skipping a GUI handler.");
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");
@@ -674,9 +686,17 @@ function readEngineScripts(projectName, author, enableAntialias){
       }else if (scriptPath.includes("mermaid.min.js")){
         console.log("[*] Skipping mermaid.");
         continue;
+      }else if (scriptPath.includes("ModuleHandler.js")){
+        console.log("[*] Skipping ModuleHandler");
+        continue;
       }
       content += scriptContent +"\n";
     }
+  }
+  for (var i = 0; i < modules.length; i ++){
+    var modulePath = "./modules/" + modules[i] + ".js";
+    var moduleContent = fs.readFileSync(modulePath, "utf8");
+    content += moduleContent + "\n";
   }
   return content;
 }
