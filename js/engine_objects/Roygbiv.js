@@ -345,7 +345,8 @@ var Roygbiv = function(){
     "cancelPointerLockRequests",
     "makeObjectLookAt",
     "vectorLength",
-    "vectorLengthSquare"
+    "vectorLengthSquare",
+    "getObjectVelocity"
   ];
 
   this.globals = new Object();
@@ -886,6 +887,26 @@ Roygbiv.prototype.getCurrentArea = function(){
   }
 
   return areaConfigurationsHandler.currentArea;
+}
+
+// Returns the velocity of given object.
+Roygbiv.prototype.getObjectVelocity = function(object, targetVector){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.getObjectVelocity, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.getObjectVelocity, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getObjectVelocity, object);
+  preConditions.checkIfDefined(ROYGBIV.getObjectVelocity, preConditions.targetVector, targetVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getObjectVelocity, preConditions.targetVector, targetVector);
+  preConditions.checkIfNoMass(ROYGBIV.getObjectVelocity, preConditions.object, object);
+
+  var velocity = object.physicsBody.velocity;
+  targetVector.x = velocity.x;
+  targetVector.y = velocity.y;
+  targetVector.z = velocity.z;
+  return targetVector;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -5238,8 +5259,8 @@ Roygbiv.prototype.vectorLengthSquare = function(vec){
     return;
   }
 
-  preConditions.checkIfDefined(ROYGBIV.vectorLength, preConditions.vec, vec);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.vectorLength, preConditions.vec, vec);
+  preConditions.checkIfDefined(ROYGBIV.vectorLengthSquare, preConditions.vec, vec);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.vectorLengthSquare, preConditions.vec, vec);
 
   REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
   return REUSABLE_VECTOR.lengthSq();
