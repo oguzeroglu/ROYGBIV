@@ -1422,4 +1422,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETSPRITEHEIGHT = "Sets the height of given sprite.";
   this.ROYGBIV_SCRIPTING_API_CANCELPOINTERLOCKREQUESTS = "Cancels existing pointer lock requests.";
   this.ROYGBIV_SCRIPTING_API_MAKEOBJECTLOOKAT = "Rotates an object and makes it look at given (x, y, z) coordinate.";
+  this.ROYGBIV_SCRIPTING_API_VECTORLENGTH = "Calculates and returns the length of given vector.";
+  this.ROYGBIV_SCRIPTING_API_VECTORLENGTHSQUARE = "Calcualtes and returns the square of the length of given vector.";
 }

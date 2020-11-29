@@ -343,7 +343,9 @@ var Roygbiv = function(){
     "setSpriteWidth",
     "setSpriteHeight",
     "cancelPointerLockRequests",
-    "makeObjectLookAt"
+    "makeObjectLookAt",
+    "vectorLength",
+    "vectorLengthSquare"
   ];
 
   this.globals = new Object();
@@ -5215,4 +5217,30 @@ Roygbiv.prototype.cancelPointerLockRequests = function(){
     return;
   }
   pointerLockRequested = false;
+}
+
+// Calculates and returns the length of given vector.
+Roygbiv.prototype.vectorLength = function(vec){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.vectorLength, preConditions.vec, vec);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.vectorLength, preConditions.vec, vec);
+
+  REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
+  return REUSABLE_VECTOR.length();
+}
+
+// Calcualtes and returns the square of the length of given vector.
+Roygbiv.prototype.vectorLengthSquare = function(vec){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.vectorLength, preConditions.vec, vec);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.vectorLength, preConditions.vec, vec);
+
+  REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
+  return REUSABLE_VECTOR.lengthSq();
 }
