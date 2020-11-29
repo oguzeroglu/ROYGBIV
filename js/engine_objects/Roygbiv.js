@@ -51,7 +51,6 @@ var Roygbiv = function(){
     "distance",
     "sub",
     "add",
-    "moveTowards",
     "applyForce",
     "rotate",
     "rotateAroundXYZ",
@@ -4560,34 +4559,6 @@ Roygbiv.prototype.add = function(vec1, vec2, targetVector){
   obj.y = vec1.y + vec2.y;
   obj.z = vec1.z + vec2.z;
   return obj;
-}
-
-//  Moves vec1 towards vec2 by given amount and returns the new position of vec1.
-//  Amount = 1 means that vec1 goes all the way towards vec2.
-Roygbiv.prototype.moveTowards = function(vec1, vec2, amount, targetVector){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.moveTowards, preConditions.vec1, vec1);
-  preConditions.checkIfDefined(ROYGBIV.moveTowards, preConditions.vec2, vec2);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.moveTowards, preConditions.vec1, vec1);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.moveTowards, preConditions.vec2, vec2);
-  preConditions.checkIfDefined(ROYGBIV.moveTowards, preConditions.amount, amount);
-  preConditions.checkIfNumber(ROYGBIV.moveTowards, preConditions.amount, amount);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.moveTowards, preConditions.targetVector, targetVector);
-  if (!(typeof targetVector == UNDEFINED)){
-    var diff = this.sub(vec2, vec1, targetVector);
-    targetVector.x = vec1.x + (amount * diff.x);
-    targetVector.y = vec1.y + (amount * diff.y);
-    targetVector.z = vec1.z + (amount * diff.z);
-    return targetVector;
-  }
-  var diff = this.sub(vec2, vec1);
-  var newVec = this.vector(0, 0, 0);
-  newVec.x = vec1.x + (amount * diff.x);
-  newVec.y = vec1.y + (amount * diff.y);
-  newVec.z = vec1.z + (amount * diff.z);
-  return newVec;
 }
 
 //  Creates a new color object from the given HTML color name.

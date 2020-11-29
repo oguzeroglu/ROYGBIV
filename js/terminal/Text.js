@@ -1011,7 +1011,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_DISTANCE = "Returns the distance between two vectors.";
   this.ROYGBIV_SCRIPTING_API_SUB = "Returns the substraction of two vectors.";
   this.ROYGBIV_SCRIPTING_API_ADD = "Returns the summation of two vectors.";
-  this.ROYGBIV_SCRIPTING_API_MOVETOWARDS = "Moves vec1 towards vec2 by given amount and returns the new position of vec1. If amount is 1, vec1 goes all the way towards vec2.";
   this.ROYGBIV_SCRIPTING_API_APPLYFORCE = "Applies a physical force to an object or a glued object from a given point.";
   this.ROYGBIV_SCRIPTING_API_ROTATE = "Rotates an object or a glued object around a given axis by given radians. The parameter axis must be one of ROYGBIV.axes.X,\nROYGBIV.axes.Y or ROYGBIV.axes.Z. Objects are rotated around their own centers, so their positions do not change when rotated\nusing this function. If object has a local rotation mode set, the rotation is performed around it's local axis, it's performed\naround the world axis otherwise.";
   this.ROYGBIV_SCRIPTING_API_ROTATEAROUNDXYZ = "Rotates an object or a glued object around the given (x, y, z). Unlike the rotate function, the positions of the objects\ncan change when rotated using this function. Note that axis must be one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.";
