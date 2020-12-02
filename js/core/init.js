@@ -100,6 +100,7 @@ window.onload = function() {
     settingsGUIHandler = new SettingsGUIHandler();
     mobileSimulationGUIHandler = new MobileSimulationGUIHandler();
     moduleCreatorGUIHandler = new ModuleCreatorGUIHandler();
+    modelCreatorGUIHandler = new ModelCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

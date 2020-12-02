@@ -368,6 +368,7 @@ var stateMachineCreatorGUIHandler;
 var settingsGUIHandler;
 var mobileSimulationGUIHandler;
 var moduleCreatorGUIHandler;
+var modelCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;

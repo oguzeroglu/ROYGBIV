@@ -351,6 +351,37 @@ app.post("/checkProtocolDefinitionFile", function(req, res){
   }
 });
 
+app.get("/getModels", function(req, res){
+  var modelFolders = [];
+
+  fs.readdirSync("./models/").forEach(fileName => {
+    var path = "./models/" + fileName;
+    if (!fs.lstatSync(path).isDirectory()){
+      return;
+    }
+
+    var mtlFileName = null;
+    var objFileName = null;
+    fs.readdirSync(path + "/").forEach(childFileName => {
+      if (childFileName.toLowerCase().endsWith(".mtl")){
+        mtlFileName = childFileName;
+      }else if (childFileName.toLowerCase().endsWith(".obj")){
+        objFileName = childFileName;
+      }
+    });
+
+    if (mtlFileName != null && objFileName != null){
+      modelFolders.push({
+        folder: fileName,
+        obj: objFileName,
+        mtl: mtlFileName
+      })
+    }
+  });
+
+  res.send(JSON.stringify(modelFolders));
+});
+
 function getScriptsInFolder(curPath, obj){
   var files = fs.readdirSync(curPath);
   for (var i = 0; i<files.length; i++){

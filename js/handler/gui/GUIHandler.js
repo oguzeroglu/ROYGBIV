@@ -172,7 +172,7 @@ var GUIHandler = function(){
     CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
     JUMP_DESCRIPTOR_CREATION: 23, KNOWLEDGE_CREATION: 24, DECISION_CREATION: 25, DECISION_TREE_CREATION: 26,
     STATE_CREATION: 27, TRANSITION_CREATION: 28, STATE_MACHINE_CREATION: 29, VIRTUAL_KEYBOARD: 30, SETTINGS: 31,
-    MOBILE_SIMULATION: 32, MASS: 33, MODULE_CREATION: 34
+    MOBILE_SIMULATION: 32, MASS: 33, MODULE_CREATION: 34, MODEL_CREATION: 35
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -182,7 +182,7 @@ var GUIHandler = function(){
     this.guiTypes.STEERING_BEHAVIOR_CREATION, this.guiTypes.JUMP_DESCRIPTOR_CREATION,
     this.guiTypes.KNOWLEDGE_CREATION, this.guiTypes.DECISION_CREATION, this.guiTypes.DECISION_TREE_CREATION,
     this.guiTypes.STATE_CREATION, this.guiTypes.TRANSITION_CREATION, this.guiTypes.STATE_MACHINE_CREATION,
-    this.guiTypes.MODULE_CREATION
+    this.guiTypes.MODULE_CREATION, this.guiTypes.MODEL_CREATION
   ];
 }
 
@@ -296,6 +296,11 @@ GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
       break;
       case this.guiTypes.MODULE_CREATION:
         if (this.datGuiModuleCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.MODEL_CREATION:
+        if (this.datGuiModelCreation){
           return true;
         }
       break;
@@ -1294,6 +1299,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiModuleCreation){
         this.destroyGUI(this.datGuiModuleCreation);
         this.datGuiModuleCreation = 0;
+      }
+    return;
+    case this.guiTypes.MODEL_CREATION:
+      if (this.datGuiModelCreation){
+        this.destroyGUI(this.datGuiModelCreation);
+        this.datGuiModelCreation = 0;
       }
     return;
   }
