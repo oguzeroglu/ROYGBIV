@@ -444,6 +444,7 @@ var mobileSimulation = {
   isIOS: false,
   orientation: 'portrait'
 };
+var modelLoader;
 
 // ROTATION MODES
 var rotationModes = {

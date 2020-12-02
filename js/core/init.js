@@ -172,6 +172,9 @@ window.onload = function() {
   // THREEJS RENDER MONITORING HANDLER
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
 
+  // MODEL LOADER
+  modelLoader = new ModelLoader();
+
   if (!isDeployment){
     // GUI HANDLER
     guiHandler = new GUIHandler();
@@ -182,6 +185,7 @@ window.onload = function() {
   // 3D CANVAS
   canvas = document.getElementById("rendererCanvas");
   onCanvasInitiated();
+
 
   // INITIALIZE THREE.JS SCENE AND RENDERER
   scene = new THREE.Scene();

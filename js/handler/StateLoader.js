@@ -378,6 +378,7 @@ StateLoader.prototype.resetProject = function(){
   lightningHandler.reset();
   steeringHandler.reset();
   decisionHandler.reset();
+  modelLoader.reset();
   fonts = new Object();
   roygbivAttributeCounter = 1;
   roygbivBufferAttributeCounter = 1;
