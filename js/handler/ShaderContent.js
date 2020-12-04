@@ -27,7 +27,9 @@ var ShaderContent = function(){
     {name: "lightningVertexShader", isVertexShader: true, dir: "lightning"},
     {name: "lightningFragmentShader", isVertexShader: false, dir: "lightning"},
     {name: "spriteVertexShader", isVertexShader: true, dir: "sprite"},
-    {name: "spriteFragmentShader", isVertexShader: false, dir: "sprite"}
+    {name: "spriteFragmentShader", isVertexShader: false, dir: "sprite"},
+    {name: "basicModelMaterialVertexShader", isVertexShader: true, dir: "materials/basic_model_material"},
+    {name: "basicModelMaterialFragmentShader", isVertexShader: false, dir: "materials/basic_model_material"}
   ];
   this.currentLoadCount = 0;
   this.allShadersReadyCallback = function(){

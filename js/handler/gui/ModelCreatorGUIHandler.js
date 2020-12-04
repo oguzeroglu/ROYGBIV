@@ -2,7 +2,7 @@ var ModelCreatorGUIHandler = function(){
 
 }
 
-ModelCreatorGUIHandler.prototype.show = function(){
+ModelCreatorGUIHandler.prototype.show = function(modelName){
   selectionHandler.resetCurrentSelection();
   guiHandler.hideAll();
   this.hiddenEngineObjects = [];
@@ -32,7 +32,7 @@ ModelCreatorGUIHandler.prototype.show = function(){
         return;
       }
 
-      modelCreatorGUIHandler.renderControls(resp, 0);
+      modelCreatorGUIHandler.renderControls(resp, 0, modelName);
     }
   }
   xhr.send();
@@ -59,7 +59,7 @@ ModelCreatorGUIHandler.prototype.close = function(message, isError){
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
 }
 
-ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index){
+ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, modelName){
   terminal.clear();
   terminal.printInfo(Text.LOADING_MODEL);
 
@@ -79,15 +79,8 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index){
       allFolders.push(allModels[i].folder);
     }
 
-    var childrenNames = [];
-    for (var i = 0; i < model.children.length; i ++){
-      var child = model.children[i];
-      childrenNames.push(child.name || "Child" + i);
-    }
-
     var params = {
       "Folder": allFolders[index],
-      "Child": childrenNames[0],
       "Done": function(){
 
       },
@@ -96,17 +89,120 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index){
       }
     };
 
-    var folderController, childController;
-
-    folderController = guiHandler.datGuiModelCreation.add(params, "Folder", allFolders).onChange(function(val){
+    var folderController = guiHandler.datGuiModelCreation.add(params, "Folder", allFolders).onChange(function(val){
       guiHandler.disableController(folderController);
-      guiHandler.disableController(childController);
-      modelCreatorGUIHandler.renderControls(allModels, allFolders.indexOf(val));
+      modelCreatorGUIHandler.renderControls(allModels, allFolders.indexOf(val), modelName);
     });
-    childController = guiHandler.datGuiModelCreation.add(params, "Child", childrenNames);
     guiHandler.datGuiModelCreation.add(params, "Done");
     guiHandler.datGuiModelCreation.add(params, "Cancel");
+
+    modelCreatorGUIHandler.renderModel(model, modelName, allFolders[index]);
   }, function(){
     modelCreatorGUIHandler.close(Text.ERROR_HAPPENED_LOADING_MODEL_FROM_FOLDER.replace(Text.PARAM1, modelToLoad.folder), true);
   });
+}
+
+ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName){
+  if (this.modelMesh){
+    scene.remove(this.modelMesh);
+  }
+
+  var pseudoGeometry = new THREE.Geometry();
+
+  for (var i = 0; i < model.children.length; i ++){
+    var childMesh = model.children[i];
+    var normalGeometry = new THREE.Geometry().fromBufferGeometry(childMesh.geometry);
+    for (var i2 = 0; i2 < normalGeometry.faces.length; i2++){
+      normalGeometry.faces[i2].materialIndex = i;
+    }
+
+    childMesh.updateMatrix(true);
+    pseudoGeometry.merge(normalGeometry, childMesh.matrix);
+  }
+
+  var vertices = pseudoGeometry.vertices;
+  var faceVertexUVs = pseudoGeometry.faceVertexUvs[0];
+
+  var positions = [];
+  var normals = [];
+  var colors = [];
+  var uvs = [];
+
+  for (var i = 0; i<pseudoGeometry.faces.length; i++){
+    var face = pseudoGeometry.faces[i];
+    var childMesh = model.children[face.materialIndex];
+
+    var a = face.a;
+    var b = face.b;
+    var c = face.c;
+
+    var vertex1 = vertices[a];
+    var vertex2 = vertices[b];
+    var vertex3 = vertices[c];
+
+    var vertexNormals = face.vertexNormals;
+    var vertexNormal1 = vertexNormals[0];
+    var vertexNormal2 = vertexNormals[1];
+    var vertexNormal3 = vertexNormals[2];
+
+    var color = childMesh.material.color;
+
+    var uv1 = faceVertexUVs[i][0];
+    var uv2 = faceVertexUVs[i][1];
+    var uv3 = faceVertexUVs[i][2];
+
+    this.triplePush(positions, vertex1, vertex2, vertex3, "xyz");
+    this.triplePush(normals, vertexNormal1, vertexNormal2, vertexNormal3, "xyz");
+    this.triplePush(colors, color, color, color, "rgb");
+    this.triplePush(uvs, uv1, uv2, uv3, "xy");
+  }
+
+  this.model = new Model({
+    name: name,
+    folderName: folderName,
+    positionsAry: positions,
+    normalsAry: normals,
+    colorsAry: colors,
+    uvsAry: uvs
+  });
+
+  this.modelMesh = new MeshGenerator(this.model.geometry).generateModelMesh();
+  scene.add(this.modelMesh);
+}
+
+ModelCreatorGUIHandler.prototype.triplePush = function(ary, obj1, obj2, obj3, type){
+  if (type == "xyz"){
+    ary.push(obj1.x);
+    ary.push(obj1.y);
+    ary.push(obj1.z);
+
+    ary.push(obj2.x);
+    ary.push(obj2.y);
+    ary.push(obj2.z);
+
+    ary.push(obj3.x);
+    ary.push(obj3.y);
+    ary.push(obj3.z);
+  }else if (type === "rgb"){
+    ary.push(obj1.r);
+    ary.push(obj1.g);
+    ary.push(obj1.b);
+
+    ary.push(obj2.r);
+    ary.push(obj2.g);
+    ary.push(obj2.b);
+
+    ary.push(obj3.r);
+    ary.push(obj3.g);
+    ary.push(obj3.b);
+  }else if (type === "xy"){
+    ary.push(obj1.x);
+    ary.push(obj1.y);
+
+    ary.push(obj2.x);
+    ary.push(obj2.y);
+
+    ary.push(obj3.x);
+    ary.push(obj3.y);
+  }
 }
