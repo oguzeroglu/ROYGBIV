@@ -13,7 +13,7 @@ ModelCreatorGUIHandler.prototype.show = function(modelName){
       this.hiddenEngineObjects.push(child);
     }
   }
-  activeControl = new OrbitControls({maxRadius: 500, zoomDelta: 5});
+  activeControl = new OrbitControls({maxRadius: 2000, zoomDelta: 5});
   activeControl.onActivated();
 
   terminal.clear();
@@ -109,6 +109,8 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
 
   var pseudoGeometry = new THREE.Geometry();
 
+  var texturesObj = {};
+
   for (var i = 0; i < model.children.length; i ++){
     var childMesh = model.children[i];
     var normalGeometry = new THREE.Geometry().fromBufferGeometry(childMesh.geometry);
@@ -118,6 +120,19 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
 
     childMesh.updateMatrix(true);
     pseudoGeometry.merge(normalGeometry, childMesh.matrix);
+
+    if (childMesh.material.map){
+      var tmpCanvas = document.createElement("canvas");
+      tmpCanvas.width = childMesh.material.map.image.width;
+      tmpCanvas.height = childMesh.material.map.image.height;
+      tmpCanvas.getContext("2d").drawImage(childMesh.material.map.image, 0, 0);
+      texturesObj[childMesh.material.map.image.src] = new THREE.CanvasTexture(tmpCanvas);
+    }
+  }
+
+  var textureMerger = null;
+  if (Object.keys(texturesObj).length > 0){
+    textureMerger = new TextureMerger(texturesObj);
   }
 
   var vertices = pseudoGeometry.vertices;
@@ -127,6 +142,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
   var normals = [];
   var colors = [];
   var uvs = [];
+  var diffuseUVs = [];
 
   for (var i = 0; i<pseudoGeometry.faces.length; i++){
     var face = pseudoGeometry.faces[i];
@@ -155,6 +171,13 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     this.triplePush(normals, vertexNormal1, vertexNormal2, vertexNormal3, "xyz");
     this.triplePush(colors, color, color, color, "rgb");
     this.triplePush(uvs, uv1, uv2, uv3, "xy");
+
+    if (childMesh.material.map){
+      var uvInfo = textureMerger.ranges[childMesh.material.map.image.src];
+      this.quadruplePush(diffuseUVs, uvInfo.startU, uvInfo.startV, uvInfo.endU, uvInfo.endV, "number");
+    }else{
+      this.quadruplePush(diffuseUVs, -100, -100, -100, -100, "number");
+    }
   }
 
   this.model = new Model({
@@ -163,10 +186,11 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     positionsAry: positions,
     normalsAry: normals,
     colorsAry: colors,
-    uvsAry: uvs
+    uvsAry: uvs,
+    diffuseUVsAry: diffuseUVs
   });
 
-  this.modelMesh = new MeshGenerator(this.model.geometry).generateModelMesh();
+  this.modelMesh = new MeshGenerator(this.model.geometry).generateModelMesh(model, textureMerger? textureMerger.mergedTexture: null);
   scene.add(this.modelMesh);
 }
 
@@ -204,5 +228,24 @@ ModelCreatorGUIHandler.prototype.triplePush = function(ary, obj1, obj2, obj3, ty
 
     ary.push(obj3.x);
     ary.push(obj3.y);
+  }
+}
+
+ModelCreatorGUIHandler.prototype.quadruplePush = function(ary, obj1, obj2, obj3, obj4, type){
+  if (type == "number"){
+    ary.push(obj1);
+    ary.push(obj2);
+    ary.push(obj3);
+    ary.push(obj4);
+
+    ary.push(obj1);
+    ary.push(obj2);
+    ary.push(obj3);
+    ary.push(obj4);
+
+    ary.push(obj1);
+    ary.push(obj2);
+    ary.push(obj3);
+    ary.push(obj4);
   }
 }

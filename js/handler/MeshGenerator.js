@@ -3,10 +3,14 @@ var MeshGenerator = function(geometry, material){
   this.material = material;
 }
 
-MeshGenerator.prototype.generateModelMesh = function(){
+MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
   var uniforms = {
     projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
     modelViewMatrix: new THREE.Uniform(new THREE.Matrix4())
+  }
+
+  if (overrideTexture){
+    uniforms.texture = new THREE.Uniform(overrideTexture);
   }
 
   var material = new THREE.RawShaderMaterial({
@@ -16,7 +20,7 @@ MeshGenerator.prototype.generateModelMesh = function(){
     uniforms: uniforms
   });
 
-  var mesh = new THREE.Mesh(this.geometry);
+  var mesh = new THREE.Mesh(this.geometry, material);
   mesh.renderOrder = renderOrders.OBJECT;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
 
