@@ -81,6 +81,7 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
 
     var params = {
       "Folder": allFolders[index],
+      "Scale": 1,
       "Done": function(){
 
       },
@@ -89,9 +90,15 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
       }
     };
 
-    var folderController = guiHandler.datGuiModelCreation.add(params, "Folder", allFolders).onChange(function(val){
+    var folderController, scaleController;
+
+    folderController = guiHandler.datGuiModelCreation.add(params, "Folder", allFolders).onChange(function(val){
       guiHandler.disableController(folderController);
+      guiHandler.disableController(scaleController);
       modelCreatorGUIHandler.renderControls(allModels, allFolders.indexOf(val), modelName);
+    });
+    scaleController = guiHandler.datGuiModelCreation.add(params, "Scale").min(0.1).max(100).step(0.1).onChange(function(val){
+      modelCreatorGUIHandler.modelMesh.scale.set(val, val, val);
     });
     guiHandler.datGuiModelCreation.add(params, "Done");
     guiHandler.datGuiModelCreation.add(params, "Cancel");
