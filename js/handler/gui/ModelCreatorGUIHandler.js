@@ -110,7 +110,7 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
           terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
           delete models[modelName];
           terminal.enable();
-        });
+        }, true);
       },
       "Cancel": function(){
         modelCreatorGUIHandler.close(Text.OPERATION_CANCELLED, false);
@@ -252,7 +252,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     childInfos: childInfos
   }, texturesObj);
 
-  this.modelMesh = new MeshGenerator(this.model.geometry).generateModelMesh(model, textureMerger? textureMerger.mergedTexture: null);
+  this.modelMesh = new MeshGenerator(this.model.geometry).generateModelMesh(this.model, textureMerger? textureMerger.mergedTexture: null);
   scene.add(this.modelMesh);
 }
 
