@@ -31,6 +31,8 @@ var Model = function(modelInfo, texturesObj){
     this.geometry.addAttribute("normal", normalsBufferAttribute);
     this.geometry.addAttribute("uv", uvsBufferAttribute);
     this.geometry.addAttribute("diffuseUV", diffuseUVsBufferAttribute);
+
+    this.geometry.center();
   }
 
   this.info = modelInfo;

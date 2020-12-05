@@ -1139,6 +1139,81 @@ GridSystem.prototype.newMass = function(selections, height, id){
   masses[id] = mass;
 }
 
+GridSystem.prototype.newModelInstance = function(selections, height, model, instanceName){
+  var boxCenterX, boxCenterY, boxCenterZ;
+  var boxSizeX, boxSizeY, boxSizeZ;
+
+  if (selections.length == 1){
+    var grid = selections[0];
+    boxCenterX = grid.centerX;
+    boxCenterZ = grid.centerZ;
+    boxSizeX = this.cellSize;
+    boxSizeZ = this.cellSize;
+  }else{
+    var grid1 = selections[0];
+    var grid2 = selections[1];
+    boxCenterX = (grid1.centerX + grid2.centerX) / 2;
+    boxCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+    boxSizeX = (Math.abs(grid1.colNumber - grid2.colNumber) + 1) * this.cellSize;
+    boxSizeZ = (Math.abs(grid1.rowNumber - grid2.rowNumber) + 1) * this.cellSize;
+  }
+
+  boxCenterY = this.centerY + (height / 2);
+  boxSizeY = Math.abs(height);
+  if (this.axis == "XY"){
+    var tmp = boxSizeY;
+    boxSizeY = boxSizeZ;
+    boxSizeZ = tmp;
+    boxCenterZ = this.centerZ + (height / 2);
+    if (selections.length == 1){
+        var grid = selections[0];
+        boxCenterY = grid.centerY;
+        console.log("XXX");
+    }else{
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      boxCenterY = (grid1.centerY + grid2.centerY) / 2;
+    }
+  }else if (this.axis == "YZ"){
+    var oldX = boxSizeX;
+    var oldY = boxSizeY;
+    var oldZ = boxSizeZ;
+    boxSizeZ = oldX;
+    boxSizeX = oldY;
+    boxSizeY = oldZ;
+    if (selections.length == 1){
+      var grid = selections[0];
+      boxCenterY = grid.centerY;
+      boxCenterZ = grid.centerZ;
+      boxCenterX = grid.centerX + (height / 2);
+    }else{
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      boxCenterY = (grid1.centerY + grid2.centerY) / 2;
+      boxCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+      boxCenterX = grid1.centerX + (height / 2);
+    }
+  }
+
+  var modelMesh = new MeshGenerator(model.geometry).generateModelMesh(model);
+
+  var originalHeight = model.info.originalBoundingBox.max.y - model.info.originalBoundingBox.min.y;
+  var modelScale = height / originalHeight;
+  modelMesh.scale.set(modelScale, modelScale, modelScale);
+
+  modelMesh.position.x = boxCenterX;
+  modelMesh.position.y = boxCenterY;
+  modelMesh.position.z = boxCenterZ;
+
+  if (this.axis == "XY"){
+    modelMesh.rotateX(Math.PI/2);
+  }else if (this.axis == "YZ"){
+    modelMesh.rotateZ(-Math.PI/2);
+  }
+
+  scene.add(modelMesh);
+}
+
 GridSystem.prototype.newBox = function(selections, height, material, name){
   var boxCenterX, boxCenterY, boxCenterZ;
   var boxSizeX, boxSizeY, boxSizeZ;

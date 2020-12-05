@@ -146,6 +146,8 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
   var texturesObj = {};
   var childInfos = [];
 
+  var boundingBox = new THREE.Box3();
+
   for (var i = 0; i < model.children.length; i ++){
     var childMesh = model.children[i];
     var childInfo = {name: childMesh.name};
@@ -215,6 +217,10 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     var vertex2 = vertices[b];
     var vertex3 = vertices[c];
 
+    boundingBox.expandByPoint(vertex1);
+    boundingBox.expandByPoint(vertex2);
+    boundingBox.expandByPoint(vertex3);
+
     var vertexNormals = face.vertexNormals;
     var vertexNormal1 = vertexNormals[0];
     var vertexNormal2 = vertexNormals[1];
@@ -249,7 +255,8 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     diffuseUVsAry: diffuseUVs,
     pseudoFaces: pseudoFaces,
     materialIndices: materialIndices,
-    childInfos: childInfos
+    childInfos: childInfos,
+    originalBoundingBox: boundingBox
   }, texturesObj);
 
   this.modelMesh = new MeshGenerator(this.model.geometry).generateModelMesh(this.model, textureMerger? textureMerger.mergedTexture: null);
