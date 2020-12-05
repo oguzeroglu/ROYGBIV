@@ -1,4 +1,4 @@
-var Model = function(modelInfo){
+var Model = function(modelInfo, texturesObj){
   this.name = modelInfo.name;
 
   var geomKey = "MODEL" + PIPE + modelInfo.folderName
@@ -34,4 +34,55 @@ var Model = function(modelInfo){
   }
 
   this.info = modelInfo;
+  this.texturesObj = texturesObj;
+}
+
+Model.prototype.getUsedTextures = function(){
+  var childInfos = this.info.childInfos;
+  var usedTextures = [];
+
+  for (var textureURL in this.texturesObj){
+    var textureID = null;
+    for (var i = 0; i < this.info.childInfos.length; i ++){
+      if (this.info.childInfos[i].diffuseTextureURL == textureURL){
+        textureID = this.info.childInfos[i].diffuseTextureID;
+      }
+    }
+    usedTextures.push({
+      id: textureID,
+      texture: this.texturesObj[textureURL]
+    });
+  }
+
+  return usedTextures;
+}
+
+Model.prototype.onTextureAtlasRefreshed = function(){
+  var diffuseUVAry = this.geometry.attributes.diffuseUV.array;
+  var diffuseUVIndex = 0;
+  var ranges = textureAtlasHandler.textureMerger.ranges;
+  for (var i = 0; i < this.info.materialIndices.length; i ++){
+    var materialIndex = this.info.materialIndices[i];
+    var childInfo = this.info.childInfos[materialIndex];
+    if (childInfo.diffuseTextureID){
+      var range = ranges[childInfo.diffuseTextureID];
+      diffuseUVAry[diffuseUVIndex ++] = range.startU;
+      diffuseUVAry[diffuseUVIndex ++] = range.startV;
+      diffuseUVAry[diffuseUVIndex ++] = range.endU;
+      diffuseUVAry[diffuseUVIndex ++] = range.endV;
+      diffuseUVAry[diffuseUVIndex ++] = range.startU;
+      diffuseUVAry[diffuseUVIndex ++] = range.startV;
+      diffuseUVAry[diffuseUVIndex ++] = range.endU;
+      diffuseUVAry[diffuseUVIndex ++] = range.endV;
+      diffuseUVAry[diffuseUVIndex ++] = range.startU;
+      diffuseUVAry[diffuseUVIndex ++] = range.startV;
+      diffuseUVAry[diffuseUVIndex ++] = range.endU;
+      diffuseUVAry[diffuseUVIndex ++] = range.endV;
+    }else{
+      diffuseUVIndex += 12;
+    }
+  }
+
+  this.geometry.attributes.diffuseUV.updateRange.set(0, diffuseUVAry.length);
+  this.geometry.attributes.diffuseUV.needsUpdate = true;
 }

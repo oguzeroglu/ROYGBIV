@@ -99,7 +99,18 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
         }
         models[modelName] = modelCreatorGUIHandler.model;
         delete modelCreatorGUIHandler.model;
-        modelCreatorGUIHandler.close(Text.MODEL_CREATED, false);
+        modelCreatorGUIHandler.close(Text.COMPRESSING_TEXTURE, false);
+        terminal.disable();
+        textureAtlasHandler.onTexturePackChange(function(){
+          terminal.clear();
+          terminal.printInfo(Text.MODEL_CREATED);
+          terminal.enable();
+        }, function(){
+          terminal.clear();
+          terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+          delete models[modelName];
+          terminal.enable();
+        });
       },
       "Cancel": function(){
         modelCreatorGUIHandler.close(Text.OPERATION_CANCELLED, false);
@@ -133,9 +144,11 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
   var pseudoGeometry = new THREE.Geometry();
 
   var texturesObj = {};
+  var childInfos = [];
 
   for (var i = 0; i < model.children.length; i ++){
     var childMesh = model.children[i];
+    var childInfo = {name: childMesh.name};
     var normalGeometry = new THREE.Geometry().fromBufferGeometry(childMesh.geometry);
     for (var i2 = 0; i2 < normalGeometry.faces.length; i2++){
       normalGeometry.faces[i2].materialIndex = i;
@@ -150,7 +163,22 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
       tmpCanvas.height = childMesh.material.map.image.height;
       tmpCanvas.getContext("2d").drawImage(childMesh.material.map.image, 0, 0);
       texturesObj[childMesh.material.map.image.src] = new THREE.CanvasTexture(tmpCanvas);
+      childInfo.diffuseTextureURL = childMesh.material.map.image.src;
+      var diffuseTextureID = null;
+      for (var i2 = 0; i2 < childInfos.length; i2 ++){
+        if (childInfos[i2].diffuseTextureURL == childMesh.material.map.image.src){
+          diffuseTextureID = childInfos[i2].diffuseTextureID;
+          break;
+        }
+      }
+      if (!diffuseTextureID){
+        childInfo.diffuseTextureID = generateUUID();
+      }else{
+        childInfo.diffuseTextureID = diffuseTextureID;
+      }
     }
+
+    childInfos.push(childInfo);
   }
 
   var textureMerger = null;
@@ -168,10 +196,14 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
   var diffuseUVs = [];
 
   var pseudoFaces = [];
+  var materialIndices = [];
+
 
   for (var i = 0; i<pseudoGeometry.faces.length; i++){
     var face = pseudoGeometry.faces[i];
     var childMesh = model.children[face.materialIndex];
+
+    materialIndices.push(face.materialIndex);
 
     var a = face.a;
     var b = face.b;
@@ -215,8 +247,10 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     colorsAry: colors,
     uvsAry: uvs,
     diffuseUVsAry: diffuseUVs,
-    pseudoFaces: pseudoFaces
-  });
+    pseudoFaces: pseudoFaces,
+    materialIndices: materialIndices,
+    childInfos: childInfos
+  }, texturesObj);
 
   this.modelMesh = new MeshGenerator(this.model.geometry).generateModelMesh(model, textureMerger? textureMerger.mergedTexture: null);
   scene.add(this.modelMesh);

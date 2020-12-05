@@ -9,8 +9,12 @@ MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
     modelViewMatrix: new THREE.Uniform(new THREE.Matrix4())
   }
 
+  uniforms.texture = new THREE.Uniform(overrideTexture);
+
   if (overrideTexture){
     uniforms.texture = new THREE.Uniform(overrideTexture);
+  }else if (model.getUsedTextures().length > 0){
+    uniforms.texture = textureAtlasHandler.getTextureUniform();
   }
 
   var material = new THREE.RawShaderMaterial({
