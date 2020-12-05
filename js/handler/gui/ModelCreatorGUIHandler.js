@@ -21,7 +21,7 @@ ModelCreatorGUIHandler.prototype.show = function(modelName){
   terminal.printInfo(Text.LOADING_MODELS);
 
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", "/getModels", true);
+  xhr.open("POST", "/getModels", true);
   xhr.setRequestHeader("Content-type", "application/json");
   xhr.onreadystatechange = function(){
     if (xhr.readyState == 4 && xhr.status == 200){
@@ -35,7 +35,7 @@ ModelCreatorGUIHandler.prototype.show = function(modelName){
       modelCreatorGUIHandler.renderControls(resp, 0, modelName);
     }
   }
-  xhr.send();
+  xhr.send(JSON.stringify({acceptedTextureSize: ACCEPTED_TEXTURE_SIZE}));
 }
 
 ModelCreatorGUIHandler.prototype.close = function(message, isError){

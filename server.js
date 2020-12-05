@@ -351,13 +351,40 @@ app.post("/checkProtocolDefinitionFile", function(req, res){
   }
 });
 
-app.get("/getModels", function(req, res){
+app.post("/getModels", function(req, res){
   var modelFolders = [];
+
+  var acceptedTextureSize = req.body.acceptedTextureSize;
+
+  var getAllImagePaths = function(path){
+    var result = [];
+
+    fs.readdirSync(path).forEach(childFileName => {
+      if (fs.lstatSync(path + "/" + childFileName).isDirectory()){
+        result = result.concat(getAllImagePaths(path + "/" + childFileName));
+      }
+
+      var lowerCase = childFileName.toLowerCase();
+      if (lowerCase.endsWith(".png") || lowerCase.endsWith(".jpg") || lowerCase.endsWith(".jpeg")){
+        result.push(path + "/" + childFileName);
+      }
+    });
+
+    return result;
+  }
 
   fs.readdirSync("./models/").forEach(fileName => {
     var path = "./models/" + fileName;
     if (!fs.lstatSync(path).isDirectory()){
       return;
+    }
+
+    const allImagePaths = getAllImagePaths(path);
+    for (var i = 0; i < allImagePaths.length; i ++){
+      var dimensions = sizeOf(allImagePaths[i]);
+      if (dimensions.width != acceptedTextureSize || dimensions.height != acceptedTextureSize){
+        return;
+      }
     }
 
     var mtlFileName = null;

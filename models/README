@@ -1,3 +1,5 @@
 This folder holds OBJ models. Use "models" CLI command to load models from this
 folder into your project. Each child folder represents a model and must contain
-an .obj and a .mtl file (and/or textures).
+an .obj and a .mtl file (and/or textures). Note that if the model contains
+any textures, texture images under the model folder must respect
+ACCEPTED_TEXTURE_SIZE parameter.
