@@ -6645,6 +6645,19 @@ function parse(input){
           moduleCreatorGUIHandler.show();
           return true;
         break;
+        case 279: //newModel
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var modelName = splitted[1];
+          if (models[modelName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          modelCreatorGUIHandler.show(modelName);
+          return true;
+        break;
       }
       return true;
     }catch(err){

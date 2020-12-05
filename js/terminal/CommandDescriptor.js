@@ -279,7 +279,8 @@ var CommandDescriptor = function(){
       1, //unbakeShadow
       0, //mobileSimulation
       1, //selectMass
-      0 //modules
+      0, //modules
+      1 //newModel
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -561,7 +562,8 @@ var CommandDescriptor = function(){
     "unbakeShadow objectName[1],objectName[2],...objectName[n]",
     "mobileSimulation",
     "selectMass massName",
-    "modules"
+    "modules",
+    "newModel modelName"
   ];
 
   this.commands = [
@@ -843,7 +845,8 @@ var CommandDescriptor = function(){
     "unbakeShadow",
     "mobileSimulation",
     "selectMass",
-    "modules"
+    "modules",
+    "newModel"
   ];
 
   this.commandInfo = [
@@ -1125,7 +1128,8 @@ var CommandDescriptor = function(){
     "unbakeShadow: Unbakes shadows on given objects.",
     "mobileSimulation: Opens the mobile simulation GUI.",
     "selectMass: Selects a mass",
-    "modules: Opens module creation GUI."
+    "modules: Opens module creation GUI.",
+    "newModel: Opens model creation GUI."
   ];
 
   this.keyboardInfo = [
@@ -2035,6 +2039,11 @@ var CommandDescriptor = function(){
   this.selectMass = new Object();
   this.selectMass.types = [];
   this.selectMass.types.push(this.MASS_ID); //massName
+
+  // newModel
+  this.newModel = new Object();
+  this.newModel.types = [];
+  this.newModel.types.push(this.UNKNOWN_INDICATOR); //modelName
 };
 
 CommandDescriptor.prototype.test = function(){

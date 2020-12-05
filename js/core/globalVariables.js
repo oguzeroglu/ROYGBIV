@@ -104,6 +104,7 @@ var scriptsToRun = new Map();
 var objectGroups = new Object();
 var disabledObjectNames = new Object();
 var markedPoints = new Object();
+var models = new Object();
 var collisionCallbackRequests = new Map();
 var particleCollisionCallbackRequests = new Object();
 var particleSystemCollisionCallbackRequests = new Object();

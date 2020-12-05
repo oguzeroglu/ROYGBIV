@@ -13,7 +13,7 @@ ModelCreatorGUIHandler.prototype.show = function(modelName){
       this.hiddenEngineObjects.push(child);
     }
   }
-  activeControl = new OrbitControls({maxRadius: 2000, zoomDelta: 5});
+  activeControl = new OrbitControls({maxRadius: 2000, zoomDelta: 10});
   activeControl.onActivated();
 
   terminal.clear();
@@ -57,6 +57,12 @@ ModelCreatorGUIHandler.prototype.close = function(message, isError){
   activeControl.onActivated();
   camera.quaternion.set(0, 0, 0, 1);
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
+
+  if (this.modelMesh){
+    scene.remove(this.modelMesh);
+    delete this.modelMesh;
+    delete this.model;
+  }
 }
 
 ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, modelName){
@@ -83,7 +89,17 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
       "Folder": allFolders[index],
       "Scale": 1,
       "Done": function(){
-
+        var folderName = modelCreatorGUIHandler.model.info.folderName;
+        for (var mName in models){
+          if (models[mName].info.folderName == folderName){
+            terminal.clear();
+            terminal.printError(Text.ANOTHER_MODEL_OF_SAME_FOLDER_EXISTS.replace(Text.PARAM1, mName));
+            return;
+          }
+        }
+        models[modelName] = modelCreatorGUIHandler.model;
+        delete modelCreatorGUIHandler.model;
+        modelCreatorGUIHandler.close(Text.MODEL_CREATED, false);
       },
       "Cancel": function(){
         modelCreatorGUIHandler.close(Text.OPERATION_CANCELLED, false);
@@ -151,6 +167,8 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
   var uvs = [];
   var diffuseUVs = [];
 
+  var pseudoFaces = [];
+
   for (var i = 0; i<pseudoGeometry.faces.length; i++){
     var face = pseudoGeometry.faces[i];
     var childMesh = model.children[face.materialIndex];
@@ -158,6 +176,8 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     var a = face.a;
     var b = face.b;
     var c = face.c;
+
+    pseudoFaces.push({a: a, b: b, c: c});
 
     var vertex1 = vertices[a];
     var vertex2 = vertices[b];
@@ -194,7 +214,8 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     normalsAry: normals,
     colorsAry: colors,
     uvsAry: uvs,
-    diffuseUVsAry: diffuseUVs
+    diffuseUVsAry: diffuseUVs,
+    pseudoFaces: pseudoFaces
   });
 
   this.modelMesh = new MeshGenerator(this.model.geometry).generateModelMesh(model, textureMerger? textureMerger.mergedTexture: null);
