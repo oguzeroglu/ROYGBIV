@@ -161,6 +161,14 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
       terminal.printError(Text.CANNOT_SET_TEXTURE_SIZE_AFTER);
       return;
     }
+
+    for (var modelName in models){
+      if (models[modelName].getUsedTextures().length > 0){
+        terminal.printError(Text.HAS_MODELS_WITH_TEXTURES);
+        return;
+      }
+    }
+
     var textureSize = parseInt(val);
     if (isNaN(textureSize)){
       terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "textureSize"));

@@ -599,6 +599,7 @@ var Text = function(){
   this.LIGHT_REMOVED = "Light removed.";
   this.ACCEPTED_TEXTURE_SIZE = "Accepted texture size";
   this.CANNOT_SET_TEXTURE_SIZE_AFTER = "Cannot set accepted texture size after texture pack creation. Delete the texture packs first.";
+  this.HAS_MODELS_WITH_TEXTURES = "Project has models with textures. Cannot modify accepted texture size. Delete the models first.";
   this.TEXTURE_COMPRESSION_ERROR = "Error happened while compressing texture pack @@1. Try using smaller PNGs.";
   this.TEXTURE_COMPRESSION_ENCODE_ERROR = "Error happened while compressing @@1 texture of @@2.\nTry providing a JPEG alternative for this texture under the texture pack folder.";
   this.TEXTURE_PACK_NOT_USABLE = "Texture pack not usable.";
