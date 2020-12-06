@@ -643,6 +643,9 @@ function onRaycasterIntersection(){
      if (!object){
        object = masses[intersectionObject];
      }
+     if (!object){
+       object = modelInstances[intersectionObject];
+     }
      if (object.isAddedObject || object.isObjectGroup){
        if (!isDeployment && mode == 0){
          terminal.clear();
@@ -764,6 +767,8 @@ function onRaycasterIntersection(){
               if (!isDeployment){
                 guiHandler.afterObjectSelection();
               }
+           }else if (selectedGrid.destroyedModelInstance && !(keyboardBuffer["Shift"]) && !modelInstances[selectedGrid.destroyedModelInstance].hiddenInDesignMode){
+
            }else{
              selectedGrid.toggleSelect(false, true);
           }
@@ -810,6 +815,8 @@ function onRaycasterIntersection(){
          guiHandler.afterObjectSelection();
        }
        object.onMouseClickIntersection(intersectionObject);
+     }else if (object.isModelInstance){
+       
      }
   }else{
     if (!isDeployment){

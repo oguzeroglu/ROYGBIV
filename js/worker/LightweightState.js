@@ -102,4 +102,10 @@ var LightweightState = function(){
     var mass = masses[massName];
     this.masses[massName] = mass.export();
   }
+  // MODEL INSTANCES
+  this.modelInstances = new Object();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
+  for (var instanceName in modelInstancesInScene){
+    this.modelInstances[instanceName] = modelInstances[instanceName].exportLightweight();
+  }
 }

@@ -62,6 +62,19 @@ RayCaster.prototype.refresh = function(){
     }
     this.binHandler.insert(addedObject.boundingBoxes[0], objName);
   }
+  for (var instanceName in this.getModelInstances()){
+    var modelInstance = modelInstances[instanceName];
+    if (mode == 1 && !modelInstance.isIntersectable){
+      continue;
+    }
+    if (mode == 0 && modelInstance.hiddenInDesignMode){
+      continue;
+    }
+    if (!modelInstance.boundingBoxes){
+      modelInstance.generateBoundingBoxes();
+    }
+    this.binHandler.insert(modelInstance.boundingBoxes[0], instanceName);
+  }
   for (var objName in this.getObjectGroups()){
     var objectGroup = objectGroups[objName];
     if (mode == 1 && !objectGroup.isIntersectable){
@@ -199,6 +212,16 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
             return;
           }
         }
+      }else if (result == 40){
+        var modelInstance = modelInstances[objName];
+        if (modelInstance){
+          intersectionPoint = modelInstance.intersectsLine(REUSABLE_LINE);
+          if (intersectionPoint){
+            intersectionObject = objName;
+            callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
+            return;
+          }
+        }
       }else{
         if (!(mode == 0 && keyboardBuffer["Shift"])){
           var parent = objectGroups[objName];
@@ -283,6 +306,13 @@ RayCaster.prototype.getMasses = function(){
     return masses;
   }
   return sceneHandler.getMasses();
+}
+
+RayCaster.prototype.getModelInstances = function(){
+  if (IS_WORKER_CONTEXT){
+    return modelInstances;
+  }
+  return sceneHandler.getModelInstances();
 }
 
 RayCaster.prototype.onActiveVirtualKeyboardChanged = noop;

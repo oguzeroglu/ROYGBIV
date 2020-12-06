@@ -59,6 +59,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   var containerExports = this.state.containers;
   var virtualKeyboardExports = this.state.virtualKeyboards;
   var massesExports = this.state.masses;
+  var modelInstanceExports = this.state.modelInstances;
 
   var addedTextExports = new Object();
   for (var key in this.state.addedTexts3D){
@@ -259,6 +260,50 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     var mass = new Mass(massName, new THREE.Vector3(), new THREE.Vector3());
     mass.import(massesExports[massName], true);
     masses[massName] = mass;
+  }
+  for (var modelInstanceName in modelInstanceExports){
+    var modelInstance = new ModelInstance(modelInstanceName);
+
+    var curExport = modelInstanceExports[modelInstanceName];
+
+    var bb = new THREE.Box3();
+    bb.roygbivObjectName = modelInstanceName;
+    modelInstance.boundingBoxes = [bb];
+    modelInstance.vertices = [];
+    modelInstance.triangles = [];
+    modelInstance.trianglePlanes = [];
+    modelInstance.transformedVertices = [];
+    modelInstance.pseudoFaces = [];
+
+    for (var i = 0; i<curExport.vertices.length; i++){
+      var curVertex = curExport.vertices[i];
+      var vect = new THREE.Vector3(curVertex.x, curVertex.y, curVertex.z)
+      modelInstance.vertices.push(vect.clone());
+      modelInstance.transformedVertices.push(vect);
+      bb.expandByPoint(vect);
+    }
+    for (var i = 0; i<curExport.triangles.length; i++){
+      var curExp = curExport.triangles[i];
+      var aVec = new THREE.Vector3(curExp.a.x, curExp.a.y, curExp.a.z);
+      var bVec = new THREE.Vector3(curExp.b.x, curExp.b.y, curExp.b.z);
+      var cVec = new THREE.Vector3(curExp.c.x, curExp.c.y, curExp.c.z);
+      var triangle = new THREE.Triangle(aVec, bVec, cVec);
+      var plane = new THREE.Plane();
+      triangle.getPlane(plane);
+      modelInstance.triangles.push(triangle);
+      modelInstance.trianglePlanes.push(plane);
+    }
+    for (var i = 0; i<curExport.pseudoFaces.length; i++){
+      var curExp = curExport.pseudoFaces[i];
+      var a = curExp.a;
+      var b = curExp.b;
+      var c = curExp.c;
+      var materialIndex = curExp.materialIndex;
+      var normal = new THREE.Vector3(curExp.normal.x, curExp.normal.y, curExp.normal.z);
+      modelInstance.pseudoFaces.push(new THREE.Face3(a, b, c, normal));
+    }
+
+    modelInstances[modelInstanceName] = modelInstance;
   }
 }
 
@@ -474,6 +519,7 @@ StateLoaderLightweight.prototype.reset = function(){
   childContainers = new Object();
   virtualKeyboards = new Object();
   masses = new Object();
+  modelInstances = new Object();
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;
