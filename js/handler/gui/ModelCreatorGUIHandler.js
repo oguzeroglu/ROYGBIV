@@ -197,9 +197,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
   var uvs = [];
   var diffuseUVs = [];
 
-  var pseudoFaces = [];
   var materialIndices = [];
-
 
   for (var i = 0; i<pseudoGeometry.faces.length; i++){
     var face = pseudoGeometry.faces[i];
@@ -210,8 +208,6 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     var a = face.a;
     var b = face.b;
     var c = face.c;
-
-    pseudoFaces.push({a: a, b: b, c: c});
 
     var vertex1 = vertices[a];
     var vertex2 = vertices[b];
@@ -253,7 +249,6 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     colorsAry: colors,
     uvsAry: uvs,
     diffuseUVsAry: diffuseUVs,
-    pseudoFaces: pseudoFaces,
     materialIndices: materialIndices,
     childInfos: childInfos,
     originalBoundingBox: boundingBox
