@@ -192,6 +192,9 @@ Scene.prototype.import = function(exportObj){
   for (var i = 0; i<exportObj.virtualKeyboardNames.length; i++){
     this.registerVirtualKeyboard(virtualKeyboards[exportObj.virtualKeyboardNames[i]]);
   }
+  for (var i = 0; i < exportObj.modelInstanceNames.length; i ++){
+    this.registerModelInstance(modelInstances[exportObj.modelInstanceNames[i]]);
+  }
   this.isSkyboxMapped = exportObj.isSkyboxMapped;
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
@@ -228,6 +231,7 @@ Scene.prototype.export = function(){
   exportObj.spriteNames = Object.keys(this.sprites);
   exportObj.containerNames = Object.keys(this.containers);
   exportObj.virtualKeyboardNames = Object.keys(this.virtualKeyboards);
+  exportObj.modelInstanceNames = Object.keys(this.modelInstances);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
 

@@ -2,6 +2,41 @@ var ImportHandler = function(){
 
 }
 
+ImportHandler.prototype.importModelInstances = function(obj){
+  for (var instanceName in obj.modelInstances){
+    var curModelInstanceExport = obj.modelInstances[instanceName];
+    var model = models[curModelInstanceExport.modelName];
+    var modelMesh = new MeshGenerator(model.geometry).generateModelMesh(model);
+    modelMesh.position.set(curModelInstanceExport.position.x, curModelInstanceExport.position.y, curModelInstanceExport.position.z);
+    modelMesh.quaternion.set(curModelInstanceExport.quaternion.x, curModelInstanceExport.quaternion.y, curModelInstanceExport.quaternion.z, curModelInstanceExport.quaternion.w);
+    modelMesh.scale.set(curModelInstanceExport.scale, curModelInstanceExport.scale, curModelInstanceExport.scale);
+    var physicsXParam = (model.info.originalBoundingBox.max.x - model.info.originalBoundingBox.min.x) * curModelInstanceExport.scale;
+    var physicsYParam = (model.info.originalBoundingBox.max.y - model.info.originalBoundingBox.min.y) * curModelInstanceExport.scale;
+    var physicsZParam = (model.info.originalBoundingBox.max.z - model.info.originalBoundingBox.min.z) * curModelInstanceExport.scale;
+    var physicsShapeParameters = {x: physicsXParam/2, y: physicsYParam/2, z: physicsZParam/2};
+    var boxPhysicsBody = physicsBodyGenerator.generateBoxBody(physicsShapeParameters);
+    boxPhysicsBody.position.copy(modelMesh.position);
+    boxPhysicsBody.quaternion.copy(modelMesh.quaternion);
+    physicsWorld.addBody(boxPhysicsBody);
+    scene.add(modelMesh);
+
+    var destroyedGrids = {};
+    var gridSystem = gridSystems[curModelInstanceExport.gsName];
+    if (gridSystem){
+      for (var gridName in curModelInstanceExport.destroyedGrids){
+        var gridExport = curModelInstanceExport.destroyedGrids[gridName];
+        var grid = gridSystem.getGridByColRow(gridExport.colNumber, gridExport.rowNumber);
+        if (grid){
+          destroyedGrids[gridName] = grid;
+        }
+      }
+    }
+
+    var modelInstance = new ModelInstance(instanceName, model, modelMesh, boxPhysicsBody, destroyedGrids, curModelInstanceExport.gsName);
+    modelInstances[instanceName] = modelInstance;
+  }
+}
+
 ImportHandler.prototype.importModels = function(obj, callback){
   for (var modelName in obj.models){
     var curModelExport = obj.models[modelName];

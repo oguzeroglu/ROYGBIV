@@ -166,6 +166,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importSprites(this.stateObj);
   this.importHandler.importContainers(this.stateObj);
   this.importHandler.importVirtualKeyboards(this.stateObj);
+  this.importHandler.importModelInstances(this.stateObj);
   this.importHandler.importScenes(this.stateObj);
   this.importHandler.importSteeringHandler(this.stateObj);
   this.importHandler.importDecisionHandler(this.stateObj);

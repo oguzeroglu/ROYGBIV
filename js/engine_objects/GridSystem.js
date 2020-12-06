@@ -547,6 +547,12 @@ GridSystem.prototype.destroy = function(){
       obj.destroyedGrids = new Object();
     }
   }
+  for (var instanceName in modelInstances){
+    var modelInstance = modelInstances[instanceName];
+    if (modelInstance.gsName == this.name){
+      modelInstance.destroyedGrids = new Object();
+    }
+  }
 }
 
 GridSystem.prototype.selectAllGrids = function(){
@@ -1262,7 +1268,7 @@ GridSystem.prototype.newModelInstance = function(selections, height, model, inst
     }
   }
 
-  var modelInstance = new ModelInstance(instanceName, model, modelMesh, boxPhysicsBody, destroyedGrids);
+  var modelInstance = new ModelInstance(instanceName, model, modelMesh, boxPhysicsBody, destroyedGrids, this.name);
   modelInstances[instanceName] = modelInstance;
 
   sceneHandler.onModelInstanceCreation(modelInstance);
