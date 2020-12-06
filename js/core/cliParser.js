@@ -6721,6 +6721,45 @@ function parse(input){
             jobHandlerRaycasterRefresh = true;
           }
         break;
+        case 281: //destroyModel
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var modelName = splitted[1];
+          if (!(modelName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var model = models[modelName];
+          if (!model){
+            terminal.printError(Text.NO_SUCH_MODEL);
+            return true;
+          }
+          for (var modelInstanceName in modelInstances){
+            if (modelInstances[modelInstanceName].model.name == modelName){
+              terminal.printError(Text.THIS_MODEL_HAS_INSTANCES);
+              return true;
+            }
+          }
+
+          model.destroy();
+          delete models[modelName];
+          if (!jobHandlerWorking && model.getUsedTextures().length > 0){
+            terminal.clear();
+            terminal.disable();
+            terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+            textureAtlasHandler.onTexturePackChange(function(){
+              terminal.clear();
+              terminal.enable();
+              terminal.print(Text.MODEL_DESTROYED);
+            }, function(){
+              terminal.clear();
+              terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+              terminal.enable();
+            }, false);
+          }
+        break;
       }
       return true;
     }catch(err){

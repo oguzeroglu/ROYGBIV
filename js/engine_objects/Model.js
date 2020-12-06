@@ -130,3 +130,13 @@ Model.prototype.loadTextures = function(callback){
     tmpImg.src = textureURL;
   }
 }
+
+Model.prototype.destroy = function(){
+  this.geometry.dispose();
+  var geomKey = "MODEL" + PIPE + this.info.folderName
+  delete geometryCache[geomKey];
+
+  for (var key in this.texturesObj){
+    this.texturesObj[key].dispose();
+  }
+}

@@ -39,6 +39,9 @@ TextureAtlasHandler.prototype.refreshUniforms = function(){
   for (var modelName in models){
     models[modelName].onTextureAtlasRefreshed();
   }
+  for (var modelInstanceName in modelInstances){
+    modelInstances[modelInstanceName].onTextureAtlasRefreshed();
+  }
 }
 
 TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallback, errorCallback, textureCount){
@@ -53,6 +56,9 @@ TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallba
       if (resp.error){
         errorCallback();
       }else{
+        if (textureAtlasHandler.atlas){
+          textureAtlasHandler.atlas.mergedTexture.dispose();
+        }
         textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true});
         textureAtlasHandler.atlas.loadTextures(false, function(){
           textureAtlasHandler.currentTextureCount = textureCount;

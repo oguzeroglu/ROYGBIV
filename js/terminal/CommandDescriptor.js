@@ -281,7 +281,8 @@ var CommandDescriptor = function(){
       1, //selectMass
       0, //modules
       1, //newModel
-      3 //newModelInstance
+      3, //newModelInstance
+      1 //destroyModel
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -565,7 +566,8 @@ var CommandDescriptor = function(){
     "selectMass massName",
     "modules",
     "newModel modelName",
-    "newModelInstance instanceName modelName height"
+    "newModelInstance instanceName modelName height",
+    "destroyModel modelName"
   ];
 
   this.commands = [
@@ -849,7 +851,8 @@ var CommandDescriptor = function(){
     "selectMass",
     "modules",
     "newModel",
-    "newModelInstance"
+    "newModelInstance",
+    "destroyModel"
   ];
 
   this.commandInfo = [
@@ -1133,7 +1136,8 @@ var CommandDescriptor = function(){
     "selectMass: Selects a mass",
     "modules: Opens module creation GUI.",
     "newModel: Opens model creation GUI.",
-    "newModelInstance: Creates a new model instance from given model."
+    "newModelInstance: Creates a new model instance from given model.",
+    "destoryModel: Destroys a model."
   ];
 
   this.keyboardInfo = [
@@ -2056,6 +2060,11 @@ var CommandDescriptor = function(){
   this.newModelInstance.types.push(this.UNKNOWN_INDICATOR); //instanceName
   this.newModelInstance.types.push(this.MODEL_NAME); //modelName
   this.newModelInstance.types.push(this.UNKNOWN_INDICATOR); //height
+
+  // destroyModel
+  this.destroyModel = new Object();
+  this.destroyModel.types = [];
+  this.destroyModel.types.push(this.MODEL_NAME); //modelName
 };
 
 CommandDescriptor.prototype.test = function(){
