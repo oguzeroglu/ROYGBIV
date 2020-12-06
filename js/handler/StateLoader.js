@@ -336,6 +336,7 @@ StateLoader.prototype.resetProject = function(){
   disabledObjectNames = new Object();
   markedPoints = new Object();
   models = new Object();
+  modelInstances = new Object();
   areas = new Object();
   objectTrails = new Object();
   activeObjectTrails = new Map();

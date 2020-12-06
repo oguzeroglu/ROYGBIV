@@ -31,6 +31,7 @@ Scene.prototype.reset = function(){
   this.containers = new Object();
   this.virtualKeyboards = new Object();
   this.masses = new Object();
+  this.modelInstances = new Object();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
   this.lightInfo = {};
@@ -491,4 +492,14 @@ Scene.prototype.registerMass = function(mass){
 Scene.prototype.unregisterMass = function(mass){
   delete this.masses[mass.name];
   delete mass.registeredSceneName;
+}
+
+Scene.prototype.registerModelInstance = function(modelInstance){
+  this.modelInstances[modelInstance.name] = modelInstance;
+  modelInstance.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterModelInstance = function(modelInstance){
+  delete this.modelInstances[modelInstance.name];
+  delete modelInstance.registeredSceneName;
 }

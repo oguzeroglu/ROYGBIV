@@ -6658,6 +6658,69 @@ function parse(input){
           modelCreatorGUIHandler.show(modelName);
           return true;
         break;
+        case 280: //newModelInstance
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var instanceName = splitted[1];
+          if (!(instanceName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var modelName = splitted[2];
+          var height = parseFloat(splitted[3]);
+          if (!checkIfNameUnique(instanceName, Text.NAME_MUST_BE_UNIQUE)){
+            return true;
+          }
+          if (!models[modelName]){
+            terminal.printError(Text.NO_SUCH_MODEL);
+            return true;
+          }
+          if (isNaN(height)){
+            terminal.printError(Text.HEIGHT_MUST_BE_A_NUMBER);
+            return true;
+          }
+          if (height == 0){
+            terminal.printError(Text.HEIGHT_CANNOT_BE_0);
+            return true;
+          }
+          if (!jobHandlerWorking){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
+          }
+
+          var selections = [];
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              selections.push(gridSelections[gridName]);
+            }
+          }else{
+            selections.push(jobHandlerSelectedGrid);
+          }
+
+          if (selections.length == 2){
+            var grid1 = selections[0];
+            var grid2 = selections[1];
+            if (grid1.parentName != grid2.parentName){
+              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+              return true;
+            }
+          }
+
+          var gridSystemName = selections[0].parentName;
+          var gridSystem = gridSystems[gridSystemName];
+
+          gridSystem.newModelInstance(selections, height, models[modelName], instanceName);
+          if (!jobHandlerWorking){
+            refreshRaycaster(Text.MODEL_INSTANCE_CREATED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
+          }
+        break;
       }
       return true;
     }catch(err){
@@ -6815,7 +6878,7 @@ function isNameUsedAsSoftCopyParentName(name){
 }
 
 function checkIfNameUnique(name, errorMsg){
-  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name] || virtualKeyboards[name] || masses[name]){
+  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name] || virtualKeyboards[name] || masses[name] || modelInstances[name]){
     terminal.printError(errorMsg);
     return false;
   }

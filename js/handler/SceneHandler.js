@@ -622,6 +622,14 @@ SceneHandler.prototype.onMassDeletion = function(mass){
   this.scenes[mass.registeredSceneName].unregisterMass(mass);
 }
 
+SceneHandler.prototype.onModelInstanceCreation = function(modelInstance){
+  this.scenes[this.activeSceneName].registerModelInstance(modelInstance);
+}
+
+SceneHandler.prototype.onModelInstanceDeletion = function(modelInstance){
+  this.scenes[modelInstance.registeredSceneName].unregisterModelInstance(modelInstance);
+}
+
 SceneHandler.prototype.getActiveSceneName = function(){
   return this.activeSceneName;
 }
@@ -728,4 +736,8 @@ SceneHandler.prototype.getLightnings = function(){
 
 SceneHandler.prototype.getMasses = function(){
   return this.scenes[this.activeSceneName].masses;
+}
+
+SceneHandler.prototype.getModelInstances = function(){
+  return this.scenes[this.activeSceneName].modelInstances;
 }

@@ -1168,7 +1168,6 @@ GridSystem.prototype.newModelInstance = function(selections, height, model, inst
     if (selections.length == 1){
         var grid = selections[0];
         boxCenterY = grid.centerY;
-        console.log("XXX");
     }else{
       var grid1 = selections[0];
       var grid2 = selections[1];
@@ -1212,6 +1211,61 @@ GridSystem.prototype.newModelInstance = function(selections, height, model, inst
   }
 
   scene.add(modelMesh);
+
+  var physicsXParam = (model.info.originalBoundingBox.max.x - model.info.originalBoundingBox.min.x) * modelScale;
+  var physicsYParam = (model.info.originalBoundingBox.max.y - model.info.originalBoundingBox.min.y) * modelScale;
+  var physicsZParam = (model.info.originalBoundingBox.max.z - model.info.originalBoundingBox.min.z) * modelScale;
+  var physicsShapeParameters = {x: physicsXParam/2, y: physicsYParam/2, z: physicsZParam/2};
+  var boxPhysicsBody = physicsBodyGenerator.generateBoxBody(physicsShapeParameters);
+  boxPhysicsBody.position.set(
+    modelMesh.position.x,
+    modelMesh.position.y,
+    modelMesh.position.z
+  );
+  boxPhysicsBody.quaternion.copy(modelMesh.quaternion);
+  physicsWorld.addBody(boxPhysicsBody);
+
+  for (var i = 0; i<selections.length; i++){
+    selections[i].toggleSelect(false, false, false, true);
+    delete gridSelections[selections[i].name];
+  }
+
+  var destroyedGrids = new Object();
+  if(selections.length == 1){
+    destroyedGrids[selections[0].name] = selections[0];
+  }else{
+    var grid1 = selections[0];
+    var grid2 = selections[1];
+    startRow = grid1.rowNumber;
+    if (grid2.rowNumber < grid1.rowNumber){
+      startRow = grid2.rowNumber;
+    }
+    startCol = grid1.colNumber;
+    if (grid2.colNumber < grid1.colNumber){
+      startCol = grid2.colNumber;
+    }
+    finalRow = grid1.rowNumber;
+    if (grid2.rowNumber > grid1.rowNumber){
+      finalRow = grid2.rowNumber;
+    }
+    finalCol = grid1.colNumber;
+    if (grid2.colNumber > grid1.colNumber){
+      finalCol = grid2.colNumber;
+    }
+    for (var row = startRow; row <= finalRow; row++){
+      for (var col = startCol; col <= finalCol; col++ ){
+        var grid = this.getGridByColRow(col, row);
+        if (grid){
+          destroyedGrids[grid.name] = grid;
+        }
+      }
+    }
+  }
+
+  var modelInstance = new ModelInstance(instanceName, model, modelMesh, boxPhysicsBody, destroyedGrids);
+  modelInstances[instanceName] = modelInstance;
+
+  sceneHandler.onModelInstanceCreation(modelInstance);
 }
 
 GridSystem.prototype.newBox = function(selections, height, material, name){

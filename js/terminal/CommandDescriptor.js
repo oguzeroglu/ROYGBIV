@@ -280,7 +280,8 @@ var CommandDescriptor = function(){
       0, //mobileSimulation
       1, //selectMass
       0, //modules
-      1 //newModel
+      1, //newModel
+      3 //newModelInstance
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -563,7 +564,8 @@ var CommandDescriptor = function(){
     "mobileSimulation",
     "selectMass massName",
     "modules",
-    "newModel modelName"
+    "newModel modelName",
+    "newModelInstance instanceName modelName height"
   ];
 
   this.commands = [
@@ -846,7 +848,8 @@ var CommandDescriptor = function(){
     "mobileSimulation",
     "selectMass",
     "modules",
-    "newModel"
+    "newModel",
+    "newModelInstance"
   ];
 
   this.commandInfo = [
@@ -1129,7 +1132,8 @@ var CommandDescriptor = function(){
     "mobileSimulation: Opens the mobile simulation GUI.",
     "selectMass: Selects a mass",
     "modules: Opens module creation GUI.",
-    "newModel: Opens model creation GUI."
+    "newModel: Opens model creation GUI.",
+    "newModelInstance: Creates a new model instance from given model."
   ];
 
   this.keyboardInfo = [
@@ -1313,6 +1317,7 @@ var CommandDescriptor = function(){
   this.STEERABLE_NAME                     =   55;
   this.MASS_ID                            =   56;
   this.LIGHT_NAME                         =   57;
+  this.MODEL_NAME                         =   58;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -2044,6 +2049,13 @@ var CommandDescriptor = function(){
   this.newModel = new Object();
   this.newModel.types = [];
   this.newModel.types.push(this.UNKNOWN_INDICATOR); //modelName
+
+  // newModelInstance
+  this.newModelInstance = new Object();
+  this.newModelInstance.types = [];
+  this.newModelInstance.types.push(this.UNKNOWN_INDICATOR); //instanceName
+  this.newModelInstance.types.push(this.MODEL_NAME); //modelName
+  this.newModelInstance.types.push(this.UNKNOWN_INDICATOR); //height
 };
 
 CommandDescriptor.prototype.test = function(){
