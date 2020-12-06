@@ -195,4 +195,9 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   this.shadowBaker = shadowBaker.export(isBuildingForDeploymentMode);
   // MODULE HANDLER ************************************************
   this.modules = moduleHandler.export();
+  // MODELS ********************************************************
+  this.models = new Object();
+  for (var modelName in models){
+    this.models[modelName] = models[modelName].export();
+  }
 }

@@ -2,6 +2,18 @@ var ImportHandler = function(){
 
 }
 
+ImportHandler.prototype.importModels = function(obj, callback){
+  for (var modelName in obj.models){
+    var curModelExport = obj.models[modelName];
+    var min = curModelExport.originalBoundingBox.min;
+    var max = curModelExport.originalBoundingBox.max;
+    curModelExport.originalBoundingBox = new THREE.Box3(new THREE.Vector3(min.x, min.y, min.z), new THREE.Vector3(max.x, max.y, max.z));
+    var model = new Model(curModelExport, {});
+    models[curModelExport.name] = model;
+    model.loadTextures(callback);
+  }
+}
+
 ImportHandler.prototype.importModules = function(obj, onReady){
   moduleHandler.import(obj.modules, onReady);
 }

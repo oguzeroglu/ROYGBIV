@@ -466,7 +466,7 @@ function startDeployment(){
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
     if (result){
-      if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasTextureAtlas || stateLoader.hasShadows){
+      if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasTextureAtlas || stateLoader.hasShadows || stateLoader.hasModels){
         appendtoDeploymentConsole("Loading assets.");
       }
     }else{

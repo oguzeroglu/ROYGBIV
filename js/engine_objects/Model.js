@@ -39,6 +39,10 @@ var Model = function(modelInfo, texturesObj){
   this.texturesObj = texturesObj;
 }
 
+Model.prototype.export = function(){
+  return this.info;
+}
+
 Model.prototype.getUsedTextures = function(){
   var childInfos = this.info.childInfos;
   var usedTextures = [];
@@ -87,4 +91,42 @@ Model.prototype.onTextureAtlasRefreshed = function(){
 
   this.geometry.attributes.diffuseUV.updateRange.set(0, diffuseUVAry.length);
   this.geometry.attributes.diffuseUV.needsUpdate = true;
+}
+
+Model.prototype.loadTextures = function(callback){
+  var texturesToLoad = {};
+  var texturesObj = {};
+  for (var i = 0; i < this.info.childInfos.length; i ++){
+    var diffuseTextureURL = this.info.childInfos[i].diffuseTextureURL;
+    var diffuseTextureID = this.info.childInfos[i].diffuseTextureID;
+    if (diffuseTextureURL){
+      texturesToLoad[diffuseTextureURL] = diffuseTextureID;
+    }
+  }
+
+  if (Object.keys(texturesToLoad).length == 0){
+    callback();
+    return;
+  }
+
+  var loadedCount = 0;
+  for (var textureURL in texturesToLoad){
+    var textureID = texturesToLoad[textureURL];
+    var tmpCanvas = document.createElement("canvas");
+    var tmpContext = tmpCanvas.getContext("2d");
+    tmpCanvas.width = ACCEPTED_TEXTURE_SIZE;
+    tmpCanvas.height = ACCEPTED_TEXTURE_SIZE;
+    var tmpImg = new Image();
+    var that = this;
+    tmpImg.onload = function() {
+      this.context.drawImage(this.img, 0, 0);
+      texturesObj[this.src] = new THREE.CanvasTexture(this.canvas);
+      loadedCount ++;
+      if (loadedCount == Object.keys(texturesToLoad).length){
+        that.texturesObj = texturesObj;
+        callback();
+      }
+    }.bind({context: tmpContext, img: tmpImg, textureID: textureID, canvas: tmpCanvas, src: textureURL});
+    tmpImg.src = textureURL;
+  }
 }
