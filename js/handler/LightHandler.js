@@ -111,6 +111,7 @@ LightHandler.prototype.removeDynamicLight = function(dynamicLight){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var lightName in this.dynamicLights){
     for (var objName in addedObjectsInScene){
@@ -123,6 +124,12 @@ LightHandler.prototype.removeDynamicLight = function(dynamicLight){
       var obj = objectGroupsInScene[objName];
       if (obj.affectedByLight){
         this.removeDynamicLightFromObject(obj, this.dynamicLights[lightName]);
+      }
+    }
+    for (var instanceName in modelInstancesInScene){
+      var modelInstance = modelInstancesInScene[instanceName];
+      if (modelInstance.affectedByLight){
+        this.removeDynamicLightFromObject(modelInstance, this.dynamicLights[lightName]);
       }
     }
   }
@@ -153,6 +160,7 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -168,6 +176,14 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
       continue;
     }
     this.addDynamicLightToObject(obj, dynamicLight);
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+    this.addDynamicLightToObject(modelInstance, dynamicLight);
   }
 
   this.dynamicLightsMatrixIndicesByLightName[dynamicLight.name] = this.dynamicLightsMatrixIndex;
@@ -416,6 +432,7 @@ LightHandler.prototype.onAfterSceneChange = function(){
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
   var autoInstancedObjectsInScene = sceneHandler.getAutoInstancedObjects();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var addedObject = addedObjectsInScene[objName];
@@ -438,6 +455,13 @@ LightHandler.prototype.onAfterSceneChange = function(){
     }
   }
 
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (modelInstance.affectedByLight){
+      this.addLightToObject(modelInstance);
+    }
+  }
+
   if (mode == 1){
     this.bakeLights();
   }
@@ -452,6 +476,7 @@ LightHandler.prototype.onBeforeSceneChange = function(){
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
   var autoInstancedObjectsInScene = sceneHandler.getAutoInstancedObjects();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var addedObject = addedObjectsInScene[objName];
@@ -471,6 +496,13 @@ LightHandler.prototype.onBeforeSceneChange = function(){
     var autoInstancedObject = autoInstancedObjectsInScene[objName];
     if (autoInstancedObject.affectedByLight){
       this.removeLightFromObject(autoInstancedObject);
+    }
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (modelInstance.affectedByLight){
+      this.removeLightFromObject(modelInstance);
     }
   }
 }
@@ -569,6 +601,7 @@ LightHandler.prototype.removeStaticPointLight = function(slotID){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -594,6 +627,15 @@ LightHandler.prototype.removeStaticPointLight = function(slotID){
     }
 
     this.removeStaticPointLightMacros(obj, slotID);
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var model = modelInstancesInScene[instanceName];
+    if (!model.affectedByLight){
+      continue;
+    }
+
+    this.removeStaticPointLightMacros(model, slotID);
   }
 
   this.staticPointLightCount --;
@@ -622,6 +664,7 @@ LightHandler.prototype.addStaticPointLight = function(position, color, strength,
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -647,6 +690,15 @@ LightHandler.prototype.addStaticPointLight = function(position, color, strength,
     this.handleStaticPointLightMacros(foundSlotID, obj, position, color, strength);
   }
 
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+
+    this.handleStaticPointLightMacros(foundSlotID, modelInstance, position, color, strength);
+  }
+
   this.staticPointLightsBySlotId[foundSlotID] = {
     positionX: position.x, positionY: position.y, positionZ: position.z,
     colorR: color.r, colorG: color.g, colorB: color.b,
@@ -669,6 +721,7 @@ LightHandler.prototype.removeStaticDiffuseLight = function(slotID){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -692,6 +745,15 @@ LightHandler.prototype.removeStaticDiffuseLight = function(slotID){
     }
 
     this.removeStaticDiffuseLightMacros(obj, slotID);
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+
+    this.removeStaticDiffuseLightMacros(modelInstance, slotID);
   }
 
   this.staticDiffuseLightCount --;
@@ -720,6 +782,7 @@ LightHandler.prototype.addStaticDiffuseLight = function(direction, color, streng
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -746,6 +809,15 @@ LightHandler.prototype.addStaticDiffuseLight = function(direction, color, streng
     this.handleStaticDiffuseLightMacros(foundSlotID, obj, direction, color, strength);
   }
 
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+
+    this.handleStaticDiffuseLightMacros(foundSlotID, modelInstance, direction, color, strength);
+  }
+
   this.staticDiffuseLightsBySlotId[foundSlotID] = {
     directionX: direction.x, directionY: direction.y, directionZ: direction.z,
     colorR: color.r, colorG: color.g, colorB: color.b,
@@ -762,6 +834,7 @@ LightHandler.prototype.addStaticDiffuseLight = function(direction, color, streng
 LightHandler.prototype.removeStaticAmbientLight = function(){
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -779,6 +852,15 @@ LightHandler.prototype.removeStaticAmbientLight = function(){
     }
 
     this.removeStaticAmbientLightMacros(obj);
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+
+    this.removeStaticAmbientLightMacros(modelInstance);
   }
 
   delete this.staticAmbientColor;
@@ -790,6 +872,7 @@ LightHandler.prototype.removeStaticAmbientLight = function(){
 LightHandler.prototype.setStaticAmbientLight = function(color, strength){
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -807,6 +890,15 @@ LightHandler.prototype.setStaticAmbientLight = function(color, strength){
     }
 
     this.handleStaticAmbientLightMacros(obj, color, strength);
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+
+    this.handleStaticAmbientLightMacros(modelInstance, color, strength);
   }
 
   this.staticAmbientColor = color.clone();

@@ -152,7 +152,8 @@ var GUIHandler = function(){
     "Model instance": "",
     "Hidden": false,
     "Has mass": false,
-    "Intersectable": false
+    "Intersectable": false,
+    "Affected by light": false
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -408,6 +409,7 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
     guiHandler.modelInstanceManipulationParameters["Has mass"] = !curSelection.noMass;
     guiHandler.modelInstanceManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
+    guiHandler.modelInstanceManipulationParameters["Affected by light"] = !!curSelection.affectedByLight;
   }else{
     guiHandler.hide(guiHandler.guiTypes.MODEL_INSTANCE);
   }
@@ -2133,6 +2135,18 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       terminal.printInfo(Text.OBJECT_INTERSECTABLE);
     }else{
       terminal.printInfo(Text.OBJECT_UNINTERSECTABLE);
+    }
+  }).listen();
+
+  var graphicsFolder = guiHandler.datGuiModelInstance.addFolder("Graphics");
+  graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Affected by light").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.setAffectedByLight(val);
+    if (val){
+      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
+    }else{
+      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
     }
   }).listen();
 }

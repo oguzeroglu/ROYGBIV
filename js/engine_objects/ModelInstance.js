@@ -17,6 +17,10 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
   }
 
   this.scale = this.mesh.scale.x;
+
+  this.matrixCache = new THREE.Matrix4();
+
+  webglCallbackHandler.registerEngineObject(this);
 }
 
 ModelInstance.prototype.onTextureAtlasRefreshed = function(){
@@ -42,7 +46,8 @@ ModelInstance.prototype.export = function(){
       z: this.mesh.quaternion.z,
       w: this.mesh.quaternion.w
     },
-    scale: this.mesh.scale.x
+    scale: this.mesh.scale.x,
+    affectedByLight: !!this.affectedByLight
   };
 
   var destroyedGridsExport = {};
@@ -241,5 +246,49 @@ ModelInstance.prototype.destroy = function(){
   this.mesh.material.dispose();
   for (var gridName in this.destroyedGrids){
     this.destroyedGrids[gridName].destroyedModelInstance = 0;
+  }
+}
+
+ModelInstance.prototype.updateWorldInverseTranspose = function(overrideMatrix){
+  if (!projectLoaded){
+    return;
+  }
+  var val = overrideMatrix? overrideMatrix: this.mesh.material.uniforms.worldInverseTranspose.value;
+  val.getInverse(this.mesh.matrixWorld).transpose();
+  this.matrixCache.copy(this.mesh.matrixWorld);
+}
+
+ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
+
+  macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+
+  delete this.mesh.material.uniforms.worldInverseTranspose;
+  delete this.mesh.material.uniforms.dynamicLightsMatrix;
+  delete this.mesh.material.uniforms.worldMatrix;
+
+  if (isAffectedByLight){
+    macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+
+    this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
+    this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+    this.mesh.material.uniforms.dynamicLightsMatrix = lightHandler.getUniform();
+    this.updateWorldInverseTranspose();
+
+    lightHandler.addLightToObject(this);
+  }else{
+    lightHandler.removeLightFromObject(this);
+  }
+
+  this.mesh.material.needsUpdate = true;
+
+  this.affectedByLight = isAffectedByLight;
+}
+
+ModelInstance.prototype.onBeforeRender = function(){
+  if (!this.affectedByLight){
+    return;
+  }
+  if (!this.matrixCache.equals(this.mesh.matrixWorld)){
+    this.updateWorldInverseTranspose();
   }
 }

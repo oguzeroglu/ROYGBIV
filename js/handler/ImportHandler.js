@@ -46,6 +46,8 @@ ImportHandler.prototype.importModelInstances = function(obj){
       modelInstance.noMass = true;
       physicsWorld.remove(modelInstance.physicsBody);
     }
+
+    modelInstance.setAffectedByLight(curModelInstanceExport.affectedByLight);
   }
 }
 
