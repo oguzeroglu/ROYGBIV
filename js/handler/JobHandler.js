@@ -136,6 +136,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleNewModelInstanceCommand();
     }else if (this.splitted[0] == "destroymodel"){
       this.handleDestroyModelCommand();
+    }else if (this.splitted[0] == "destroymodelinstance"){
+      this.handleDestroyModelInstanceCommand();
     }
 
     if (jobHandlerRaycasterRefresh){
@@ -160,6 +162,30 @@ JobHandler.prototype.handle = function(previewModeCommand){
   }
 
   jobHandlerWorking = false;
+}
+
+JobHandler.prototype.handleDestroyModelInstanceCommand = function(){
+  var instanceNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var instanceName in sceneHandler.getModelInstances()){
+    if (instanceName.startsWith(instanceNamePrefix)){
+      parseCommand("destroyModelInstance "+instanceName)
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_MODEL_INSTANCES_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_MODEL_INSTANCES.replace(Text.PARAM1, ctr));
+
+    if (physicsDebugMode){
+      terminal.skip = true;
+      parseCommand("switchPhysicsDebugMode");
+      parseCommand("switchPhysicsDebugMode");
+      terminal.skip = false;
+    }
+  }
 }
 
 JobHandler.prototype.handleDestroyModelCommand = function(){

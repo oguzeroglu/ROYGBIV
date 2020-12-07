@@ -6778,6 +6778,10 @@ function parse(input){
             return true;
           }
           var modelInstanceName = splitted[1];
+          if (!(modelInstanceName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var modelInstance = modelInstances[modelInstanceName];
           if (!modelInstance){
             terminal.printError(Text.NO_SUCH_MODEL_INSTANCE);
@@ -6787,13 +6791,17 @@ function parse(input){
           delete modelInstances[modelInstanceName];
           modelInstance.destroy();
           sceneHandler.onModelInstanceDeletion(modelInstance);
-          if (physicsDebugMode){
-            terminal.skip = true;
-            parseCommand("switchPhysicsDebugMode");
-            parseCommand("switchPhysicsDebugMode");
-            terminal.skip = false;
+          if (!jobHandlerWorking){
+            if (physicsDebugMode){
+              terminal.skip = true;
+              parseCommand("switchPhysicsDebugMode");
+              parseCommand("switchPhysicsDebugMode");
+              terminal.skip = false;
+            }
+            refreshRaycaster(Text.MODEL_INSTANCE_DESTROYED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
           }
-          refreshRaycaster(Text.MODEL_INSTANCE_DESTROYED);
           return true;
         break;
       }
