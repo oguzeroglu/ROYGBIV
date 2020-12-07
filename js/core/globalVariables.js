@@ -134,6 +134,7 @@ var selectedSprite = 0;
 var selectedContainer = 0;
 var selectedVirtualKeyboard = 0;
 var selectedMass = 0;
+var selectedModelInstance = 0;
 var planeWidthSegments = 10;
 var planeHeightSegments = 10;
 var boxWidthSegments = 10;

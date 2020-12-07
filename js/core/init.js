@@ -646,7 +646,7 @@ function onRaycasterIntersection(){
      if (!object){
        object = modelInstances[intersectionObject];
      }
-     if (object.isAddedObject || object.isObjectGroup){
+     if (object.isAddedObject || object.isObjectGroup || object.isModelInstance){
        if (!isDeployment && mode == 0){
          terminal.clear();
        }
@@ -672,6 +672,22 @@ function onRaycasterIntersection(){
            object.clickCallbackFunction(point.x, point.y, point.z);
          }
        }else if (object.isObjectGroup){
+         if (!isDeployment && mode == 0){
+           terminal.printInfo(Text.CLICKED_ON.replace(
+             Text.PARAM1, object.name+coordStr
+           ));
+         }
+         if (mode == 0){
+           selectionHandler.resetCurrentSelection();
+         }
+         if (!isDeployment){
+           selectionHandler.select(object);
+           guiHandler.afterObjectSelection();
+         }
+         if (object.clickCallbackFunction){
+           object.clickCallbackFunction(point.x, point.y, point.z);
+         }
+       }else if (object.isModelInstance){
          if (!isDeployment && mode == 0){
            terminal.printInfo(Text.CLICKED_ON.replace(
              Text.PARAM1, object.name+coordStr
@@ -768,7 +784,23 @@ function onRaycasterIntersection(){
                 guiHandler.afterObjectSelection();
               }
            }else if (selectedGrid.destroyedModelInstance && !(keyboardBuffer["Shift"]) && !modelInstances[selectedGrid.destroyedModelInstance].hiddenInDesignMode){
-             
+             var modelInstance = modelInstances [selectedGrid.destroyedModelInstance];
+             terminal.clear();
+             var point = intersectionPoint;
+             var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
+             terminal.printInfo(Text.CLICKED_ON.replace(
+               Text.PARAM1, modelInstance.name+coordStr
+             ));
+             if (mode == 0){
+               selectionHandler.resetCurrentSelection();
+             }
+             if (!isDeployment){
+               selectionHandler.select(modelInstance);
+               guiHandler.afterObjectSelection();
+             }
+             if (modelInstance.clickCallbackFunction){
+               modelInstance.clickCallbackFunction(point.x, point.y, point.z);
+             }
            }else{
              selectedGrid.toggleSelect(false, true);
           }
@@ -815,8 +847,6 @@ function onRaycasterIntersection(){
          guiHandler.afterObjectSelection();
        }
        object.onMouseClickIntersection(intersectionObject);
-     }else if (object.isModelInstance){
-
      }
   }else{
     if (!isDeployment){

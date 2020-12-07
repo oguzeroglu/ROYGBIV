@@ -42,6 +42,11 @@ SelectionHandler.prototype.select = function(object){
     object.visualise();
     selectedMass = object;
   }
+  if (object.isModelInstance){
+    object.visualiseBoundingBoxes();
+    object.mesh.add(axesHelper);
+    selectedModelInstance = object;
+  }
   this.currentSelection = object;
 }
 
@@ -66,6 +71,9 @@ SelectionHandler.prototype.getSelectedObject = function(){
   }
   if (selectedMass){
     return selectedMass;
+  }
+  if (selectedModelInstance){
+    return selectedModelInstance;
   }
   return 0;
 }
@@ -103,6 +111,10 @@ SelectionHandler.prototype.resetCurrentSelection = function(){
   }else if (this.currentSelection.isMass){
     selectedMass.unVisualise();
     selectedMass = 0;
+  }else if (this.currentSelection.isModelInstance){
+    this.currentSelection.mesh.remove(axesHelper);
+    this.currentSelection.removeBoundingBoxesFromScene();
+    selectedModelInstance = 0;
   }
   this.currentSelection = 0;
   if (!isDeployment){
