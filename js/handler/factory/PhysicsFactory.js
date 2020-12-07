@@ -29,12 +29,17 @@ PhysicsFactory.prototype.refresh = function(){
         elem.add(objectGroups[objName].physicsBody);
       }
     }
+    for (var instanceName in sceneHandler.getModelInstances()){
+      if (!modelInstances[instanceName].noMass){
+        elem.add(modelInstances[instanceName].physicsBody);
+      }
+    }
 
     var masses = sceneHandler.getMasses();
     for (var massName in masses){
       elem.add(masses[massName].physicsBody);
     }
-    
+
     sceneHandler.onPhysicsReady();
   }else if (!this.workerTurnedOff){
     elem.refresh();

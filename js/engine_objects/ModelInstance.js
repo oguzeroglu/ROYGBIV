@@ -87,6 +87,22 @@ ModelInstance.prototype.exportLightweight = function(){
     exportObject.hiddenInDesignMode = true;
   }
 
+  var physicsXParam = (this.model.info.originalBoundingBox.max.x - this.model.info.originalBoundingBox.min.x) * this.scale;
+  var physicsYParam = (this.model.info.originalBoundingBox.max.y - this.model.info.originalBoundingBox.min.y) * this.scale;
+  var physicsZParam = (this.model.info.originalBoundingBox.max.z - this.model.info.originalBoundingBox.min.z) * this.scale;
+  exportObject.physicsShapeParameters = {x: physicsXParam/2, y: physicsYParam/2, z: physicsZParam/2};
+  exportObject.physicsPosition = {
+    x: this.physicsBody.position.x,
+    y: this.physicsBody.position.y,
+    z: this.physicsBody.position.z
+  };
+  exportObject.physicsQuaternion = {
+    x: this.physicsBody.quaternion.x,
+    y: this.physicsBody.quaternion.y,
+    z: this.physicsBody.quaternion.z,
+    w: this.physicsBody.quaternion.w
+  };
+
   return exportObject;
 }
 

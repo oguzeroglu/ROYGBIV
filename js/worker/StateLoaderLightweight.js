@@ -342,6 +342,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
   var childAddedObjectExports = this.state.childAddedObjects;
   var objectGroupExports = this.state.objectGroups;
   var massExports = this.state.masses;
+  var modelInstanceExports = this.state.modelInstances;
   var totalAddedObjectExports = new Object();
   var childBodies = new Object();
   for (var objName in addedObjectExports){
@@ -485,6 +486,18 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     physicsWorld.addBody(mass.physicsBody);
     masses[massName] = mass;
   }
+  for (var instanceName in modelInstanceExports){
+    var curInstanceExport = modelInstanceExports[instanceName];
+    var physicsBody = physicsBodyGenerator.generateBoxBody(curInstanceExport.physicsShapeParameters);
+    physicsBody.position.set(curInstanceExport.physicsPosition.x, curInstanceExport.physicsPosition.y, curInstanceExport.physicsPosition.z);
+    physicsBody.quaternion.set(curInstanceExport.physicsQuaternion.x, curInstanceExport.physicsQuaternion.y, curInstanceExport.physicsQuaternion.z, curInstanceExport.physicsQuaternion.w);
+    var modelInstance = new ModelInstance(instanceName);
+    modelInstance.physicsBody = physicsBody;
+    modelInstances[instanceName] = modelInstance;
+    if (!curInstanceExport.noMass){
+      physicsWorld.addBody(physicsBody);
+    }
+  }
 }
 
 StateLoaderLightweight.prototype.loadPhysicsData = function(){
@@ -506,6 +519,7 @@ StateLoaderLightweight.prototype.resetPhysics = function(){
   addedObjects = new Object();
   objectGroups = new Object();
   masses = new Object();
+  modelInstances = new Object();
 }
 
 StateLoaderLightweight.prototype.reset = function(){
