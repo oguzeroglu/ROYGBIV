@@ -52,6 +52,7 @@ ModelInstance.prototype.export = function(){
 
   exportObj.destroyedGrids = destroyedGridsExport;
   exportObj.hiddenInDesignMode = !!this.hiddenInDesignMode;
+  exportObj.noMass = !!this.noMass;
 
   return exportObj;
 }
@@ -102,6 +103,8 @@ ModelInstance.prototype.exportLightweight = function(){
     z: this.physicsBody.quaternion.z,
     w: this.physicsBody.quaternion.w
   };
+
+  exportObject.noMass = !!this.noMass;
 
   return exportObject;
 }
@@ -215,4 +218,13 @@ ModelInstance.prototype.showInDesignMode = function(){
   this.showVisually();
   this.hiddenInDesignMode = false;
   refreshRaycaster(Text.OBJECT_SHOWN);
+}
+
+ModelInstance.prototype.setNoMass = function(val){
+  if (!val){
+    physicsWorld.addBody(this.physicsBody);
+  }else{
+    physicsWorld.remove(this.physicsBody);
+  }
+  this.noMass = val;
 }

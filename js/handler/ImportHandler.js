@@ -39,6 +39,11 @@ ImportHandler.prototype.importModelInstances = function(obj){
     }
 
     modelInstances[instanceName] = modelInstance;
+
+    if (curModelInstanceExport.noMass){
+      modelInstance.noMass = true;
+      physicsWorld.remove(modelInstance.physicsBody);
+    }
   }
 }
 

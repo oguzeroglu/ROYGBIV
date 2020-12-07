@@ -150,7 +150,8 @@ var GUIHandler = function(){
   };
   this.modelInstanceManipulationParameters = {
     "Model instance": "",
-    "Hidden": false
+    "Hidden": false,
+    "Has mass": false
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -404,6 +405,7 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.show(guiHandler.guiTypes.MODEL_INSTANCE);
     guiHandler.modelInstanceManipulationParameters["Model instance"] = curSelection.name;
     guiHandler.modelInstanceManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
+    guiHandler.modelInstanceManipulationParameters["Has mass"] = !curSelection.noMass;
   }else{
     guiHandler.hide(guiHandler.guiTypes.MODEL_INSTANCE);
   }
@@ -2107,6 +2109,16 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       selectionHandler.getSelectedObject().hideInDesignMode();
     }else{
       selectionHandler.getSelectedObject().showInDesignMode();
+    }
+  }).listen();
+
+  var physicsFolder = guiHandler.datGuiModelInstance.addFolder("Physics");
+  physicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Has mass").onChange(function(val){
+    terminal.clear();
+    selectionHandler.getSelectedObject().setNoMass(!val);
+    terminal.printInfo(val? Text.PHYSICS_ENABLED: Text.PHYSICS_DISABLED);
+    if (physicsDebugMode){
+      debugRenderer.refresh();
     }
   }).listen();
 }
