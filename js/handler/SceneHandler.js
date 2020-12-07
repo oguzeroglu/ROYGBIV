@@ -182,6 +182,15 @@ SceneHandler.prototype.hideAll = function(){
     }
     obj.hideVisually();
   }
+  for (var instanceName in modelInstances){
+    var modelInstance = modelInstances[instanceName];
+    if (mode == 1){
+      for (var animName in modelInstance.animations){
+        animationHandler.forceFinish(modelInstance.animations[animName]);
+      }
+    }
+    modelInstance.hideVisually();
+  }
   for (var textName in addedTexts){
     var text = addedTexts[textName];
     if (mode == 1){
@@ -312,6 +321,14 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
         obj.hideInDesignMode(true);
       }
     }
+    for (var instanceName in this.scenes[sceneName].modelInstances){
+      var modelInstance = this.scenes[sceneName].modelInstances[instanceName];
+      if (!modelInstance.hiddenInDesignMode){
+        modelInstance.showVisually();
+      }else{
+        modelInstance.hideInDesignMode(true);
+      }
+    }
     for (var textName in this.scenes[sceneName].addedTexts){
       var text = this.scenes[sceneName].addedTexts[textName];
       if (!text.hiddenInDesignMode){
@@ -385,6 +402,10 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     for (var objName in this.scenes[sceneName].objectGroups){
       var obj = this.scenes[sceneName].objectGroups[objName];
       obj.showVisually();
+    }
+    for (var instanceName in this.scenes[sceneName].modelInstances){
+      var modelInstance = this.scenes[sceneName].modelInstances[instanceName];
+      modelInstance.showVisually();
     }
     for (var textName in this.scenes[sceneName].addedTexts){
       var text = this.scenes[sceneName].addedTexts[textName];

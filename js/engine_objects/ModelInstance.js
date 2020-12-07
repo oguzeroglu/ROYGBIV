@@ -161,3 +161,23 @@ ModelInstance.prototype.intersectsLine = function(line){
   }
   return false;
 }
+
+ModelInstance.prototype.hideVisually = function(){
+  this.mesh.visible = false;
+}
+
+ModelInstance.prototype.showVisually = function(){
+  this.mesh.visible = true;
+}
+
+ModelInstance.prototype.hideInDesignMode = function(skipRaycasterRefresh){
+  if (isDeployment){
+    return;
+  }
+  this.hideVisually();
+  this.hiddenInDesignMode = true;
+
+  if (!skipRaycasterRefresh){
+    refreshRaycaster(Text.OBJECT_HIDDEN);
+  }
+}
