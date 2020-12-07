@@ -465,6 +465,7 @@ var Text = function(){
   this.JUMP_DESCRIPTOR_INSERTED_TO_A_GRAPH = "Jump descriptor is inserted to a graph. Cannot delete.";
   this.LIGHTNING_DESTROYED = "Lightning destroyed.";
   this.WALL_COLLECTIONS = "Wall collections";
+  this.MODEL_INSTANCE_DESTROYED = "Model instance destroyed.";
   this.TREE_WALL_COLLECTIONS = "|____@@1: OUTLINE COLOR -> @@2";
   this.PHYSICS_UNSIMPLIFIED = "Physics unsimplified.";
   this.CONTAINER_IS_EMPTY = "Container is empty.";

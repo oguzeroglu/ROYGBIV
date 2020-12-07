@@ -142,6 +142,8 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
         parseCommand("destroySprite " + currentSelection.name);
       }else if (currentSelection.isContainer){
         parseCommand("destroyContainer " + currentSelection.name);
+      }else if (currentSelection.isModelInstance){
+        parseCommand("destroyModelInstance " + currentSelection.name);
       }
       guiHandler.afterObjectSelection();
     break;

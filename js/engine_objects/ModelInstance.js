@@ -234,3 +234,12 @@ ModelInstance.prototype.setNoMass = function(val){
 ModelInstance.prototype.setIntersectableStatus = function(val){
   this.isIntersectable = val;
 }
+
+ModelInstance.prototype.destroy = function(){
+  scene.remove(this.mesh);
+  physicsWorld.remove(this.physicsBody);
+  this.mesh.material.dispose();
+  for (var gridName in this.destroyedGrids){
+    this.destroyedGrids[gridName].destroyedModelInstance = 0;
+  }
+}

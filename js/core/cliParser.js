@@ -6778,6 +6778,35 @@ function parse(input){
           selectionHandler.select(modelInstance);
           camera.lookAt(modelInstance.mesh.position.x, modelInstance.mesh.position.y, modelInstance.mesh.position.z);
           terminal.printInfo(Text.MODEL_INSTANCE_SELECTED.replace(Text.PARAM1, modelInstance.name));
+          return true;
+        break;
+        case 283: //destroyModelInstance
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var modelInstanceName = splitted[1];
+          var modelInstance = modelInstances[modelInstanceName];
+          if (!modelInstance){
+            terminal.printError(Text.NO_SUCH_MODEL_INSTANCE);
+            return true;
+          }
+          if (modelInstance.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.MODEL_INSTANCE_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          selectionHandler.resetCurrentSelection();
+          delete modelInstances[modelInstanceName];
+          modelInstance.destroy();
+          sceneHandler.onModelInstanceDeletion(modelInstance);
+          if (physicsDebugMode){
+            terminal.skip = true;
+            parseCommand("switchPhysicsDebugMode");
+            parseCommand("switchPhysicsDebugMode");
+            terminal.skip = false;
+          }
+          refreshRaycaster(Text.MODEL_INSTANCE_DESTROYED);
+          return true;
         break;
       }
       return true;
