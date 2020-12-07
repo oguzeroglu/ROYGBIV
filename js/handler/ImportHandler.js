@@ -33,6 +33,11 @@ ImportHandler.prototype.importModelInstances = function(obj){
     }
 
     var modelInstance = new ModelInstance(instanceName, model, modelMesh, boxPhysicsBody, destroyedGrids, curModelInstanceExport.gsName);
+
+    if (curModelInstanceExport.hiddenInDesignMode){
+      modelInstance.hideInDesignMode(true);
+    }
+
     modelInstances[instanceName] = modelInstance;
   }
 }

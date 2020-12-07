@@ -149,7 +149,8 @@ var GUIHandler = function(){
     "Intersectable": false
   };
   this.modelInstanceManipulationParameters = {
-    "Model instance": ""
+    "Model instance": "",
+    "Hidden": false
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -402,6 +403,7 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
   if (curSelection && curSelection.isModelInstance){
     guiHandler.show(guiHandler.guiTypes.MODEL_INSTANCE);
     guiHandler.modelInstanceManipulationParameters["Model instance"] = curSelection.name;
+    guiHandler.modelInstanceManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
   }else{
     guiHandler.hide(guiHandler.guiTypes.MODEL_INSTANCE);
   }
@@ -2100,6 +2102,13 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   });
 
   guiHandler.disableController(guiHandler.datGuiModelInstance.add(guiHandler.modelInstanceManipulationParameters, "Model instance").listen());
+  guiHandler.datGuiModelInstance.add(guiHandler.modelInstanceManipulationParameters, "Hidden").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().hideInDesignMode();
+    }else{
+      selectionHandler.getSelectedObject().showInDesignMode();
+    }
+  }).listen();
 }
 
 GUIHandler.prototype.initializeMassManipulationGUI = function(){

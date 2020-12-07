@@ -307,6 +307,8 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
       modelInstance.pseudoFaces.push(new THREE.Face3(a, b, c, normal));
     }
 
+    modelInstance.hiddenInDesignMode = curExport.hiddenInDesignMode;
+
     modelInstances[modelInstanceName] = modelInstance;
   }
 }

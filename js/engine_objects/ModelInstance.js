@@ -51,6 +51,7 @@ ModelInstance.prototype.export = function(){
   }
 
   exportObj.destroyedGrids = destroyedGridsExport;
+  exportObj.hiddenInDesignMode = !!this.hiddenInDesignMode;
 
   return exportObj;
 }
@@ -80,6 +81,10 @@ ModelInstance.prototype.exportLightweight = function(){
   }
   for (var i = 0; i<this.pseudoFaces.length; i++){
     exportObject.pseudoFaces.push(this.pseudoFaces[i]);
+  }
+
+  if (this.hiddenInDesignMode){
+    exportObject.hiddenInDesignMode = true;
   }
 
   return exportObject;
@@ -185,4 +190,13 @@ ModelInstance.prototype.hideInDesignMode = function(skipRaycasterRefresh){
   if (!skipRaycasterRefresh){
     refreshRaycaster(Text.OBJECT_HIDDEN);
   }
+}
+
+ModelInstance.prototype.showInDesignMode = function(){
+  if (isDeployment){
+    return;
+  }
+  this.showVisually();
+  this.hiddenInDesignMode = false;
+  refreshRaycaster(Text.OBJECT_SHOWN);
 }
