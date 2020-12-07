@@ -282,7 +282,8 @@ var CommandDescriptor = function(){
       0, //modules
       1, //newModel
       3, //newModelInstance
-      1 //destroyModel
+      1, //destroyModel
+      1 //selectModelInstance
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -567,7 +568,8 @@ var CommandDescriptor = function(){
     "modules",
     "newModel modelName",
     "newModelInstance instanceName modelName height",
-    "destroyModel modelName"
+    "destroyModel modelName",
+    "selectModelInstance instanceName"
   ];
 
   this.commands = [
@@ -852,7 +854,8 @@ var CommandDescriptor = function(){
     "modules",
     "newModel",
     "newModelInstance",
-    "destroyModel"
+    "destroyModel",
+    "selectModelInstance"
   ];
 
   this.commandInfo = [
@@ -1137,7 +1140,8 @@ var CommandDescriptor = function(){
     "modules: Opens module creation GUI.",
     "newModel: Opens model creation GUI.",
     "newModelInstance: Creates a new model instance from given model.",
-    "destoryModel: Destroys a model."
+    "destoryModel: Destroys a model.",
+    "selectModelInstance: Selects a model instance."
   ];
 
   this.keyboardInfo = [
@@ -1322,6 +1326,7 @@ var CommandDescriptor = function(){
   this.MASS_ID                            =   56;
   this.LIGHT_NAME                         =   57;
   this.MODEL_NAME                         =   58;
+  this.MODEL_INSTANCE_NAME                =   59;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -2065,6 +2070,11 @@ var CommandDescriptor = function(){
   this.destroyModel = new Object();
   this.destroyModel.types = [];
   this.destroyModel.types.push(this.MODEL_NAME); //modelName
+
+  // selectModelInstance
+  this.selectModelInstance = new Object();
+  this.selectModelInstance.types = [];
+  this.selectModelInstance.types.push(this.MODEL_INSTANCE_NAME); //instanceName
 };
 
 CommandDescriptor.prototype.test = function(){

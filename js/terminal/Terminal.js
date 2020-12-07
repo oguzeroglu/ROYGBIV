@@ -967,6 +967,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Models]: ";
 			break;
+			case commandDescriptor.MODEL_INSTANCE_NAME:
+				for (var instanceName in sceneHandler.getModelInstances()){
+					if (instanceName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(instanceName);
+					}
+				}
+				helpString = "[Model instances]: ";
+			break;
 		}
 
 		//  **********************************************************
