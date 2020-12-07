@@ -100,6 +100,9 @@ Scene.prototype.destroy = function(){
   for (var massName in this.masses){
     parseCommand("destroyMass " + massName);
   }
+  for (var instanceName in this.modelInstances){
+    parseCommand("destroyModelInstance " + instanceName); 
+  }
   this.reset();
 
   steeringHandler.onSceneDeletion(this.name);

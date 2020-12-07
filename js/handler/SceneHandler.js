@@ -42,8 +42,10 @@ SceneHandler.prototype.onRaycasterReady = function(){
 }
 
 SceneHandler.prototype.destroyScene = function(sceneName){
+  this.deletingScene = true;
   this.scenes[sceneName].destroy();
   delete this.scenes[sceneName];
+  this.deletingScene = false;
 }
 
 SceneHandler.prototype.reset = function(){

@@ -4446,10 +4446,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SPRITE);
             return true;
           }
-          if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
-            return true;
-          }
           sprite.destroy();
           if (sprite.containerParent){
             sprite.containerParent.removeSprite();
@@ -6256,10 +6252,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_MASS);
             return true;
           }
-          if (mass.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.MASS_NOT_IN_ACTIVE_SCENE);
-            return true;
-          }
           delete masses[massID];
           sceneHandler.onMassDeletion(mass);
           if (physicsDebugMode){
@@ -6791,10 +6783,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_MODEL_INSTANCE);
             return true;
           }
-          if (modelInstance.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.MODEL_INSTANCE_NOT_IN_ACTIVE_SCENE);
-            return true;
-          }
           selectionHandler.resetCurrentSelection();
           delete modelInstances[modelInstanceName];
           modelInstance.destroy();
@@ -6926,6 +6914,9 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
 }
 
 function refreshRaycaster(messageOnFinished, noClear, callback){
+  if (mode == 0 && sceneHandler.deletingScene){
+    return;
+  }
   if (!isDeployment){
     if (physicsDebugMode){
       debugRenderer.refresh();
