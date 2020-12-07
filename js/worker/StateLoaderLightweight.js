@@ -279,6 +279,10 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
       var curVertex = curExport.vertices[i];
       var vect = new THREE.Vector3(curVertex.x, curVertex.y, curVertex.z)
       modelInstance.vertices.push(vect.clone());
+    }
+    for (var i = 0; i<curExport.transformedVertices.length; i++){
+      var curTransformedVertex = curExport.transformedVertices[i];
+      var vect = new THREE.Vector3(curTransformedVertex.x, curTransformedVertex.y, curTransformedVertex.z)
       modelInstance.transformedVertices.push(vect);
       bb.expandByPoint(vect);
     }

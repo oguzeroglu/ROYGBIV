@@ -56,19 +56,24 @@ ModelInstance.prototype.export = function(){
 }
 
 ModelInstance.prototype.exportLightweight = function(){
+  this.mesh.updateMatrixWorld();
+
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
   }
 
-  this.mesh.updateMatrixWorld();
   var exportObject = new Object();
 
   exportObject.vertices = [];
+  exportObject.transformedVertices = [];
   exportObject.triangles = [];
   exportObject.pseudoFaces = [];
 
   for (var i = 0; i<this.vertices.length; i++){
     exportObject.vertices.push({x: this.vertices[i].x, y: this.vertices[i].y, z: this.vertices[i].z})
+  }
+  for (var i = 0; i<this.transformedVertices.length; i++){
+    exportObject.transformedVertices.push({x: this.transformedVertices[i].x, y: this.transformedVertices[i].y, z: this.transformedVertices[i].z})
   }
   for (var i = 0; i<this.triangles.length; i++){
     exportObject.triangles.push({a: this.triangles[i].a, b: this.triangles[i].b, c: this.triangles[i].c})
