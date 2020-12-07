@@ -40,6 +40,8 @@ ImportHandler.prototype.importModelInstances = function(obj){
 
     modelInstances[instanceName] = modelInstance;
 
+    modelInstance.isIntersectable = !!curModelInstanceExport.isIntersectable;
+
     if (curModelInstanceExport.noMass){
       modelInstance.noMass = true;
       physicsWorld.remove(modelInstance.physicsBody);

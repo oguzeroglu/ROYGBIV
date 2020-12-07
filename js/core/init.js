@@ -535,6 +535,9 @@ function onRaycasterMouseMoveIntersection(){
     if (!object){
       object = masses[intersectionObject];
     }
+    if (!object){
+      object = modelInstances[intersectionObject];
+    }
 
     if (object && object.mouseMoveCallbackFunction){
       object.mouseMoveCallbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
@@ -572,6 +575,9 @@ function onRaycasterMouseMoveIntersection(){
       if (!curObj){
         curObj = masses[currentMouseOverObjectName];
       }
+      if (!curObj){
+        curObj = modelInstances[currentMouseOverObjectName];
+      }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
           curObj.mouseOutCallbackFunction();
@@ -608,6 +614,9 @@ function onRaycasterMouseMoveIntersection(){
       }
       if (!curObj){
         curObj = masses[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = modelInstances[currentMouseOverObjectName];
       }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){

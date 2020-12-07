@@ -151,7 +151,8 @@ var GUIHandler = function(){
   this.modelInstanceManipulationParameters = {
     "Model instance": "",
     "Hidden": false,
-    "Has mass": false
+    "Has mass": false,
+    "Intersectable": false
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -406,6 +407,7 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Model instance"] = curSelection.name;
     guiHandler.modelInstanceManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
     guiHandler.modelInstanceManipulationParameters["Has mass"] = !curSelection.noMass;
+    guiHandler.modelInstanceManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
   }else{
     guiHandler.hide(guiHandler.guiTypes.MODEL_INSTANCE);
   }
@@ -2119,6 +2121,18 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     terminal.printInfo(val? Text.PHYSICS_ENABLED: Text.PHYSICS_DISABLED);
     if (physicsDebugMode){
       debugRenderer.refresh();
+    }
+  }).listen();
+
+  var generalFolder = guiHandler.datGuiModelInstance.addFolder("General");
+  generalFolder.add(guiHandler.modelInstanceManipulationParameters, "Intersectable").onChange(function(val){
+    terminal.clear();
+    var obj = selectionHandler.getSelectedObject();
+    obj.setIntersectableStatus(val)
+    if (obj.isIntersectable){
+      terminal.printInfo(Text.OBJECT_INTERSECTABLE);
+    }else{
+      terminal.printInfo(Text.OBJECT_UNINTERSECTABLE);
     }
   }).listen();
 }

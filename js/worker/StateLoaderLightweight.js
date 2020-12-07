@@ -308,6 +308,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     }
 
     modelInstance.hiddenInDesignMode = curExport.hiddenInDesignMode;
+    modelInstance.isIntersectable = curExport.isIntersectable;
 
     modelInstances[modelInstanceName] = modelInstance;
   }

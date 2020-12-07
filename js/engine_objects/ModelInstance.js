@@ -53,6 +53,7 @@ ModelInstance.prototype.export = function(){
   exportObj.destroyedGrids = destroyedGridsExport;
   exportObj.hiddenInDesignMode = !!this.hiddenInDesignMode;
   exportObj.noMass = !!this.noMass;
+  exportObj.isIntersectable = !!this.isIntersectable;
 
   return exportObj;
 }
@@ -105,6 +106,7 @@ ModelInstance.prototype.exportLightweight = function(){
   };
 
   exportObject.noMass = !!this.noMass;
+  exportObject.isIntersectable = this.isIntersectable;
 
   return exportObject;
 }
@@ -227,4 +229,8 @@ ModelInstance.prototype.setNoMass = function(val){
     physicsWorld.remove(this.physicsBody);
   }
   this.noMass = val;
+}
+
+ModelInstance.prototype.setIntersectableStatus = function(val){
+  this.isIntersectable = val;
 }
