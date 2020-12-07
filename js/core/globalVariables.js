@@ -28,6 +28,7 @@ var cmGUIFocused = false;
 var acGUIFocused = false;
 var vkGUIFocused = false;
 var mmGUIFocused = false;
+var mimGUIFocused = false;
 var lGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;

@@ -15,7 +15,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
     return;
   }
   keyboardEventHandler.isCapsOn = event.getModifierState && event.getModifierState(keyboardEventHandler.CAPSLOCK);
-  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused || lGUIFocused || vkGUIFocused || mmGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused || lGUIFocused || vkGUIFocused || mmGUIFocused || mimGUIFocused){
     return;
   }
   if (keyCodeToChar[event.keyCode] == keyboardEventHandler.SHIFT){
@@ -76,7 +76,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
     return;
   }
   keyboardEventHandler.isCapsOn = event.getModifierState && event.getModifierState(keyboardEventHandler.CAPSLOCK);
-  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused || lGUIFocused || vkGUIFocused || mmGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused || lGUIFocused || vkGUIFocused || mmGUIFocused || mimGUIFocused){
     return;
   }
   var foundKey;

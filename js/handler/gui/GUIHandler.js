@@ -148,6 +148,9 @@ var GUIHandler = function(){
     "Mass": "",
     "Intersectable": false
   };
+  this.modelInstanceManipulationParameters = {
+    "Model instance": ""
+  };
   this.bloomParameters = {
     "Threshold": 0.0,
     "Active": false,
@@ -172,7 +175,7 @@ var GUIHandler = function(){
     CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
     JUMP_DESCRIPTOR_CREATION: 23, KNOWLEDGE_CREATION: 24, DECISION_CREATION: 25, DECISION_TREE_CREATION: 26,
     STATE_CREATION: 27, TRANSITION_CREATION: 28, STATE_MACHINE_CREATION: 29, VIRTUAL_KEYBOARD: 30, SETTINGS: 31,
-    MOBILE_SIMULATION: 32, MASS: 33, MODULE_CREATION: 34, MODEL_CREATION: 35
+    MOBILE_SIMULATION: 32, MASS: 33, MODULE_CREATION: 34, MODEL_CREATION: 35, MODEL_INSTANCE: 36
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -390,6 +393,20 @@ GUIHandler.prototype.afterVirtualKeyboardSelection = function(){
   guiHandler.afterMassSelection();
 }
 
+GUIHandler.prototype.afterModelInstanceSelection = function(){
+  if (mode != 0){
+    return;
+  }
+
+  var curSelection = selectionHandler.getSelectedObject();
+  if (curSelection && curSelection.isModelInstance){
+    guiHandler.show(guiHandler.guiTypes.MODEL_INSTANCE);
+    guiHandler.modelInstanceManipulationParameters["Model instance"] = curSelection.name;
+  }else{
+    guiHandler.hide(guiHandler.guiTypes.MODEL_INSTANCE);
+  }
+}
+
 GUIHandler.prototype.afterMassSelection = function(){
   if (mode != 0){
     return;
@@ -403,6 +420,7 @@ GUIHandler.prototype.afterMassSelection = function(){
   }else{
     guiHandler.hide(guiHandler.guiTypes.MASS);
   }
+  guiHandler.afterModelInstanceSelection();
 }
 
 GUIHandler.prototype.afterSpriteSelection = function(){
@@ -1069,6 +1087,11 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeMassManipulationGUI();
       }
     return;
+    case this.guiTypes.MODEL_INSTANCE:
+      if (!this.datGuiModelInstance){
+        this.initializeModelInstanceManipulationGUI();
+      }
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -1305,6 +1328,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiModelCreation){
         this.destroyGUI(this.datGuiModelCreation);
         this.datGuiModelCreation = 0;
+      }
+    return;
+    case this.guiTypes.MODEL_INSTANCE:
+      if (this.datGuiModelInstance){
+        this.destroyGUI(this.datGuiModelInstance);
+        this.datGuiModelInstance = 0;
       }
     return;
   }
@@ -2062,6 +2091,15 @@ GUIHandler.prototype.initializeVirtualKeyboardGUI = function(){
       selectionHandler.getSelectedObject().showInDesignMode();
     }
   }).listen();
+}
+
+GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
+  guiHandler.datGuiModelInstance = new dat.GUI({hideable: false, width: 420});
+  guiHandler.datGuiModelInstance.domElement.addEventListener("mousedown", function(e){
+    mimGUIFocused = true;
+  });
+
+  guiHandler.disableController(guiHandler.datGuiModelInstance.add(guiHandler.modelInstanceManipulationParameters, "Model instance").listen());
 }
 
 GUIHandler.prototype.initializeMassManipulationGUI = function(){

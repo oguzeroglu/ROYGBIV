@@ -63,6 +63,7 @@ MouseEventHandler.prototype.onCliDivClick = function(event){
   lGUIFocused = false;
   vkGUIFocused = false;
   mmGUIFocused = false;
+  mimGUIFocused = false;
   inactiveCounter = 0;
   if (keyboardBuffer["Shift"] && mode == 0){
     keyboardBuffer["Shift"] = false;
@@ -215,6 +216,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
   lGUIFocused = false;
   vkGUIFocused = false;
   mmGUIFocused = false;
+  mimGUIFocused = false;
   if (windowLoaded){
     if (mode == 0){
       if (!isDeployment && guiHandler.isOneOfBlockingGUIActive()){
