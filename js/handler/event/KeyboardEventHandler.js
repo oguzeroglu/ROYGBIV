@@ -169,6 +169,12 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
     }
     objectGroups[objName].mesh.visible = false;
   }
+  for (var instanceName in sceneHandler.getModelInstances()){
+    if (modelInstances[instanceName].hiddenInDesignMode){
+      continue;
+    }
+    modelInstances[instanceName].mesh.visible = false;
+  }
   for (var textName in sceneHandler.getAddedTexts()){
     if (addedTexts[textName].hiddenInDesignMode){
       continue;
@@ -208,6 +214,12 @@ KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
       continue;
     }
     objectGroups[objName].mesh.visible = true;
+  }
+  for (var instanceName in sceneHandler.getModelInstances()){
+    if (modelInstances[instanceName].hiddenInDesignMode){
+      continue;
+    }
+    modelInstances[instanceName].mesh.visible = true;
   }
   for (var textName in sceneHandler.getAddedTexts()){
     if (addedTexts[textName].hiddenInDesignMode){

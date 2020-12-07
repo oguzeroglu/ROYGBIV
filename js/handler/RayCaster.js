@@ -195,31 +195,37 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
       }else if (result == 20){
         var addedText = addedTexts[objName];
         if (addedText && addedText.plane){
-          intersectionPoint = addedText.intersectsLine(REUSABLE_LINE);
-          if (intersectionPoint){
-            intersectionObject = objName;
-            callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
-            return;
+          if (!(mode == 0 && keyboardBuffer["Shift"])){
+            intersectionPoint = addedText.intersectsLine(REUSABLE_LINE);
+            if (intersectionPoint){
+              intersectionObject = objName;
+              callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
+              return;
+            }
           }
         }
       }else if (result == 30){
         var mass = masses[objName];
         if (mass){
-          intersectionPoint = mass.intersectsLine(REUSABLE_LINE);
-          if (intersectionPoint){
-            intersectionObject = objName;
-            callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
-            return;
+          if (!(mode == 0 && keyboardBuffer["Shift"])){
+            intersectionPoint = mass.intersectsLine(REUSABLE_LINE);
+            if (intersectionPoint){
+              intersectionObject = objName;
+              callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
+              return;
+            }
           }
         }
       }else if (result == 40){
         var modelInstance = modelInstances[objName];
         if (modelInstance){
-          intersectionPoint = modelInstance.intersectsLine(REUSABLE_LINE);
-          if (intersectionPoint){
-            intersectionObject = objName;
-            callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
-            return;
+          if (!(mode == 0 && keyboardBuffer["Shift"])){
+            intersectionPoint = modelInstance.intersectsLine(REUSABLE_LINE);
+            if (intersectionPoint){
+              intersectionObject = objName;
+              callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
+              return;
+            }
           }
         }
       }else{

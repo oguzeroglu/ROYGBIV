@@ -768,7 +768,7 @@ function onRaycasterIntersection(){
                 guiHandler.afterObjectSelection();
               }
            }else if (selectedGrid.destroyedModelInstance && !(keyboardBuffer["Shift"]) && !modelInstances[selectedGrid.destroyedModelInstance].hiddenInDesignMode){
-
+             
            }else{
              selectedGrid.toggleSelect(false, true);
           }
@@ -816,7 +816,7 @@ function onRaycasterIntersection(){
        }
        object.onMouseClickIntersection(intersectionObject);
      }else if (object.isModelInstance){
-       
+
      }
   }else{
     if (!isDeployment){
