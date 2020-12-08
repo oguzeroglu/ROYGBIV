@@ -241,6 +241,7 @@ AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
         obj.affectedByLight = isAffectedByLight;
         if (isAffectedByLight){
           obj.updateWorldInverseTranspose();
+          obj.lightingType = lightHandler.lightTypes.GOURAUD;
         }
       }
     }
@@ -252,11 +253,29 @@ AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
 AddedObject.prototype.setPhongLight = function(){
   macroHandler.injectMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
   this.lightingType = lightHandler.lightTypes.PHONG;
+
+  for (var objName in addedObjects){
+    if (objName != this.name){
+      var obj = addedObjects[objName];
+      if (obj.softCopyParentName == this.name){
+        obj.lightingType = lightHandler.lightTypes.PHONG;
+      }
+    }
+  }
 }
 
 AddedObject.prototype.unsetPhongLight = function(){
   macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
   this.lightingType = lightHandler.lightTypes.GOURAUD;
+
+  for (var objName in addedObjects){
+    if (objName != this.name){
+      var obj = addedObjects[objName];
+      if (obj.softCopyParentName == this.name){
+        obj.lightingType = lightHandler.lightTypes.GOURAUD;
+      }
+    }
+  }
 }
 
 AddedObject.prototype.isAnimationSuitable = function(animation){
@@ -3376,6 +3395,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     copyInstance.softCopyParentName = this.name;
     if (this.affectedByLight){
       copyInstance.affectedByLight = true;
+      copyInstance.lightingType = this.lightingType;
       copyInstance.updateWorldInverseTranspose();
     }
   }
