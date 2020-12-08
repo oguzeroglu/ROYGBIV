@@ -310,3 +310,13 @@ ModelInstance.prototype.onBeforeRender = function(){
     this.updateWorldInverseTranspose();
   }
 }
+
+ModelInstance.prototype.visualiseNormals = function(){
+  this.vertexNormalsHelper = new THREE.VertexNormalsHelper(this.mesh, 10, "lime", 1);
+  scene.add(this.vertexNormalsHelper);
+}
+
+ModelInstance.prototype.unvisialiseNormals = function(){
+  scene.remove(this.vertexNormalsHelper);
+  delete this.vertexNormalsHelper;
+}

@@ -412,11 +412,11 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Has mass"] = !curSelection.noMass;
     guiHandler.modelInstanceManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
     guiHandler.modelInstanceManipulationParameters["Affected by light"] = !!curSelection.affectedByLight;
-
     if (curSelection.affectedByLight){
-      guiHandler.modelInstanceManipulationParameters["Lighting type"] = curSelection.lightingType;
+      guiHandler.modelInstanceManipulationParameters["Lighting type"] = curSelection.lightingType || lightHandler.lightTypes.GOURAUD;
       guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
     }else{
+      guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
       guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
     }
   }else{
