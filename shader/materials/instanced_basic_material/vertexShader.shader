@@ -755,7 +755,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     #ifdef IS_AUTO_INSTANCED
       vec3 computedNormal = rotatedNormal;
     #else
-      vec3 computedNormal = mat3(worldInverseTranspose) * rotatedNormal;
+      vec3 computedNormal = normalize(mat3(worldInverseTranspose) * rotatedNormal);
     #endif
 
     #ifdef HAS_STATIC_DIFFUSE_LIGHT_1
@@ -1103,7 +1103,7 @@ void main(){
     #ifdef IS_AUTO_INSTANCED
       vNormal = rotatedNormal;
     #else
-      vNormal = mat3(worldInverseTranspose) * rotatedNormal;
+      vNormal = normalize(mat3(worldInverseTranspose) * rotatedNormal);
     #endif
   #endif
 

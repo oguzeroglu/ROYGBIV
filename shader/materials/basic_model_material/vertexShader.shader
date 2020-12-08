@@ -632,7 +632,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
   vec3 handleLighting(vec3 worldPositionComputed){
 
-    vec3 computedNormal = mat3(worldInverseTranspose) * normal;
+    vec3 computedNormal = normalize(mat3(worldInverseTranspose) * normal);
 
     #ifdef IS_LIGHT_BAKED
       vec3 totalColor = handleDynamicLights(computedNormal, worldPositionComputed) + bakedColor;
@@ -739,7 +739,7 @@ void main(){
   #endif
 
   #ifdef HAS_PHONG_LIGHTING
-    vNormal = mat3(worldInverseTranspose) * normal;
+    vNormal = normalize(mat3(worldInverseTranspose) * normal);
     vWorldPosition = worldPositionComputed;
   #endif
 
