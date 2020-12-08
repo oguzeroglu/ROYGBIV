@@ -60,6 +60,10 @@ ModelInstance.prototype.export = function(){
   exportObj.noMass = !!this.noMass;
   exportObj.isIntersectable = !!this.isIntersectable;
 
+  if (this.affectedByLight){
+    exportObj.lightingType = this.lightingType;
+  }
+
   return exportObj;
 }
 
@@ -277,11 +281,25 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
     lightHandler.addLightToObject(this);
   }else{
     lightHandler.removeLightFromObject(this);
+    if (this.lightingType == lightHandler.lightTypes.PHONG){
+      macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+    }
+    delete this.lightingType;
   }
 
   this.mesh.material.needsUpdate = true;
 
   this.affectedByLight = isAffectedByLight;
+}
+
+ModelInstance.prototype.setPhongLight = function(){
+  macroHandler.injectMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.PHONG;
+}
+
+ModelInstance.prototype.unsetPhongLight = function(){
+  macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.GOURAUD;
 }
 
 ModelInstance.prototype.onBeforeRender = function(){

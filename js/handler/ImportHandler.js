@@ -48,6 +48,9 @@ ImportHandler.prototype.importModelInstances = function(obj){
     }
 
     modelInstance.setAffectedByLight(curModelInstanceExport.affectedByLight);
+    if (modelInstance.affectedByLight && curModelInstanceExport.lightingType == lightHandler.lightTypes.PHONG){
+      modelInstance.setPhongLight();
+    }
   }
 }
 
@@ -1387,7 +1390,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (objectGroupInstance.affectedByLight && curObjectGroupExport.lightingType == lightHandler.lightTypes.PHONG){
       objectGroupInstance.setPhongLight();
     }
-    
+
     objectGroupInstance.usedAsAIEntity = curObjectGroupExport.usedAsAIEntity;
 
     if (curObjectGroupExport.hiddenInDesignMode){

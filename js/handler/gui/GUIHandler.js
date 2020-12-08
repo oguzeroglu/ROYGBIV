@@ -154,7 +154,8 @@ var GUIHandler = function(){
     "Hidden": false,
     "Has mass": false,
     "Intersectable": false,
-    "Affected by light": false
+    "Affected by light": false,
+    "Lighting type": lightHandler.lightTypes.GOURAUD
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -411,6 +412,13 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Has mass"] = !curSelection.noMass;
     guiHandler.modelInstanceManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
     guiHandler.modelInstanceManipulationParameters["Affected by light"] = !!curSelection.affectedByLight;
+
+    if (curSelection.affectedByLight){
+      guiHandler.modelInstanceManipulationParameters["Lighting type"] = curSelection.lightingType;
+      guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
+    }else{
+      guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
+    }
   }else{
     guiHandler.hide(guiHandler.guiTypes.MODEL_INSTANCE);
   }
@@ -2163,9 +2171,19 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     terminal.clear();
     obj.setAffectedByLight(val);
     if (val){
+      guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
+      guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
       terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
     }else{
+      guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
       terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
+    }
+  }).listen();
+  guiHandler.modelInstanceManupulationLightingTypeController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Lighting type", Object.keys(lightHandler.lightTypes)).onChange(function(val){
+    if (val == lightHandler.lightTypes.PHONG){
+      selectionHandler.getSelectedObject().setPhongLight();
+    }else{
+      selectionHandler.getSelectedObject().unsetPhongLight();
     }
   }).listen();
 }

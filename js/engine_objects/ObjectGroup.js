@@ -277,7 +277,7 @@ ObjectGroup.prototype.setAffectedByLight = function(isAffectedByLight){
     if (this.lightingType == lightHandler.lightTypes.PHONG){
       macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
     }
-    lightHandler.removeLightFromObject(this);
+    delete this.lightingType;
   }
 
   this.mesh.material.needsUpdate = true;
