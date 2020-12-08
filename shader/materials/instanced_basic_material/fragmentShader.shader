@@ -73,6 +73,9 @@ varying vec3 vColor;
   varying vec3 vNormal;
   uniform mat4 dynamicLightsMatrix;
 #endif
+#if defined(HAS_PHONG_LIGHTING) && defined(IS_AUTO_INSTANCED)
+  varying float vAffectedByLight;
+#endif
 #ifdef HAS_FOG
   uniform vec4 fogInfo;
 #endif
@@ -840,7 +843,13 @@ void main(){
 
   vec3 colorHandled = vColor;
   #ifdef HAS_PHONG_LIGHTING
-    colorHandled = handleLighting(vWorldPosition);
+    #ifdef IS_AUTO_INSTANCED
+      if (vAffectedByLight > 0.0){
+        colorHandled = handleLighting(vWorldPosition);
+      }
+    #else
+      colorHandled = handleLighting(vWorldPosition);
+    #endif
   #endif
 
   #ifdef IS_AUTO_INSTANCED

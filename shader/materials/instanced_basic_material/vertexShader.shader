@@ -137,6 +137,10 @@ varying float vAlpha;
   varying vec3 vNormal;
 #endif
 
+#if defined(HAS_PHONG_LIGHTING) && defined(IS_AUTO_INSTANCED)
+  varying float vAffectedByLight;
+#endif
+
 vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
   vec3 pointLightPosition = vec3(pX, pY, pZ);
   vec3 toLight = normalize(pointLightPosition - worldPosition);
@@ -1066,12 +1070,21 @@ void main(){
     vec3 worldPositionComputed = (worldMatrix * vec4(transformedPosition, 1.0)).xyz;
   #endif
 
+  #if defined(HAS_PHONG_LIGHTING) && defined(IS_AUTO_INSTANCED)
+    vAffectedByLight = -100.0;
+  #endif
+
   #ifdef AFFECTED_BY_LIGHT
     vec3 rotatedNormal = applyQuaternionToVector(normalize(normal), quaternion);
     vec3 selectedWorldPosition;
     #ifdef IS_AUTO_INSTANCED
       if (affectedByLight > 0.0){
-        vColor = handleLighting(transformedPosition, rotatedNormal);
+        #ifdef HAS_PHONG_LIGHTING
+          vColor = color;
+          vAffectedByLight = 100.0;
+        #else
+          vColor = handleLighting(transformedPosition, rotatedNormal);
+        #endif
       }else{
         vColor = color;
       }
