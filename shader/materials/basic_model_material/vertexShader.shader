@@ -16,6 +16,11 @@ varying vec4 vDiffuseUV;
 
 #define INSERTION
 
+#ifdef HAS_PHONG_LIGHTING
+  varying vec3 vWorldPosition;
+  varying vec3 vNormal;
+#endif
+
 #ifdef AFFECTED_BY_LIGHT
   uniform mat4 worldMatrix;
 #endif
@@ -725,9 +730,17 @@ void main(){
 
   #ifdef AFFECTED_BY_LIGHT
     vec3 worldPositionComputed = (worldMatrix * vec4(position, 1.0)).xyz;
+  #endif
+
+  #if defined(AFFECTED_BY_LIGHT) && !defined(HAS_PHONG_LIGHTING)
     vColor = handleLighting(worldPositionComputed);
   #else
     vColor = color;
+  #endif
+
+  #ifdef HAS_PHONG_LIGHTING
+    vNormal = mat3(worldInverseTranspose) * normal;
+    vWorldPosition = worldPositionComputed;
   #endif
 
   vUV = uv;
