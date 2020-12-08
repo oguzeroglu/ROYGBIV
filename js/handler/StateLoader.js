@@ -95,7 +95,7 @@ StateLoader.prototype.load = function(){
     this.importHandler.importShadowBaker(obj, this.onShadowsLoaded.bind(this));
     this.importHandler.importModels(obj, this.onModelLoaded.bind(this));
 
-    if (!isDeployment){
+    if (!isDeployment && this.hasModules){
       this.importHandler.importModules(obj, this.onModulesLoaded.bind(this));
     }
 

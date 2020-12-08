@@ -274,6 +274,10 @@ ObjectGroup.prototype.setAffectedByLight = function(isAffectedByLight){
     lightHandler.addLightToObject(this);
   }else{
     lightHandler.removeLightFromObject(this);
+    if (this.lightingType == lightHandler.lightTypes.PHONG){
+      macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+    }
+    lightHandler.removeLightFromObject(this);
   }
 
   this.mesh.material.needsUpdate = true;
@@ -291,6 +295,18 @@ ObjectGroup.prototype.setAffectedByLight = function(isAffectedByLight){
       }
     }
   }
+
+  this.lightingType = lightHandler.lightTypes.GOURAUD;
+}
+
+ObjectGroup.prototype.setPhongLight = function(){
+  macroHandler.injectMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.PHONG;
+}
+
+ObjectGroup.prototype.unsetPhongLight = function(){
+  macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.GOURAUD;
 }
 
 ObjectGroup.prototype.onAfterRotationAnimation = function(){
@@ -3101,6 +3117,10 @@ ObjectGroup.prototype.export = function(isBuildingForDeploymentMode){
 
   exportObj.affectedByLight = this.affectedByLight;
   exportObj.usedAsAIEntity = this.usedAsAIEntity;
+
+  if (this.affectedByLight){
+    exportObj.lightingType = this.lightingType;
+  }
 
   if (this.steerableInfo){
     exportObj.steerableInfo = {

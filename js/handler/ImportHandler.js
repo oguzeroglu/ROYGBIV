@@ -1384,6 +1384,10 @@ ImportHandler.prototype.importObjectGroups = function(obj){
       objectGroupInstance.setPosition(curObjectGroupExport.manualPositionInfo.x, curObjectGroupExport.manualPositionInfo.y, curObjectGroupExport.manualPositionInfo.z, true);
     }
     objectGroupInstance.setAffectedByLight(curObjectGroupExport.affectedByLight);
+    if (objectGroupInstance.affectedByLight && curObjectGroupExport.lightingType == lightHandler.lightTypes.PHONG){
+      objectGroupInstance.setPhongLight();
+    }
+    
     objectGroupInstance.usedAsAIEntity = curObjectGroupExport.usedAsAIEntity;
 
     if (curObjectGroupExport.hiddenInDesignMode){
