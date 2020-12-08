@@ -224,6 +224,10 @@ AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
     lightHandler.addLightToObject(this);
   }else{
     lightHandler.removeLightFromObject(this);
+    if (this.lightingType == lightHandler.lightTypes.PHONG){
+      macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+    }
+    delete this.lightingType;
   }
 
   this.mesh.material.needsUpdate = true;
@@ -241,6 +245,18 @@ AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
       }
     }
   }
+
+  this.lightingType = lightHandler.lightTypes.GOURAUD;
+}
+
+AddedObject.prototype.setPhongLight = function(){
+  macroHandler.injectMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.PHONG;
+}
+
+AddedObject.prototype.unsetPhongLight = function(){
+  macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.GOURAUD;
 }
 
 AddedObject.prototype.isAnimationSuitable = function(animation){
@@ -998,6 +1014,9 @@ AddedObject.prototype.export = function(){
     exportObject.manualPositionInfo = this.manualPositionInfo;
   }
   exportObject.affectedByLight = this.affectedByLight;
+  if (this.affectedByLight){
+    exportObject.lightingType = this.lightingType;
+  }
   exportObject.customDisplacementTextureMatrixInfo  = this.customDisplacementTextureMatrixInfo;
   exportObject.usedAsAIEntity = this.usedAsAIEntity;
 

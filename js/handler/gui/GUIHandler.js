@@ -45,6 +45,7 @@ var GUIHandler = function(){
     "Jump speed": "500",
     "Look speed": 0.1,
     "Hidden": false,
+    "Lighting type": lightHandler.lightTypes.GOURAUD,
     "Light": "diffuse1",
     "Bake shadow": function(){
       terminal.clear();
@@ -850,6 +851,13 @@ GUIHandler.prototype.afterObjectSelection = function(){
       guiHandler.disableController(guiHandler.omLookSpeedController);
     }
 
+    if (obj.affectedByLight){
+      guiHandler.objectManipulationParameters["Lighting type"] = obj.lightingType;
+    }else{
+      guiHandler.disableController(guiHandler.omLightingTypeController);
+      guiHandler.objectManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
+    }
+
     if (obj.usedAsAIEntity){
       guiHandler.disableController(guiHandler.omFPSWeaponController);
     }
@@ -1055,6 +1063,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omJumpSpeedController);
   guiHandler.enableController(guiHandler.omLookSpeedController);
   guiHandler.enableController(guiHandler.omRotationModeController);
+  guiHandler.enableController(guiHandler.omLightingTypeController);
 }
 
 GUIHandler.prototype.show = function(guiType){
@@ -1787,9 +1796,19 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.clear();
       obj.setAffectedByLight(val);
       if (val){
+        guiHandler.enableController(guiHandler.omLightingTypeController);
         terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
+        guiHandler.objectManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
       }else{
+        guiHandler.disableController(guiHandler.omLightingTypeController);
         terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
+      }
+    }).listen();
+    guiHandler.omLightingTypeController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Lighting type", Object.keys(lightHandler.lightTypes)).onChange(function(val){
+      if (val == lightHandler.lightTypes.PHONG){
+        selectionHandler.getSelectedObject().setPhongLight();
+      }else{
+        selectionHandler.getSelectedObject().unsetPhongLight();
       }
     }).listen();
 
