@@ -70,11 +70,17 @@ varying vec3 vColor;
 #endif
 #ifdef HAS_SKYBOX_FOG
   uniform mat4 worldMatrix;
+#endif
+#if defined(HAS_SKYBOX_FOG) || defined(HAS_PHONG_LIGHTING)
   varying vec3 vWorldPosition;
 #endif
 
 #ifdef AFFECTED_BY_LIGHT
   uniform mat4 dynamicLightsMatrix;
+#endif
+
+#ifdef HAS_PHONG_LIGHTING
+  varying vec3 vNormal;
 #endif
 
 vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
@@ -888,13 +894,17 @@ void main(){
     vec3 newPosition = coord + rotatedPos;
     gl_Position = projectionMatrix * viewMatrix * vec4(newPosition, 1.0);
 
-    #ifdef AFFECTED_BY_LIGHT
+    #if defined(AFFECTED_BY_LIGHT) && !defined(HAS_PHONG_LIGHTING)
       vColor = handleLighting(newPosition, applyQuaternionToVector(normalize(normal), quat));
     #else
       vColor = color;
     #endif
 
-    #ifdef HAS_SKYBOX_FOG
+    #ifdef HAS_PHONG_LIGHTING
+      vNormal = applyQuaternionToVector(normalize(normal), quat);
+    #endif
+
+    #if defined(HAS_SKYBOX_FOG) || defined(HAS_PHONG_LIGHTING)
       vWorldPosition = newPosition;
     #endif
   }
