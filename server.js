@@ -27,6 +27,7 @@ app.use(bodyParser.urlencoded({
   limit: '500mb',
   extended: true
 }));
+app.use(bodyParser.raw({type: 'application/octet-stream', limit : '500mb'}));
 
 app.get("/", function(req, res){
   console.log("[*] A new request received.");
@@ -407,6 +408,20 @@ app.post("/getModels", function(req, res){
   });
 
   res.send(JSON.stringify(modelFolders));
+});
+
+app.post("/createRMFFile", function(req, res){
+  var folderName = req.query.folderName;
+  var buffers = [];
+  req.on("data", function(chunk) {
+    buffers.push(chunk);
+  });
+
+  req.on("end", function(){
+    var data = Buffer.concat(buffers);
+    fs.writeFileSync("./models/" + folderName + "/model.rmf", data);
+    res.send({});
+  });
 });
 
 function getScriptsInFolder(curPath, obj){

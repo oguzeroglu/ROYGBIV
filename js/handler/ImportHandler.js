@@ -55,14 +55,34 @@ ImportHandler.prototype.importModelInstances = function(obj){
 }
 
 ImportHandler.prototype.importModels = function(obj, callback){
+  var that = this;
   for (var modelName in obj.models){
     var curModelExport = obj.models[modelName];
-    var min = curModelExport.originalBoundingBox.min;
-    var max = curModelExport.originalBoundingBox.max;
-    curModelExport.originalBoundingBox = new THREE.Box3(new THREE.Vector3(min.x, min.y, min.z), new THREE.Vector3(max.x, max.y, max.z));
-    var model = new Model(curModelExport, {});
-    models[curModelExport.name] = model;
-    model.loadTextures(callback);
+    rmfHandler.load(curModelExport.folderName, function(positions, normals, uvs){
+      var min = this.curModelExport.originalBoundingBox.min;
+      var max = this.curModelExport.originalBoundingBox.max;
+      this.curModelExport.originalBoundingBox = new THREE.Box3(new THREE.Vector3(min.x, min.y, min.z), new THREE.Vector3(max.x, max.y, max.z));
+
+      var colors = [];
+      var diffuseUVs = [];
+      var materialIndices = [];
+      for (var i = 0; i < this.curModelExport.groupInfo.length; i ++){
+        var curGroup = this.curModelExport.groupInfo[i];
+        var curMaterialIndex = curGroup.materialIndex;
+        var curCount = curGroup.count;
+        var curMaterial = this.curModelExport.childInfos[curMaterialIndex];
+        var color = {r: curMaterial.colorR, g: curMaterial.colorG, b: curMaterial.colorB};
+        for (var i2 = 0; i2 < curCount; i2 ++){
+          that.triplePush(colors, color, color, color, "rgb");
+          that.quadruplePush(diffuseUVs, -100, -100, -100, -100, "number");
+          materialIndices.push(curMaterialIndex);
+        }
+      }
+
+      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, materialIndices);
+      models[this.curModelExport.name] = model;
+      model.loadTextures(callback);
+    }.bind({curModelExport: curModelExport}));
   }
 }
 
@@ -1580,5 +1600,61 @@ ImportHandler.prototype.importSprites = function(obj){
 ImportHandler.prototype.importDynamicTextureFolders = function(obj){
   for (var folderName in obj.dynamicTextureFolders){
     dynamicTextureFolders[folderName] = true;
+  }
+}
+
+ImportHandler.prototype.triplePush = function(ary, obj1, obj2, obj3, type){
+  if (type == "xyz"){
+    ary.push(obj1.x);
+    ary.push(obj1.y);
+    ary.push(obj1.z);
+
+    ary.push(obj2.x);
+    ary.push(obj2.y);
+    ary.push(obj2.z);
+
+    ary.push(obj3.x);
+    ary.push(obj3.y);
+    ary.push(obj3.z);
+  }else if (type === "rgb"){
+    ary.push(obj1.r);
+    ary.push(obj1.g);
+    ary.push(obj1.b);
+
+    ary.push(obj2.r);
+    ary.push(obj2.g);
+    ary.push(obj2.b);
+
+    ary.push(obj3.r);
+    ary.push(obj3.g);
+    ary.push(obj3.b);
+  }else if (type === "xy"){
+    ary.push(obj1.x);
+    ary.push(obj1.y);
+
+    ary.push(obj2.x);
+    ary.push(obj2.y);
+
+    ary.push(obj3.x);
+    ary.push(obj3.y);
+  }
+}
+
+ImportHandler.prototype.quadruplePush = function(ary, obj1, obj2, obj3, obj4, type){
+  if (type == "number"){
+    ary.push(obj1);
+    ary.push(obj2);
+    ary.push(obj3);
+    ary.push(obj4);
+
+    ary.push(obj1);
+    ary.push(obj2);
+    ary.push(obj3);
+    ary.push(obj4);
+
+    ary.push(obj1);
+    ary.push(obj2);
+    ary.push(obj3);
+    ary.push(obj4);
   }
 }

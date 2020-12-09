@@ -1,4 +1,4 @@
-var Model = function(modelInfo, texturesObj){
+var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, diffuseUVs, materialIndices){
   this.name = modelInfo.name;
 
   var geomKey = "MODEL" + PIPE + modelInfo.folderName
@@ -8,11 +8,11 @@ var Model = function(modelInfo, texturesObj){
     this.geometry = new THREE.BufferGeometry();
     geometryCache[geomKey] = this.geometry;
 
-    var positionsTypedArray = new Float32Array(modelInfo.positionsAry);
-    var colorsTypedArray = new Float32Array(modelInfo.colorsAry);
-    var normalsTypedArray = new Float32Array(modelInfo.normalsAry);
-    var uvsTypedArray = new Float32Array(modelInfo.uvsAry);
-    var diffuseUVsTypedArray = new Float32Array(modelInfo.diffuseUVsAry);
+    var positionsTypedArray = new Float32Array(positions);
+    var colorsTypedArray = new Float32Array(colors);
+    var normalsTypedArray = new Float32Array(normals);
+    var uvsTypedArray = new Float32Array(uvs);
+    var diffuseUVsTypedArray = new Float32Array(diffuseUVs);
 
     var positionsBufferAttribute = new THREE.BufferAttribute(positionsTypedArray, 3);
     var colorsBufferAttribute = new THREE.BufferAttribute(colorsTypedArray, 3);
@@ -37,6 +37,7 @@ var Model = function(modelInfo, texturesObj){
 
   this.info = modelInfo;
   this.texturesObj = texturesObj;
+  this.materialIndices = materialIndices;
 }
 
 Model.prototype.export = function(){
@@ -67,8 +68,8 @@ Model.prototype.onTextureAtlasRefreshed = function(){
   var diffuseUVAry = this.geometry.attributes.diffuseUV.array;
   var diffuseUVIndex = 0;
   var ranges = textureAtlasHandler.textureMerger.ranges;
-  for (var i = 0; i < this.info.materialIndices.length; i ++){
-    var materialIndex = this.info.materialIndices[i];
+  for (var i = 0; i < this.materialIndices.length; i ++){
+    var materialIndex = this.materialIndices[i];
     var childInfo = this.info.childInfos[materialIndex];
     if (childInfo.diffuseTextureID){
       var range = ranges[childInfo.diffuseTextureID];

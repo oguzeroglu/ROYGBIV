@@ -41,6 +41,8 @@ window.onload = function() {
   Text = (!isDeployment)? new Text(): 0;
   // SHADOW BAKER
   shadowBaker = new ShadowBaker();
+  // RMF HANDLER
+  rmfHandler = new RMFHandler();
 
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");

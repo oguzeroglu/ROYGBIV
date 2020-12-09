@@ -71,15 +71,6 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
 
   var modelToLoad = allModels[index];
   modelLoader.loadModel(modelToLoad.folder, modelToLoad.obj, modelToLoad.mtl, function(model){
-    terminal.clear();
-    terminal.printInfo(Text.MODEL_LOADED);
-
-    if (guiHandler.datGuiModelCreation){
-      guiHandler.removeControllers(guiHandler.datGuiModelCreation);
-    }else{
-      guiHandler.datGuiModelCreation = new dat.GUI({hideable: false});
-    }
-
     var allFolders = [];
     for (var i = 0; i < allModels.length; i ++){
       allFolders.push(allModels[i].folder);
@@ -117,26 +108,35 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
       }
     };
 
-    var folderController, scaleController;
+    modelCreatorGUIHandler.renderModel(model, modelName, allFolders[index], function(){
+      terminal.clear();
+      terminal.printInfo(Text.MODEL_LOADED);
 
-    folderController = guiHandler.datGuiModelCreation.add(params, "Folder", allFolders).onChange(function(val){
-      guiHandler.disableController(folderController);
-      guiHandler.disableController(scaleController);
-      modelCreatorGUIHandler.renderControls(allModels, allFolders.indexOf(val), modelName);
-    });
-    scaleController = guiHandler.datGuiModelCreation.add(params, "Scale").min(0.1).max(100).step(0.1).onChange(function(val){
-      modelCreatorGUIHandler.modelMesh.scale.set(val, val, val);
-    });
-    guiHandler.datGuiModelCreation.add(params, "Done");
-    guiHandler.datGuiModelCreation.add(params, "Cancel");
+      if (guiHandler.datGuiModelCreation){
+        guiHandler.removeControllers(guiHandler.datGuiModelCreation);
+      }else{
+        guiHandler.datGuiModelCreation = new dat.GUI({hideable: false});
+      }
 
-    modelCreatorGUIHandler.renderModel(model, modelName, allFolders[index]);
+      var folderController, scaleController;
+
+      folderController = guiHandler.datGuiModelCreation.add(params, "Folder", allFolders).onChange(function(val){
+        guiHandler.disableController(folderController);
+        guiHandler.disableController(scaleController);
+        modelCreatorGUIHandler.renderControls(allModels, allFolders.indexOf(val), modelName);
+      });
+      scaleController = guiHandler.datGuiModelCreation.add(params, "Scale").min(0.1).max(100).step(0.1).onChange(function(val){
+        modelCreatorGUIHandler.modelMesh.scale.set(val, val, val);
+      });
+      guiHandler.datGuiModelCreation.add(params, "Done");
+      guiHandler.datGuiModelCreation.add(params, "Cancel");
+    });
   }, function(){
     modelCreatorGUIHandler.close(Text.ERROR_HAPPENED_LOADING_MODEL_FROM_FOLDER.replace(Text.PARAM1, modelToLoad.folder), true);
   });
 }
 
-ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName){
+ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName, onReady){
   if (this.modelMesh){
     scene.remove(this.modelMesh);
   }
@@ -150,7 +150,12 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
 
   for (var i = 0; i < model.children.length; i ++){
     var childMesh = model.children[i];
-    var childInfo = {name: childMesh.name};
+    var childInfo = {
+      name: childMesh.name,
+      colorR: childMesh.material.color.r,
+      colorG: childMesh.material.color.g,
+      colorB: childMesh.material.color.b
+    };
     var normalGeometry = new THREE.Geometry().fromBufferGeometry(childMesh.geometry);
     for (var i2 = 0; i2 < normalGeometry.faces.length; i2++){
       normalGeometry.faces[i2].materialIndex = i;
@@ -241,21 +246,49 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName)
     }
   }
 
-  this.model = new Model({
-    name: name,
-    folderName: folderName,
-    positionsAry: positions,
-    normalsAry: normals,
-    colorsAry: colors,
-    uvsAry: uvs,
-    diffuseUVsAry: diffuseUVs,
-    materialIndices: materialIndices,
-    childInfos: childInfos,
-    originalBoundingBox: boundingBox
-  }, texturesObj);
+  var groupInfo = [{
+    materialIndex: materialIndices[0],
+    count: 1
+  }];
 
-  this.modelMesh = new MeshGenerator(this.model.geometry).generateModelMesh(this.model, textureMerger? textureMerger.mergedTexture: null);
-  scene.add(this.modelMesh);
+  for (var i = 1; i < materialIndices.length; i ++){
+    var curInfo = groupInfo[groupInfo.length - 1];
+    var curMaterialIndex = materialIndices[i];
+    if (curInfo.materialIndex == curMaterialIndex){
+      curInfo.count ++;
+    }else{
+      groupInfo.push({
+        materialIndex: curMaterialIndex,
+        count: 1
+      })
+    }
+  };
+
+  var sum = 0;
+  for (var i = 0; i < groupInfo.length; i ++){
+    sum += groupInfo[i].count;
+  }
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/createRMFFile?folderName=" + folderName, true);
+  xhr.overrideMimeType("application/octet-stream");
+  xhr.onreadystatechange = function(){
+    if (xhr.readyState == 4 && xhr.status == 200){
+      modelCreatorGUIHandler.model = new Model({
+        name: name,
+        folderName: folderName,
+        childInfos: childInfos,
+        groupInfo: groupInfo,
+        originalBoundingBox: boundingBox
+      }, texturesObj, positions, normals, uvs, colors, diffuseUVs, materialIndices);
+
+      modelCreatorGUIHandler.modelMesh = new MeshGenerator(modelCreatorGUIHandler.model.geometry).generateModelMesh(modelCreatorGUIHandler.model, textureMerger? textureMerger.mergedTexture: null);
+      scene.add(modelCreatorGUIHandler.modelMesh);
+      onReady();
+    }
+  }
+
+  xhr.send(rmfHandler.generate(positions, normals, uvs));
 }
 
 ModelCreatorGUIHandler.prototype.triplePush = function(ary, obj1, obj2, obj3, type){
