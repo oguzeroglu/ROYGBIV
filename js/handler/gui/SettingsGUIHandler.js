@@ -341,7 +341,8 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     "Skybox": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SKYBOX),
     "Text": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.TEXT),
     "Lightning": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.LIGHTNING),
-    "Sprite": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SPRITE)
+    "Sprite": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SPRITE),
+    "Model": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.MODEL)
   };
 
   var precisionAry = ["low", "medium", "high"];
@@ -393,6 +394,11 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
   }).listen();
   shaderPrecisionFolder.add(shaderPrecisionParameters, "Sprite", precisionAry).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.SPRITE, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Model", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.MODEL, settingsGUIHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
   }).listen();

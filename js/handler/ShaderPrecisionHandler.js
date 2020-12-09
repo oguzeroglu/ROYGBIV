@@ -12,7 +12,8 @@ var ShaderPrecisionHandler = function(){
     SKYBOX: 6,
     TEXT: 7,
     LIGHTNING: 8,
-    SPRITE: 9
+    SPRITE: 9,
+    MODEL: 10
   }
   this.reset();
 }
@@ -320,6 +321,18 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
         sprite.mesh.material.vertexShader = this.replace(sprite.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
         sprite.mesh.material.fragmentShader = this.replace(sprite.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
         sprite.mesh.material.needsUpdate = true;
+      }
+    break;
+    case this.types.MODEL:
+      vertexShader = ShaderContent.basicModelMaterialVertexShader;
+      fragmentShader = ShaderContent.basicModelMaterialFragmentShader;
+      vertexShaderName = "basicModelMaterialVertexShader";
+      fragmentShaderName = "basicModelMaterialFragmentShader";
+      for (var modelInstanceName in modelInstances){
+        var modelInstance = modelInstances[modelInstanceName];
+        modelInstance.mesh.material.vertexShader = this.replace(modelInstance.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
+        modelInstance.mesh.material.fragmentShader = this.replace(modelInstance.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
+        modelInstance.mesh.material.needsUpdate = true;
       }
     break;
   }
