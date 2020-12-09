@@ -332,7 +332,7 @@ LightHandler.prototype.findBakeableObjects = function(){
   var bakeableObjects = [];
   for (var objName in addedObjects){
     var obj1 = addedObjects[objName];
-    if (obj1.isChangeable || obj1.isDynamicObject || !obj1.affectedByLight){
+    if (obj1.isChangeable || obj1.isDynamicObject || !obj1.affectedByLight || obj1.lightingType != lightHandler.lightTypes.GOURAUD){
       continue;
     }
     var isBakeable = true;
@@ -352,7 +352,7 @@ LightHandler.prototype.findBakeableObjects = function(){
 
   for (var objName in objectGroups){
     var obj = objectGroups[objName];
-    if (!obj.isChangeable && !obj.isDynamicObject && obj.affectedByLight && !obj.isInstanced){
+    if (!obj.isChangeable && !obj.isDynamicObject && obj.affectedByLight && !obj.isInstanced && obj.lightingType == lightHandler.lightTypes.GOURAUD){
       bakeableObjects.push(obj);
     }
   }
