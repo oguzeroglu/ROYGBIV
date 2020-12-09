@@ -198,7 +198,7 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   // MODELS ********************************************************
   this.models = new Object();
   for (var modelName in models){
-    this.models[modelName] = models[modelName].export();
+    this.models[modelName] = models[modelName].export(isBuildingForDeploymentMode);
   }
   // MODEL INSTANCES ***********************************************
   this.modelInstances = new Object();

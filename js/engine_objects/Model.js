@@ -40,7 +40,16 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
   this.materialIndices = materialIndices;
 }
 
-Model.prototype.export = function(){
+Model.prototype.export = function(isBuildingForDeploymentMode){
+  if (!isBuildingForDeploymentMode){
+    return this.info;
+  }
+
+  this.info.texturesObj = {};
+  for (var textureURL in this.texturesObj){
+    this.info.texturesObj[textureURL] = true;
+  }
+
   return this.info;
 }
 
@@ -48,7 +57,9 @@ Model.prototype.getUsedTextures = function(){
   var childInfos = this.info.childInfos;
   var usedTextures = [];
 
-  for (var textureURL in this.texturesObj){
+  var obj = isDeployment? this.info.texturesObj: this.texturesObj;
+
+  for (var textureURL in obj){
     var textureID = null;
     for (var i = 0; i < this.info.childInfos.length; i ++){
       if (this.info.childInfos[i].diffuseTextureURL == textureURL){
@@ -57,7 +68,7 @@ Model.prototype.getUsedTextures = function(){
     }
     usedTextures.push({
       id: textureID,
-      texture: this.texturesObj[textureURL]
+      texture: obj[textureURL]
     });
   }
 

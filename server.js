@@ -644,6 +644,15 @@ function copyAssets(application){
   for (var folderName in application.dynamicTextureFolders){
     copyFolderRecursiveSync("dynamic_textures/"+folderName, "deploy/"+application.projectName+"/dynamic_textures/");
   }
+  for (var modelName in application.models){
+    var folderName = application.models[modelName].folderName;
+    fs.readdirSync("models").forEach(file => {
+      if (file == folderName){
+        copyFolderRecursiveSync("models/"+file, "deploy/"+application.projectName+"/models/");
+        console.log("[*] Copied a model: " + file);
+      }
+    });
+  }
 }
 
 function generateDeployDirectory(projectName, application){
@@ -663,6 +672,7 @@ function generateDeployDirectory(projectName, application){
   var hasDynamicTextureFolders = (Object.keys(application.dynamicTextureFolders) != 0);
   var hasTextureAtlas = application.textureAtlas.hasTextureAtlas;
   var hasShadowAtlas = Object.keys(application.shadowBaker.textureRangesByObjectName).length > 0;
+  var hasModels = Object.keys(application.models.length != 0);
   if (hasTexturePacks){
     fs.mkdirSync("deploy/"+projectName+"/texture_packs");
     console.log("[*] Project has texture packs to load.");
@@ -674,6 +684,12 @@ function generateDeployDirectory(projectName, application){
     console.log("[*] Project has skyboxes to load.");
   }else{
     console.log("[*] Project has no skyboxes to load.");
+  }
+  if (hasModels){
+    fs.mkdirSync("deploy/" + projectName + "/models");
+    console.log("[*] Project has models to load.");
+  }else{
+    console.log("[*] Project has no models to load.");
   }
   if (hasFonts || hasTextureAtlas || hasShadowAtlas){
     fs.mkdirSync("deploy/"+projectName+"/fonts");

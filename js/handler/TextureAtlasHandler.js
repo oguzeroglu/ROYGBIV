@@ -141,6 +141,10 @@ TextureAtlasHandler.prototype.import = function(exportObject, readyCallback){
     this.textureMerger.ranges = JSON.parse(JSON.stringify(exportObject.ranges));
     textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true});
     textureAtlasHandler.atlas.loadTextures(false, function(){
+      for (var modelName in models){
+        models[modelName].onTextureAtlasRefreshed();
+      }
+      
       readyCallback();
     });
   }else{

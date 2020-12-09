@@ -81,7 +81,11 @@ ImportHandler.prototype.importModels = function(obj, callback){
 
       var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, materialIndices);
       models[this.curModelExport.name] = model;
-      model.loadTextures(callback);
+      if (!isDeployment){
+        model.loadTextures(callback);
+      }else{
+        callback();
+      }
     }.bind({curModelExport: curModelExport}));
   }
 }
