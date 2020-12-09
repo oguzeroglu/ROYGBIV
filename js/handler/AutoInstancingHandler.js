@@ -45,9 +45,13 @@ AutoInstancingHandler.prototype.handle = function(){
     var ary = objectsByGeometryID[key];
     if (ary.length > 1){
       var pseudoGroup = new Object();
+      var hasPhong = false;
       for (var i = 0; i<ary.length; i++){
         pseudoGroup[ary[i].name] = ary[i];
         scene.remove(ary[i].mesh);
+        if (ary[i].affectedByLight && ary[i].lightingType == lightHandler.lightTypes.PHONG){
+          hasPhong = true;
+        }
       }
       var autoInstancedObject = new AutoInstancedObject("autoInstancedObject_"+(ctr++), pseudoGroup);
       autoInstancedObject.init();
@@ -55,6 +59,9 @@ AutoInstancingHandler.prototype.handle = function(){
       autoInstancedObject.mesh.visible = false;
       autoInstancedObjects[autoInstancedObject.name] = autoInstancedObject;
       sceneHandler.onAutoInstancedObjectCreation(autoInstancedObject);
+      if (hasPhong){
+        autoInstancedObject.setPhongLight();
+      }
     }
   }
 }

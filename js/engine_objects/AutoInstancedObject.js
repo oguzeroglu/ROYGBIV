@@ -25,6 +25,11 @@ AutoInstancedObject.prototype.setAffectedByLight = function(isAffectedByLight){
   this.affectedByLight = isAffectedByLight;
 }
 
+AutoInstancedObject.prototype.setPhongLight = function(){
+  macroHandler.injectMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.PHONG;
+}
+
 AutoInstancedObject.prototype.hideVisually = function(){
   this.mesh.visible = false;
 }
