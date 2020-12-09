@@ -527,9 +527,12 @@ ObjectTrail.prototype.hasTexture = function(){
 ObjectTrail.prototype.handleLighting = function(){
   if (this.object.affectedByLight){
     lightHandler.addLightToObject(this);
-    macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+    macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, true);
     this.mesh.material.uniforms.dynamicLightsMatrix = lightHandler.getUniform();
     this.mesh.material.needsUpdate = true;
+  }
+  if (this.object.lightingType == lightHandler.lightTypes.PHONG){
+    macroHandler.injectMacro("HAS_PHONG_LIGHT", this.mesh.material, true, true);
   }
 }
 
