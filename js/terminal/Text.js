@@ -573,6 +573,7 @@ var Text = function(){
   this.CROSSHAIRS = "Crosshairs";
   this.LIGHTNINGS = "Lightnings";
   this.SCENES = "Scenes";
+  this.PHONG_LIGHTS_DO_NOT_SUPPORT_THIS_FUNCTION = "Phong lights do not support this function.";
   this.NO_TEXTURE_PACK_FOUND = "No texture pack found.";
   this.NO_MODELS_FOUND = "No models found.";
   this.COMMAND_EXECUTED_FOR_X_TEXTURES = "Command executed for @@1 textures.";

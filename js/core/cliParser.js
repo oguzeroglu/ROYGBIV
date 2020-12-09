@@ -6395,6 +6395,10 @@ function parse(input){
             terminal.printError(Text.OBJECT_IS_NOT_MARKED_AS_AFFECTED_BY_LIGHT);
             return true;
           }
+          if (obj.lightingType == lightHandler.lightTypes.PHONG){
+            terminal.printError(Text.PHONG_LIGHTS_DO_NOT_SUPPORT_THIS_FUNCTION);
+            return true;
+          }
 
           obj.bakeLights();
           if (!jobHandlerWorking){
