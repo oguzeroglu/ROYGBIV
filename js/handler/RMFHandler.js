@@ -64,9 +64,6 @@ RMFHandler.prototype.load = function(folderName, onReady){
     var view = new Float32Array(arrayBuffer);
 
     var indicesLength = view[0];
-    var positionsByIndex = {};
-    var normalsByIndex = {};
-    var uvsByIndex = {};
 
     var positions = [];
     var normals = [];
@@ -84,29 +81,28 @@ RMFHandler.prototype.load = function(folderName, onReady){
       var curUVX = view[i ++];
       var curUVY = view[i ++];
 
-      positionsByIndex[totalRead] = {x: curPosX, y: curPosY, z: curPosZ};
-      normalsByIndex[totalRead] = {x: curNormalX, y: curNormalY, z: curNormalZ};
-      uvsByIndex[totalRead] = {x: curUVX, y: curUVY};
+      positions.push(curPosX);
+      positions.push(curPosY);
+      positions.push(curPosZ);
+      normals.push(curNormalX);
+      normals.push(curNormalY);
+      normals.push(curNormalZ);
+      uvs.push(curUVX);
+      uvs.push(curUVY);
 
       totalRead ++;
     }
 
+    var indices = new Array(indicesLength);
+
+    var i2 = 0;
+
     for (var i = 1 + (indicesLength * 8); i < view.length; i ++){
       var curIndex = view[i];
-      var pos = positionsByIndex[curIndex];
-      var normal = normalsByIndex[curIndex];
-      var uv = uvsByIndex[curIndex];
-      positions.push(pos.x);
-      positions.push(pos.y);
-      positions.push(pos.z);
-      normals.push(normal.x);
-      normals.push(normal.y);
-      normals.push(normal.z);
-      uvs.push(uv.x);
-      uvs.push(uv.y);
+      indices[i2 ++] = curIndex;
     }
 
-    onReady(positions, normals, uvs);
+    onReady(positions, normals, uvs, indices);
   };
 
   xhr.send(null);

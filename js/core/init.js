@@ -244,6 +244,7 @@ window.onload = function() {
   // SHADER CONTENT
   ShaderContent = new ShaderContent();
   if (isDeployment){
+    loadTime.shaderLoadTime = performance.now();
     cliDiv.value = "";
     appendtoDeploymentConsole("Loading shaders.");
     console.log(
@@ -440,6 +441,7 @@ function onCanvasInitiated(){
 
 // DEPLOYMENT
 function startDeployment(){
+  loadTime.shaderLoadTime = performance.now() - loadTime.shaderLoadTime;
   appendtoDeploymentConsole("Project name: "+projectName);
   appendtoDeploymentConsole("Author: "+author);
   appendtoDeploymentConsole("");
@@ -457,13 +459,14 @@ function startDeployment(){
   var xobj = new XMLHttpRequest();
   xobj.overrideMimeType("application/json");
   xobj.open("GET", "js/application.json", true);
+  loadTime.applicationJSONLoadTime = performance.now();
   xobj.onreadystatechange = function(){
     if (!(xobj.readyState === 4 && xobj.status === 200)){
       return;
     }
 
     var data = JSON.parse(xobj.responseText);
-
+    loadTime.applicationJSONLoadTime = performance.now() - loadTime.applicationJSONLoadTime;
     appendtoDeploymentConsole("Initializing.");
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();

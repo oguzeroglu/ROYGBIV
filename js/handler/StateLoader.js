@@ -59,6 +59,11 @@ StateLoader.prototype.onModulesLoaded = function(){
 StateLoader.prototype.onModelLoaded = function(){
   this.totalLoadedModelCount ++;
   if (this.totalLoadedModelCount == Object.keys(this.stateObj.models).length){
+
+    if (isDeployment){
+      loadTime.modelImporttime = performance.now() - loadTime.modelImporttime;
+    }
+
     this.modelsReady = true;
     this.tryToImportTextureAtlas();
     this.finalize();
@@ -67,6 +72,11 @@ StateLoader.prototype.onModelLoaded = function(){
 
 StateLoader.prototype.load = function(){
   try{
+
+    if (isDeployment){
+      loadTime.totalLoadTime = performance.now();
+    }
+
     projectLoaded = false;
     this.resetProject();
     var obj = this.stateObj;
@@ -94,6 +104,10 @@ StateLoader.prototype.load = function(){
     this.importHandler.importFonts(obj, this.onFontLoaded.bind(this));
     this.importHandler.importShadowBaker(obj, this.onShadowsLoaded.bind(this));
     this.importHandler.importModels(obj, this.onModelLoaded.bind(this));
+
+    if (isDeployment && this.hasModels){
+      loadTime.modelImporttime = performance.now();
+    }
 
     if (!isDeployment && this.hasModules){
       this.importHandler.importModules(obj, this.onModulesLoaded.bind(this));
@@ -146,6 +160,8 @@ StateLoader.prototype.onAfterFinalized = function(){
       }
     }
 
+    loadTime.totalLoadTime = performance.now() - loadTime.totalLoadTime;
+
     appendtoDeploymentConsole("Initializing workers.");
     modeSwitcher.switchMode();
   }
@@ -154,6 +170,10 @@ StateLoader.prototype.onAfterFinalized = function(){
 StateLoader.prototype.finalize = function(){
   if (!this.shouldFinalize()){
     return;
+  }
+
+  if (isDeployment){
+    loadTime.finalizeTime = performance.now();
   }
 
   this.importHandler.importParticleSystems(this.stateObj);
@@ -175,6 +195,11 @@ StateLoader.prototype.finalize = function(){
   this.closeRaycasterWorkerIfNotUsed();
 
   projectLoaded = true;
+
+  if (isDeployment){
+    loadTime.finalizeTime = performance.now() - loadTime.finalizeTime;
+  }
+
   this.onAfterFinalized();
 }
 

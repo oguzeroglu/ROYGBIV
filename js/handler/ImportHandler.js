@@ -58,7 +58,17 @@ ImportHandler.prototype.importModels = function(obj, callback){
   var that = this;
   for (var modelName in obj.models){
     var curModelExport = obj.models[modelName];
-    rmfHandler.load(curModelExport.folderName, function(positions, normals, uvs){
+
+    if (isDeployment){
+      loadTime.rmfLoadTimes[modelName] = performance.now();
+    }
+
+    rmfHandler.load(curModelExport.folderName, function(positions, normals, uvs, indices){
+
+      if (isDeployment){
+        loadTime.rmfLoadTimes[this.curModelExport.name] = performance.now() - loadTime.rmfLoadTimes[this.curModelExport.name];
+      }
+
       var min = this.curModelExport.originalBoundingBox.min;
       var max = this.curModelExport.originalBoundingBox.max;
       this.curModelExport.originalBoundingBox = new THREE.Box3(new THREE.Vector3(min.x, min.y, min.z), new THREE.Vector3(max.x, max.y, max.z));
@@ -66,6 +76,11 @@ ImportHandler.prototype.importModels = function(obj, callback){
       var colors = [];
       var diffuseUVs = [];
       var materialIndices = [];
+
+      if (isDeployment){
+        loadTime.rmfGroupParsingTimes[this.curModelExport.name] = performance.now();
+      }
+
       for (var i = 0; i < this.curModelExport.groupInfo.length; i ++){
         var curGroup = this.curModelExport.groupInfo[i];
         var curMaterialIndex = curGroup.materialIndex;
@@ -79,11 +94,17 @@ ImportHandler.prototype.importModels = function(obj, callback){
         }
       }
 
-      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, materialIndices);
+      if (isDeployment){
+        loadTime.rmfGroupParsingTimes[this.curModelExport.name] = performance.now() - loadTime.rmfGroupParsingTimes[this.curModelExport.name];
+        loadTime.modelGenerationTimes[this.curModelExport.name] = performance.now();
+      }
+
+      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, materialIndices, indices);
       models[this.curModelExport.name] = model;
       if (!isDeployment){
         model.loadTextures(callback);
       }else{
+        loadTime.modelGenerationTimes[this.curModelExport.name] = performance.now() - loadTime.modelGenerationTimes[this.curModelExport.name];
         callback();
       }
     }.bind({curModelExport: curModelExport}));

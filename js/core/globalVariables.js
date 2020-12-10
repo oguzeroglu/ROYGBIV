@@ -571,3 +571,14 @@ var BANNERL5 = "|_| \\_\\\\___/ |_| \\____|____/___|  \\_/    ";
 var deploymentScriptsStatus = {
 //@DEPLOYMENT_SCRIPTS_STATUS
 };
+
+var loadTime = {
+  totalLoadTime: 0,
+  shaderLoadTime: 0,
+  applicationJSONLoadTime: 0,
+  finalizeTime: 0,
+  modelImporttime: 0,
+  rmfLoadTimes: {},
+  rmfGroupParsingTimes: {},
+  modelGenerationTimes: {}
+};
