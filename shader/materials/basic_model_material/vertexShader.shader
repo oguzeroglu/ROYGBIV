@@ -30,6 +30,10 @@ varying vec4 vDiffuseUV;
   uniform mat4 dynamicLightsMatrix;
 #endif
 
+#ifdef IS_LIGHT_BAKED
+  attribute vec3 bakedColor;
+#endif
+
 vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
   vec3 pointLightPosition = vec3(pX, pY, pZ);
   vec3 toLight = normalize(pointLightPosition - worldPosition);

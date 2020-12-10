@@ -290,6 +290,7 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
   this.mesh.material.needsUpdate = true;
 
   this.affectedByLight = isAffectedByLight;
+  this.lightingType = lightHandler.lightTypes.GOURAUD;
 }
 
 ModelInstance.prototype.setPhongLight = function(){

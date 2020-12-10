@@ -258,7 +258,7 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
     var normal = new THREE.Vector3(normalAttrAry[i], normalAttrAry[i + 1], normalAttrAry[i + 2]);
     var pos = new THREE.Vector3(positionAttrAry[i], positionAttrAry[i + 1], positionAttrAry[i + 2]);
 
-    if (obj.isObjectGroup){
+    if (obj.isObjectGroup || obj.isModelInstance){
       var colorAry = obj.mesh.geometry.attributes.color.array;
       color = new THREE.Vector3(colorAry[i], colorAry[i + 1], colorAry[i + 2]);
     }
@@ -356,6 +356,29 @@ LightHandler.prototype.findBakeableObjects = function(){
       bakeableObjects.push(obj);
     }
   }
+
+  for (var instanceName in modelInstances){
+    var modelInstance = modelInstances[instanceName];
+    if (modelInstance.isChangeable || modelInstance.isDynamicObject || !modelInstance.affectedByLight || modelInstance.lightingType == lightHandler.lightTypes.PHONG){
+      continue;
+    }
+
+    var isBakeable = true;
+    for (var instanceName2 in modelInstances){
+      if (instanceName != instanceName2){
+        var modelInstance2 = modelInstances[instanceName2];
+        if (modelInstance.model.name == modelInstance2.model.name && modelInstance2.affectedByLight && modelInstance2.lightingType == lightHandler.lightTypes.GOURAUD){
+          isBakeable = false;
+          break;
+        }
+      }
+    }
+
+    if (isBakeable){
+      bakeableObjects.push(modelInstance);
+    }
+  }
+
   return bakeableObjects;
 }
 
