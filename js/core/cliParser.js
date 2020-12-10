@@ -6808,6 +6808,40 @@ function parse(input){
           }
           return true;
         break;
+        case 284: //printModels
+          var count = 0;
+          var length = Object.keys(models).length;
+          terminal.printHeader(Text.MODELS);
+          for (var modelName in models){
+            count++;
+            var options = true;
+            if (length == count){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, modelName).replace(Text.PARAM2, models[modelName].info.folderName), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_MODELS_CREATED);
+          }
+          return true;
+        break;
+        case 285: //printModelInstances
+          var count = 0;
+          var length = Object.keys(models).length;
+          terminal.printHeader(Text.MODEL_INSTANCES);
+          for (var instanceName in modelInstances){
+            count++;
+            var options = true;
+            if (length == count){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, instanceName).replace(Text.PARAM2, Text.OF_MODEL.replace(Text.PARAM1, modelInstances[instanceName].model.name)), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_MODELS_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

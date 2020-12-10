@@ -284,7 +284,9 @@ var CommandDescriptor = function(){
       3, //newModelInstance
       1, //destroyModel
       1, //selectModelInstance
-      1 //destroyModelInstance
+      1, //destroyModelInstance
+      0, //printModels
+      0 //printModelInstances
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -571,7 +573,9 @@ var CommandDescriptor = function(){
     "newModelInstance instanceName modelName height",
     "destroyModel modelName",
     "selectModelInstance instanceName",
-    "destroyModelInstance instanceName"
+    "destroyModelInstance instanceName",
+    "printModels",
+    "printModelInstances"
   ];
 
   this.commands = [
@@ -858,7 +862,9 @@ var CommandDescriptor = function(){
     "newModelInstance",
     "destroyModel",
     "selectModelInstance",
-    "destroyModelInstance"
+    "destroyModelInstance",
+    "printModels",
+    "printModelInstances"
   ];
 
   this.commandInfo = [
@@ -1145,7 +1151,9 @@ var CommandDescriptor = function(){
     "newModelInstance: Creates a new model instance from given model.",
     "destoryModel: Destroys a model.",
     "selectModelInstance: Selects a model instance.",
-    "destroyModelInstance: Destroys a model instance."
+    "destroyModelInstance: Destroys a model instance.",
+    "printModels: Prints a list of created models.",
+    "printModelInstances: Prints model instances."
   ];
 
   this.keyboardInfo = [
