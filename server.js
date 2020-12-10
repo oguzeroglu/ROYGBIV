@@ -778,6 +778,12 @@ function readEngineScripts(projectName, author, enableAntialias, modules){
       }else if (scriptPath.includes("ModuleHandler.js")){
         console.log("[*] Skipping ModuleHandler");
         continue;
+      }else if (scriptPath.includes("OBJLoader.js")){
+        console.log("[*] Skipping OBJLoader.js");
+        continue;
+      }else if (scriptPath.includes("MTLLoader.js")){
+        console.log("[*] Skipping MTLLOader.js");
+        continue;
       }
       content += scriptContent +"\n";
     }
