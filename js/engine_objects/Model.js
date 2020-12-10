@@ -8,17 +8,101 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
     this.geometry = new THREE.BufferGeometry();
     geometryCache[geomKey] = this.geometry;
 
-    var positionsTypedArray = new Float32Array(positions);
-    var colorsTypedArray = new Float32Array(colors);
-    var normalsTypedArray = new Float32Array(normals);
-    var uvsTypedArray = new Float32Array(uvs);
-    var diffuseUVsTypedArray = new Float32Array(diffuseUVs);
+    var indexInfos = {};
+    var indexInfosInverse = {};
+    var curIndex = 0;
+    var i2 = 0;
+    var i3 = 0;
+    var i4 = 0;
+    var indexHitCount = 0;
+    var indices = [];
+    for (var i = 0; i < positions.length; i += 3){
+      var curPosX = positions[i];
+      var curPosY = positions[i + 1];
+      var curPosZ = positions[i + 2];
+      var curNormalX = normals[i];
+      var curNormalY = normals[i + 1];
+      var curNormalZ = normals[i + 2];
+      var curColorR = colors[i];
+      var curColorG = colors[i + 1];
+      var curColorB = colors[i + 2];
+      var curUVX = uvs[i2];
+      var curUVY = uvs[i2 + 1];
+      var curDiffuseUVX = diffuseUVs[i4];
+      var curDiffuseUVY = diffuseUVs[i4 + 1];
+      var curDiffuseUVZ = diffuseUVs[i4 + 2];
+      var curDiffuseUVW = diffuseUVs[i4 + 3];
+      var curMaterialIndex = materialIndices[i3];
+      var key = curPosX + PIPE + curPosY + PIPE + curPosZ;
+      key += PIPE + curNormalX + PIPE + curNormalY + PIPE + curNormalZ;
+      key += PIPE + curUVX + PIPE + curUVY;
+      key += PIPE + curDiffuseUVX + PIPE + curDiffuseUVY + PIPE + curDiffuseUVZ + PIPE + curDiffuseUVW;
+      key += PIPE + curColorR + PIPE + curColorG + PIPE + curColorB;
+      if (indexInfos[key]){
+        indexHitCount ++;
+        indices.push(indexInfos[key]);
+      }else{
+        indexInfos[key] = curIndex;
+        indexInfosInverse[curIndex] = key;
+        indices.push(curIndex);
+        curIndex ++;
+      }
+      i2 += 2;
+      i3 ++;
+      i4 += 4;
+    }
 
-    var positionsBufferAttribute = new THREE.BufferAttribute(positionsTypedArray, 3);
-    var colorsBufferAttribute = new THREE.BufferAttribute(colorsTypedArray, 3);
-    var normalsBufferAttribute = new THREE.BufferAttribute(normalsTypedArray, 3);
-    var uvsBufferAttribute = new THREE.BufferAttribute(uvsTypedArray, 2);
-    var diffuseUVsBufferAttribute = new THREE.BufferAttribute(diffuseUVsTypedArray, 4);
+    this.indexHitCount = indexHitCount;
+    var allPositions = new Float32Array(curIndex * 3);
+    var allNormals = new Float32Array(curIndex * 3);
+    var allUVs = new Float32Array(curIndex * 2);
+    var allDiffuseUVs = new Float32Array(curIndex * 4);
+    var allColors = new Float32Array(curIndex * 3);
+
+    var x = 0, y = 0, z = 0, w = 0, t = 0;
+    for (var i = 0; i < curIndex; i ++){
+      var key = indexInfosInverse[i];
+      var splitted = key.split(PIPE);
+      var curPosX = parseFloat(splitted[0]);
+      var curPosY = parseFloat(splitted[1]);
+      var curPosZ = parseFloat(splitted[2]);
+      var curNormalX = parseFloat(splitted[3]);
+      var curNormalY = parseFloat(splitted[4]);
+      var curNormalZ = parseFloat(splitted[5]);
+      var curUVX = parseFloat(splitted[6]);
+      var curUVY = parseFloat(splitted[7]);
+      var curDiffuseUVX = parseFloat(splitted[8]);
+      var curDiffuseUVY = parseFloat(splitted[9]);
+      var curDiffuseUVZ = parseFloat(splitted[10]);
+      var curDiffuseUVW = parseFloat(splitted[11]);
+      var curColorR = parseFloat(splitted[12]);
+      var curColorG = parseFloat(splitted[13]);
+      var curColorB = parseFloat(splitted[14]);
+
+      allPositions[x ++] = curPosX;
+      allPositions[x ++] = curPosY;
+      allPositions[x ++] = curPosZ;
+      allNormals[y ++] = curNormalX;
+      allNormals[y ++] = curNormalY;
+      allNormals[y ++] = curNormalZ;
+      allUVs[z ++] = curUVX;
+      allUVs[z ++] = curUVY;
+      allDiffuseUVs[w ++] = curDiffuseUVX;
+      allDiffuseUVs[w ++] = curDiffuseUVY;
+      allDiffuseUVs[w ++] = curDiffuseUVZ;
+      allDiffuseUVs[w ++] = curDiffuseUVW;
+      allColors[t ++] = curColorR;
+      allColors[t ++] = curColorG;
+      allColors[t ++] = curColorB;
+    }
+
+    var positionsBufferAttribute = new THREE.BufferAttribute(allPositions, 3);
+    var colorsBufferAttribute = new THREE.BufferAttribute(allColors, 3);
+    var normalsBufferAttribute = new THREE.BufferAttribute(allNormals, 3);
+    var uvsBufferAttribute = new THREE.BufferAttribute(allUVs, 2);
+    var diffuseUVsBufferAttribute = new THREE.BufferAttribute(allDiffuseUVs, 4);
+
+    this.geometry.setIndex(indices);
 
     positionsBufferAttribute.setDynamic(false);
     colorsBufferAttribute.setDynamic(false);
