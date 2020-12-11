@@ -579,6 +579,5 @@ var loadTime = {
   finalizeTime: 0,
   modelImporttime: 0,
   rmfLoadTimes: {},
-  rmfGroupParsingTimes: {},
   modelGenerationTimes: {}
 };

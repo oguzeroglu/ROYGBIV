@@ -63,7 +63,7 @@ ImportHandler.prototype.importModels = function(obj, callback){
       loadTime.rmfLoadTimes[modelName] = performance.now();
     }
 
-    rmfHandler.load(curModelExport.folderName, function(positions, normals, uvs, indices){
+    rmfHandler.load(curModelExport.folderName, function(positions, normals, uvs, indices, indexedMaterialIndices){
 
       if (isDeployment){
         loadTime.rmfLoadTimes[this.curModelExport.name] = performance.now() - loadTime.rmfLoadTimes[this.curModelExport.name];
@@ -73,33 +73,24 @@ ImportHandler.prototype.importModels = function(obj, callback){
       var max = this.curModelExport.originalBoundingBox.max;
       this.curModelExport.originalBoundingBox = new THREE.Box3(new THREE.Vector3(min.x, min.y, min.z), new THREE.Vector3(max.x, max.y, max.z));
 
-      var colors = [];
-      var diffuseUVs = [];
-      var materialIndices = [];
-
-      if (isDeployment){
-        loadTime.rmfGroupParsingTimes[this.curModelExport.name] = performance.now();
-      }
-
-      for (var i = 0; i < this.curModelExport.groupInfo.length; i ++){
-        var curGroup = this.curModelExport.groupInfo[i];
-        var curMaterialIndex = curGroup.materialIndex;
-        var curCount = curGroup.count;
-        var curMaterial = this.curModelExport.childInfos[curMaterialIndex];
-        var color = {r: curMaterial.colorR, g: curMaterial.colorG, b: curMaterial.colorB};
-        for (var i2 = 0; i2 < curCount; i2 ++){
-          that.triplePush(colors, color, color, color, "rgb");
-          that.quadruplePush(diffuseUVs, -100, -100, -100, -100, "number");
-          materialIndices.push(curMaterialIndex);
-        }
+      var colors = [], diffuseUVs = [];
+      for (var i = 0; i < indexedMaterialIndices.length; i ++){
+        var materialIndex = indexedMaterialIndices[i];
+        var curMaterial = this.curModelExport.childInfos[materialIndex];
+        colors.push(curMaterial.colorR);
+        colors.push(curMaterial.colorG);
+        colors.push(curMaterial.colorB);
+        diffuseUVs.push(-100);
+        diffuseUVs.push(-100);
+        diffuseUVs.push(-100);
+        diffuseUVs.push(-100);
       }
 
       if (isDeployment){
-        loadTime.rmfGroupParsingTimes[this.curModelExport.name] = performance.now() - loadTime.rmfGroupParsingTimes[this.curModelExport.name];
         loadTime.modelGenerationTimes[this.curModelExport.name] = performance.now();
       }
 
-      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, materialIndices, indices);
+      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, null, indices, indexedMaterialIndices);
       models[this.curModelExport.name] = model;
       if (!isDeployment){
         model.loadTextures(callback);
@@ -1625,61 +1616,5 @@ ImportHandler.prototype.importSprites = function(obj){
 ImportHandler.prototype.importDynamicTextureFolders = function(obj){
   for (var folderName in obj.dynamicTextureFolders){
     dynamicTextureFolders[folderName] = true;
-  }
-}
-
-ImportHandler.prototype.triplePush = function(ary, obj1, obj2, obj3, type){
-  if (type == "xyz"){
-    ary.push(obj1.x);
-    ary.push(obj1.y);
-    ary.push(obj1.z);
-
-    ary.push(obj2.x);
-    ary.push(obj2.y);
-    ary.push(obj2.z);
-
-    ary.push(obj3.x);
-    ary.push(obj3.y);
-    ary.push(obj3.z);
-  }else if (type === "rgb"){
-    ary.push(obj1.r);
-    ary.push(obj1.g);
-    ary.push(obj1.b);
-
-    ary.push(obj2.r);
-    ary.push(obj2.g);
-    ary.push(obj2.b);
-
-    ary.push(obj3.r);
-    ary.push(obj3.g);
-    ary.push(obj3.b);
-  }else if (type === "xy"){
-    ary.push(obj1.x);
-    ary.push(obj1.y);
-
-    ary.push(obj2.x);
-    ary.push(obj2.y);
-
-    ary.push(obj3.x);
-    ary.push(obj3.y);
-  }
-}
-
-ImportHandler.prototype.quadruplePush = function(ary, obj1, obj2, obj3, obj4, type){
-  if (type == "number"){
-    ary.push(obj1);
-    ary.push(obj2);
-    ary.push(obj3);
-    ary.push(obj4);
-
-    ary.push(obj1);
-    ary.push(obj2);
-    ary.push(obj3);
-    ary.push(obj4);
-
-    ary.push(obj1);
-    ary.push(obj2);
-    ary.push(obj3);
-    ary.push(obj4);
   }
 }

@@ -209,6 +209,8 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     var childMesh = model.children[face.materialIndex];
 
     materialIndices.push(face.materialIndex);
+    materialIndices.push(face.materialIndex);
+    materialIndices.push(face.materialIndex);
 
     var a = face.a;
     var b = face.b;
@@ -246,49 +248,25 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     }
   }
 
-  var groupInfo = [{
-    materialIndex: materialIndices[0],
-    count: 1
-  }];
-
-  for (var i = 1; i < materialIndices.length; i ++){
-    var curInfo = groupInfo[groupInfo.length - 1];
-    var curMaterialIndex = materialIndices[i];
-    if (curInfo.materialIndex == curMaterialIndex){
-      curInfo.count ++;
-    }else{
-      groupInfo.push({
-        materialIndex: curMaterialIndex,
-        count: 1
-      })
-    }
-  };
-
-  var sum = 0;
-  for (var i = 0; i < groupInfo.length; i ++){
-    sum += groupInfo[i].count;
-  }
+  modelCreatorGUIHandler.model = new Model({
+    name: name,
+    folderName: folderName,
+    childInfos: childInfos,
+    originalBoundingBox: boundingBox
+  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, materialIndices);
 
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "/createRMFFile?folderName=" + folderName, true);
   xhr.overrideMimeType("application/octet-stream");
   xhr.onreadystatechange = function(){
     if (xhr.readyState == 4 && xhr.status == 200){
-      modelCreatorGUIHandler.model = new Model({
-        name: name,
-        folderName: folderName,
-        childInfos: childInfos,
-        groupInfo: groupInfo,
-        originalBoundingBox: boundingBox
-      }, texturesObj, positions, normals, uvs, colors, diffuseUVs, materialIndices);
-
       modelCreatorGUIHandler.modelMesh = new MeshGenerator(modelCreatorGUIHandler.model.geometry).generateModelMesh(modelCreatorGUIHandler.model, textureMerger? textureMerger.mergedTexture: null);
       scene.add(modelCreatorGUIHandler.modelMesh);
       onReady();
     }
   }
 
-  xhr.send(rmfHandler.generate(positions, normals, uvs));
+  xhr.send(rmfHandler.generate(positions, normals, uvs, modelCreatorGUIHandler.model.indexedMaterialIndices));
 }
 
 ModelCreatorGUIHandler.prototype.triplePush = function(ary, obj1, obj2, obj3, type){
