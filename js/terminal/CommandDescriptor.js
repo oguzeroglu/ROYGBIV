@@ -217,7 +217,7 @@ var CommandDescriptor = function(){
       1, //destroyVirtualKeyboard
       0, //printVirtualKeyboards
       2, //syncSpriteSize
-      1, //newDynamicTextureFolder
+      2, //newDynamicTextureFolder
       1, //destroyDynamicTextureFolder
       0, //printDynamicTextureFolders
       1, //setProtocolDefinition
@@ -506,7 +506,7 @@ var CommandDescriptor = function(){
     "destroyVirtualKeyboard virtualKeyboardName",
     "printVirtualKeyboards",
     "syncSpriteSize sourceSprite targetSprite",
-    "newDynamicTextureFolder folderName",
+    "newDynamicTextureFolder folderName noCompress",
     "destroyDynamicTextureFolder dynamicTextureFolderName",
     "printDynamicTextureFolders",
     "setProtocolDefinition protocolDefinitionFileName",
@@ -1084,7 +1084,7 @@ var CommandDescriptor = function(){
     "destroyVirtualKeyboard: Destroys a virtual keyboard.",
     "printVirtualKeyboards: Prints created virtual keyboards.",
     "syncSpriteSize: Makes the size of targetSprite same with sourceSprite",
-    "newDynamicTextureFolder: Compresses each PNG under dynamic_textures/folderName to be used as dynamic texture.",
+    "newDynamicTextureFolder: Creates a new dynamic texture folder. If noCompress is set to false, it compresses each image under dynamic_textures/folderName.",
     "destroyDynamicTextureFolder: Destroys a dynamic texture folder.",
     "printDynamicTextureFolders: Prints dynamic texture folders.",
     "setProtocolDefinition: Sets a protocol definition from protocol_definitions folder.",
@@ -1880,6 +1880,7 @@ var CommandDescriptor = function(){
   this.newDynamicTextureFolder = new Object();
   this.newDynamicTextureFolder.types = [];
   this.newDynamicTextureFolder.types.push(this.UNKNOWN_INDICATOR); //folderName
+  this.newDynamicTextureFolder.types.push(this.BOOLEAN); //noCompress
 
   // destroyDynamicTextureFolder
   this.destroyDynamicTextureFolder = new Object();

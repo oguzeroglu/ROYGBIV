@@ -5102,7 +5102,10 @@ Roygbiv.prototype.isDefined = function(element){
 // with results parameter when the loading process is finished. This results parameter holds either
 // a texture pack object as element if the texture could be loaded, or false if not. The order of
 // elements of results parameter and textureNamesArray are the same. ROYGBIV engine automatically takes care of
-// caching, so a texture is not loaded twice from the same path.
+// caching, so a texture is not loaded twice from the same path. If png, jpg or jpeg file extensions are
+// provided in the texture name, ROYGBIV tries to load non compressed textures. If no extension is provided
+// a compressed texture is loaded in case the dynamic texture folder is created with noCompress parameter set to false.
+// The default format is png if no extension is provided.
 Roygbiv.prototype.loadDynamicTextures = function(dynamicTextureFolderName, textureNamesArray, onLoadedCallback){
   if (mode == 0){
     return;

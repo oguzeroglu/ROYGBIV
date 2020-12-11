@@ -4840,6 +4840,9 @@ function parse(input){
             terminal.printInfo(Text.DYNAMIC_TEXTURE_FOLDER_WITH_SAME_NAME);
             return true;
           }
+
+          var noCompress = splitted[2].toLowerCase() == "true";
+
           terminal.printInfo(Text.LOADING);
           canvas.style.visibility = "hidden";
           terminal.disable();
@@ -4859,11 +4862,11 @@ function parse(input){
                 terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE.replace(Text.PARAM1, resp.errorFile));
                 return;
               }
-              dynamicTextureFolders[folderName] = true;
-              terminal.printInfo(Text.DYNAMIC_TEXTURE_FOLDER_PREPARED);
+              dynamicTextureFolders[folderName] = { noCompress: noCompress };
+              terminal.printInfo(Text.DYNAMIC_TEXTURE_FOLDER_CREATED);
             }
           }
-          xhr.send(JSON.stringify({folderName: folderName}));
+          xhr.send(JSON.stringify({folderName: folderName, noCompress: noCompress}));
           return true;
         break;
         case 217: //destroyDynamicTextureFolder

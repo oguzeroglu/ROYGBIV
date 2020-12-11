@@ -443,7 +443,7 @@ var Text = function(){
   this.OBJECT_HAS_SOFT_COPY_PARENT_TEXTURE = "Object has a soft copy parent. Run this command on the parent instead.";
   this.AN_ERROR_HAPPENED_CHOOSE_ANOTHER_NAME = "An error happened. Choose another name.";
   this.ERROR_HAPPENED_COMPRESSING_TEXTURE = "Error happened compressing texture @@1. Provide a JPG alternative.";
-  this.DYNAMIC_TEXTURE_FOLDER_PREPARED = "Dynamic texture folder prepared.";
+  this.DYNAMIC_TEXTURE_FOLDER_CREATED = "Dynamic texture folder created.";
   this.MUZZLE_FLASH_USED_IN = "Muzzleflash used in FPS weapon @@1. Cannot destroy.";
   this.MUZZLE_FLASH_DESTROYED = "Muzzleflash destroyed."
   this.HEIGHT_CANNOT_BE_0 = "Height cannot be 0.";
@@ -1367,7 +1367,8 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETSPRITEMARGINX = "Returns the marginX value of given sprite.";
   this.ROYGBIV_SCRIPTING_API_GETSPRITEMARGINY = "Returns the marginY value of given sprite.";
   this.ROYGBIV_SCRIPTING_API_LOADDYNAMICTEXTURES = "Loads given textures inside provided dynamic texture folder. onLoadedCallback is executed with results parameter\nwhen the loading process is finished. This results parameter holds either a texture pack object as element\nif the texture could be loaded, or false if not. The order of elements of results parameter and textureNamesArray\nare the same." +
-                                                   " ROYGBIV engine automatically takes care of caching, so a texture is not loaded twice from the same path.";
+                                                   " ROYGBIV engine automatically takes care of caching, so a texture is not loaded twice from the same path.\n" +
+                                                   "If png, jpg or jpeg file extensions are provided in the texture name, ROYGBIV tries to load non compressed textures.\nIf no extension is provided a compressed texture is loaded in case the dynamic texture folder is created with noCompress parameter\nset to false. The default format is png if no extension is provided.";
   this.ROYGBIV_SCRIPTING_API_CONNECTTOSERVER = "Connects to a game server, the URL of which is set by setWSServerURL CLI command. The server and the client interacts through\nRhubarb protocol definition files, the path of which is set by setProtocolDefinition CLI command. onReady callback parameter is\nexecuted when the connection is established. onError is executed with errorReason parameter in case there is an error\nestablishing the connection.";
   this.ROYGBIV_SCRIPTING_API_CLEARSERVERCONNECTION = "Disconnects from server and clears Rhubarb context. Does nothing if not connected to server.";
   this.ROYGBIV_SCRIPTING_API_ONDISCONNECTEDFROMSERVER = "Sets a listener for server connection status. The callbackFunction is executed when the connection between\nthe server and the client is lost. If client needs to try reconnecting, ROYGBIV.clearServerConnection API\nneeds to be used before ROYGBIV.connectFromServer.";

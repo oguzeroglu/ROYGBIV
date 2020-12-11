@@ -162,15 +162,23 @@ app.post("/getTexturePackInfo", async function(req, res){
 app.post("/prepareDynamicTextures", async function(req, res){
   console.log("[*] Preparing dynamic textures");
   var folderName = req.body.folderName;
+  var noCompress = req.body.noCompress;
   var path = "./dynamic_textures/"+folderName;
   if (!fs.existsSync(path)){
     res.send(JSON.stringify({folderDoesNotExist: true}));
     return;
   }
+
+  if (noCompress){
+    res.send(JSON.stringify({ok: true}));
+    return;
+  }
+
   var files = fs.readdirSync(path);
   var types = ["astc", "pvrtc", "s3tc"];
   for (var i = 0; i<files.length; i++){
-    if (files[i].toLowerCase().endsWith(".png")){
+    var lower = files[i].toLowerCase();
+    if (lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg")){
       var fileName = files[i].split(".")[0];
       for (var i2 = 0; i2<types.length; i2++){
         var result = await compressTexture(types[i2], fileName, path, true, false, false);

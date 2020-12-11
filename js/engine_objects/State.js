@@ -71,7 +71,7 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   // DYNAMIC TEXTURE FOLDERS ***************************************
   var dynamicTextureFoldersExport = new Object();
   for (var folderName in dynamicTextureFolders){
-    dynamicTextureFoldersExport[folderName] = true;
+    dynamicTextureFoldersExport[folderName] = {noCompress: dynamicTextureFolders[folderName]};
   }
   this.dynamicTextureFolders = dynamicTextureFoldersExport;
   // SKYBOXES ******************************************************
