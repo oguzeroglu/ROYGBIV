@@ -347,7 +347,8 @@ var Roygbiv = function(){
     "vectorLength",
     "vectorLengthSquare",
     "getObjectVelocity",
-    "getModelInstance"
+    "getModelInstance",
+    "getMaxTextureSize"
   ];
 
   this.globals = new Object();
@@ -5279,4 +5280,13 @@ Roygbiv.prototype.vectorLengthSquare = function(vec){
 
   REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
   return REUSABLE_VECTOR.lengthSq();
+}
+
+// Returns the max texture size the client device supports.
+Roygbiv.prototype.getMaxTextureSize = function(){
+  if (mode == 0){
+    return;
+  }
+
+  return WEBGL_MAX_TEXTURE_SIZE;
 }

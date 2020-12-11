@@ -223,6 +223,7 @@ window.onload = function() {
   PVRTC_SUPPORTED = renderer.isPVRTCSupported();
   INSTANCING_SUPPORTED = renderer.isInstancingSupported();
   HIGH_PRECISION_SUPPORTED = renderer.isHighPrecisionSupported();
+  WEBGL_MAX_TEXTURE_SIZE = renderer.getMaxTextureSize();
   BROWSER_NAME = (navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1? "Opera": (
     navigator.userAgent.indexOf("Chrome") != -1? "Chrome": (
       navigator.userAgent.indexOf("Safari") != -1? "Safari": (

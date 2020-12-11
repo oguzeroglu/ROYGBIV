@@ -45,6 +45,10 @@ Renderer.prototype.isHighPrecisionSupported = function(){
   );
 }
 
+Renderer.prototype.getMaxTextureSize = function(){
+  return this.webglRenderer.context.getParameter(this.webglRenderer.context.MAX_TEXTURE_SIZE);
+}
+
 Renderer.prototype.isInstancingSupported = function(){
   return (!(this.webglRenderer.context.getExtension("ANGLE_instanced_arrays") == null));
 }
