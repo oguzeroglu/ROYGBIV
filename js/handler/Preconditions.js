@@ -298,6 +298,7 @@ var Preconditions = function(){
   this.yOffset = "yOffset";
   this.object1 = "object1";
   this.object2 = "object2";
+  this.modelInstanceName = "modelInstanceName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

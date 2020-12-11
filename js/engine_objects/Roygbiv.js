@@ -346,7 +346,8 @@ var Roygbiv = function(){
     "makeObjectLookAt",
     "vectorLength",
     "vectorLengthSquare",
-    "getObjectVelocity"
+    "getObjectVelocity",
+    "getModelInstance"
   ];
 
   this.globals = new Object();
@@ -907,6 +908,17 @@ Roygbiv.prototype.getObjectVelocity = function(object, targetVector){
   targetVector.y = velocity.y;
   targetVector.z = velocity.z;
   return targetVector;
+}
+
+// Returns a ModelInstance or 0 if ModelInstance of given name does not exist.
+Roygbiv.prototype.getModelInstance = function(modelInstanceName){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.getModelInstance, preConditions.modelInstanceName, modelInstanceName);
+
+  return modelInstances[modelInstanceName] || 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************

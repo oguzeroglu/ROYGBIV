@@ -1462,4 +1462,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_VECTORLENGTH = "Calculates and returns the length of given vector.";
   this.ROYGBIV_SCRIPTING_API_VECTORLENGTHSQUARE = "Calcualtes and returns the square of the length of given vector.";
   this.ROYGBIV_SCRIPTING_API_GETOBJECTVELOCITY = "Returns the velocity of given object.";
+  this.ROYGBIV_SCRIPTING_API_GETMODELINSTANCE = "Returns a ModelInstance or 0 if ModelInstance of given name does not exist.";
 }
