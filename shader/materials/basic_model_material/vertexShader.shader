@@ -34,6 +34,11 @@ varying vec4 vDiffuseUV;
   attribute vec3 bakedColor;
 #endif
 
+#ifdef HAS_CUSTOM_TEXTURE
+  attribute float diffuseTextureIndex;
+  varying float vDiffuseTextureIndex;
+#endif
+
 vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
   vec3 pointLightPosition = vec3(pX, pY, pZ);
   vec3 toLight = normalize(pointLightPosition - worldPosition);
@@ -749,6 +754,10 @@ void main(){
 
   vUV = uv;
   vDiffuseUV = diffuseUV;
+
+  #ifdef HAS_CUSTOM_TEXTURE
+    vDiffuseTextureIndex = diffuseTextureIndex;
+  #endif
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }

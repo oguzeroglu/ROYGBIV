@@ -47,6 +47,7 @@ DynamicTextureLoader.prototype.createTexturePack = function(textureData){
   textureData.hasDiffuse = true;
   textureData.wrapS = THREE.RepeatWrapping;
   textureData.wrapT = THREE.RepeatWrapping;
+  textureData.magFilter = THREE.NearestFilter;
   textureData.needsUpdate = true;
   return texturePack;
 }

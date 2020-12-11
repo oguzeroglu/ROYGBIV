@@ -263,16 +263,16 @@ Model.prototype.enableCustomTextures = function(){
   var diffuseTextureIndexByTextureID = {};
   var curTextureIndex = 0;
 
-  var diffuseTextureIndices = new Uint8Array(this.indexedMaterialIndices.length);
+  var diffuseTextureIndices = new Float32Array(this.indexedMaterialIndices.length);
 
   for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
     var materialIndex = this.indexedMaterialIndices[i];
     var material = this.info.childInfos[materialIndex];
     if (material.diffuseTextureID){
-      if (!diffuseTextureIndexByTextureID[material.diffuseTextureID]){
+      if (typeof diffuseTextureIndexByTextureID[material.diffuseTextureID] == UNDEFINED){
         diffuseTextureIndexByTextureID[material.diffuseTextureID] = curTextureIndex ++;
       }
-
+      
       diffuseTextureIndices[i] = diffuseTextureIndexByTextureID[material.diffuseTextureID];
     }else{
       diffuseTextureIndices[i] = -100;

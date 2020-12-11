@@ -321,3 +321,52 @@ ModelInstance.prototype.unvisialiseNormals = function(){
   scene.remove(this.vertexNormalsHelper);
   delete this.vertexNormalsHelper;
 }
+
+ModelInstance.prototype.mapCustomTextures = function(texturesObj){
+  var material = this.mesh.material;
+  var uniforms = material.uniforms;
+  if (!this.customTextureMapped){
+    macroHandler.injectMacro("HAS_CUSTOM_TEXTURE", material, true, true);
+    delete uniforms.texture;
+  }
+
+  var model = this.model;
+  var usedTextures = model.getUsedTextures();
+  var diffuseTextureIndexByTextureID = model.diffuseTextureIndexByTextureID;
+  for (var i = 0; i < usedTextures.length; i ++){
+    var textureID = usedTextures[i].id;
+    var diffuseTextureIndex = diffuseTextureIndexByTextureID[textureID];
+    var texture = texturesObj[textureID].diffuseTexture;
+    var key = "customDiffuseTexture" + diffuseTextureIndex;
+    if (!uniforms[key]){
+      uniforms[key] = new THREE.Uniform(texture);
+      macroHandler.injectMacro("CUSTOM_TEXTURE_" + diffuseTextureIndex, material, false, true);
+    }else{
+      uniforms[key].value = texture;
+    }
+  }
+
+  this.customTextureMapped = true;
+}
+
+ModelInstance.prototype.unmapCustomTextures = function(){
+  var material = this.mesh.material;
+  var uniforms = material.uniforms;
+
+  macroHandler.removeMacro("HAS_CUSTOM_TEXTURE", material, true, true);
+
+  var model = this.model;
+  var usedTextures = model.getUsedTextures();
+  var diffuseTextureIndexByTextureID = model.diffuseTextureIndexByTextureID;
+  for (var i = 0; i < usedTextures.length; i ++){
+    var textureID = usedTextures[i].id;
+    var diffuseTextureIndex = diffuseTextureIndexByTextureID[textureID];
+    var key = "customDiffuseTexture" + diffuseTextureIndex;
+    macroHandler.removeMacro("CUSTOM_TEXTURE_" + diffuseTextureIndex, material, false, true);
+    delete uniforms[key];
+  }
+
+  uniforms.texture = textureAtlasHandler.getTextureUniform();
+
+  this.customTextureMapped = false;
+}

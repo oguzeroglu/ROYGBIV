@@ -5,14 +5,33 @@ varying vec2 vUV;
 varying vec3 vColor;
 varying vec4 vDiffuseUV;
 
-uniform sampler2D texture;
-
 #define INSERTION
 
 #ifdef HAS_PHONG_LIGHTING
   varying vec3 vWorldPosition;
   varying vec3 vNormal;
   uniform mat4 dynamicLightsMatrix;
+#endif
+
+#ifdef HAS_CUSTOM_TEXTURE
+  varying float vDiffuseTextureIndex;
+  #ifdef CUSTOM_TEXTURE_0
+    uniform sampler2D customDiffuseTexture0;
+  #endif
+  #ifdef CUSTOM_TEXTURE_1
+    uniform sampler2D customDiffuseTexture1;
+  #endif
+  #ifdef CUSTOM_TEXTURE_2
+    uniform sampler2D customDiffuseTexture2;
+  #endif
+  #ifdef CUSTOM_TEXTURE_3
+    uniform sampler2D customDiffuseTexture3;
+  #endif
+  #ifdef CUSTOM_TEXTURE_4
+    uniform sampler2D customDiffuseTexture4;
+  #endif
+#else
+  uniform sampler2D texture;
 #endif
 
 float flipNumber(float num, float min, float max){
@@ -744,7 +763,36 @@ void main(){
   vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
 
   if (vDiffuseUV.x >= 0.0) {
-    diffuseColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w));
+    #ifdef HAS_CUSTOM_TEXTURE
+      int diffuseTextureIndexInt = int(vDiffuseTextureIndex);
+      #ifdef CUSTOM_TEXTURE_0
+        if (diffuseTextureIndexInt == 0){
+          diffuseColor = texture2D(customDiffuseTexture0, vUV);
+        }
+      #endif
+      #ifdef CUSTOM_TEXTURE_1
+        if (diffuseTextureIndexInt == 1){
+          diffuseColor = texture2D(customDiffuseTexture1, vUV);
+        }
+      #endif
+      #ifdef CUSTOM_TEXTURE_2
+        if (diffuseTextureIndexInt == 2){
+          diffuseColor = texture2D(customDiffuseTexture2, vUV);
+        }
+      #endif
+      #ifdef CUSTOM_TEXTURE_3
+        if (diffuseTextureIndexInt == 3){
+          diffuseColor = texture2D(customDiffuseTexture3, vUV);
+        }
+      #endif
+      #ifdef CUSTOM_TEXTURE_4
+        if (diffuseTextureIndexInt == 4){
+          diffuseColor = texture2D(customDiffuseTexture4, vUV);
+          }
+      #endif
+    #else
+      diffuseColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w));
+    #endif
   }
 
   gl_FragColor = vec4(colorHandled, 1.0) * diffuseColor;
