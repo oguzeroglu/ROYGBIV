@@ -246,3 +246,43 @@ Model.prototype.destroy = function(){
     this.texturesObj[key].dispose();
   }
 }
+
+Model.prototype.supportsCustomTextures = function(){
+  var usedTextures = this.getUsedTextures();
+
+  return !(usedTextures.length == 0 || usedTextures.length > 5);
+}
+
+Model.prototype.enableCustomTextures = function(){
+  var diffuseTextureIndexByTextureID = {};
+  var curTextureIndex = 0;
+
+  var diffuseTextureIndices = new Uint8Array(this.indexedMaterialIndices.length);
+
+  for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
+    var materialIndex = this.indexedMaterialIndices[i];
+    var material = this.info.childInfos[materialIndex];
+    if (material.diffuseTextureID){
+      if (!diffuseTextureIndexByTextureID[material.diffuseTextureID]){
+        diffuseTextureIndexByTextureID[material.diffuseTextureID] = curTextureIndex ++;
+      }
+
+      diffuseTextureIndices[i] = diffuseTextureIndexByTextureID[material.diffuseTextureID];
+    }else{
+      diffuseTextureIndices[i] = -100;
+    }
+  }
+
+  var diffuseTextureIndexBufferAttribute = new THREE.BufferAttribute(diffuseTextureIndices, 1);
+  diffuseTextureIndexBufferAttribute.setDynamic(false);
+  this.geometry.addAttribute("diffuseTextureIndex", diffuseTextureIndexBufferAttribute);
+
+  this.info.customTexturesEnabled = true;
+  this.diffuseTextureIndexByTextureID = diffuseTextureIndexByTextureID;
+}
+
+Model.prototype.disableCustomTextures = function(){
+  delete this.diffuseTextureIndexByTextureID;
+  this.geometry.removeAttribute("diffuseTextureIndex");
+  this.info.customTexturesEnabled = false;
+}

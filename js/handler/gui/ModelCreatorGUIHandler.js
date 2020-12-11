@@ -78,6 +78,7 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
 
     var params = {
       "Folder": allFolders[index],
+      "Enable custom textures": false,
       "Scale": 1,
       "Done": function(){
         var folderName = modelCreatorGUIHandler.model.info.folderName;
@@ -115,16 +116,32 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
       if (guiHandler.datGuiModelCreation){
         guiHandler.removeControllers(guiHandler.datGuiModelCreation);
       }else{
-        guiHandler.datGuiModelCreation = new dat.GUI({hideable: false});
+        guiHandler.datGuiModelCreation = new dat.GUI({hideable: false, width: 420});
       }
 
-      var folderController, scaleController;
+      var folderController, scaleController, customTextureController;
 
       folderController = guiHandler.datGuiModelCreation.add(params, "Folder", allFolders).onChange(function(val){
         guiHandler.disableController(folderController);
         guiHandler.disableController(scaleController);
+        guiHandler.disableController(customTextureController);
         modelCreatorGUIHandler.renderControls(allModels, allFolders.indexOf(val), modelName);
       });
+      customTextureController = guiHandler.datGuiModelCreation.add(params, "Enable custom textures").onChange(function(val){
+        terminal.clear();
+        if (!modelCreatorGUIHandler.model.supportsCustomTextures()){
+          params["Enable custom textures"] = false;
+          terminal.printError(Text.THIS_MODEL_DOES_NOT_SUPPORT_CUSTOM_TEXTURES);
+          return;
+        }
+        if (val){
+          modelCreatorGUIHandler.model.enableCustomTextures();
+        }else{
+          modelCreatorGUIHandler.model.disableCustomTextures();
+        }
+
+        terminal.printInfo(val? Text.CUSTOM_TEXTURES_ENABLED_FOR_THIS_MODEL: Text.CUSTOM_TEXTURES_DISABLED_FOR_THIS_MODEL);
+      }).listen();
       scaleController = guiHandler.datGuiModelCreation.add(params, "Scale").min(0.1).max(100).step(0.1).onChange(function(val){
         modelCreatorGUIHandler.modelMesh.scale.set(val, val, val);
       });
