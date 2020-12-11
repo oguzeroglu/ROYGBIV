@@ -2186,6 +2186,20 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       selectionHandler.getSelectedObject().unsetPhongLight();
     }
   }).listen();
+
+  if (selectionHandler.getSelectedObject().model.info.customTexturesEnabled){
+    var textureFolder = guiHandler.datGuiModelInstance.addFolder("Textures");
+    var usedTextures = selectionHandler.getSelectedObject().model.getUsedTextures();
+    for (var i = 0; i < usedTextures.length; i ++){
+      var usedTexture = usedTextures[i];
+      var childFolder = textureFolder.addFolder(usedTexture.id);
+      childFolder.add({
+        "View": function(){
+          window.open (this.url, "texture","menubar=1,resizable=1,width=500,height=500");
+        }.bind({url: usedTexture.url})
+      }, "View");
+    }
+  }
 }
 
 GUIHandler.prototype.initializeMassManipulationGUI = function(){

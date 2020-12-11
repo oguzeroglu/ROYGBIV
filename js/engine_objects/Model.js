@@ -156,13 +156,17 @@ Model.prototype.export = function(isBuildingForDeploymentMode){
 }
 
 Model.prototype.getUsedTextures = function(){
+  if (this.usedTexturesCache){
+    return this.usedTexturesCache;
+  }
+
   var childInfos = this.info.childInfos;
   var usedTextures = [];
 
   var obj = isDeployment? this.info.texturesObj: this.texturesObj;
 
   for (var textureURL in obj){
-    var textureID = null;
+    var textureID;
     for (var i = 0; i < this.info.childInfos.length; i ++){
       if (this.info.childInfos[i].diffuseTextureURL == textureURL){
         textureID = this.info.childInfos[i].diffuseTextureID;
@@ -170,10 +174,12 @@ Model.prototype.getUsedTextures = function(){
     }
     usedTextures.push({
       id: textureID,
-      texture: obj[textureURL]
+      texture: obj[textureURL],
+      url: textureURL
     });
   }
 
+  this.usedTexturesCache = usedTextures;
   return usedTextures;
 }
 
