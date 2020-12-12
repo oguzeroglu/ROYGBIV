@@ -205,4 +205,7 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   for (var instanceName in modelInstances){
     this.modelInstances[instanceName] = modelInstances[instanceName].export();
   }
+  // BOOTSCREEN ****************************************************
+  this.bootscreenFolderName = bootscreenFolderName;
+  this.bodyBGColor = bodyBGColor;
 }

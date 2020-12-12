@@ -456,6 +456,8 @@ StateLoader.prototype.resetProject = function(){
   ENABLE_ANTIALIAS = false;
   lightHandler.reset();
   masses = new Object();
+  bootscreenFolderName = null;
+  bodyBGColor = null;
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;
   INSTANCING_DISABLED = false;

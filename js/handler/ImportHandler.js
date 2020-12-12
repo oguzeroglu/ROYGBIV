@@ -218,6 +218,8 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   serverWSURL = obj.serverWSURL;
   developmentServerWSURL = obj.developmentServerWSURL;
   skyboxDistance = obj.skyboxDistance || skyboxDistance;
+  bootscreenFolderName = obj.bootscreenFolderName;
+  bodyBGColor = obj.bodyBGColor;
 }
 
 ImportHandler.prototype.importGridSystems = function(obj){

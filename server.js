@@ -42,7 +42,7 @@ app.post("/build", function(req, res){
       res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
       return;
     }
-    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS, req.body.modules);
+    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS, req.body.modules, req.body.bootscreenFolderName);
     var roygbivPath = "deploy/"+req.body.projectName+"/js/roygbiv.js";
     fs.writeFileSync(roygbivPath, handleScripts(req.body, engineScriptsConcatted));
     minify(roygbivPath).then(function(minified){
@@ -584,6 +584,29 @@ function handleScripts(application, engineScriptsConcatted){
 function copyAssets(application){
   copyFileSync("css/FiraMono-Bold.ttf", "deploy/"+application.projectName+"/css/");
   var htmlContent = fs.readFileSync("template/application.html", "utf8");
+
+  if (application.bodyBGColor){
+    htmlContent = htmlContent.replace('<body style="background-color:black;">', '<body style="background-color:' + application.bodyBGColor + ';">');
+  }
+
+  if (application.bootscreenFolderName){
+    var customBootscreenHTML = fs.readFileSync("./bootscreens/" + application.bootscreenFolderName + "/component.html", "utf8");
+    var customBootscreenDIV = "<div id='customBootscreen'>@@1</div>".replace("@@1", customBootscreenHTML);
+    htmlContent = htmlContent.replace('<textarea id="cliDiv" class="noselect" readonly></textarea>', customBootscreenDIV);
+
+    if (fs.existsSync("./bootscreens/" + application.bootscreenFolderName + "/component.css")){
+      var customCSSContent = fs.readFileSync("./bootscreens/" + application.bootscreenFolderName + "/component.css", "utf8");
+      htmlContent = htmlContent.replace("/* CSS_INJECTION */", customCSSContent);
+    }
+
+    if (fs.existsSync("./bootscreens/" + application.bootscreenFolderName + "/component.ttf")){
+      var fontFaceContent = "@font-face {\n" + "font-family: bootscreen;\n" + "src: url(./bootscreens/" + application.bootscreenFolderName + "/component.ttf);\n}";
+      htmlContent = htmlContent.replace("/* FONT_INJECTION */", fontFaceContent)
+    }
+
+    copyFolderRecursiveSync("./bootscreens/" + application.bootscreenFolderName, "deploy/" + application.projectName + "/bootscreens");
+  }
+
   htmlContent = htmlContent.replace(
     "@@1", application.projectName
   );
@@ -681,6 +704,7 @@ function generateDeployDirectory(projectName, application){
   var hasTextureAtlas = application.textureAtlas.hasTextureAtlas;
   var hasShadowAtlas = Object.keys(application.shadowBaker.textureRangesByObjectName).length > 0;
   var hasModels = Object.keys(application.models.length != 0);
+  var hasCustomBootScreen = !!application.bootscreenFolderName;
   if (hasTexturePacks){
     fs.mkdirSync("deploy/"+projectName+"/texture_packs");
     console.log("[*] Project has texture packs to load.");
@@ -715,10 +739,16 @@ function generateDeployDirectory(projectName, application){
   }else{
     console.log("[*] Project has no dynamic textures.");
   }
+  if (hasCustomBootScreen){
+    fs.mkdirSync("deploy/" + projectName + "/bootscreens");
+    console.log("[*] Project has custom bootscreen.");
+  }else{
+    console.log("[*] Project has no custom bootscreen.");
+  }
   return true;
 }
 
-function readEngineScripts(projectName, author, enableAntialias, modules){
+function readEngineScripts(projectName, author, enableAntialias, modules, bootscreenFolderName){
   var content = "";
   var htmlContent = fs.readFileSync("roygbiv.html", "utf8");
   htmlContent = htmlContent.replace("three.js", "three.min.js");
@@ -729,6 +759,9 @@ function readEngineScripts(projectName, author, enableAntialias, modules){
       var scriptContent = fs.readFileSync(scriptPath, "utf8");
       if (scriptPath.includes("globalVariables.js")){
         scriptContent = scriptContent.replace("var isDeployment = false;", "var isDeployment = true;");
+        if (bootscreenFolderName) {
+          scriptContent = scriptContent.replace("var hasCustomBootScreen = false;", "var hasCustomBootScreen = true;");
+        }
         scriptContent = scriptContent.replace("var projectName = \"@@1\"", "var projectName = \""+projectName+"\"");
         scriptContent = scriptContent.replace("var author = \"@@2\"", "var author = \""+author+"\"");
         scriptContent = scriptContent.replace("var ENABLE_ANTIALIAS = false;", "var ENABLE_ANTIALIAS = @@1;".replace("@@1", enableAntialias));

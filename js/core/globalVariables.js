@@ -1,4 +1,6 @@
 var isDeployment = false;
+var hasCustomBootScreen = false;
+
 var IS_WORKER_CONTEXT = false;
 
 var COS30DEG = Math.cos(30 * Math.PI / 180);
@@ -446,6 +448,8 @@ var developmentServerWSURL = 0;
 var objectExportImportHandler;
 var DUMMY_TEXTURE = new THREE.Texture();
 var masses = new Object();
+var bootscreenFolderName = null;
+var bodyBGColor = null;
 var mobileSimulation = {
   isActive: false,
   isIOS: false,

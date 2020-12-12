@@ -246,14 +246,16 @@ window.onload = function() {
   ShaderContent = new ShaderContent();
   if (isDeployment){
     loadTime.shaderLoadTime = performance.now();
-    cliDiv.value = "";
-    appendtoDeploymentConsole("Loading shaders.");
-    console.log(
-      "%c"+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
-      BANNERL4+"\n"+BANNERL5 +"\n"+"                                         "
-      + "\nby Oguz Eroglu - github.com/oguzeroglu   ",
-      "background: #40318d; color: white"
-    );
+    if (!hasCustomBootScreen){
+      cliDiv.value = "";
+      appendtoDeploymentConsole("Loading shaders.");
+      console.log(
+        "%c"+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
+        BANNERL4+"\n"+BANNERL5 +"\n"+"                                         "
+        + "\nby Oguz Eroglu - github.com/oguzeroglu   ",
+        "background: #40318d; color: white"
+      );
+    }
   }
 };
 
@@ -485,14 +487,24 @@ function startDeployment(){
 }
 
 function clearDeploymentConsole(){
+  if (hasCustomBootScreen){
+    return;
+  }
   document.getElementById("cliDiv").value = "";
 }
 
 function appendtoDeploymentConsole(val){
+  if (hasCustomBootScreen){
+    return;
+  }
   document.getElementById("cliDiv").value += val + "\n";
 }
 
 function removeCLIDom(){
+  if (hasCustomBootScreen){
+    document.getElementById("customBootscreen").style.display = "none";
+    return;
+  }
   if (webglCallbackHandler.shaderCompilationError){
     return;
   }
@@ -503,6 +515,9 @@ function removeCLIDom(){
 }
 
 function addCLIDom(){
+  if (hasCustomBootScreen){
+    return;
+  }
   if (!(typeof cliDiv == UNDEFINED)){
     document.getElementById("cliDiv").style.display = "";
   }

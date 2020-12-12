@@ -3,7 +3,7 @@ the settings GUI (settings CLI command). Each bootscreen folder may contain:
 
 * Mandatory: component.html -> The HTML implementation of the bootscreen. Usually a file containing just a DIV.
 * component.css -> The injected css
-* component.ttf -> The injected font
+* component.ttf -> The injected font (will be available via font-family named bootscreen)
 * Any additional images/files
 
 Additional files may be loaded via a relative path -> "./bootscreens/[bootscreen name]/[file name]"
