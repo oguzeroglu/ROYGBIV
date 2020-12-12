@@ -187,6 +187,7 @@ OrbitControls.prototype.update = function(){
     }
   }
   camera.position.setFromSpherical(this.spherical);
+  camera.position.add(this.lookPosition);
   camera.lookAt(this.lookPosition.x, this.lookPosition.y, this.lookPosition.z);
   this.resetStatus();
 }
