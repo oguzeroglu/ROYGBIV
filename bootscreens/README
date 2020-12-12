@@ -1,0 +1,15 @@
+This folder holds the bootscreen folders. A custom bootscreen may be loaded via
+the settings GUI (settings CLI command). Each bootscreen folder may contain:
+
+* Mandatory: component.html -> The HTML implementation of the bootscreen. Usually a file containing just a DIV.
+* component.css -> The injected css
+* component.ttf -> The injected font
+* Any additional images/files
+
+Additional files may be loaded via a relative path -> "./bootscreens/[bootscreen name]/[file name]"
+
+These DOM ids are not safe to use in component.html:
+
+* cliDiv
+* rendererCanvas
+* customBootscreen
