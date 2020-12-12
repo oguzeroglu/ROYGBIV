@@ -408,6 +408,9 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     for (var instanceName in this.scenes[sceneName].modelInstances){
       var modelInstance = this.scenes[sceneName].modelInstances[instanceName];
       modelInstance.showVisually();
+      if (modelInstance.customTextureMapped){
+        modelInstance.unmapCustomTextures();
+      }
     }
     for (var textName in this.scenes[sceneName].addedTexts){
       var text = this.scenes[sceneName].addedTexts[textName];

@@ -1464,4 +1464,8 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETOBJECTVELOCITY = "Returns the velocity of given object.";
   this.ROYGBIV_SCRIPTING_API_GETMODELINSTANCE = "Returns a ModelInstance or 0 if ModelInstance of given name does not exist.";
   this.ROYGBIV_SCRIPTING_API_GETMAXTEXTURESIZE = "Returns the max texture size the client device supports.";
+  this.ROYGBIV_SCRIPTING_API_MAPTEXTURESTOMODELINSTANCE = "Maps given textures to a model instance. texturesObj is an object having:\n" +
+                                                          "keys -> texture IDs of models instance\n" +
+                                                          "values -> texture pack objects obtained via loadDynamicTextures API\n" +
+                                                          "Textures IDs of a model instance may be obtained from the GUI by clicking on a model instance in the design mode\nand looking under the Textures folder.";
 }

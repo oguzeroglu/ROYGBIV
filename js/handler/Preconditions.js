@@ -299,6 +299,8 @@ var Preconditions = function(){
   this.object1 = "object1";
   this.object2 = "object2";
   this.modelInstanceName = "modelInstanceName";
+  this.modelInstance = "modelInstance";
+  this.texturesObj = "texturesObj";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -307,6 +309,32 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfValidModelTextureSObj = function(callerFunc, modelInstance, texturesObj){
+  var usedTextures = modelInstance.model.getUsedTextures();
+
+  for (var i = 0; i < usedTextures.length; i ++){
+    var textureID = usedTextures[i].id;
+    if (!texturesObj[textureID]){
+      this.throw(callerFunc, "Textures object does not have texture: " + textureID);
+    }
+    if (!texturesObj[textureID].isTexturePack){
+      this.throw(callerFunc, "Provided object for texture " + textureID + " is not a texture pack.");
+    }
+  }
+}
+
+Preconditions.prototype.checkIfCustomTexturesEnabled = function(callerFunc, modelInstance){
+  if (!modelInstance.model.info.customTexturesEnabled){
+    this.throw(callerFunc, "Custom textures are not enabled for this model.");
+  }
+}
+
+Preconditions.prototype.checkIfModelInstance = function(callerFunc, modelInstance){
+  if (!modelInstance.isModelInstance){
+    this.throw(callerFunc, "Object is not a model instance.");
+  }
 }
 
 Preconditions.prototype.checkIfSpriteHasFixedHeight = function(callerFunc, sprite){

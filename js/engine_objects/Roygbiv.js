@@ -12,6 +12,7 @@
 //  * Motion blur functions
 //  * Crosshair functions
 //  * Text functions
+//  * Model functions
 //  * Control functions
 //  * Animation functions
 //  * Muzzleflash functions
@@ -348,7 +349,8 @@ var Roygbiv = function(){
     "vectorLengthSquare",
     "getObjectVelocity",
     "getModelInstance",
-    "getMaxTextureSize"
+    "getMaxTextureSize",
+    "mapTexturesToModelInstance"
   ];
 
   this.globals = new Object();
@@ -3063,6 +3065,27 @@ Roygbiv.prototype.deactivateTextInputMode = function(text){
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.activateTextInputMode, text);
   preConditions.checkIfText3D(ROYGBIV.activateTextInputMode, preConditions.text, text);
   text.deactivateInputMode();
+}
+
+// MODEL FUNCTIONS *************************************************************
+
+// Maps given textures to a model instance. texturesObj is an object
+// having:
+// keys -> texture IDs of models instance
+// values -> texture pack objects obtained via loadDynamicTextures API
+// Textures IDs of a model instance may be obtained from the GUI by clicking
+// on a model instance in the design mode and looking under the Textures folder.
+Roygbiv.prototype.mapTexturesToModelInstance = function(modelInstance, texturesObj){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.mapTexturesToModelInstance, preConditions.modelInstance, modelInstance);
+  preConditions.checkIfDefined(ROYGBIV.mapTexturesToModelInstance, preConditions.texturesObj, texturesObj);
+  preConditions.checkIfModelInstance(ROYGBIV.mapTexturesToModelInstance, modelInstance);
+  preConditions.checkIfCustomTexturesEnabled(ROYGBIV.mapTexturesToModelInstance, modelInstance);
+  preConditions.checkIfValidModelTextureSObj(ROYGBIV.mapTexturesToModelInstance, modelInstance, texturesObj);
+  modelInstance.mapCustomTextures(texturesObj);
 }
 
 // CONTROL FUNCTIONS ***********************************************************

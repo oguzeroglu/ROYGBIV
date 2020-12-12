@@ -617,6 +617,14 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     object.updateBoundingBoxes();
   }
 
+  for (var instanceName in modelInstances){
+    var modelInstance = modelInstances[instanceName];
+
+    if (modelInstance.customTextureMapped){
+      modelInstance.unmapCustomTextures();
+    }
+  }
+
   for (var sceneName in sceneHandler.scenes){
     delete sceneHandler.scenes[sceneName].beforeExitCallback;
   }
