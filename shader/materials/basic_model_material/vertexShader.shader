@@ -746,7 +746,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
   }
 #endif
 
-#ifdef HAS_NORMAL_MAP
+#if defined(HAS_NORMAL_MAP) && defined(HAS_PHONG_LIGHTING)
   void handleNormalMap(){
     vNormalUV = normalUV;
     vTangent = (modelViewMatrix * vec4(tangent.xyz, 0.0)).xyz;

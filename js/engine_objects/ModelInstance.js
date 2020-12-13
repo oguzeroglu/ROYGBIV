@@ -62,6 +62,13 @@ ModelInstance.prototype.export = function(){
 
   if (this.affectedByLight){
     exportObj.lightingType = this.lightingType;
+
+    if (this.model.info.hasNormalMap && this.lightingType == lightHandler.lightTypes.PHONG){
+      exportObj.normalScale = {
+        x: this.mesh.material.uniforms.normalScale.value.x,
+        y: this.mesh.material.uniforms.normalScale.value.y
+      };
+    }
   }
 
   return exportObj;
@@ -283,6 +290,10 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
     lightHandler.removeLightFromObject(this);
     if (this.lightingType == lightHandler.lightTypes.PHONG){
       macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+      if (this.model.info.hasNormalMap){
+        macroHandler.removeMacro("HAS_NORMAL_MAP", this.mesh.material, true, true);
+        delete this.mesh.material.uniforms.normalScale;
+      }
     }
     delete this.lightingType;
   }
@@ -299,6 +310,7 @@ ModelInstance.prototype.setPhongLight = function(){
 
   if (this.model.info.hasNormalMap){
     macroHandler.injectMacro("HAS_NORMAL_MAP", this.mesh.material, true, true);
+    this.mesh.material.uniforms.normalScale = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
 }
 
@@ -308,6 +320,7 @@ ModelInstance.prototype.unsetPhongLight = function(){
 
   if (this.model.info.hasNormalMap){
     macroHandler.removeMacro("HAS_NORMAL_MAP", this.mesh.material, true, true);
+    delete this.mesh.material.uniforms.normalScale;
   }
 }
 

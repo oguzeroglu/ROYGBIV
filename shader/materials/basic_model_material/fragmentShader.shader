@@ -15,6 +15,7 @@ varying vec4 vDiffuseUV;
     varying vec3 vTangent;
     varying vec3 vBitangent;
     varying vec4 vNormalUV;
+    uniform vec2 normalScale;
   #endif
 #endif
 
@@ -725,6 +726,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         #endif
 
         normalTextureColor = normalTextureColor * 2.0 - 1.0;
+        normalTextureColor.xy *= normalScale;
         mat3 TBN = mat3(normalize(vTangent), normalize(vBitangent), normalize(vNormal));
         computedNormal = normalize(TBN * normalTextureColor);
       }else{

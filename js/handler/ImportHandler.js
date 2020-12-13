@@ -50,6 +50,10 @@ ImportHandler.prototype.importModelInstances = function(obj){
     modelInstance.setAffectedByLight(curModelInstanceExport.affectedByLight);
     if (modelInstance.affectedByLight && curModelInstanceExport.lightingType == lightHandler.lightTypes.PHONG){
       modelInstance.setPhongLight();
+
+      if (curModelInstanceExport.normalScale){
+        modelInstance.mesh.material.uniforms.normalScale.value.set(curModelInstanceExport.normalScale.x, curModelInstanceExport.normalScale.y);
+      }
     }
   }
 }

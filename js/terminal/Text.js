@@ -852,6 +852,7 @@ var Text = function(){
   this.FAILED_TO_LOAD_SCRIPT = "Failed to load script @@1 from file path @@2.";
   this.SCRIPT_UPLOADED = "Script uploaded.";
   this.SCENE_LOADED = "Scene loaded.";
+  this.NORMAL_MAP_SCALE_SET = "Normal map scale set.";
   this.JUMP_DESCRIPTOR_UPDATED = "Jump descriptor updated.";
   this.NO_SUCH_DYNAMIC_TEXTURE_FOLDER = "No such dynamic texture folder.";
   this.DYNAMIC_TEXTURE_FOLDER_DESTROYED = "Dynamic texture folder destroyed.";

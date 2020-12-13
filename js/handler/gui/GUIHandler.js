@@ -155,7 +155,8 @@ var GUIHandler = function(){
     "Has mass": false,
     "Intersectable": false,
     "Affected by light": false,
-    "Lighting type": lightHandler.lightTypes.GOURAUD
+    "Lighting type": lightHandler.lightTypes.GOURAUD,
+    "Normal map scale": "1,1"
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -418,6 +419,13 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     }else{
       guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
       guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
+    }
+
+    if (curSelection.lightingType == lightHandler.lightTypes.PHONG && curSelection.model.info.hasNormalMap){
+      guiHandler.modelInstanceManipulationParameters["Normal map scale"] = curSelection.mesh.material.uniforms.normalScale.value.x + "," + curSelection.mesh.material.uniforms.normalScale.value.y;
+      guiHandler.enableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+    }else{
+      guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
     }
   }else{
     guiHandler.hide(guiHandler.guiTypes.MODEL_INSTANCE);
@@ -2176,15 +2184,38 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
     }else{
       guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
+      guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+      guiHandler.modelInstanceManipulationParameters["Normal map scale"] = "1,1";
       terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
     }
   }).listen();
   guiHandler.modelInstanceManupulationLightingTypeController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Lighting type", Object.keys(lightHandler.lightTypes)).onChange(function(val){
     if (val == lightHandler.lightTypes.PHONG){
       selectionHandler.getSelectedObject().setPhongLight();
+      if (selectionHandler.getSelectedObject().model.info.hasNormalMap){
+        guiHandler.enableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+      }
     }else{
+      guiHandler.modelInstanceManipulationParameters["Normal map scale"] = "1,1";
       selectionHandler.getSelectedObject().unsetPhongLight();
+      guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
     }
+  }).listen();
+  guiHandler.modelInstanceManipulationNormalMapScaleController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Normal map scale").onFinishChange(function(val){
+    terminal.clear();
+    var splitted = val.split(",");
+    if (splitted.length != 2){
+      terminal.printError(Text.INVALID_VECTOR_VALUE);
+      return;
+    }
+    var valX = parseFloat(splitted[0]);
+    var valY = parseFloat(splitted[1]);
+    if (isNaN(valX) || isNaN(valY)){
+      terminal.printError(Text.INVALID_VECTOR_VALUE);
+      return;
+    }
+    selectionHandler.getSelectedObject().mesh.material.uniforms.normalScale.value.set(valX, valY);
+    terminal.printInfo(Text.NORMAL_MAP_SCALE_SET);
   }).listen();
 
   if (selectionHandler.getSelectedObject().model.info.customTexturesEnabled){
