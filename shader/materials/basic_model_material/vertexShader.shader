@@ -19,6 +19,13 @@ varying vec4 vDiffuseUV;
 #ifdef HAS_PHONG_LIGHTING
   varying vec3 vWorldPosition;
   varying vec3 vNormal;
+  #ifdef HAS_NORMAL_MAP
+    attribute vec4 normalUV;
+    attribute vec4 tangent;
+    varying vec3 vTangent;
+    varying vec3 vBitangent;
+    varying vec4 vNormalUV;
+  #endif
 #endif
 
 #ifdef AFFECTED_BY_LIGHT
@@ -735,6 +742,14 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
   }
 #endif
 
+#ifdef HAS_NORMAL_MAP
+  void handleNormalMap(){
+    vNormalUV = normalUV;
+    vTangent = (modelViewMatrix * vec4(tangent.xyz, 0.0)).xyz;
+    vBitangent = normalize(cross(vNormal, vTangent) * tangent.w);
+  }
+#endif
+
 void main(){
 
   #ifdef AFFECTED_BY_LIGHT
@@ -750,6 +765,9 @@ void main(){
   #ifdef HAS_PHONG_LIGHTING
     vNormal = normalize(mat3(worldInverseTranspose) * normal);
     vWorldPosition = worldPositionComputed;
+    #ifdef HAS_NORMAL_MAP
+      handleNormalMap();
+    #endif
   #endif
 
   vUV = uv;

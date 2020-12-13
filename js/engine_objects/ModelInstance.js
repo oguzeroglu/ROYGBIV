@@ -296,11 +296,19 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
 ModelInstance.prototype.setPhongLight = function(){
   macroHandler.injectMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
   this.lightingType = lightHandler.lightTypes.PHONG;
+
+  if (this.model.info.hasNormalMap){
+    macroHandler.injectMacro("HAS_NORMAL_MAP", this.mesh.material, true, true);
+  }
 }
 
 ModelInstance.prototype.unsetPhongLight = function(){
   macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
   this.lightingType = lightHandler.lightTypes.GOURAUD;
+
+  if (this.model.info.hasNormalMap){
+    macroHandler.removeMacro("HAS_NORMAL_MAP", this.mesh.material, true, true);
+  }
 }
 
 ModelInstance.prototype.onBeforeRender = function(){

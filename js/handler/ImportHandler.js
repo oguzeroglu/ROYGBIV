@@ -73,7 +73,7 @@ ImportHandler.prototype.importModels = function(obj, callback){
       var max = this.curModelExport.originalBoundingBox.max;
       this.curModelExport.originalBoundingBox = new THREE.Box3(new THREE.Vector3(min.x, min.y, min.z), new THREE.Vector3(max.x, max.y, max.z));
 
-      var colors = [], diffuseUVs = [];
+      var colors = [], diffuseUVs = [], normalUVs = [];
       for (var i = 0; i < indexedMaterialIndices.length; i ++){
         var materialIndex = indexedMaterialIndices[i];
         var curMaterial = this.curModelExport.childInfos[materialIndex];
@@ -84,13 +84,20 @@ ImportHandler.prototype.importModels = function(obj, callback){
         diffuseUVs.push(-100);
         diffuseUVs.push(-100);
         diffuseUVs.push(-100);
+
+        if (this.curModelExport.hasNormalMap){
+          normalUVs.push(-100);
+          normalUVs.push(-100);
+          normalUVs.push(-100);
+          normalUVs.push(-100);
+        }
       }
 
       if (isDeployment){
         loadTime.modelGenerationTimes[this.curModelExport.name] = performance.now();
       }
 
-      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, null, indices, indexedMaterialIndices);
+      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, normalUVs, null, indices, indexedMaterialIndices);
 
       if (this.curModelExport.customTexturesEnabled){
         model.enableCustomTextures();

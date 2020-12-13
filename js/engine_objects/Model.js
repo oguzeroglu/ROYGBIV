@@ -1,9 +1,11 @@
-var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, diffuseUVs, materialIndices, indices, indexedMaterialIndices){
+var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, materialIndices, indices, indexedMaterialIndices){
   this.name = modelInfo.name;
 
   this.geometry = new THREE.BufferGeometry();
 
   this.indexedMaterialIndices = indexedMaterialIndices || [];
+
+  var hasNormalMap = modelInfo.hasNormalMap;
 
   if (!indices){
     var indexInfos = {};
@@ -30,12 +32,17 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var curDiffuseUVY = diffuseUVs[i4 + 1];
       var curDiffuseUVZ = diffuseUVs[i4 + 2];
       var curDiffuseUVW = diffuseUVs[i4 + 3];
+      var curNormalUVX = hasNormalMap? normalUVs[i4]: 0;
+      var curNormalUVY = hasNormalMap? normalUVs[i4 + 1]: 0;
+      var curNormalUVZ = hasNormalMap? normalUVs[i4 + 2]: 0;
+      var curNormalUVW = hasNormalMap? normalUVs[i4 + 3]: 0;
       var curMaterialIndex = materialIndices[i3];
       var key = curPosX + PIPE + curPosY + PIPE + curPosZ;
       key += PIPE + curNormalX + PIPE + curNormalY + PIPE + curNormalZ;
       key += PIPE + curUVX + PIPE + curUVY;
       key += PIPE + curDiffuseUVX + PIPE + curDiffuseUVY + PIPE + curDiffuseUVZ + PIPE + curDiffuseUVW;
       key += PIPE + curColorR + PIPE + curColorG + PIPE + curColorB;
+      key += PIPE + curNormalUVX + PIPE + curNormalUVY + PIPE + curNormalUVZ + PIPE + curNormalUVW;
       if (indexInfos[key]){
         indexHitCount ++;
         indices.push(indexInfos[key]);
@@ -58,7 +65,9 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
     var allDiffuseUVs = new Float32Array(curIndex * 4);
     var allColors = new Float32Array(curIndex * 3);
 
-    var x = 0, y = 0, z = 0, w = 0, t = 0;
+    var allNormalUVs = hasNormalMap? new Float32Array(curIndex * 4): null;
+
+    var x = 0, y = 0, z = 0, w = 0, t = 0, s = 0;
     for (var i = 0; i < curIndex; i ++){
       var key = indexInfosInverse[i];
       var splitted = key.split(PIPE);
@@ -77,6 +86,10 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var curColorR = parseFloat(splitted[12]);
       var curColorG = parseFloat(splitted[13]);
       var curColorB = parseFloat(splitted[14]);
+      var curNormalUVX = parseFloat(splitted[15]);
+      var curNormalUVY = parseFloat(splitted[16]);
+      var curNormalUVZ = parseFloat(splitted[17]);
+      var curNormalUVW = parseFloat(splitted[18]);
 
       allPositions[x ++] = curPosX;
       allPositions[x ++] = curPosY;
@@ -93,6 +106,13 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       allColors[t ++] = curColorR;
       allColors[t ++] = curColorG;
       allColors[t ++] = curColorB;
+
+      if (hasNormalMap){
+        allNormalUVs[s ++] = curNormalUVX;
+        allNormalUVs[s ++] = curNormalUVY;
+        allNormalUVs[s ++] = curNormalUVZ;
+        allNormalUVs[s ++] = curNormalUVW;
+      }
     }
 
     var positionsBufferAttribute = new THREE.BufferAttribute(allPositions, 3);
@@ -114,6 +134,12 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
     this.geometry.addAttribute("normal", normalsBufferAttribute);
     this.geometry.addAttribute("uv", uvsBufferAttribute);
     this.geometry.addAttribute("diffuseUV", diffuseUVsBufferAttribute);
+
+    if (hasNormalMap){
+      var normalUVsBufferAttribute = new THREE.BufferAttribute(allNormalUVs, 4);
+      normalUVsBufferAttribute.setDynamic(false);
+      this.geometry.addAttribute("normalUV", normalUVsBufferAttribute);
+    }
   }else{
     var positionsBufferAttribute = new THREE.BufferAttribute(new Float32Array(positions), 3);
     var colorsBufferAttribute = new THREE.BufferAttribute(new Float32Array(colors), 3);
@@ -134,12 +160,22 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
     this.geometry.addAttribute("normal", normalsBufferAttribute);
     this.geometry.addAttribute("uv", uvsBufferAttribute);
     this.geometry.addAttribute("diffuseUV", diffuseUVsBufferAttribute);
+
+    if (hasNormalMap){
+      var normalUVsBufferAttribute = new THREE.BufferAttribute(new Float32Array(normalUVs), 4);
+      normalUVsBufferAttribute.setDynamic(false);
+      this.geometry.addAttribute("normalUV", normalUVsBufferAttribute);
+    }
   }
 
   this.geometry.center();
 
   this.info = modelInfo;
   this.texturesObj = texturesObj;
+
+  if (hasNormalMap){
+    THREE.BufferGeometryUtils.computeTangents(this.geometry);
+  }
 }
 
 Model.prototype.export = function(isBuildingForDeploymentMode){
@@ -171,6 +207,9 @@ Model.prototype.getUsedTextures = function(){
       if (this.info.childInfos[i].diffuseTextureURL == textureURL){
         textureID = this.info.childInfos[i].diffuseTextureID;
       }
+      if (this.info.childInfos[i].normalTextureURL == textureURL){
+        textureID = this.info.childInfos[i].normalTextureID;
+      }
     }
     usedTextures.push({
       id: textureID,
@@ -185,7 +224,8 @@ Model.prototype.getUsedTextures = function(){
 
 Model.prototype.onTextureAtlasRefreshed = function(){
   var diffuseUVAry = this.geometry.attributes.diffuseUV.array;
-  var diffuseUVIndex = 0;
+  var normalUVAry = this.info.hasNormalMap? this.geometry.attributes.normalUV.array: null;
+  var diffuseUVIndex = 0, normalUVIndex = 0;
   var ranges = textureAtlasHandler.textureMerger.ranges;
   for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
     var materialIndex = this.indexedMaterialIndices[i];
@@ -199,10 +239,27 @@ Model.prototype.onTextureAtlasRefreshed = function(){
     }else{
       diffuseUVIndex += 4;
     }
+
+    if (normalUVAry){
+      if (childInfo.normalTextureID){
+        var range = ranges[childInfo.normalTextureID];
+        normalUVAry[normalUVIndex ++] = range.startU;
+        normalUVAry[normalUVIndex ++] = range.startV;
+        normalUVAry[normalUVIndex ++] = range.endU;
+        normalUVAry[normalUVIndex ++] = range.endV;
+      }else{
+        normalUVIndex += 4;
+      }
+    }
   }
 
   this.geometry.attributes.diffuseUV.updateRange.set(0, diffuseUVAry.length);
   this.geometry.attributes.diffuseUV.needsUpdate = true;
+
+  if (normalUVAry){
+    this.geometry.attributes.normalUV.updateRange.set(0, normalUVAry.length);
+    this.geometry.attributes.normalUV.needsUpdate = true;
+  }
 }
 
 Model.prototype.loadTextures = function(callback){
@@ -210,9 +267,14 @@ Model.prototype.loadTextures = function(callback){
   var texturesObj = {};
   for (var i = 0; i < this.info.childInfos.length; i ++){
     var diffuseTextureURL = this.info.childInfos[i].diffuseTextureURL;
+    var normalTextureURL = this.info.childInfos[i].normalTextureURL;
     var diffuseTextureID = this.info.childInfos[i].diffuseTextureID;
+    var normalTextureID = this.info.childInfos[i].normalTextureID;
     if (diffuseTextureURL){
       texturesToLoad[diffuseTextureURL] = diffuseTextureID;
+    }
+    if (normalTextureURL){
+      texturesToLoad[normalTextureURL] = normalTextureID;
     }
   }
 
@@ -272,7 +334,7 @@ Model.prototype.enableCustomTextures = function(){
       if (typeof diffuseTextureIndexByTextureID[material.diffuseTextureID] == UNDEFINED){
         diffuseTextureIndexByTextureID[material.diffuseTextureID] = curTextureIndex ++;
       }
-      
+
       diffuseTextureIndices[i] = diffuseTextureIndexByTextureID[material.diffuseTextureID];
     }else{
       diffuseTextureIndices[i] = -100;

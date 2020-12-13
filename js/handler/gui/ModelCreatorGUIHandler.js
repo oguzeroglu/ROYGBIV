@@ -165,6 +165,8 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
 
   var boundingBox = new THREE.Box3();
 
+  var hasNormalMap = false;
+
   for (var i = 0; i < model.children.length; i ++){
     var childMesh = model.children[i];
     var childInfo = {
@@ -202,6 +204,28 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       }
     }
 
+    if (childMesh.material.normalMap){
+      hasNormalMap = true;
+      var tmpCanvas = document.createElement("canvas");
+      tmpCanvas.width = childMesh.material.normalMap.image.width;
+      tmpCanvas.height = childMesh.material.normalMap.image.height;
+      tmpCanvas.getContext("2d").drawImage(childMesh.material.normalMap.image, 0, 0);
+      texturesObj[childMesh.material.normalMap.image.src] = new THREE.CanvasTexture(tmpCanvas);
+      childInfo.normalTextureURL = childMesh.material.normalMap.image.src;
+      var normalTextureID = null;
+      for (var i2 = 0; i2 < childInfos.length; i2 ++){
+        if (childInfos[i2].normalTextureURL == childMesh.material.normalMap.image.src){
+          normalTextureID = childInfos[i2].normalTextureID;
+          break;
+        }
+      }
+      if (!normalTextureID){
+        childInfo.normalTextureID = generateUUID();
+      }else{
+        childInfo.normalTextureID = normalTextureID;
+      }
+    }
+
     childInfos.push(childInfo);
   }
 
@@ -218,6 +242,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   var colors = [];
   var uvs = [];
   var diffuseUVs = [];
+  var normalUVs = [];
 
   var materialIndices = [];
 
@@ -263,14 +288,22 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     }else{
       this.quadruplePush(diffuseUVs, -100, -100, -100, -100, "number");
     }
+
+    if (childMesh.material.normalMap){
+      var uvInfo = textureMerger.ranges[childMesh.material.normalMap.image.src];
+      this.quadruplePush(normalUVs, uvInfo.startU, uvInfo.startV, uvInfo.endU, uvInfo.endV, "number");
+    }else if (hasNormalMap){
+      this.quadruplePush(normalUVs, -100, -100, -100, -100, "number");
+    }
   }
 
   modelCreatorGUIHandler.model = new Model({
     name: name,
     folderName: folderName,
     childInfos: childInfos,
-    originalBoundingBox: boundingBox
-  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, materialIndices);
+    originalBoundingBox: boundingBox,
+    hasNormalMap: hasNormalMap
+  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, materialIndices);
 
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "/createRMFFile?folderName=" + folderName, true);

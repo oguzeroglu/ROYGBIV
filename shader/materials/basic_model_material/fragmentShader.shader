@@ -11,6 +11,11 @@ varying vec4 vDiffuseUV;
   varying vec3 vWorldPosition;
   varying vec3 vNormal;
   uniform mat4 dynamicLightsMatrix;
+  #ifdef HAS_NORMAL_MAP
+    varying vec3 vTangent;
+    varying vec3 vBitangent;
+    varying vec4 vNormalUV;
+  #endif
 #endif
 
 #ifdef HAS_CUSTOM_TEXTURE
@@ -664,7 +669,14 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
   vec3 handleLighting(vec3 worldPositionComputed){
 
-    vec3 computedNormal = vNormal;
+    #ifdef HAS_NORMAL_MAP
+      mat3 TBN = mat3(normalize(vTangent), normalize(vBitangent), normalize(vNormal));
+      vec3 normalTextureColor = texture2D(texture, uvAffineTransformation(vUV, vNormalUV.x, vNormalUV.y, vNormalUV.z, vNormalUV.w)).rgb;
+      normalTextureColor = normalTextureColor * 2.0 - 1.0;
+      vec3 computedNormal = normalize(TBN * normalTextureColor);
+    #else
+      vec3 computedNormal = normalize(vNormal);
+    #endif
 
     vec3 ambient = vec3(0.0, 0.0, 0.0);
     vec3 diffuse = vec3(0.0, 0.0, 0.0);
