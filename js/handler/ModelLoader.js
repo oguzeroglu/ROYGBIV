@@ -19,6 +19,22 @@ ModelLoader.prototype.loadModel = function(directoryName, objFileName, mtlFileNa
 
     new THREE.OBJLoader().setMaterials(materials).setPath(rootPath).load(objFileName, function(object){
       modelLoader.cache[directoryName] = object;
+      for (var i = 0; i < object.children.length; i ++){
+        var mat = object.children[i].material;
+        if ((mat.map && !mat.map.image) || (mat.normalMap && !mat.normalMap.image)){
+          var fn = function(){
+            for (var i = 0; i < object.children.length; i ++){
+              if ((mat.map && !mat.map.image) || (mat.normalMap && !mat.normalMap.image)){
+                setTimeout(fn, 100);
+                return;
+              }
+            }
+            onLoaded(object);
+          }
+          setTimeout(fn, 100);
+          return;
+        }
+      }
       onLoaded(object);
     }, noop, function(err){
       onError(false, err);
