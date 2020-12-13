@@ -323,9 +323,11 @@ Model.prototype.supportsCustomTextures = function(){
 
 Model.prototype.enableCustomTextures = function(){
   var diffuseTextureIndexByTextureID = {};
+  var normalTextureIndexByTextureID = {};
   var curTextureIndex = 0;
 
   var diffuseTextureIndices = new Float32Array(this.indexedMaterialIndices.length);
+  var normalTextureIndices = this.info.hasNormalMap? new Float32Array(this.indexedMaterialIndices.length): null
 
   for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
     var materialIndex = this.indexedMaterialIndices[i];
@@ -339,6 +341,18 @@ Model.prototype.enableCustomTextures = function(){
     }else{
       diffuseTextureIndices[i] = -100;
     }
+
+    if (this.info.hasNormalMap){
+      if (material.normalTextureID){
+        if (typeof normalTextureIndexByTextureID[material.normalTextureID] == UNDEFINED){
+          normalTextureIndexByTextureID[material.normalTextureID] = curTextureIndex ++;
+        }
+
+        normalTextureIndices[i] = normalTextureIndexByTextureID[material.normalTextureID];
+      }else{
+        normalTextureIndices[i] = -100;
+      }
+    }
   }
 
   var diffuseTextureIndexBufferAttribute = new THREE.BufferAttribute(diffuseTextureIndices, 1);
@@ -347,10 +361,23 @@ Model.prototype.enableCustomTextures = function(){
 
   this.info.customTexturesEnabled = true;
   this.diffuseTextureIndexByTextureID = diffuseTextureIndexByTextureID;
+  this.normalTextureIndexByTextureID = normalTextureIndexByTextureID;
+
+  if (this.info.hasNormalMap){
+    var normalTextureIndexBufferAttribute = new THREE.BufferAttribute(normalTextureIndices, 1);
+    normalTextureIndexBufferAttribute.setDynamic(false);
+    this.geometry.addAttribute("normalTextureIndex", normalTextureIndexBufferAttribute);
+  }
 }
 
 Model.prototype.disableCustomTextures = function(){
   delete this.diffuseTextureIndexByTextureID;
+  delete this.normalTextureIndexByTextureID;
+
   this.geometry.removeAttribute("diffuseTextureIndex");
   this.info.customTexturesEnabled = false;
+
+  if (this.info.hasNormalMap){
+    this.geometry.removeAttribute("normalTextureIndex");
+  }
 }

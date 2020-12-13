@@ -20,6 +20,9 @@ varying vec4 vDiffuseUV;
 
 #ifdef HAS_CUSTOM_TEXTURE
   varying float vDiffuseTextureIndex;
+  #ifdef HAS_NORMAL_MAP
+    varying float vNormalTextureIndex;
+  #endif
   #ifdef CUSTOM_TEXTURE_0
     uniform sampler2D customDiffuseTexture0;
   #endif
@@ -34,6 +37,21 @@ varying vec4 vDiffuseUV;
   #endif
   #ifdef CUSTOM_TEXTURE_4
     uniform sampler2D customDiffuseTexture4;
+  #endif
+  #ifdef CUSTOM_NORMAL_TEXTURE_0
+    uniform sampler2D customNormalTexture0;
+  #endif
+  #ifdef CUSTOM_NORMAL_TEXTURE_1
+    uniform sampler2D customNormalTexture1;
+  #endif
+  #ifdef CUSTOM_NORMAL_TEXTURE_2
+    uniform sampler2D customNormalTexture2;
+  #endif
+  #ifdef CUSTOM_NORMAL_TEXTURE_3
+    uniform sampler2D customNormalTexture3;
+  #endif
+  #ifdef CUSTOM_NORMAL_TEXTURE_4
+    uniform sampler2D customNormalTexture4;
   #endif
 #else
   uniform sampler2D texture;
@@ -670,10 +688,48 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
   vec3 handleLighting(vec3 worldPositionComputed){
 
     #ifdef HAS_NORMAL_MAP
-      mat3 TBN = mat3(normalize(vTangent), normalize(vBitangent), normalize(vNormal));
-      vec3 normalTextureColor = texture2D(texture, uvAffineTransformation(vUV, vNormalUV.x, vNormalUV.y, vNormalUV.z, vNormalUV.w)).rgb;
-      normalTextureColor = normalTextureColor * 2.0 - 1.0;
-      vec3 computedNormal = normalize(TBN * normalTextureColor);
+      vec3 computedNormal;
+
+      if (vNormalUV.x >= 0.0){
+        #ifdef HAS_CUSTOM_TEXTURE
+          int normalTextureIndexInt = int(vNormalTextureIndex);
+          vec3 normalTextureColor;
+
+          #ifdef CUSTOM_NORMAL_TEXTURE_0
+            if (normalTextureIndexInt == 0){
+              normalTextureColor = texture2D(customNormalTexture0, vUV).rgb;
+            }
+          #endif
+          #ifdef CUSTOM_NORMAL_TEXTURE_1
+            if (normalTextureIndexInt == 1){
+              normalTextureColor = texture2D(customNormalTexture1, vUV).rgb;
+            }
+          #endif
+          #ifdef CUSTOM_NORMAL_TEXTURE_2
+            if (normalTextureIndexInt == 2){
+              normalTextureColor = texture2D(customNormalTexture2, vUV).rgb;
+            }
+          #endif
+          #ifdef CUSTOM_NORMAL_TEXTURE_3
+            if (normalTextureIndexInt == 3){
+              normalTextureColor = texture2D(customNormalTexture3, vUV).rgb;
+            }
+          #endif
+          #ifdef CUSTOM_NORMAL_TEXTURE_4
+            if (normalTextureIndexInt == 4){
+              normalTextureColor = texture2D(customNormalTexture4, vUV).rgb;
+            }
+          #endif
+        #else
+          vec3 normalTextureColor = texture2D(texture, uvAffineTransformation(vUV, vNormalUV.x, vNormalUV.y, vNormalUV.z, vNormalUV.w)).rgb;
+        #endif
+
+        normalTextureColor = normalTextureColor * 2.0 - 1.0;
+        mat3 TBN = mat3(normalize(vTangent), normalize(vBitangent), normalize(vNormal));
+        computedNormal = normalize(TBN * normalTextureColor);
+      }else{
+        computedNormal = normalize(vNormal);
+      }
     #else
       vec3 computedNormal = normalize(vNormal);
     #endif

@@ -44,6 +44,10 @@ varying vec4 vDiffuseUV;
 #ifdef HAS_CUSTOM_TEXTURE
   attribute float diffuseTextureIndex;
   varying float vDiffuseTextureIndex;
+  #ifdef HAS_NORMAL_MAP
+    attribute float normalTextureIndex;
+    varying float vNormalTextureIndex;
+  #endif
 #endif
 
 vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
@@ -775,6 +779,9 @@ void main(){
 
   #ifdef HAS_CUSTOM_TEXTURE
     vDiffuseTextureIndex = diffuseTextureIndex;
+    #ifdef HAS_NORMAL_MAP
+      vNormalTextureIndex = normalTextureIndex;
+    #endif
   #endif
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
