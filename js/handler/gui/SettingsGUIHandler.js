@@ -11,12 +11,14 @@ SettingsGUIHandler.prototype.show = function(){
   var graphicsFolder = guiHandler.datGuiSettings.addFolder("Graphics");
   var workerFolder = guiHandler.datGuiSettings.addFolder("Worker");
   var websocketFolder = guiHandler.datGuiSettings.addFolder("WebSocket");
+  var bootscreenFolder = guiHandler.datGuiSettings.addFolder("Bootscreen");
   var debugFolder = guiHandler.datGuiSettings.addFolder("Debug");
 
   this.initializeRaycasterFolder(raycasterFolder);
   this.initializeGraphicsFolder(graphicsFolder);
   this.initializeWorkerFolder(workerFolder);
   this.initializeWebSocketFolder(websocketFolder);
+  this.initializeBootscreenFolder(bootscreenFolder);
   this.initializeDebugFolder(debugFolder);
 
   guiHandler.datGuiSettings.add({
@@ -26,6 +28,59 @@ SettingsGUIHandler.prototype.show = function(){
       terminal.printInfo(Text.SETTINGS_GUI_CLOSED);
     }
   }, "Done");
+}
+
+SettingsGUIHandler.prototype.initializeBootscreenFolder = function(parentFolder){
+  var params = {
+    "Bootscreen folder name": bootscreenFolderName || "",
+    "Body BG Color": bodyBGColor || ""
+  };
+
+  parentFolder.add(params, "Bootscreen folder name").onFinishChange(function(val){
+    terminal.clear();
+
+    if (!val){
+      bootscreenFolderName = null;
+      terminal.printInfo(Text.CUSTOM_BOOTSCREEN_RESET);
+      return;
+    }
+
+    terminal.printInfo(Text.LOADING);
+    canvas.style.visibility = "hidden";
+    terminal.disable();
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/checkBootscreenFolder", true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onreadystatechange = function(){
+      if (xhr.readyState == 4 && xhr.status == 200){
+        canvas.style.visibility = "";
+        var resp = JSON.parse(xhr.responseText);
+        terminal.clear();
+        terminal.enable();
+
+        if (resp.error && resp.error.noFolder){
+          terminal.printError(Text.NO_SUCH_FOLDER_UNDER_BOOTSCRENS_FOLDER);
+        }else if (resp.error && resp.error.notValid){
+          terminal.printError(Text.PROVIDED_FOLDER_DOES_NOT_CONTAIN_COMPONENT_HTML);
+        }else{
+          bootscreenFolderName = this.folderName
+          terminal.printError(Text.CUSTOM_BOOTSCREEN_SET);
+        }
+      }
+    }.bind({folderName: val})
+    xhr.send(JSON.stringify({folderName: val}));
+  });
+  parentFolder.add(params, "Body BG Color").onFinishChange(function(val){
+    terminal.clear();
+    if (!val){
+      bodyBGColor = null;
+      terminal.printInfo(Text.CUSTOM_BODY_BG_COLOR_RESET);
+    }else{
+      bodyBGColor = val;
+      terminal.printInfo(Text.CUSTOM_BODY_BG_COLOR_SET);
+    }
+  });
 }
 
 SettingsGUIHandler.prototype.initializeWebSocketFolder = function(parentFolder){
@@ -53,8 +108,8 @@ SettingsGUIHandler.prototype.initializeWebSocketFolder = function(parentFolder){
     xhr.open("POST", "/checkProtocolDefinitionFile", true);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.onreadystatechange = function(){
-      canvas.style.visibility = "";
       if (xhr.readyState == 4 && xhr.status == 200){
+        canvas.style.visibility = "";
         var resp = JSON.parse(xhr.responseText);
         terminal.clear();
         terminal.enable();

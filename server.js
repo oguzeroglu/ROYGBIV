@@ -350,6 +350,28 @@ app.post("/compressFont", async function(req, res){
   res.send(JSON.stringify({error: false}));
 });
 
+app.post("/checkBootscreenFolder", function(req, res){
+  console.log("[*] Checking bootscren folder");
+  var folderName = req.body.folderName;
+  if (fs.existsSync("./bootscreens/" + folderName)){
+    if (fs.existsSync("./bootscreens/" + folderName + "/component.html")){
+      res.send(JSON.stringify({}));
+    }else{
+      res.send(JSON.stringify({
+        error: {
+          notValid: true
+        }
+      }));
+    }
+  }else{
+    res.send(JSON.stringify({
+      error: {
+        noFolder: true
+      }
+    }));
+  }
+});
+
 app.post("/checkProtocolDefinitionFile", function(req, res){
   console.log("[*] Checking protocol definition file.");
   var fileName = req.body.fileName;
