@@ -73,7 +73,9 @@ RayCaster.prototype.refresh = function(){
     if (!modelInstance.boundingBoxes){
       modelInstance.generateBoundingBoxes();
     }
-    this.binHandler.insert(modelInstance.boundingBoxes[0], instanceName);
+    for (var i = 0; i < modelInstance.boundingBoxes.length; i ++){
+      this.binHandler.insert(modelInstance.boundingBoxes[i], instanceName);
+    }
   }
   for (var objName in this.getObjectGroups()){
     var objectGroup = objectGroups[objName];

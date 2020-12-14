@@ -176,6 +176,11 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
   if (hasNormalMap){
     THREE.BufferGeometryUtils.computeTangents(this.geometry);
   }
+
+  this.group = new THREE.Group();
+  for (var i = 0; i < modelInfo.childInfos.length; i ++){
+    this.group.add(new THREE.Object3D());
+  }
 }
 
 Model.prototype.export = function(isBuildingForDeploymentMode){

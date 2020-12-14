@@ -128,41 +128,49 @@ ModelInstance.prototype.exportLightweight = function(){
 }
 
 ModelInstance.prototype.generateBoundingBoxes = function(){
-  var originalBB = this.model.info.originalBoundingBox.clone();
-  var width = (originalBB.max.x - originalBB.min.x);
-  var height = (originalBB.max.y - originalBB.min.y);
-  var depth = (originalBB.max.z - originalBB.min.z);
-
-  var pseudoGeometry = new THREE.BoxGeometry(width, height, depth);
-
-  this.vertices = pseudoGeometry.vertices;
-  var bb = new THREE.Box3();
-  bb.roygbivObjectName = this.name;
-  this.boundingBoxes = [bb];
-  this.mesh.updateMatrixWorld();
+  this.boundingBoxes = [];
   this.transformedVertices = [];
-  for (var i = 0; i<this.vertices.length; i++){
-    var vertex = this.vertices[i].clone();
-    vertex.applyMatrix4(this.mesh.matrixWorld);
-    bb.expandByPoint(vertex);
-    this.transformedVertices.push(vertex);
-  }
   this.triangles = [];
   this.trianglePlanes = [];
-  for (var i = 0; i<pseudoGeometry.faces.length; i++){
-    var face = pseudoGeometry.faces[i];
-    var a = face.a;
-    var b = face.b;
-    var c = face.c;
-    var triangle = new THREE.Triangle(
-      this.transformedVertices[a], this.transformedVertices[b], this.transformedVertices[c]
-    );
-    this.triangles.push(triangle);
-    var plane = new THREE.Plane();
-    triangle.getPlane(plane);
-    this.trianglePlanes.push(plane);
+  this.pseudoFaces = [];
+  this.vertices = [];
+
+  var bbs = this.getBBs();
+
+  for (var x = 0; x < bbs.length; x ++){
+    var center = bbs[x].center;
+    var size = bbs[x].size;
+
+    this.boundingBoxes.push(new THREE.Box3().setFromCenterAndSize(center, size));
+
+    var pseudoGeometry = new THREE.BoxGeometry(size.x, size.y, size.z);
+    var pseudoObj = new THREE.Object3D();
+    pseudoObj.position.copy(center);
+    pseudoObj.updateMatrixWorld(true);
+    var transformedVertices =[];
+    for (var i = 0; i < pseudoGeometry.vertices.length; i ++){
+      this.vertices.push(pseudoGeometry.vertices[i]);
+      var vertex = pseudoGeometry.vertices[i].clone();
+      vertex.applyMatrix4(pseudoObj.matrixWorld);
+      this.transformedVertices.push(vertex);
+      transformedVertices.push(vertex);
+    }
+
+    for (var i = 0; i < pseudoGeometry.faces.length; i ++){
+      var face = pseudoGeometry.faces[i];
+      var a = face.a;
+      var b = face.b;
+      var c = face.c;
+      var triangle = new THREE.Triangle(
+        transformedVertices[a], transformedVertices[b], transformedVertices[c]
+      );
+      this.triangles.push(triangle);
+      var plane = new THREE.Plane();
+      triangle.getPlane(plane);
+      this.trianglePlanes.push(plane);
+      this.pseudoFaces.push(face);
+    }
   }
-  this.pseudoFaces = pseudoGeometry.faces;
 }
 
 ModelInstance.prototype.visualiseBoundingBoxes = function(){
@@ -411,4 +419,38 @@ ModelInstance.prototype.unmapCustomTextures = function(){
   uniforms.texture = textureAtlasHandler.getTextureUniform();
 
   this.customTextureMapped = false;
+}
+
+ModelInstance.prototype.getBBs = function(){
+  var totalBB = new THREE.Box3();
+  this.model.group.position.copy(this.mesh.position);
+  this.model.group.quaternion.copy(this.mesh.quaternion);
+  this.model.group.scale.set(this.scale, this.scale, this.scale);
+  this.model.group.updateMatrixWorld(true);
+  this.model.group.updateMatrix(true);
+  var bbs = [];
+  for (var i = 0; i < this.model.group.children.length; i ++){
+    this.model.group.children[i].updateMatrixWorld(true);
+    this.model.group.children[i].updateMatrix(true);
+    var curMatrixWorld = this.model.group.children[i].matrixWorld;
+    var curBB = this.model.info.childInfos[i].bb;
+    var bb = new THREE.Box3(new THREE.Vector3(curBB.minX, curBB.minY, curBB.minZ), new THREE.Vector3(curBB.maxX, curBB.maxY, curBB.maxZ));
+    bb.applyMatrix4(curMatrixWorld);
+    totalBB.expandByPoint(bb.min);
+    totalBB.expandByPoint(bb.max);
+    bbs.push(bb);
+  }
+
+  var origBB = new THREE.Box3().setFromObject(this.mesh);
+
+  var diff = totalBB.getCenter(new THREE.Vector3()).sub(origBB.getCenter(new THREE.Vector3()));
+  for (var i = 0; i < bbs.length; i ++){
+    var bb = bbs[i];
+    var size = bb.getSize(new THREE.Vector3());
+    var center = bb.getCenter(new THREE.Vector3());
+    center.sub(diff);
+    bbs[i] = {center: center, size: size}
+  }
+
+  return bbs;
 }

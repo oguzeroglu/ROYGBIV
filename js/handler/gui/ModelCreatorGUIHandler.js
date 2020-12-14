@@ -175,6 +175,17 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       colorG: childMesh.material.color.g,
       colorB: childMesh.material.color.b
     };
+
+    var childBB = new THREE.Box3().setFromObject(childMesh);
+    childInfo.bb = {
+      minX: childBB.min.x,
+      minY: childBB.min.y,
+      minZ: childBB.min.z,
+      maxX: childBB.max.x,
+      maxY: childBB.max.y,
+      maxZ: childBB.max.z
+    };
+
     var normalGeometry = new THREE.Geometry().fromBufferGeometry(childMesh.geometry);
     for (var i2 = 0; i2 < normalGeometry.faces.length; i2++){
       normalGeometry.faces[i2].materialIndex = i;
