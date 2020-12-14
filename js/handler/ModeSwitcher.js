@@ -86,6 +86,9 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
 }
 
 ModeSwitcher.prototype.switchFromDesignToPreview = function(){
+  if (isDeployment){
+    loadTime.modeSwitchTime = performance.now();
+  }
   steeringHandler.onModeSwitch();
   TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;
@@ -288,6 +291,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   this.commonSwitchFunctions();
   handleViewport();
   renderer.setPixelRatio(screenResolution);
+
+  if (isDeployment){
+    loadTime.modeSwitchTime = performance.now() - loadTime.modeSwitchTime;
+  }
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){

@@ -585,5 +585,6 @@ var loadTime = {
   finalizeTime: 0,
   modelImporttime: 0,
   rmfLoadTimes: {},
-  modelGenerationTimes: {}
+  modelGenerationTimes: {},
+  modeSwitchTime: 0
 };
