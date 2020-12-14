@@ -1475,4 +1475,5 @@ var Text = function(){
                                                           "keys -> texture IDs of models instance\n" +
                                                           "values -> texture pack objects obtained via loadDynamicTextures API\n" +
                                                           "Textures IDs of a model instance may be obtained from the GUI by clicking on a model instance in the design mode\nand looking under the Textures folder.";
+  this.ROYGBIV_SCRIPTING_API_SETPIXELRATIO = "Sets the pixel ratio of the WebGL renderer. More the pixelRatio better the rendering quality however worse the performance.\nUse this with caution, especially for fullscreen apps.";
 }

@@ -301,6 +301,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     inputText.deactivateInputMode();
   }
 
+  previewModeScreenResolution = null;
+
   steeringHandler.onModeSwitch();
 
   mode = 0;

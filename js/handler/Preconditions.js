@@ -301,6 +301,7 @@ var Preconditions = function(){
   this.modelInstanceName = "modelInstanceName";
   this.modelInstance = "modelInstance";
   this.texturesObj = "texturesObj";
+  this.pixelRatio = "pixelRatio";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

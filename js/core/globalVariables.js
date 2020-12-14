@@ -275,6 +275,7 @@ var SIDE_FRONT = "Front";
 var SIDE_BACK = "Back";
 var textureUniformCache = new Object(); // after global texture atlas implementation, this only has dynamic texture uniforms
 var screenResolution = 1;
+var previewModeScreenResolution = null;
 var useOriginalResolution = false;
 var rayCaster;
 var objectPicker2D;

@@ -89,6 +89,10 @@ Renderer.prototype.setSize = function(width, height){
 }
 
 Renderer.prototype.setPixelRatio = function(ratio){
+  if (mode == 1 && previewModeScreenResolution != null){
+    ratio = previewModeScreenResolution;
+  }
+
   this.webglRenderer.setPixelRatio(ratio);
   GLOBAL_SCREEN_RESOLUTION_UNIFORM.value = ratio;
   for (var effectName in this.effects){

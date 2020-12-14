@@ -350,7 +350,8 @@ var Roygbiv = function(){
     "getObjectVelocity",
     "getModelInstance",
     "getMaxTextureSize",
-    "mapTexturesToModelInstance"
+    "mapTexturesToModelInstance",
+    "setPixelRatio"
   ];
 
   this.globals = new Object();
@@ -5312,4 +5313,19 @@ Roygbiv.prototype.getMaxTextureSize = function(){
   }
 
   return WEBGL_MAX_TEXTURE_SIZE;
+}
+
+// Sets the pixel ratio of the WebGL renderer. More the pixelRatio
+// better the rendering quality however worse the performance. Use this with
+// caution, especially for fullscreen apps.
+Roygbiv.prototype.setPixelRatio = function(pixelRatio){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.setPixelRatio, preConditions.pixelRatio, pixelRatio);
+  preConditions.checkIfNumber(ROYGBIV.setPixelRatio, preConditions.pixelRatio, pixelRatio);
+
+  previewModeScreenResolution = pixelRatio;
+  renderer.setPixelRatio(previewModeScreenResolution);
 }
