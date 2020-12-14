@@ -413,7 +413,7 @@ Roygbiv.prototype.getRandomColor = function(){
   return ColorNames.generateRandomColor();
 }
 
-//  Returns the (x, y, z) coordinates of an object, glued object or a particle system.
+//  Returns the (x, y, z) coordinates of an object, glued object, particle system or a model instance.
 //  If a specific axis is specified, only the position on the specified axis is returned.
 //  Note that axis should be one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.
 Roygbiv.prototype.getPosition = function(object, targetVector, axis){
@@ -423,7 +423,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   preConditions.checkIfDefined(ROYGBIV.getPosition, preConditions.object, object);
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.getPosition, preConditions.axis, axis);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getPosition, preConditions.targetVector, targetVector);
-  preConditions.checkIfAddedObjectObjectGroupParticleSystem(ROYGBIV.getPosition, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupParticleSystemModelInstance(ROYGBIV.getPosition, preConditions.object, object);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getPosition, object);
   if (object.isAddedObject){
     if (axis){
@@ -506,7 +506,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
         );
       }
     }
-  }else if (object.isParticleSystem){
+  }else if (object.isParticleSystem || object.isModelInstance){
     if (axis){
       if (axis == this.axes.X){
         return object.mesh.position.x;

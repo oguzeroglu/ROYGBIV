@@ -918,6 +918,12 @@ Preconditions.prototype.checkIfAddedObjectOrObjectGroupOnlyIfExists = function(c
   }
 }
 
+Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystemModelInstance = function(callerFunc, paramName, obj){
+  if (!obj.isAddedObject && !obj.isObjectGroup && !obj.isParticleSystem && !obj.isModelInstance){
+    this.throw(callerFunc, parameterName+" must be an object, object group, particle system or a model instance.");
+  }
+}
+
 Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystem = function(callerFunc, parameterName, obj){
   if (!obj.isAddedObject && !obj.isObjectGroup && !obj.isParticleSystem){
     this.throw(callerFunc, parameterName+" must be an object, object group or a particle system.");
