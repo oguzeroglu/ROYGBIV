@@ -11,6 +11,7 @@ SettingsGUIHandler.prototype.show = function(){
   var graphicsFolder = guiHandler.datGuiSettings.addFolder("Graphics");
   var workerFolder = guiHandler.datGuiSettings.addFolder("Worker");
   var websocketFolder = guiHandler.datGuiSettings.addFolder("WebSocket");
+  var loadingFolder = guiHandler.datGuiSettings.addFolder("Loading");
   var bootscreenFolder = guiHandler.datGuiSettings.addFolder("Bootscreen");
   var debugFolder = guiHandler.datGuiSettings.addFolder("Debug");
 
@@ -18,6 +19,7 @@ SettingsGUIHandler.prototype.show = function(){
   this.initializeGraphicsFolder(graphicsFolder);
   this.initializeWorkerFolder(workerFolder);
   this.initializeWebSocketFolder(websocketFolder);
+  this.initializeLoadingFolder(loadingFolder);
   this.initializeBootscreenFolder(bootscreenFolder);
   this.initializeDebugFolder(debugFolder);
 
@@ -146,6 +148,18 @@ SettingsGUIHandler.prototype.initializeWebSocketFolder = function(parentFolder){
 
     developmentServerWSURL = val;
     terminal.printInfo(Text.DEV_SERVER_WS_URL_SET);
+  });
+}
+
+SettingsGUIHandler.prototype.initializeLoadingFolder = function(parentFolder){
+  var params = {
+    "Lazy load shadows": !!shadowBaker.lazyLoad
+  };
+
+  parentFolder.add(params, "Lazy load shadows").onChange(function(val){
+    shadowBaker.lazyLoad = val;
+    terminal.clear();
+    terminal.printInfo(val? Text.SHADOWS_WILL_BE_LAZILY_LOADED: Text.SHADOWS_WONT_BE_LAZILY_LOADED);
   });
 }
 
