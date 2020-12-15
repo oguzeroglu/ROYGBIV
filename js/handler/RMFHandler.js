@@ -131,7 +131,6 @@ RMFHandler.prototype.load = function(folderName, onReady){
     for (var x = i; x < view.length; x += 2){
       var index = view[x];
       var count = view[x + 1];
-      console.log(index, count);
       for (var y = 0; y < count; y ++){
         indexedMaterialIndices.push(index);
       }
