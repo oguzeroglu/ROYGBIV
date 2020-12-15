@@ -42,7 +42,8 @@ app.post("/build", function(req, res){
       res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
       return;
     }
-    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS, req.body.modules, req.body.bootscreenFolderName);
+    
+    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS, req.body.modules, req.body.bootscreenFolderName, req.body.disabledShaderInfo);
     var roygbivPath = "deploy/"+req.body.projectName+"/js/roygbiv.js";
     fs.writeFileSync(roygbivPath, handleScripts(req.body, engineScriptsConcatted));
     minify(roygbivPath).then(function(minified){
@@ -770,7 +771,7 @@ function generateDeployDirectory(projectName, application){
   return true;
 }
 
-function readEngineScripts(projectName, author, enableAntialias, modules, bootscreenFolderName){
+function readEngineScripts(projectName, author, enableAntialias, modules, bootscreenFolderName, disabledShaderInfo){
   var content = "";
   var htmlContent = fs.readFileSync("roygbiv.html", "utf8");
   htmlContent = htmlContent.replace("three.js", "three.min.js");
@@ -787,6 +788,41 @@ function readEngineScripts(projectName, author, enableAntialias, modules, bootsc
         scriptContent = scriptContent.replace("var projectName = \"@@1\"", "var projectName = \""+projectName+"\"");
         scriptContent = scriptContent.replace("var author = \"@@2\"", "var author = \""+author+"\"");
         scriptContent = scriptContent.replace("var ENABLE_ANTIALIAS = false;", "var ENABLE_ANTIALIAS = @@1;".replace("@@1", enableAntialias));
+
+        if (disabledShaderInfo.DISABLE_PARTICLE_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_PARTICLE_SHADERS = false;", "var DISABLE_PARTICLE_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_OBJECT_TRAIL_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_OBJECT_TRAIL_SHADERS = false;", "var DISABLE_OBJECT_TRAIL_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_CROSSHAIR_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_CROSSHAIR_SHADERS = false;", "var DISABLE_CROSSHAIR_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_OBJECT_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_OBJECT_SHADERS = false;", "var DISABLE_OBJECT_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_SKYBOX_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_SKYBOX_SHADERS = false;", "var DISABLE_SKYBOX_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_TEXT_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_TEXT_SHADERS = false;", "var DISABLE_TEXT_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_RECTANGLE_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_RECTANGLE_SHADERS = false;", "var DISABLE_RECTANGLE_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_BLOOM_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_BLOOM_SHADERS = false;", "var DISABLE_BLOOM_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_LIGHTNING_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_LIGHTNING_SHADERS = false;", "var DISABLE_LIGHTNING_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_SPRITE_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_SPRITE_SHADERS = false;", "var DISABLE_SPRITE_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_MODEL_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_MODEL_SHADERS = false;", "var DISABLE_MODEL_SHADERS = true;");
+        }
+
         console.log("[*] isDeployment flag injected into globalVariables.");
       }
       if (scriptPath.includes("Roygbiv.js")){

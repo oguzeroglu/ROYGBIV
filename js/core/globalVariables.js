@@ -2,6 +2,17 @@ var isDeployment = false;
 var hasCustomBootScreen = false;
 
 var IS_WORKER_CONTEXT = false;
+var DISABLE_PARTICLE_SHADERS = false;
+var DISABLE_OBJECT_TRAIL_SHADERS = false;
+var DISABLE_CROSSHAIR_SHADERS = false;
+var DISABLE_OBJECT_SHADERS = false;
+var DISABLE_SKYBOX_SHADERS = false;
+var DISABLE_TEXT_SHADERS = false;
+var DISABLE_RECTANGLE_SHADERS = false;
+var DISABLE_BLOOM_SHADERS = false;
+var DISABLE_LIGHTNING_SHADERS = false;
+var DISABLE_SPRITE_SHADERS = false;
+var DISABLE_MODEL_SHADERS = false;
 
 var COS30DEG = Math.cos(30 * Math.PI / 180);
 var SIN30DEG = Math.sin(30 * Math.PI / 180);

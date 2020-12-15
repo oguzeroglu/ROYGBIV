@@ -337,11 +337,14 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
     break;
   }
   if (!vertexShader){
-    throw new Error("Unknown type.");
+    if (!isDeployment){
+      throw new Error("Unknown type.");
+    }
+  }else{
+    vertexShader = this.replace(vertexShader, currentPrecisionForType, newPrecisionForType);
+    fragmentShader = this.replace(fragmentShader, currentPrecisionForType, newPrecisionForType);
+    ShaderContent[vertexShaderName] = vertexShader;
+    ShaderContent[fragmentShaderName] = fragmentShader;
+    this.precisions[type] = precision;
   }
-  vertexShader = this.replace(vertexShader, currentPrecisionForType, newPrecisionForType);
-  fragmentShader = this.replace(fragmentShader, currentPrecisionForType, newPrecisionForType);
-  ShaderContent[vertexShaderName] = vertexShader;
-  ShaderContent[fragmentShaderName] = fragmentShader;
-  this.precisions[type] = precision;
 }

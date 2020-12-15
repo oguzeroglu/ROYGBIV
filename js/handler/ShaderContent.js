@@ -45,17 +45,109 @@ var ShaderContent = function(){
       startDeployment();
     }
   }
+
+  var totalLen = this.shaders.length;
+
   this.aShaderLoadedCallback = function(){
     this.currentLoadCount ++;
-    if (this.currentLoadCount == this.shaders.length){
+    if (this.currentLoadCount == totalLen){
       this.allShadersReadyCallback();
     }
   }
-  this.load();
+
+  if (isDeployment){
+    if (DISABLE_PARTICLE_SHADERS){
+      this.shaders[0].disabled = true;
+      this.shaders[1].disabled = true;
+      totalLen -= 2;
+    }
+    if (DISABLE_OBJECT_TRAIL_SHADERS){
+      this.shaders[2].disabled = true;
+      this.shaders[3].disabled = true;
+      totalLen -= 2;
+    }
+    if (DISABLE_CROSSHAIR_SHADERS){
+      this.shaders[4].disabled = true;
+      this.shaders[5].disabled = true;
+      totalLen -= 2;
+    }
+    if (DISABLE_OBJECT_SHADERS){
+      this.shaders[6].disabled = true;
+      this.shaders[7].disabled = true;
+      this.shaders[8].disabled = true;
+      this.shaders[9].disabled = true;
+      this.shaders[10].disabled = true;
+      this.shaders[11].disabled = true;
+      totalLen -= 6;
+    }
+    if (DISABLE_SKYBOX_SHADERS){
+      this.shaders[12].disabled = true;
+      this.shaders[13].disabled = true;
+      totalLen -= 2;
+    }
+    if (DISABLE_TEXT_SHADERS){
+      this.shaders[14].disabled = true;
+      this.shaders[15].disabled = true;
+      totalLen -= 2;
+    }
+    if (DISABLE_RECTANGLE_SHADERS){
+      this.shaders[16].disabled = true;
+      this.shaders[17].disabled = true;
+      totalLen -= 2;
+    }
+    if (DISABLE_BLOOM_SHADERS){
+      this.shaders[18].disabled = true;
+      this.shaders[19].disabled = true;
+      this.shaders[20].disabled = true;
+      this.shaders[21].disabled = true;
+      this.shaders[22].disabled = true;
+      this.shaders[23].disabled = true;
+      totalLen -= 6;
+    }
+    if (DISABLE_LIGHTNING_SHADERS){
+      this.shaders[24].disabled = true;
+      this.shaders[25].disabled = true;
+      totalLen -= 2;
+    }
+    if (DISABLE_SPRITE_SHADERS){
+      this.shaders[26].disabled = true;
+      this.shaders[27].disabled = true;
+      totalLen -= 2;
+    }
+    if (DISABLE_MODEL_SHADERS){
+      this.shaders[28].disabled = true;
+      this.shaders[29].disabled = true;
+      totalLen -= 2;
+    }
+  }
+
+  var count = this.load(this.aShaderLoadedCallback);
+  if (!count){
+    renderer.initEffects();
+    if (!isDeployment){
+      canvas.style.visibility = "";
+      terminal.enable();
+      terminal.clear();
+      terminal.print("Type help for list of commands.");
+    }else{
+      appendtoDeploymentConsole("Shaders loaded.");
+      appendtoDeploymentConsole("");
+      startDeployment();
+    }
+  }
 }
 
-ShaderContent.prototype.load = function(){
+ShaderContent.prototype.load = function(callback){
+  var count = 0;
   for (var i = 0; i<this.shaders.length; i++){
+
+    if (this.shaders[i].disabled){
+      this[this.shaders[i].name] = "DISABLED";
+      continue
+    }
+
+    count ++;
+
     var req = new XMLHttpRequest();
     var postfix = "vertexShader.shader";
     if (!this.shaders[i].isVertexShader){
@@ -69,4 +161,48 @@ ShaderContent.prototype.load = function(){
     }.bind({index: i, request: req}));
     req.send();
   }
+
+  return count;
+}
+
+ShaderContent.prototype.getDisableInfo = function(){
+  var obj = {
+    DISABLE_PARTICLE_SHADERS: Object.keys(preConfiguredParticleSystems).length == 0,
+    DISABLE_CROSSHAIR_SHADERS: Object.keys(crosshairs).length == 0,
+    DISABLE_OBJECT_SHADERS: (Object.keys(addedObjects).length + Object.keys(objectGroups).length) == 0,
+    DISABLE_SKYBOX_SHADERS: Object.keys(skyBoxes).length == 0,
+    DISABLE_TEXT_SHADERS: (Object.keys(addedTexts).length + Object.keys(virtualKeyboards).length) == 0,
+    DISABLE_RECTANGLE_SHADERS: (Object.keys(sprites).length + Object.keys(virtualKeyboards).length) == 0,
+    DISABLE_LIGHTNING_SHADERS: Object.keys(lightnings).length == 0,
+    DISABLE_SPRITE_SHADERS: (Object.keys(sprites).length + Object.keys(virtualKeyboards).length) == 0,
+    DISABLE_MODEL_SHADERS: Object.keys(modelInstances).length == 0
+  };
+
+  var hasObjectTrail;
+  for (var objName in addedObjects){
+    if (addedObjects[objName].objectTrailConfigurations){
+      hasObjectTrail = true;
+    }
+  }
+
+  for (var objName in objectGroups){
+    if (objectGroups[objName].objectTrailConfigurations){
+      hasObjectTrail = true;
+    }
+  }
+
+  var hasBloom = false;
+  sceneHandler.scenes[sceneHandler.getActiveSceneName()].savePostProcessing();
+  for (var sceneName in sceneHandler.scenes){
+    var scene = sceneHandler.scenes[sceneName];
+    if (scene.postProcessing && scene.postProcessing.isOn){
+      hasBloom = true;
+      break;
+    }
+  }
+
+  obj.DISABLE_BLOOM_SHADERS = !hasBloom;
+  obj.DISABLE_OBJECT_TRAIL_SHADERS = !hasObjectTrail;
+
+  return obj;
 }

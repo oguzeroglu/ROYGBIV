@@ -208,4 +208,8 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   // BOOTSCREEN ****************************************************
   this.bootscreenFolderName = bootscreenFolderName;
   this.bodyBGColor = bodyBGColor;
+  // DISABLED SHADERS **********************************************
+  if (isBuildingForDeploymentMode){
+    this.disabledShaderInfo = ShaderContent.getDisableInfo();
+  }
 }
