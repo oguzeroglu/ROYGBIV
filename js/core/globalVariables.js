@@ -586,5 +586,8 @@ var loadTime = {
   modelImporttime: 0,
   rmfLoadTimes: {},
   modelGenerationTimes: {},
-  modeSwitchTime: 0
+  modeSwitchTime: 0,
+  firstRendertime: performance.now(),
 };
+
+var firstRenderPerformed = false;
