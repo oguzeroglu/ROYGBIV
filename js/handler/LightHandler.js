@@ -238,8 +238,6 @@ LightHandler.prototype.onSwitchFromDesignToPreview = function(){
 }
 
 LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
-  var result = [];
-
   var normalAttrAry = obj.mesh.geometry.attributes.normal.array;
   var positionAttrAry = obj.mesh.geometry.attributes.position.array;
 
@@ -254,20 +252,23 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
 
   obj.mesh.updateMatrixWorld(true);
 
+  var result = new Float32Array(normalAttrAry.length);
+  var x = 0;
+
   for (var i = 0; i < normalAttrAry.length; i = i + 3){
-    var normal = new THREE.Vector3(normalAttrAry[i], normalAttrAry[i + 1], normalAttrAry[i + 2]);
-    var pos = new THREE.Vector3(positionAttrAry[i], positionAttrAry[i + 1], positionAttrAry[i + 2]);
+    var normal = REUSABLE_VECTOR.set(normalAttrAry[i], normalAttrAry[i + 1], normalAttrAry[i + 2]);
+    var pos = REUSABLE_VECTOR_2.set(positionAttrAry[i], positionAttrAry[i + 1], positionAttrAry[i + 2]);
 
     if (obj.isObjectGroup || obj.isModelInstance){
       var colorAry = obj.mesh.geometry.attributes.color.array;
-      color = new THREE.Vector3(colorAry[i], colorAry[i + 1], colorAry[i + 2]);
+      color = REUSABLE_VECTOR_3.set(colorAry[i], colorAry[i + 1], colorAry[i + 2]);
     }
 
     normal.applyMatrix3(mat3).normalize();
     pos.applyMatrix4(obj.mesh.matrixWorld);
 
-    var ambient = new THREE.Vector3(0, 0, 0);
-    var diffuse = new THREE.Vector3(0, 0, 0);
+    var ambient = REUSABLE_VECTOR_4.set(0, 0, 0);
+    var diffuse = REUSABLE_VECTOR_5.set(0, 0, 0);
 
     if (this.hasStaticAmbientLight()){
       ambient.set(this.staticAmbientColor.r * this.staticAmbientStrength, this.staticAmbientColor.g * this.staticAmbientStrength, this.staticAmbientColor.b * this.staticAmbientStrength);
@@ -275,7 +276,7 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
 
     for (var slotID in this.staticDiffuseLightsBySlotId){
       var info = this.staticDiffuseLightsBySlotId[slotID];
-      var lightDirNegative = new THREE.Vector3(-info.directionX, -info.directionY, -info.directionZ).normalize();
+      var lightDirNegative = REUSABLE_VECTOR_6.set(-info.directionX, -info.directionY, -info.directionZ).normalize();
       var diffuseFactor = normal.dot(lightDirNegative);
       if (diffuseFactor > 0){
         diffuse.x += info.strength * diffuseFactor * info.colorR;
@@ -286,7 +287,7 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
 
     for (var slotID in this.staticPointLightsBySlotId){
       var info = this.staticPointLightsBySlotId[slotID];
-      var toLight = new THREE.Vector3(info.positionX - pos.x, info.positionY - pos.y, info.positionZ - pos.z).normalize();
+      var toLight = REUSABLE_VECTOR_6.set(info.positionX - pos.x, info.positionY - pos.y, info.positionZ - pos.z).normalize();
       var diffuseFactor = normal.dot(toLight);
       if (diffuseFactor > 0){
         diffuse.x += info.strength * diffuseFactor * info.colorR;
@@ -295,15 +296,15 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
       }
     }
 
-    result.push(color.x * (ambient.x + diffuse.x));
-    result.push(color.y * (ambient.y + diffuse.y));
-    result.push(color.z * (ambient.z + diffuse.z));
+    result[x ++] = (color.x * (ambient.x + diffuse.x));
+    result[x ++] = (color.y * (ambient.y + diffuse.y));
+    result[x ++] = (color.z * (ambient.z + diffuse.z));
   }
 
   if (!isDesignMode){
     macroHandler.injectMacro("IS_LIGHT_BAKED", obj.mesh.material, true, false);
     obj.mesh.material.needsUpdate = true;
-    obj.mesh.geometry.addAttribute("bakedColor", new THREE.BufferAttribute(new Float32Array(result), 3));
+    obj.mesh.geometry.addAttribute("bakedColor", new THREE.BufferAttribute(result, 3));
     obj.mesh.geometry.attributes.bakedColor.needsUpdate = true;
   }else{
     return result;
