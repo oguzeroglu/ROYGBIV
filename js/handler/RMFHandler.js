@@ -53,8 +53,25 @@ RMFHandler.prototype.generate = function(positions, normals, uvs, indexedMateria
     info.push(indices[i]);
   }
 
-  for (var i = 0; i < indexedMaterialIndices.length; i ++){
-    info.push(indexedMaterialIndices[i]);
+  var indexedMaterilIndicesInfo = [
+    {index: indexedMaterialIndices[0], count: 1}
+  ];
+
+  for (var i = 1; i < indexedMaterialIndices.length; i ++){
+    var curInfo = indexedMaterilIndicesInfo[indexedMaterilIndicesInfo.length - 1];
+    if (curInfo.index == indexedMaterialIndices[i]){
+      curInfo.count ++;
+    }else{
+      indexedMaterilIndicesInfo.push({
+        index: indexedMaterialIndices[i],
+        count: 1
+      });
+    }
+  }
+
+  for (var i = 0; i < indexedMaterilIndicesInfo.length; i ++){
+    info.push(indexedMaterilIndicesInfo[i].index);
+    info.push(indexedMaterilIndicesInfo[i].count);
   }
 
   return new Float32Array(info);
@@ -111,8 +128,13 @@ RMFHandler.prototype.load = function(folderName, onReady){
     }
 
     var indexedMaterialIndices = [];
-    for (var x = i; x < view.length; x ++){
-      indexedMaterialIndices.push(view[x]);
+    for (var x = i; x < view.length; x += 2){
+      var index = view[x];
+      var count = view[x + 1];
+      console.log(index, count);
+      for (var y = 0; y < count; y ++){
+        indexedMaterialIndices.push(index);
+      }
     }
 
     onReady(positions, normals, uvs, indices, indexedMaterialIndices);
