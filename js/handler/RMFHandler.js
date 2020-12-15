@@ -88,12 +88,14 @@ RMFHandler.prototype.load = function(folderName, onReady){
 
     var indicesLength = view[0];
 
-    var positions = [];
-    var normals = [];
-    var uvs = [];
+    var positions = new Float32Array(indicesLength * 3);
+    var normals = new Float32Array(indicesLength * 3);
+    var uvs = new Float32Array(indicesLength * 2);
 
     var totalRead = 0;
     var i = 1;
+
+    var x = 0, y = 0; z = 0;
     while (totalRead != indicesLength){
       var curPosX = view[i ++];
       var curPosY = view[i ++];
@@ -104,14 +106,14 @@ RMFHandler.prototype.load = function(folderName, onReady){
       var curUVX = view[i ++];
       var curUVY = view[i ++];
 
-      positions.push(curPosX);
-      positions.push(curPosY);
-      positions.push(curPosZ);
-      normals.push(curNormalX);
-      normals.push(curNormalY);
-      normals.push(curNormalZ);
-      uvs.push(curUVX);
-      uvs.push(curUVY);
+      positions[x ++] = curPosX;
+      positions[x ++] = curPosY;
+      positions[x ++] = curPosZ;
+      normals[y ++] = curNormalX;
+      normals[y ++] = curNormalY;
+      normals[y ++] = curNormalZ;
+      uvs[z ++] = curUVX;
+      uvs[z ++] = curUVY;
 
       totalRead ++;
     }
@@ -127,12 +129,13 @@ RMFHandler.prototype.load = function(folderName, onReady){
       indices[i2 ++] = curIndex;
     }
 
-    var indexedMaterialIndices = [];
+    var indexedMaterialIndices = new Array(indicesLength);
+    var z = 0;
     for (var x = i; x < view.length; x += 2){
       var index = view[x];
       var count = view[x + 1];
       for (var y = 0; y < count; y ++){
-        indexedMaterialIndices.push(index);
+        indexedMaterialIndices[z ++] = index;
       }
     }
 

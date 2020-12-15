@@ -77,23 +77,30 @@ ImportHandler.prototype.importModels = function(obj, callback){
       var max = this.curModelExport.originalBoundingBox.max;
       this.curModelExport.originalBoundingBox = new THREE.Box3(new THREE.Vector3(min.x, min.y, min.z), new THREE.Vector3(max.x, max.y, max.z));
 
-      var colors = [], diffuseUVs = [], normalUVs = [];
+      var colors = new Float32Array(indexedMaterialIndices.length * 3);
+      var diffuseUVs = new Float32Array(indexedMaterialIndices.length * 4);
+      var normalUVs;
+      if (this.curModelExport.hasNormalMap){
+        normalUVs = new Float32Array(indexedMaterialIndices.length * 4);
+      }
+
+      var x = 0, y = 0, z = 0;
       for (var i = 0; i < indexedMaterialIndices.length; i ++){
         var materialIndex = indexedMaterialIndices[i];
         var curMaterial = this.curModelExport.childInfos[materialIndex];
-        colors.push(curMaterial.colorR);
-        colors.push(curMaterial.colorG);
-        colors.push(curMaterial.colorB);
-        diffuseUVs.push(-100);
-        diffuseUVs.push(-100);
-        diffuseUVs.push(-100);
-        diffuseUVs.push(-100);
+        colors[x ++] = curMaterial.colorR;
+        colors[x ++] = curMaterial.colorG;
+        colors[x ++] = curMaterial.colorB;
+        diffuseUVs[y ++] = -100;
+        diffuseUVs[y ++] = -100;
+        diffuseUVs[y ++] = -100;
+        diffuseUVs[y ++] = -100;
 
         if (this.curModelExport.hasNormalMap){
-          normalUVs.push(-100);
-          normalUVs.push(-100);
-          normalUVs.push(-100);
-          normalUVs.push(-100);
+          normalUVs[z ++] = -100;
+          normalUVs[z ++] = -100;
+          normalUVs[z ++] = -100;
+          normalUVs[z ++] = -100;
         }
       }
 

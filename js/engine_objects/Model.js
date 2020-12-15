@@ -141,11 +141,11 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       this.geometry.addAttribute("normalUV", normalUVsBufferAttribute);
     }
   }else{
-    var positionsBufferAttribute = new THREE.BufferAttribute(new Float32Array(positions), 3);
-    var colorsBufferAttribute = new THREE.BufferAttribute(new Float32Array(colors), 3);
-    var normalsBufferAttribute = new THREE.BufferAttribute(new Float32Array(normals), 3);
-    var uvsBufferAttribute = new THREE.BufferAttribute(new Float32Array(uvs), 2);
-    var diffuseUVsBufferAttribute = new THREE.BufferAttribute(new Float32Array(diffuseUVs), 4);
+    var positionsBufferAttribute = new THREE.BufferAttribute(positions, 3);
+    var colorsBufferAttribute = new THREE.BufferAttribute(colors, 3);
+    var normalsBufferAttribute = new THREE.BufferAttribute(normals, 3);
+    var uvsBufferAttribute = new THREE.BufferAttribute(uvs, 2);
+    var diffuseUVsBufferAttribute = new THREE.BufferAttribute(diffuseUVs, 4);
 
     this.geometry.setIndex(indices);
 
@@ -162,7 +162,7 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
     this.geometry.addAttribute("diffuseUV", diffuseUVsBufferAttribute);
 
     if (hasNormalMap){
-      var normalUVsBufferAttribute = new THREE.BufferAttribute(new Float32Array(normalUVs), 4);
+      var normalUVsBufferAttribute = new THREE.BufferAttribute(normalUVs, 4);
       normalUVsBufferAttribute.setDynamic(false);
       this.geometry.addAttribute("normalUV", normalUVsBufferAttribute);
     }
