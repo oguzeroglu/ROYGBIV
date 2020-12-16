@@ -3318,7 +3318,7 @@ Roygbiv.prototype.createFPSControl = function(parameters){
 // For desktop:
 // Mouse wheel/Mouse drag: Rotate
 // Right/Left/D/A/Q: Rotate
-// Up/Down/W/S/Z: Zoom in/out
+// Mouse wheel/Up/Down/W/S/Z: Zoom in/out
 // Space: Zoom in/out
 // For mobile:
 // Finger pinch zoom: Zoom in/out

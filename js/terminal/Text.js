@@ -1268,7 +1268,7 @@ var Text = function(){
                                                   "For desktop:\n"+
                                                   "Mouse wheel/Mouse drag: Rotate\n"+
                                                   "Right/Left/D/A/Q: Rotate\n"+
-                                                  "Up/Down/W/S/Z: Zoom in/out\n"+
+                                                  "Mouse wheel/Up/Down/W/S/Z: Zoom in/out\n"+
                                                   "Space: Zoom in/out\n"+
                                                   "For mobile:\n"+
                                                   "Finger pinch zoom: Zoom in/out\n"+

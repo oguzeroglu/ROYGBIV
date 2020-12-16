@@ -67,22 +67,28 @@ OrbitControls.prototype.zoom = function(){
   }
 }
 
-OrbitControls.prototype.zoomIn = function(){
+OrbitControls.prototype.zoomIn = function(coef){
+
+  coef = coef || 1;
+
   if (activeControl.zoomedInThisFrame){
     return;
   }
-  activeControl.spherical.radius -= activeControl.zoomDelta;
+  activeControl.spherical.radius -= activeControl.zoomDelta * coef;
   if (activeControl.spherical.radius < activeControl.minRadius){
     activeControl.spherical.radius = activeControl.minRadius;
   }
   activeControl.zoomedInThisFrame = true;
 }
 
-OrbitControls.prototype.zoomOut = function(){
+OrbitControls.prototype.zoomOut = function(coef){
+
+  coef = coef || 1;
+
   if (activeControl.zoomedOutThisFrame){
     return;
   }
-  activeControl.spherical.radius += activeControl.zoomDelta;
+  activeControl.spherical.radius += activeControl.zoomDelta * coef;
   if (activeControl.spherical.radius > activeControl.maxRadius){
     activeControl.spherical.radius = activeControl.maxRadius;
   }
@@ -122,17 +128,21 @@ OrbitControls.prototype.onMouseWheel = function(event){
 
     activeControl.spherical.theta += thetaDelta;
   }else{
-    var phiDelta = deltaY * activeControl.mouseWheelRotationSpeed;
+    var zoomDelta = deltaY * activeControl.mouseWheelRotationSpeed;
 
-    if (phiDelta > 0.09){
-      phiDelta = 0.09;
+    if (zoomDelta > 0.09){
+      zoomDelta = 0.09;
     }
 
-    if (phiDelta < -0.09){
-      phiDelta = -0.09;
+    if (zoomDelta < -0.09){
+      zoomDelta = -0.09;
     }
 
-    activeControl.spherical.phi -= phiDelta;
+    if (deltaY > 0){
+      activeControl.zoomIn(zoomDelta * 100);
+    }else{
+      activeControl.zoomOut(-zoomDelta * 100);
+    }
   }
 }
 
