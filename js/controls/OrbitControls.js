@@ -10,11 +10,11 @@ var OrbitControls = function(params){
   this.keyboardRotationSpeed = (!(typeof params.keyboardRotationSpeed == UNDEFINED))? params.keyboardRotationSpeed: 10;
   this.requestFullScreen = (!(typeof params.requestFullScreen == UNDEFINED))? params.requestFullScreen: false;
   this.keyboardActions = [
-    {key: "Right", action: this.rotateAroundYPositiveKeyboard},
-    {key: "D", action: this.rotateAroundYPositiveKeyboard},
-    {key: "Left", action: this.rotateAroundYNegativeKeyboard},
-    {key: "A", action: this.rotateAroundYNegativeKeyboard},
-    {key: "Q", action: this.rotateAroundYNegativeKeyboard},
+    {key: "Right", action: this.rotateAroundYNegativeKeyboard},
+    {key: "D", action: this.rotateAroundYNegativeKeyboard},
+    {key: "Left", action: this.rotateAroundYPositiveKeyboard},
+    {key: "A", action: this.rotateAroundYPositiveKeyboard},
+    {key: "Q", action: this.rotateAroundYPositiveKeyboard},
     {key: "W", action: this.zoomIn},
     {key: "Up", action: this.zoomIn},
     {key: "Z", action: this.zoomIn},
@@ -137,7 +137,7 @@ OrbitControls.prototype.onMouseWheel = function(event){
 }
 
 OrbitControls.prototype.onDrag = function(x, y, moveX, moveY){
-  activeControl.spherical.theta += (moveX / 10000) * activeControl.mouseDragRotationSpeed;
+  activeControl.spherical.theta -= (moveX / 10000) * activeControl.mouseDragRotationSpeed;
   activeControl.spherical.phi -= (moveY / 10000) * activeControl.mouseDragRotationSpeed;
 }
 
