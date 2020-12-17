@@ -20,8 +20,7 @@ var OrbitControls = function(params){
     {key: "Up", action: this.zoomIn},
     {key: "Z", action: this.zoomIn},
     {key: "S", action: this.zoomOut},
-    {key: "Down", action: this.zoomOut},
-    {key: "Space", action: this.zoom}
+    {key: "Down", action: this.zoomOut}
   ];
 }
 
@@ -41,30 +40,6 @@ OrbitControls.prototype.onResize = noop;
 OrbitControls.prototype.onFullScreenChange = function(isFullScreen){
   if (!isFullScreen && activeControl.requestFullScreen){
     fullScreenRequested = true;
-  }
-}
-
-OrbitControls.prototype.zoom = function(){
-  if (activeControl.zoomDirectionIn){
-    if (activeControl.zoomedInThisFrame){
-      return;
-    }
-    activeControl.spherical.radius -= activeControl.zoomDelta;
-    if (activeControl.spherical.radius < activeControl.minRadius){
-      activeControl.spherical.radius = activeControl.minRadius;
-      activeControl.zoomDirectionIn = false;
-    }
-    activeControl.zoomedInThisFrame = true;
-  }else{
-    if (activeControl.zoomedOutThisFrame){
-      return;
-    }
-    activeControl.spherical.radius += activeControl.zoomDelta;
-    if (activeControl.spherical.radius > activeControl.maxRadius){
-      activeControl.spherical.radius = activeControl.maxRadius;
-      activeControl.zoomDirectionIn = true;
-    }
-    activeControl.zoomedOutThisFrame = true;
   }
 }
 
@@ -182,7 +157,6 @@ OrbitControls.prototype.onActivated = function(){
   camera.position.copy(this.lookPosition);
   this.spherical = new THREE.Spherical(this.maxRadius, Math.PI/4, Math.PI/4);
   this.resetStatus();
-  this.zoomDirectionIn = true;
   if (this.requestFullScreen){
     fullScreenRequested = true;
   }
