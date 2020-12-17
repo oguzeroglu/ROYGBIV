@@ -132,6 +132,7 @@ var activeObjectTrails = new Map();
 var dynamicObjects = new Map();
 var dynamicObjectGroups = new Map();
 var addedObjectsInsideGroups = new Object();
+var domElements = new Object();
 var ShaderContent;
 var commandDescriptor;
 var ColorNames;

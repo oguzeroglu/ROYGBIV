@@ -383,6 +383,13 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     this.activeSceneName = sceneName;
     areaConfigurationsHandler.onAfterSceneChange();
   }else{
+
+    for (domElementName in domElements){
+      domElements[domElementName].onModeSwitch();
+    }
+
+    domElements = {};
+
     canvas.style.visibility = "hidden";
     if (!isDeployment){
       terminal.clear();

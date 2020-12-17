@@ -302,6 +302,12 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     Rhubarb.destroy();
   } catch(err) {}
 
+  for (var domElementName in domElements){
+    domElements[domElementName].onModeSwitch();
+  }
+
+  domElements = {};
+
   history.replaceState(null, null, ' ');
 
   if (inputText){
