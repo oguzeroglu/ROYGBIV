@@ -1279,6 +1279,7 @@ var Text = function(){
                                                   "minRadius (optional): The minimum radius of the imaginary sphere that the camera can zoom in to. Default value is 50.\n"+
                                                   "zoomDelta (optional): The difference of radius when the user performs a zoom in/out. Default value is 1.\n"+
                                                   "mouseWheelRotationSpeed (optional): The speed of mouse wheel rotation. Default value is 3.\n"+
+                                                  "mouseWheelZoomSpeed (optional): The speed of mouse wheel zoom. Default value is 3.\n" +
                                                   "mouseDragRotationSpeed (optional): The speed of mouse drag rotation. Default value is 20.\n"+
                                                   "fingerSwipeRotationSpeed (optional): The speed of finger touch rotation for mobile devices. Default value is 20.\n"+
                                                   "keyboardRotationSpeed (optional): The speed of rotation using keyboard events. Default value is 10.\n"+

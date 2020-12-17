@@ -3331,6 +3331,7 @@ Roygbiv.prototype.createFPSControl = function(parameters){
 // value is 50.
 // zoomDelta (optional): The difference of radius when the user performs a zoom in/out. Default value is 1.
 // mouseWheelRotationSpeed (optional): The speed of mouse wheel rotation. Default value is 3.
+// mouseWheelZoomSpeed (optional): The speed of mouse wheel zoom. Default value is 3.
 // mouseDragRotationSpeed (optional): The speed of mouse drag rotation. Default value is 20.
 // fingerSwipeRotationSpeed (optional): The speed of finger touch rotation for mobile devices. Default value is 20.
 // keyboardRotationSpeed (optional): The speed of rotation using keyboard events. Default value is 10.

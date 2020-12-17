@@ -5,6 +5,7 @@ var OrbitControls = function(params){
   this.minRadius = (!(typeof params.minRadius == UNDEFINED))? params.minRadius: 50;
   this.zoomDelta = (!(typeof params.zoomDelta == UNDEFINED))? params.zoomDelta: 1;
   this.mouseWheelRotationSpeed = (!(typeof params.mouseWheelRotationSpeed == UNDEFINED))? params.mouseWheelRotationSpeed: 3;
+  this.mouseWheelZoomSpeed = (!(typeof params.mouseWheelZoomSpeed == UNDEFINED))? params.mouseWheelZoomSpeed: 3;
   this.mouseDragRotationSpeed = (!(typeof params.mouseDragRotationSpeed == UNDEFINED))? params.mouseDragRotationSpeed: 20;
   this.fingerSwipeRotationSpeed = (!(typeof params.fingerSwipeRotationSpeed == UNDEFINED))? params.fingerSwipeRotationSpeed: 20;
   this.keyboardRotationSpeed = (!(typeof params.keyboardRotationSpeed == UNDEFINED))? params.keyboardRotationSpeed: 10;
@@ -128,7 +129,13 @@ OrbitControls.prototype.onMouseWheel = function(event){
 
     activeControl.spherical.theta += thetaDelta;
   }else{
-    var zoomDelta = deltaY * activeControl.mouseWheelRotationSpeed;
+    if (event.ctrlKey){
+      deltaY = -deltaY;
+    }
+
+    var zoomDelta = deltaY * activeControl.mouseWheelZoomSpeed;
+
+    var coef = event.ctrlKey? 1500: 100;
 
     if (zoomDelta > 0.09){
       zoomDelta = 0.09;
@@ -139,9 +146,9 @@ OrbitControls.prototype.onMouseWheel = function(event){
     }
 
     if (deltaY > 0){
-      activeControl.zoomIn(zoomDelta * 100);
+      activeControl.zoomIn(zoomDelta * coef);
     }else{
-      activeControl.zoomOut(-zoomDelta * 100);
+      activeControl.zoomOut(-zoomDelta * coef);
     }
   }
 }
