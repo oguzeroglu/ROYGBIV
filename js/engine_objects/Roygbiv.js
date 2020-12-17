@@ -3329,6 +3329,9 @@ Roygbiv.prototype.createFPSControl = function(parameters){
 // value is 150.
 // minRadius (optional): The minimum radius of the imaginary sphere that the camera can zoom in to. Default
 // value is 50.
+// initialRadius (optional): The initial radius of the imaginary sphere. Default value is the value of maxRadius.
+// initialTheta (optional): The initial theta angle of the imaginary sphere. Default value is Math.PI/4.
+// initialPhi (optional): The initial phi angle of the imaginary sphere. Default value is Math.PI/4.
 // zoomDelta (optional): The difference of radius when the user performs a zoom in/out. Default value is 1.
 // mouseWheelRotationSpeed (optional): The speed of mouse wheel rotation. Default value is 3.
 // mouseWheelZoomSpeed (optional): The speed of mouse wheel zoom. Default value is 3.
@@ -3352,6 +3355,10 @@ Roygbiv.prototype.createOrbitControl = function(parameters){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.fingerSwipeRotationSpeed, parameters.fingerSwipeRotationSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.keyboardRotationSpeed, parameters.keyboardRotationSpeed);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.requestFullScreen, parameters.requestFullScreen);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.initialRadius, parameters.initialRadius);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.mouseWheelZoomSpeed, parameters.mouseWheelZoomSpeed);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.initialPhi, parameters.initialPhi);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.initialTheta, parameters.initialTheta);
   return new OrbitControls(parameters);
 }
 

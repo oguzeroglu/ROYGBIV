@@ -1277,6 +1277,9 @@ var Text = function(){
                                                   "lookPosition (optional): A vector defining the look position and the center of the imaginary sphere. Default value is (0, 0, 0).\n"+
                                                   "maxRadius (optional): The maximum radius of the imaginary sphere that the camera can zoom out to. Default value is 150.\n"+
                                                   "minRadius (optional): The minimum radius of the imaginary sphere that the camera can zoom in to. Default value is 50.\n"+
+                                                  "initialRadius (optional): The initial radius of the imaginary sphere. Default value is the value of maxRadius.\n"+
+                                                  "initialTheta (optional): The initial theta angle of the imaginary sphere. Default value is Math.PI/4.\n"+
+                                                  "initialPhi (optional): The initial phi angle of the imaginary sphere. Default value is Math.PI/4.\n"+
                                                   "zoomDelta (optional): The difference of radius when the user performs a zoom in/out. Default value is 1.\n"+
                                                   "mouseWheelRotationSpeed (optional): The speed of mouse wheel rotation. Default value is 3.\n"+
                                                   "mouseWheelZoomSpeed (optional): The speed of mouse wheel zoom. Default value is 3.\n" +

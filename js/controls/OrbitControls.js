@@ -10,6 +10,17 @@ var OrbitControls = function(params){
   this.fingerSwipeRotationSpeed = (!(typeof params.fingerSwipeRotationSpeed == UNDEFINED))? params.fingerSwipeRotationSpeed: 20;
   this.keyboardRotationSpeed = (!(typeof params.keyboardRotationSpeed == UNDEFINED))? params.keyboardRotationSpeed: 10;
   this.requestFullScreen = (!(typeof params.requestFullScreen == UNDEFINED))? params.requestFullScreen: false;
+  this.initialRadius = (!(typeof params.initialRadius == UNDEFINED))? params.initialRadius: this.maxRadius;
+  this.initialPhi = (!(typeof params.initialPhi == UNDEFINED))? params.initialPhi: Math.PI/4;
+  this.initialTheta = (!(typeof params.initialTheta == UNDEFINED))? params.initialTheta: Math.PI/4;
+
+  if (this.initialRadius > this.maxRadius){
+    this.initialRadius = this.maxRadius;
+  }
+  if (this.initialRadius < this.minRadius){
+    this.initialRadius = this.minRadius;
+  }
+
   this.keyboardActions = [
     {key: "Right", action: this.rotateAroundYNegativeKeyboard},
     {key: "D", action: this.rotateAroundYNegativeKeyboard},
@@ -155,7 +166,7 @@ OrbitControls.prototype.resetStatus = function(){
 
 OrbitControls.prototype.onActivated = function(){
   camera.position.copy(this.lookPosition);
-  this.spherical = new THREE.Spherical(this.maxRadius, Math.PI/4, Math.PI/4);
+  this.spherical = new THREE.Spherical(this.initialRadius, this.initialPhi, this.initialTheta);
   this.resetStatus();
   if (this.requestFullScreen){
     fullScreenRequested = true;

@@ -302,6 +302,10 @@ var Preconditions = function(){
   this.modelInstance = "modelInstance";
   this.texturesObj = "texturesObj";
   this.pixelRatio = "pixelRatio";
+  this.initialRadius = "initialRadius";
+  this.mouseWheelZoomSpeed = "mouseWheelZoomSpeed";
+  this.initialPhi = "initialPhi";
+  this.initialTheta = "initialTheta";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
