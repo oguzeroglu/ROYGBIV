@@ -1482,4 +1482,16 @@ var Text = function(){
                                                           "values -> texture pack objects obtained via loadDynamicTextures API\n" +
                                                           "Textures IDs of a model instance may be obtained from the GUI by clicking on a model instance in the design mode\nand looking under the Textures folder.";
   this.ROYGBIV_SCRIPTING_API_SETPIXELRATIO = "Sets the pixel ratio of the WebGL renderer. More the pixelRatio better the rendering quality however worse the performance.\nUse this with caution, especially for fullscreen apps.";
+  this.ROYGBIV_SCRIPTING_API_CREATEDOMELEMENT = "Creates and returns a new DOM element of given type (span, div etc.). Supported properties are:\n" +
+                                                "* width (in pixels). Default is 50.\n" +
+                                                "* height (in pixels). Default is 50.\n" +
+                                                "* backgroundColor. Default is white.\n" +
+                                                "* centerXPercent. Default is 0.\n" +
+                                                "* centerYPercent. Default is 0.\n" +
+                                                "* borderRadiusPercent. Default is none.\n" +
+                                                "* opacity. Default is 1.";
+  this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTPOSITION = "Sets the center position of given DOM element created via createDOMElement scripting API.";
+  this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTBACKGROUNDCOLOR = "Sets the background color of given DOM element created via createDOMElement scripting API.";
+  this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTOPACITY = "Sets the opacity of given DOM element created via createDOMElement scripting API.";
+  this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTSIZE = "Sets the size in pixels of given DOM element created via createDOMElement scripting API.";
 }

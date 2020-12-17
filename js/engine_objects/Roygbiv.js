@@ -23,6 +23,7 @@
 //  * Virtual keyboard functions
 //  * Script related functions
 //  * Networking functions
+//  * DOM functions
 //  * AI functions
 var Roygbiv = function(){
 
@@ -351,11 +352,15 @@ var Roygbiv = function(){
     "getModelInstance",
     "getMaxTextureSize",
     "mapTexturesToModelInstance",
-    "setPixelRatio"
+    "setPixelRatio",
+    "createDOMElement",
+    "setDOMElementPosition",
+    "setDOMElementBackgroundColor",
+    "setDOMElementOpacity",
+    "setDOMElementSize"
   ];
 
   this.globals = new Object();
-
 }
 
 // GETTER FUNCTIONS ************************************************************
@@ -4110,6 +4115,86 @@ Roygbiv.prototype.onLatencyUpdated = function(callbackFunction){
   preConditions.checkIfDefined(ROYGBIV.onLatencyUpdated, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onLatencyUpdated, preConditions.callbackFunction, callbackFunction);
   Rhubarb.onLatencyUpdated(callbackFunction);
+}
+
+// DOM FUNCTIONS ***************************************************************
+
+// Creates and returns a new DOM element of given type (span, div etc.). Supported
+// properties are:
+// * width (in pixels). Default is 50.
+// * height (in pixels). Default is 50.
+// * backgroundColor. Default is white.
+// * centerXPercent. Default is 0.
+// * centerYPercent. Default is 0.
+// * borderRadiusPercent. Default is none.
+// * opacity. Default is 1.
+Roygbiv.prototype.createDOMElement = function(type, properties){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.createDOMElement, preConditions.type, type);
+  preConditions.checkIfDefined(ROYGBIV.createDOMElement, preConditions.properties, properties);
+  preConditions.checkIfString(ROYGBIV.createDOMElement, preConditions.type, type);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.width, properties.width);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.height, properties.height);
+  preConditions.checkIfStringOnlyIfExists(ROYGBIV.createDOMElement, preConditions.backgroundColor, properties.backgroundColor);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.centerXPercent, properties.centerXPercent);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.centerYPercent, properties.centerYPercent);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.borderRadiusPercent, properties.borderRadiusPercent);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.opacity, properties.opacity);
+  return new DOMElement(type, properties);
+}
+
+// Sets the center position of given DOM element created via createDOMElement scripting API.
+Roygbiv.prototype.setDOMElementPosition = function(domElement, centerXPercent, centerYPercent){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementPosition, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementPosition, preConditions.centerXPercent, centerXPercent);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementPosition, preConditions.centerYPercent, centerYPercent);
+  preConditions.checkIfDOMElement(ROYGBIV.setDOMElementPosition, domElement);
+  preConditions.checkIfNumber(ROYGBIV.setDOMElementPosition, preConditions.centerXPercent, centerXPercent);
+  preConditions.checkIfNumber(ROYGBIV.setDOMElementPosition, preConditions.centerYPercent, centerYPercent);
+  domElement.setPosition(centerXPercent, centerYPercent);
+}
+
+// Sets the background color of given DOM element created via createDOMElement scripting API.
+Roygbiv.prototype.setDOMElementBackgroundColor = function(domElement, backgroundColor){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementBackgroundColor, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementBackgroundColor, preConditions.backgroundColor, backgroundColor);
+  preConditions.checkIfDOMElement(ROYGBIV.setDOMElementBackgroundColor, domElement);
+  preConditions.checkIfString(ROYGBIV.setDOMElementBackgroundColor, preConditions.backgroundColor, backgroundColor);
+  domElement.setBackgroundColor(backgroundColor);
+}
+
+// Sets the opacity of given DOM element created via createDOMElement scripting API.
+Roygbiv.prototype.setDOMElementOpacity = function(domElement, opacity){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementOpacity, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementOpacity, preConditions.opacity, opacity);
+  preConditions.checkIfDOMElement(ROYGBIV.setDOMElementOpacity, domElement);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setDOMElementOpacity, preConditions.opacity, opacity);
+  domElement.setOpacity(opacity);
+}
+
+// Sets the size in pixels of given DOM element created via createDOMElement scripting API.
+Roygbiv.prototype.setDOMElementSize = function(domElement, width, height){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementSize, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementSize, preConditions.width, width);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementSize, preConditions.height, height);
+  preConditions.checkIfDOMElement(ROYGBIV.setDOMElementSize, domElement);
+  preConditions.checkIfNumber(ROYGBIV.setDOMElementSize, preConditions.width, width);
+  preConditions.checkIfNumber(ROYGBIV.setDOMElementSize, preConditions.height, height);
+  domElement.setSize(width, height);
 }
 
 // AI FUNCTIONS ****************************************************************

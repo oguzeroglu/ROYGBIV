@@ -1,5 +1,5 @@
-var DOMElement = function(name, type, properties){
-  this.name = name;
+var DOMElement = function(type, properties){
+  this.isDOMElement = true;
   this.type = type;
 
   var width = properties.width || 50;
@@ -29,7 +29,7 @@ var DOMElement = function(name, type, properties){
   this.element = element;
 
   document.body.appendChild(element);
-  domElements[name] = this;
+  domElements[generateUUID()] = this;
 }
 
 DOMElement.prototype.setPosition = function(centerXPercent, centerYPercent){

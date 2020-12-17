@@ -306,6 +306,16 @@ var Preconditions = function(){
   this.mouseWheelZoomSpeed = "mouseWheelZoomSpeed";
   this.initialPhi = "initialPhi";
   this.initialTheta = "initialTheta";
+  this.properties = "properties";
+  this.type = "type";
+  this.width = "width";
+  this.height = "height";
+  this.backgroundColor = "backgroundColor";
+  this.centerXPercent = "centerXPercent";
+  this.centerYPercent = "centerYPercent";
+  this.borderRadiusPercent = "borderRadiusPercent";
+  this.opacity = "opacity";
+  this.domElement = "domElement";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -314,6 +324,12 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfDOMElement = function(callerFunc, obj){
+  if (!obj.isDOMElement){
+    this.throw(callerFunc, "Object is not a DOM element.");
+  }
 }
 
 Preconditions.prototype.checkIfValidModelTextureSObj = function(callerFunc, modelInstance, texturesObj){
@@ -1037,6 +1053,12 @@ Preconditions.prototype.checkIfNumber = function(callerFunc, parameterName, obj)
 
 Preconditions.prototype.checkIfString = function(callerFunc, parameterName, obj){
   if(!(typeof obj == "string")){
+    this.throw(callerFunc, parameterName+" is not a string.");
+  }
+}
+
+Preconditions.prototype.checkIfStringOnlyIfExists = function(callerFunc, parameterName, obj){
+  if(!(typeof obj == UNDEFINED) && !(typeof obj == "string")){
     this.throw(callerFunc, parameterName+" is not a string.");
   }
 }
