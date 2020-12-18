@@ -357,7 +357,13 @@ var Roygbiv = function(){
     "setDOMElementPosition",
     "setDOMElementBackgroundColor",
     "setDOMElementOpacity",
-    "setDOMElementSize"
+    "setDOMElementSize",
+    "onDOMElementMouseOver",
+    "removeDOMElementMouseOverListener",
+    "onDOMElementMouseOut",
+    "removeDOMElementMouseOutListener",
+    "onDOMElementClick",
+    "removeDOMElementClickListener"
   ];
 
   this.globals = new Object();
@@ -2905,6 +2911,84 @@ Roygbiv.prototype.removeROYGBIVScoreUpdateListener = function(){
   }
 
   roygbivScoreUpdateCallbackFunction = noop;
+}
+
+// Sets a mouse over listener for given DOMElement.
+Roygbiv.prototype.onDOMElementMouseOver = function(domElement, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementMouseOver, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfDOMElement(ROYGBIV.onDOMElementMouseOver, domElement);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onDOMElementMouseOver, preConditions.callbackFunction, callbackFunction);
+
+  domElement.mouseoverCallback = callbackFunction;
+}
+
+// Sets a mouse out listener for given DOMElement.
+Roygbiv.prototype.onDOMElementMouseOut = function(domElement, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementMouseOut, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfDOMElement(ROYGBIV.onDOMElementMouseOut, domElement);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onDOMElementMouseOut, preConditions.callbackFunction, callbackFunction);
+
+  domElement.mouseoutCallback = callbackFunction;
+}
+
+// Sets a click listener for given DOMElement.
+Roygbiv.prototype.onDOMElementClick = function(domElement, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementClick, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfDOMElement(ROYGBIV.onDOMElementClick, domElement);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onDOMElementClick, preConditions.callbackFunction, callbackFunction);
+
+  domElement.clickCallback = callbackFunction;
+}
+
+// Removes a click listener from given DOMElement.
+Roygbiv.prototype.removeDOMElementClickListener = function(domElement){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removeDOMElementClickListener, preConditions.domElement, domElement);
+  preConditions.checkIfDOMElement(ROYGBIV.removeDOMElementClickListener, domElement);
+
+  domElement.clickCallback = noop;
+}
+
+// Removes a mouse over listener from given DOMElement.
+Roygbiv.prototype.removeDOMElementMouseOverListener = function(domElement){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removeDOMElementMouseOverListener, preConditions.domElement, domElement);
+  preConditions.checkIfDOMElement(ROYGBIV.removeDOMElementMouseOverListener, domElement);
+
+  domElement.mouseoverCallback = noop;
+}
+
+// Removes a mouse out listener from given DOMElement.
+Roygbiv.prototype.removeDOMElementMouseOutListener = function(domElement){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removeDOMElementMouseOutListener, preConditions.domElement, domElement);
+  preConditions.checkIfDOMElement(ROYGBIV.removeDOMElementMouseOutListener, domElement);
+
+  domElement.mouseoutCallback = noop;
 }
 
 // TEXT FUNCTIONS **************************************************************

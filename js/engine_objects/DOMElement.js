@@ -30,6 +30,22 @@ var DOMElement = function(type, properties){
 
   document.body.appendChild(element);
   domElements[generateUUID()] = this;
+
+  element.addEventListener("mouseover", function(){
+    if (this.mouseoverCallback){
+      this.mouseoverCallback();
+    }
+  }.bind(this));
+  element.addEventListener("mouseout", function(){
+    if (this.mouseoutCallback){
+      this.mouseoutCallback();
+    }
+  }.bind(this));
+  element.addEventListener("click", function(){
+    if (this.clickCallback){
+      this.clickCallback();
+    }
+  }.bind(this));
 }
 
 DOMElement.prototype.setPosition = function(centerXPercent, centerYPercent){

@@ -1494,4 +1494,10 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTBACKGROUNDCOLOR = "Sets the background color of given DOM element created via createDOMElement scripting API.";
   this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTOPACITY = "Sets the opacity of given DOM element created via createDOMElement scripting API.";
   this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTSIZE = "Sets the size in pixels of given DOM element created via createDOMElement scripting API.";
+  this.ROYGBIV_SCRIPTING_API_ONDOMELEMENTMOUSEOVER = "Sets a mouse over listener for given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_ONDOMELEMENTMOUSEOUT = "Sets a mouse out listener for given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_ONDOMELEMENTCLICK = "Sets a click listener for given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEDOMELEMENTCLICKLISTENER = "Removes a click listener from given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEDOMELEMENTMOUSEOVERLISTENER = "Removes a mouse over listener from given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEDOMELEMENTMOUSEOUTLISTENER = "Removes a mouse out listener from given DOMElement.";
 }
