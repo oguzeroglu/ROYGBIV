@@ -11,6 +11,7 @@ SettingsGUIHandler.prototype.show = function(){
   var graphicsFolder = guiHandler.datGuiSettings.addFolder("Graphics");
   var workerFolder = guiHandler.datGuiSettings.addFolder("Worker");
   var websocketFolder = guiHandler.datGuiSettings.addFolder("WebSocket");
+  var analyticsFolder = guiHandler.datGuiSettings.addFolder("Analytics");
   var loadingFolder = guiHandler.datGuiSettings.addFolder("Loading");
   var bootscreenFolder = guiHandler.datGuiSettings.addFolder("Bootscreen");
   var debugFolder = guiHandler.datGuiSettings.addFolder("Debug");
@@ -19,6 +20,7 @@ SettingsGUIHandler.prototype.show = function(){
   this.initializeGraphicsFolder(graphicsFolder);
   this.initializeWorkerFolder(workerFolder);
   this.initializeWebSocketFolder(websocketFolder);
+  this.initializeAnalyticsFolder(analyticsFolder);
   this.initializeLoadingFolder(loadingFolder);
   this.initializeBootscreenFolder(bootscreenFolder);
   this.initializeDebugFolder(debugFolder);
@@ -82,6 +84,26 @@ SettingsGUIHandler.prototype.initializeBootscreenFolder = function(parentFolder)
       bodyBGColor = val;
       terminal.printInfo(Text.CUSTOM_BODY_BG_COLOR_SET);
     }
+  });
+}
+
+SettingsGUIHandler.prototype.initializeAnalyticsFolder = function(parentFolder){
+  var params = {
+    "Server URL": analyticsHandler.serverURL || "",
+    "Dev server URL": analyticsHandler.devServerURL || ""
+  };
+
+  parentFolder.add(params, "Server URL").onFinishChange(function(val){
+    if (val.endsWith("/")){
+      val = val.substring(0, val.length - 1);
+    }
+    analyticsHandler.serverURL = val;
+  });
+  parentFolder.add(params, "Dev server URL").onFinishChange(function(val){
+    if (val.endsWith("/")){
+      val = val.substring(0, val.length - 1);
+    }
+    analyticsHandler.devServerURL = val;
   });
 }
 

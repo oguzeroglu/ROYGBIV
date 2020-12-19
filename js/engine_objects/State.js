@@ -212,4 +212,9 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   if (isBuildingForDeploymentMode){
     this.disabledShaderInfo = ShaderContent.getDisableInfo();
   }
+  // ANALYTICS *****************************************************
+  this.analytics = {
+    serverURL: analyticsHandler.serverURL,
+    devServerURL: analyticsHandler.devServerURL
+  };
 }
