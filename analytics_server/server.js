@@ -84,7 +84,7 @@ app.get("/analytics", async (req, res) => {
     return res.sendStatus(401);
   }
 
-  var query = "SELECT * FROM @@X LIMIT @@Y OFFSET @@Z".replace("@@X", tableName).replace("@@Y", perPage).replace("@@Z", (page - 1) * perPage);
+  var query = "SELECT * FROM @@X ORDER BY date DESC LIMIT @@Y OFFSET @@Z".replace("@@X", tableName).replace("@@Y", perPage).replace("@@Z", (page - 1) * perPage);
   const result = await pool.query(query);
 
   res.json({
