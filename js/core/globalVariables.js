@@ -403,6 +403,7 @@ var preConfiguredParticleSystemPools = new Object();
 var muzzleFlashes = new Object();
 var particleSystemGenerator;
 var rmfHandler;
+var analyticsHandler;
 var PARTICLE_REWIND_ON_COLLIDED = 2;
 var PARTICLE_DISSAPEAR_ON_COLLIDED = 1;
 var PARTICLE_SYSTEM_ACTION_TYPE_NONE = -1;

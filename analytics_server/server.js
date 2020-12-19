@@ -2,6 +2,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var http = require("http");
 var { Pool } = require('pg')
+var { performance } = require("perf_hooks");
 
 var pool = process.env.DATABASE_URL? new Pool({
   connectionString: process.env.DATABASE_URL
@@ -34,6 +35,7 @@ app.post("/hello", (req, res) => {
   }
 
   onlineClients[id] = {
+    timeSpent: performance.now(),
     totalLoadTime: body.totalLoadTime,
     shaderLoadTime: body.shaderLoadTime,
     applicationJSONLoadTime: body.applicationJSONLoadTime,
@@ -57,7 +59,7 @@ app.post("/bye", (req, res) => {
   }
 
   delete onlineClients[id];
-  clientInfo.timeSpent = body.timeSpent;
+  clientInfo.timeSpent = performance.now() - clientInfo.timeSpent;
   clientInfo.avgFPS = body.avgFPS;
 
   writeToDatabase(id, clientInfo);
@@ -72,16 +74,9 @@ server.listen(port);
 
 console.log("Server listening port", port);
 
-function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-
 async function writeToDatabase(id, info){
   try {
-    var insertQuery = "INSERT INTO @@X (id, total_load_time, shader_load_time, application_json_load_time, mode_switch_time, first_render_time, is_mobile, is_ios, highp_precision_supported, browser, time_spent, avg_fps) VALUES ('@@A', @@B, @@C, @@D, @@E, @@F, @@G, @@H, @@I, '@@J', @@K, @@L);"
+    var insertQuery = "INSERT INTO @@X (id, total_load_time, shader_load_time, application_json_load_time, mode_switch_time, first_render_time, is_mobile, is_ios, highp_precision_supported, browser, time_spent, avg_fps) VALUES ('@@A', @@B, @@C, @@D, @@E, @@F, '@@G', '@@H', '@@I', '@@J', @@K, @@L);"
     insertQuery = insertQuery.replace("@@X", tableName)
                              .replace("@@A", id)
                              .replace("@@B", info.totalLoadTime || 0)
@@ -89,10 +84,10 @@ async function writeToDatabase(id, info){
                              .replace("@@D", info.applicationJSONLoadTime || 0)
                              .replace("@@E", info.modeSwitchTime || 0)
                              .replace("@@F", info.firstRendertime || 0)
-                             .replace("@@G", info.isMobile || 0)
-                             .replace("@@H", info.isIOS || 0)
-                             .replace("@@I", info.highPrecisionSupported || 0)
-                             .replace("@@J", info.browser || '')
+                             .replace("@@G", info.isMobile? "T": "F")
+                             .replace("@@H", info.isIOS? "T": "F")
+                             .replace("@@I", info.highPrecisionSupported? "T": "F")
+                             .replace("@@J", info.browser || "")
                              .replace("@@K", info.timeSpent || 0)
                              .replace("@@L", info.avgFPS || 0)
     await pool.query(insertQuery);

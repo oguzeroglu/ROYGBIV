@@ -302,6 +302,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     Rhubarb.destroy();
   } catch(err) {}
 
+  analyticsHandler.handle(false);
+
   for (var domElementName in domElements){
     domElements[domElementName].onModeSwitch();
   }
