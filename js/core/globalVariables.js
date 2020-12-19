@@ -1,5 +1,18 @@
 var isDeployment = false;
+var hasCustomBootScreen = false;
+
 var IS_WORKER_CONTEXT = false;
+var DISABLE_PARTICLE_SHADERS = false;
+var DISABLE_OBJECT_TRAIL_SHADERS = false;
+var DISABLE_CROSSHAIR_SHADERS = false;
+var DISABLE_OBJECT_SHADERS = false;
+var DISABLE_SKYBOX_SHADERS = false;
+var DISABLE_TEXT_SHADERS = false;
+var DISABLE_RECTANGLE_SHADERS = false;
+var DISABLE_BLOOM_SHADERS = false;
+var DISABLE_LIGHTNING_SHADERS = false;
+var DISABLE_SPRITE_SHADERS = false;
+var DISABLE_MODEL_SHADERS = false;
 
 var COS30DEG = Math.cos(30 * Math.PI / 180);
 var SIN30DEG = Math.sin(30 * Math.PI / 180);
@@ -28,6 +41,7 @@ var cmGUIFocused = false;
 var acGUIFocused = false;
 var vkGUIFocused = false;
 var mmGUIFocused = false;
+var mimGUIFocused = false;
 var lGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
@@ -104,6 +118,8 @@ var scriptsToRun = new Map();
 var objectGroups = new Object();
 var disabledObjectNames = new Object();
 var markedPoints = new Object();
+var models = new Object();
+var modelInstances = new Object();
 var collisionCallbackRequests = new Map();
 var particleCollisionCallbackRequests = new Object();
 var particleSystemCollisionCallbackRequests = new Object();
@@ -116,6 +132,7 @@ var activeObjectTrails = new Map();
 var dynamicObjects = new Map();
 var dynamicObjectGroups = new Map();
 var addedObjectsInsideGroups = new Object();
+var domElements = new Object();
 var ShaderContent;
 var commandDescriptor;
 var ColorNames;
@@ -132,6 +149,7 @@ var selectedSprite = 0;
 var selectedContainer = 0;
 var selectedVirtualKeyboard = 0;
 var selectedMass = 0;
+var selectedModelInstance = 0;
 var planeWidthSegments = 10;
 var planeHeightSegments = 10;
 var boxWidthSegments = 10;
@@ -220,6 +238,7 @@ var MAX_OBJECT_COLLISION_LISTENER_COUNT = 50;
 var MAX_VERTEX_UNIFORM_VECTORS;
 var isWebGLFriendly = true;
 var MAX_VERTEX_ATTRIBS;
+var WEBGL_MAX_TEXTURE_SIZE;
 var MAX_PS_COMPRESS_AMOUNT_4096 = 200;
 var TOTAL_MERGED_COUNT = 0;
 var MAX_TEXTURE_SIZE = 512;
@@ -268,6 +287,7 @@ var SIDE_FRONT = "Front";
 var SIDE_BACK = "Back";
 var textureUniformCache = new Object(); // after global texture atlas implementation, this only has dynamic texture uniforms
 var screenResolution = 1;
+var previewModeScreenResolution = null;
 var useOriginalResolution = false;
 var rayCaster;
 var objectPicker2D;
@@ -368,6 +388,7 @@ var stateMachineCreatorGUIHandler;
 var settingsGUIHandler;
 var mobileSimulationGUIHandler;
 var moduleCreatorGUIHandler;
+var modelCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
@@ -381,6 +402,7 @@ var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
 var muzzleFlashes = new Object();
 var particleSystemGenerator;
+var rmfHandler;
 var PARTICLE_REWIND_ON_COLLIDED = 2;
 var PARTICLE_DISSAPEAR_ON_COLLIDED = 1;
 var PARTICLE_SYSTEM_ACTION_TYPE_NONE = -1;
@@ -439,11 +461,14 @@ var developmentServerWSURL = 0;
 var objectExportImportHandler;
 var DUMMY_TEXTURE = new THREE.Texture();
 var masses = new Object();
+var bootscreenFolderName = null;
+var bodyBGColor = null;
 var mobileSimulation = {
   isActive: false,
   isIOS: false,
   orientation: 'portrait'
 };
+var modelLoader;
 
 // ROTATION MODES
 var rotationModes = {
@@ -564,3 +589,17 @@ var BANNERL5 = "|_| \\_\\\\___/ |_| \\____|____/___|  \\_/    ";
 var deploymentScriptsStatus = {
 //@DEPLOYMENT_SCRIPTS_STATUS
 };
+
+var loadTime = {
+  totalLoadTime: 0,
+  shaderLoadTime: 0,
+  applicationJSONLoadTime: 0,
+  finalizeTime: 0,
+  modelImporttime: 0,
+  rmfLoadTimes: {},
+  modelGenerationTimes: {},
+  modeSwitchTime: 0,
+  firstRendertime: performance.now(),
+};
+
+var firstRenderPerformed = false;

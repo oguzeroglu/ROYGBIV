@@ -11,12 +11,16 @@ SettingsGUIHandler.prototype.show = function(){
   var graphicsFolder = guiHandler.datGuiSettings.addFolder("Graphics");
   var workerFolder = guiHandler.datGuiSettings.addFolder("Worker");
   var websocketFolder = guiHandler.datGuiSettings.addFolder("WebSocket");
+  var loadingFolder = guiHandler.datGuiSettings.addFolder("Loading");
+  var bootscreenFolder = guiHandler.datGuiSettings.addFolder("Bootscreen");
   var debugFolder = guiHandler.datGuiSettings.addFolder("Debug");
 
   this.initializeRaycasterFolder(raycasterFolder);
   this.initializeGraphicsFolder(graphicsFolder);
   this.initializeWorkerFolder(workerFolder);
   this.initializeWebSocketFolder(websocketFolder);
+  this.initializeLoadingFolder(loadingFolder);
+  this.initializeBootscreenFolder(bootscreenFolder);
   this.initializeDebugFolder(debugFolder);
 
   guiHandler.datGuiSettings.add({
@@ -26,6 +30,59 @@ SettingsGUIHandler.prototype.show = function(){
       terminal.printInfo(Text.SETTINGS_GUI_CLOSED);
     }
   }, "Done");
+}
+
+SettingsGUIHandler.prototype.initializeBootscreenFolder = function(parentFolder){
+  var params = {
+    "Bootscreen folder name": bootscreenFolderName || "",
+    "Body BG Color": bodyBGColor || ""
+  };
+
+  parentFolder.add(params, "Bootscreen folder name").onFinishChange(function(val){
+    terminal.clear();
+
+    if (!val){
+      bootscreenFolderName = null;
+      terminal.printInfo(Text.CUSTOM_BOOTSCREEN_RESET);
+      return;
+    }
+
+    terminal.printInfo(Text.LOADING);
+    canvas.style.visibility = "hidden";
+    terminal.disable();
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/checkBootscreenFolder", true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onreadystatechange = function(){
+      if (xhr.readyState == 4 && xhr.status == 200){
+        canvas.style.visibility = "";
+        var resp = JSON.parse(xhr.responseText);
+        terminal.clear();
+        terminal.enable();
+
+        if (resp.error && resp.error.noFolder){
+          terminal.printError(Text.NO_SUCH_FOLDER_UNDER_BOOTSCRENS_FOLDER);
+        }else if (resp.error && resp.error.notValid){
+          terminal.printError(Text.PROVIDED_FOLDER_DOES_NOT_CONTAIN_COMPONENT_HTML);
+        }else{
+          bootscreenFolderName = this.folderName
+          terminal.printError(Text.CUSTOM_BOOTSCREEN_SET);
+        }
+      }
+    }.bind({folderName: val})
+    xhr.send(JSON.stringify({folderName: val}));
+  });
+  parentFolder.add(params, "Body BG Color").onFinishChange(function(val){
+    terminal.clear();
+    if (!val){
+      bodyBGColor = null;
+      terminal.printInfo(Text.CUSTOM_BODY_BG_COLOR_RESET);
+    }else{
+      bodyBGColor = val;
+      terminal.printInfo(Text.CUSTOM_BODY_BG_COLOR_SET);
+    }
+  });
 }
 
 SettingsGUIHandler.prototype.initializeWebSocketFolder = function(parentFolder){
@@ -53,8 +110,8 @@ SettingsGUIHandler.prototype.initializeWebSocketFolder = function(parentFolder){
     xhr.open("POST", "/checkProtocolDefinitionFile", true);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.onreadystatechange = function(){
-      canvas.style.visibility = "";
       if (xhr.readyState == 4 && xhr.status == 200){
+        canvas.style.visibility = "";
         var resp = JSON.parse(xhr.responseText);
         terminal.clear();
         terminal.enable();
@@ -91,6 +148,18 @@ SettingsGUIHandler.prototype.initializeWebSocketFolder = function(parentFolder){
 
     developmentServerWSURL = val;
     terminal.printInfo(Text.DEV_SERVER_WS_URL_SET);
+  });
+}
+
+SettingsGUIHandler.prototype.initializeLoadingFolder = function(parentFolder){
+  var params = {
+    "Lazy load shadows": !!shadowBaker.lazyLoad
+  };
+
+  parentFolder.add(params, "Lazy load shadows").onChange(function(val){
+    shadowBaker.lazyLoad = val;
+    terminal.clear();
+    terminal.printInfo(val? Text.SHADOWS_WILL_BE_LAZILY_LOADED: Text.SHADOWS_WONT_BE_LAZILY_LOADED);
   });
 }
 
@@ -161,6 +230,14 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
       terminal.printError(Text.CANNOT_SET_TEXTURE_SIZE_AFTER);
       return;
     }
+
+    for (var modelName in models){
+      if (models[modelName].getUsedTextures().length > 0){
+        terminal.printError(Text.HAS_MODELS_WITH_TEXTURES);
+        return;
+      }
+    }
+
     var textureSize = parseInt(val);
     if (isNaN(textureSize)){
       terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "textureSize"));
@@ -333,7 +410,8 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     "Skybox": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SKYBOX),
     "Text": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.TEXT),
     "Lightning": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.LIGHTNING),
-    "Sprite": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SPRITE)
+    "Sprite": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SPRITE),
+    "Model": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.MODEL)
   };
 
   var precisionAry = ["low", "medium", "high"];
@@ -385,6 +463,11 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
   }).listen();
   shaderPrecisionFolder.add(shaderPrecisionParameters, "Sprite", precisionAry).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.SPRITE, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "Model", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.MODEL, settingsGUIHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
   }).listen();

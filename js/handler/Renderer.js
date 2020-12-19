@@ -45,6 +45,10 @@ Renderer.prototype.isHighPrecisionSupported = function(){
   );
 }
 
+Renderer.prototype.getMaxTextureSize = function(){
+  return this.webglRenderer.context.getParameter(this.webglRenderer.context.MAX_TEXTURE_SIZE);
+}
+
 Renderer.prototype.isInstancingSupported = function(){
   return (!(this.webglRenderer.context.getExtension("ANGLE_instanced_arrays") == null));
 }
@@ -85,6 +89,10 @@ Renderer.prototype.setSize = function(width, height){
 }
 
 Renderer.prototype.setPixelRatio = function(ratio){
+  if (mode == 1 && previewModeScreenResolution != null){
+    ratio = previewModeScreenResolution;
+  }
+
   this.webglRenderer.setPixelRatio(ratio);
   GLOBAL_SCREEN_RESOLUTION_UNIFORM.value = ratio;
   for (var effectName in this.effects){

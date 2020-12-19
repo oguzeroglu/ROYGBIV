@@ -10,7 +10,8 @@ ShadowBaker.prototype.export = function(isBuildingForDeploymentMode){
     textureRangesByObjectName: JSON.parse(JSON.stringify(this.textureRangesByObjectName)),
     blurAmount: this.blurAmount,
     dataURLsByTextureID: {},
-    textureIDsByObjName: {}
+    textureIDsByObjName: {},
+    lazyLoad: !!this.lazyLoad
   };
 
   if (!isBuildingForDeploymentMode){
@@ -39,6 +40,7 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
   this.reset();
   this.intensity = exportObj.intensity;
   this.blurAmount = exportObj.blurAmount;
+  this.lazyLoad = exportObj.lazyLoad;
 
   if (Object.keys(exportObj.textureRangesByObjectName).length == 0){
     return;
@@ -54,8 +56,46 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
     var textureMerger = new TextureMerger();
     textureMerger.ranges = JSON.parse(JSON.stringify(this.textureRangesByObjectName));
     var atlas = new TexturePack(null, null, {isShadowAtlas: true});
-    atlas.loadTextures(false, function(){
-      var shadowMapUniform = new THREE.Uniform(atlas.diffuseTexture);
+
+    if (!this.lazyLoad){
+      atlas.loadTextures(false, function(){
+        var shadowMapUniform = new THREE.Uniform(atlas.diffuseTexture);
+        shadowBaker.shadowMapUniform = shadowMapUniform;
+        for (var objName in shadowBaker.textureRangesByObjectName){
+          var obj = addedObjects[objName];
+
+          if (obj.fromObjectGroup){
+            continue;
+          }
+
+          if (isDeployment && !isWebGLFriendly && obj.skipShadowsInNonWebGLFriendlyDevices){
+            continue;
+          }
+
+          var material = obj.mesh.material;
+          var uniforms = material.uniforms;
+
+          var range = textureMerger.ranges[objName];
+
+          uniforms.shadowMap = shadowMapUniform;
+          macroHandler.injectMacro("HAS_SHADOW_MAP", material, true, true);
+          macroHandler.injectMacro("SHADOW_INTENSITY " + shadowBaker.intensity, material, false, true);
+          macroHandler.injectMacro("SHADOW_MAP_START_U " + range.startU, material, false, true);
+          macroHandler.injectMacro("SHADOW_MAP_START_V " + range.startV, material, false, true);
+          macroHandler.injectMacro("SHADOW_MAP_END_U " + range.endU, material, false, true);
+          macroHandler.injectMacro("SHADOW_MAP_END_V " + range.endV, material, false, true);
+          material.uniformsNeedUpdate = true;
+        }
+
+        onReady();
+      });
+    }else{
+      var shadowMapUniform = new THREE.Uniform(DUMMY_TEXTURE);
+
+      atlas.loadTextures(false, function(){
+        shadowMapUniform.value = atlas.diffuseTexture;
+      });
+
       shadowBaker.shadowMapUniform = shadowMapUniform;
       for (var objName in shadowBaker.textureRangesByObjectName){
         var obj = addedObjects[objName];
@@ -84,7 +124,8 @@ ShadowBaker.prototype.import = function(exportObj, onReady){
       }
 
       onReady();
-    });
+    }
+
     return;
   }
 
@@ -125,6 +166,7 @@ ShadowBaker.prototype.reset = function(){
   this.textureRangesByObjectName = {};
   this.intensity = 0.5;
   this.blurAmount = null;
+  this.lazyLoad = false;
 }
 
 ShadowBaker.prototype.getBakingCanvas = function(){

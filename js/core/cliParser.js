@@ -1733,7 +1733,7 @@ function parse(input){
                   var stateLoader = new StateLoader(loadedState);
                   var result = stateLoader.load();
                   if (result){
-                    if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasShadows || stateLoader.hasModules){
+                    if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasShadows || stateLoader.hasModules || stateLoader.hasModels){
                       terminal.printInfo(Text.LOADING_PROJECT);
                       canvas.style.visibility = "hidden";
                       terminal.disable();
@@ -4446,10 +4446,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SPRITE);
             return true;
           }
-          if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
-            return true;
-          }
           sprite.destroy();
           if (sprite.containerParent){
             sprite.containerParent.removeSprite();
@@ -4844,6 +4840,9 @@ function parse(input){
             terminal.printInfo(Text.DYNAMIC_TEXTURE_FOLDER_WITH_SAME_NAME);
             return true;
           }
+
+          var noCompress = splitted[2].toLowerCase() == "true";
+
           terminal.printInfo(Text.LOADING);
           canvas.style.visibility = "hidden";
           terminal.disable();
@@ -4863,11 +4862,11 @@ function parse(input){
                 terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE.replace(Text.PARAM1, resp.errorFile));
                 return;
               }
-              dynamicTextureFolders[folderName] = true;
-              terminal.printInfo(Text.DYNAMIC_TEXTURE_FOLDER_PREPARED);
+              dynamicTextureFolders[folderName] = { noCompress: noCompress };
+              terminal.printInfo(Text.DYNAMIC_TEXTURE_FOLDER_CREATED);
             }
           }
-          xhr.send(JSON.stringify({folderName: folderName}));
+          xhr.send(JSON.stringify({folderName: folderName, noCompress: noCompress}));
           return true;
         break;
         case 217: //destroyDynamicTextureFolder
@@ -6256,10 +6255,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_MASS);
             return true;
           }
-          if (mass.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.MASS_NOT_IN_ACTIVE_SCENE);
-            return true;
-          }
           delete masses[massID];
           sceneHandler.onMassDeletion(mass);
           if (physicsDebugMode){
@@ -6401,6 +6396,10 @@ function parse(input){
           }
           if (!obj.affectedByLight){
             terminal.printError(Text.OBJECT_IS_NOT_MARKED_AS_AFFECTED_BY_LIGHT);
+            return true;
+          }
+          if (obj.lightingType == lightHandler.lightTypes.PHONG){
+            terminal.printError(Text.PHONG_LIGHTS_DO_NOT_SUPPORT_THIS_FUNCTION);
             return true;
           }
 
@@ -6645,6 +6644,207 @@ function parse(input){
           moduleCreatorGUIHandler.show();
           return true;
         break;
+        case 279: //newModel
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var modelName = splitted[1];
+          if (models[modelName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          modelCreatorGUIHandler.show(modelName);
+          return true;
+        break;
+        case 280: //newModelInstance
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var instanceName = splitted[1];
+          if (!(instanceName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var modelName = splitted[2];
+          var height = parseFloat(splitted[3]);
+          if (!checkIfNameUnique(instanceName, Text.NAME_MUST_BE_UNIQUE)){
+            return true;
+          }
+          if (!models[modelName]){
+            terminal.printError(Text.NO_SUCH_MODEL);
+            return true;
+          }
+          if (isNaN(height)){
+            terminal.printError(Text.HEIGHT_MUST_BE_A_NUMBER);
+            return true;
+          }
+          if (height == 0){
+            terminal.printError(Text.HEIGHT_CANNOT_BE_0);
+            return true;
+          }
+          if (!jobHandlerWorking){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
+          }
+
+          var selections = [];
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              selections.push(gridSelections[gridName]);
+            }
+          }else{
+            selections.push(jobHandlerSelectedGrid);
+          }
+
+          if (selections.length == 2){
+            var grid1 = selections[0];
+            var grid2 = selections[1];
+            if (grid1.parentName != grid2.parentName){
+              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+              return true;
+            }
+          }
+
+          var gridSystemName = selections[0].parentName;
+          var gridSystem = gridSystems[gridSystemName];
+
+          gridSystem.newModelInstance(selections, height, models[modelName], instanceName);
+          if (!jobHandlerWorking){
+            refreshRaycaster(Text.MODEL_INSTANCE_CREATED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
+          }
+        break;
+        case 281: //destroyModel
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var modelName = splitted[1];
+          if (!(modelName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var model = models[modelName];
+          if (!model){
+            terminal.printError(Text.NO_SUCH_MODEL);
+            return true;
+          }
+          for (var modelInstanceName in modelInstances){
+            if (modelInstances[modelInstanceName].model.name == modelName){
+              terminal.printError(Text.THIS_MODEL_HAS_INSTANCES);
+              return true;
+            }
+          }
+
+          model.destroy();
+          delete models[modelName];
+          if (!jobHandlerWorking && model.getUsedTextures().length > 0){
+            terminal.clear();
+            terminal.disable();
+            terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+            textureAtlasHandler.onTexturePackChange(function(){
+              terminal.clear();
+              terminal.enable();
+              terminal.print(Text.MODEL_DESTROYED);
+            }, function(){
+              terminal.clear();
+              terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+              terminal.enable();
+            }, false);
+          }
+        break;
+        case 282: //selectModelInstance
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var modelInstanceName = splitted[1];
+          var modelInstance = modelInstances[modelInstanceName];
+          if (!modelInstance){
+            terminal.printError(Text.NO_SUCH_MODEL_INSTANCE);
+            return true;
+          }
+          if (modelInstance.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.MODEL_INSTANCE_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          selectionHandler.select(modelInstance);
+          camera.lookAt(modelInstance.mesh.position.x, modelInstance.mesh.position.y, modelInstance.mesh.position.z);
+          terminal.printInfo(Text.MODEL_INSTANCE_SELECTED.replace(Text.PARAM1, modelInstance.name));
+          return true;
+        break;
+        case 283: //destroyModelInstance
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var modelInstanceName = splitted[1];
+          if (!(modelInstanceName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var modelInstance = modelInstances[modelInstanceName];
+          if (!modelInstance){
+            terminal.printError(Text.NO_SUCH_MODEL_INSTANCE);
+            return true;
+          }
+          selectionHandler.resetCurrentSelection();
+          delete modelInstances[modelInstanceName];
+          modelInstance.destroy();
+          sceneHandler.onModelInstanceDeletion(modelInstance);
+          if (!jobHandlerWorking){
+            if (physicsDebugMode){
+              terminal.skip = true;
+              parseCommand("switchPhysicsDebugMode");
+              parseCommand("switchPhysicsDebugMode");
+              terminal.skip = false;
+            }
+            refreshRaycaster(Text.MODEL_INSTANCE_DESTROYED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
+          }
+          return true;
+        break;
+        case 284: //printModels
+          var count = 0;
+          var length = Object.keys(models).length;
+          terminal.printHeader(Text.MODELS);
+          for (var modelName in models){
+            count++;
+            var options = true;
+            if (length == count){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, modelName).replace(Text.PARAM2, models[modelName].info.folderName), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_MODELS_CREATED);
+          }
+          return true;
+        break;
+        case 285: //printModelInstances
+          var count = 0;
+          var length = Object.keys(models).length;
+          terminal.printHeader(Text.MODEL_INSTANCES);
+          for (var instanceName in modelInstances){
+            count++;
+            var options = true;
+            if (length == count){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, instanceName).replace(Text.PARAM2, Text.OF_MODEL.replace(Text.PARAM1, modelInstances[instanceName].model.name)), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_MODELS_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
@@ -6763,6 +6963,9 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
 }
 
 function refreshRaycaster(messageOnFinished, noClear, callback){
+  if (mode == 0 && sceneHandler.deletingScene){
+    return;
+  }
   if (!isDeployment){
     if (physicsDebugMode){
       debugRenderer.refresh();
@@ -6802,7 +7005,7 @@ function isNameUsedAsSoftCopyParentName(name){
 }
 
 function checkIfNameUnique(name, errorMsg){
-  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name] || virtualKeyboards[name] || masses[name]){
+  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name] || virtualKeyboards[name] || masses[name] || modelInstances[name]){
     terminal.printError(errorMsg);
     return false;
   }

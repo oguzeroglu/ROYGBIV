@@ -62,6 +62,21 @@ RayCaster.prototype.refresh = function(){
     }
     this.binHandler.insert(addedObject.boundingBoxes[0], objName);
   }
+  for (var instanceName in this.getModelInstances()){
+    var modelInstance = modelInstances[instanceName];
+    if (mode == 1 && !modelInstance.isIntersectable){
+      continue;
+    }
+    if (mode == 0 && modelInstance.hiddenInDesignMode){
+      continue;
+    }
+    if (!modelInstance.boundingBoxes){
+      modelInstance.generateBoundingBoxes();
+    }
+    for (var i = 0; i < modelInstance.boundingBoxes.length; i ++){
+      this.binHandler.insert(modelInstance.boundingBoxes[i], instanceName);
+    }
+  }
   for (var objName in this.getObjectGroups()){
     var objectGroup = objectGroups[objName];
     if (mode == 1 && !objectGroup.isIntersectable){
@@ -182,21 +197,37 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
       }else if (result == 20){
         var addedText = addedTexts[objName];
         if (addedText && addedText.plane){
-          intersectionPoint = addedText.intersectsLine(REUSABLE_LINE);
-          if (intersectionPoint){
-            intersectionObject = objName;
-            callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
-            return;
+          if (!(mode == 0 && keyboardBuffer["Shift"])){
+            intersectionPoint = addedText.intersectsLine(REUSABLE_LINE);
+            if (intersectionPoint){
+              intersectionObject = objName;
+              callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
+              return;
+            }
           }
         }
       }else if (result == 30){
         var mass = masses[objName];
         if (mass){
-          intersectionPoint = mass.intersectsLine(REUSABLE_LINE);
-          if (intersectionPoint){
-            intersectionObject = objName;
-            callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
-            return;
+          if (!(mode == 0 && keyboardBuffer["Shift"])){
+            intersectionPoint = mass.intersectsLine(REUSABLE_LINE);
+            if (intersectionPoint){
+              intersectionObject = objName;
+              callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
+              return;
+            }
+          }
+        }
+      }else if (result == 40){
+        var modelInstance = modelInstances[objName];
+        if (modelInstance){
+          if (!(mode == 0 && keyboardBuffer["Shift"])){
+            intersectionPoint = modelInstance.intersectsLine(REUSABLE_LINE);
+            if (intersectionPoint){
+              intersectionObject = objName;
+              callbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
+              return;
+            }
           }
         }
       }else{
@@ -283,6 +314,13 @@ RayCaster.prototype.getMasses = function(){
     return masses;
   }
   return sceneHandler.getMasses();
+}
+
+RayCaster.prototype.getModelInstances = function(){
+  if (IS_WORKER_CONTEXT){
+    return modelInstances;
+  }
+  return sceneHandler.getModelInstances();
 }
 
 RayCaster.prototype.onActiveVirtualKeyboardChanged = noop;

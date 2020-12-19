@@ -1,5 +1,7 @@
 var LightHandler = function(){
 
+  this.lightTypes = {"GOURAUD": "GOURAUD", "PHONG": "PHONG"};
+
   this.dynamicLightTypes = {
     AMBIENT_COLOR: 0,
     AMBIENT_STRENGTH: 1,
@@ -59,7 +61,7 @@ LightHandler.prototype.removeDynamicLightFromObject = function(object, light){
   var index = this.dynamicLightsIndicesByLightName[light.name];
   var macros = this.getDynamicLightMacros(light, index);
   for (var i = 0; i < macros.length; i ++){
-    macroHandler.removeMacro(macros[i], object.mesh.material, true, false);
+    macroHandler.removeMacro(macros[i], object.mesh.material, true, true);
   }
 }
 
@@ -67,7 +69,7 @@ LightHandler.prototype.addDynamicLightToObject = function(object, light){
   var index = this.dynamicLightsIndicesByLightName[light.name];
   var macros = this.getDynamicLightMacros(light, index);
   for (var i = 0; i < macros.length; i ++){
-    macroHandler.injectMacro(macros[i], object.mesh.material, true, false);
+    macroHandler.injectMacro(macros[i], object.mesh.material, true, true);
   }
 }
 
@@ -111,6 +113,7 @@ LightHandler.prototype.removeDynamicLight = function(dynamicLight){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var lightName in this.dynamicLights){
     for (var objName in addedObjectsInScene){
@@ -123,6 +126,12 @@ LightHandler.prototype.removeDynamicLight = function(dynamicLight){
       var obj = objectGroupsInScene[objName];
       if (obj.affectedByLight){
         this.removeDynamicLightFromObject(obj, this.dynamicLights[lightName]);
+      }
+    }
+    for (var instanceName in modelInstancesInScene){
+      var modelInstance = modelInstancesInScene[instanceName];
+      if (modelInstance.affectedByLight){
+        this.removeDynamicLightFromObject(modelInstance, this.dynamicLights[lightName]);
       }
     }
   }
@@ -153,6 +162,7 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -168,6 +178,14 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
       continue;
     }
     this.addDynamicLightToObject(obj, dynamicLight);
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+    this.addDynamicLightToObject(modelInstance, dynamicLight);
   }
 
   this.dynamicLightsMatrixIndicesByLightName[dynamicLight.name] = this.dynamicLightsMatrixIndex;
@@ -220,8 +238,6 @@ LightHandler.prototype.onSwitchFromDesignToPreview = function(){
 }
 
 LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
-  var result = [];
-
   var normalAttrAry = obj.mesh.geometry.attributes.normal.array;
   var positionAttrAry = obj.mesh.geometry.attributes.position.array;
 
@@ -236,20 +252,23 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
 
   obj.mesh.updateMatrixWorld(true);
 
-  for (var i = 0; i < normalAttrAry.length; i = i + 3){
-    var normal = new THREE.Vector3(normalAttrAry[i], normalAttrAry[i + 1], normalAttrAry[i + 2]);
-    var pos = new THREE.Vector3(positionAttrAry[i], positionAttrAry[i + 1], positionAttrAry[i + 2]);
+  var result = new Float32Array(normalAttrAry.length);
+  var x = 0;
 
-    if (obj.isObjectGroup){
+  for (var i = 0; i < normalAttrAry.length; i = i + 3){
+    var normal = REUSABLE_VECTOR.set(normalAttrAry[i], normalAttrAry[i + 1], normalAttrAry[i + 2]);
+    var pos = REUSABLE_VECTOR_2.set(positionAttrAry[i], positionAttrAry[i + 1], positionAttrAry[i + 2]);
+
+    if (obj.isObjectGroup || obj.isModelInstance){
       var colorAry = obj.mesh.geometry.attributes.color.array;
-      color = new THREE.Vector3(colorAry[i], colorAry[i + 1], colorAry[i + 2]);
+      color = REUSABLE_VECTOR_3.set(colorAry[i], colorAry[i + 1], colorAry[i + 2]);
     }
 
     normal.applyMatrix3(mat3).normalize();
     pos.applyMatrix4(obj.mesh.matrixWorld);
 
-    var ambient = new THREE.Vector3(0, 0, 0);
-    var diffuse = new THREE.Vector3(0, 0, 0);
+    var ambient = REUSABLE_VECTOR_4.set(0, 0, 0);
+    var diffuse = REUSABLE_VECTOR_5.set(0, 0, 0);
 
     if (this.hasStaticAmbientLight()){
       ambient.set(this.staticAmbientColor.r * this.staticAmbientStrength, this.staticAmbientColor.g * this.staticAmbientStrength, this.staticAmbientColor.b * this.staticAmbientStrength);
@@ -257,7 +276,7 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
 
     for (var slotID in this.staticDiffuseLightsBySlotId){
       var info = this.staticDiffuseLightsBySlotId[slotID];
-      var lightDirNegative = new THREE.Vector3(-info.directionX, -info.directionY, -info.directionZ).normalize();
+      var lightDirNegative = REUSABLE_VECTOR_6.set(-info.directionX, -info.directionY, -info.directionZ).normalize();
       var diffuseFactor = normal.dot(lightDirNegative);
       if (diffuseFactor > 0){
         diffuse.x += info.strength * diffuseFactor * info.colorR;
@@ -268,7 +287,7 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
 
     for (var slotID in this.staticPointLightsBySlotId){
       var info = this.staticPointLightsBySlotId[slotID];
-      var toLight = new THREE.Vector3(info.positionX - pos.x, info.positionY - pos.y, info.positionZ - pos.z).normalize();
+      var toLight = REUSABLE_VECTOR_6.set(info.positionX - pos.x, info.positionY - pos.y, info.positionZ - pos.z).normalize();
       var diffuseFactor = normal.dot(toLight);
       if (diffuseFactor > 0){
         diffuse.x += info.strength * diffuseFactor * info.colorR;
@@ -277,15 +296,15 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
       }
     }
 
-    result.push(color.x * (ambient.x + diffuse.x));
-    result.push(color.y * (ambient.y + diffuse.y));
-    result.push(color.z * (ambient.z + diffuse.z));
+    result[x ++] = (color.x * (ambient.x + diffuse.x));
+    result[x ++] = (color.y * (ambient.y + diffuse.y));
+    result[x ++] = (color.z * (ambient.z + diffuse.z));
   }
 
   if (!isDesignMode){
     macroHandler.injectMacro("IS_LIGHT_BAKED", obj.mesh.material, true, false);
     obj.mesh.material.needsUpdate = true;
-    obj.mesh.geometry.addAttribute("bakedColor", new THREE.BufferAttribute(new Float32Array(result), 3));
+    obj.mesh.geometry.addAttribute("bakedColor", new THREE.BufferAttribute(result, 3));
     obj.mesh.geometry.attributes.bakedColor.needsUpdate = true;
   }else{
     return result;
@@ -314,7 +333,7 @@ LightHandler.prototype.findBakeableObjects = function(){
   var bakeableObjects = [];
   for (var objName in addedObjects){
     var obj1 = addedObjects[objName];
-    if (obj1.isChangeable || obj1.isDynamicObject || !obj1.affectedByLight){
+    if (obj1.isChangeable || obj1.isDynamicObject || !obj1.affectedByLight || obj1.lightingType != lightHandler.lightTypes.GOURAUD){
       continue;
     }
     var isBakeable = true;
@@ -334,10 +353,33 @@ LightHandler.prototype.findBakeableObjects = function(){
 
   for (var objName in objectGroups){
     var obj = objectGroups[objName];
-    if (!obj.isChangeable && !obj.isDynamicObject && obj.affectedByLight && !obj.isInstanced){
+    if (!obj.isChangeable && !obj.isDynamicObject && obj.affectedByLight && !obj.isInstanced && obj.lightingType == lightHandler.lightTypes.GOURAUD){
       bakeableObjects.push(obj);
     }
   }
+
+  for (var instanceName in modelInstances){
+    var modelInstance = modelInstances[instanceName];
+    if (modelInstance.isChangeable || modelInstance.isDynamicObject || !modelInstance.affectedByLight || modelInstance.lightingType == lightHandler.lightTypes.PHONG){
+      continue;
+    }
+
+    var isBakeable = true;
+    for (var instanceName2 in modelInstances){
+      if (instanceName != instanceName2){
+        var modelInstance2 = modelInstances[instanceName2];
+        if (modelInstance.model.name == modelInstance2.model.name && modelInstance2.affectedByLight && modelInstance2.lightingType == lightHandler.lightTypes.GOURAUD){
+          isBakeable = false;
+          break;
+        }
+      }
+    }
+
+    if (isBakeable){
+      bakeableObjects.push(modelInstance);
+    }
+  }
+
   return bakeableObjects;
 }
 
@@ -416,6 +458,7 @@ LightHandler.prototype.onAfterSceneChange = function(){
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
   var autoInstancedObjectsInScene = sceneHandler.getAutoInstancedObjects();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var addedObject = addedObjectsInScene[objName];
@@ -438,6 +481,13 @@ LightHandler.prototype.onAfterSceneChange = function(){
     }
   }
 
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (modelInstance.affectedByLight){
+      this.addLightToObject(modelInstance);
+    }
+  }
+
   if (mode == 1){
     this.bakeLights();
   }
@@ -452,6 +502,7 @@ LightHandler.prototype.onBeforeSceneChange = function(){
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
   var autoInstancedObjectsInScene = sceneHandler.getAutoInstancedObjects();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var addedObject = addedObjectsInScene[objName];
@@ -471,6 +522,13 @@ LightHandler.prototype.onBeforeSceneChange = function(){
     var autoInstancedObject = autoInstancedObjectsInScene[objName];
     if (autoInstancedObject.affectedByLight){
       this.removeLightFromObject(autoInstancedObject);
+    }
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (modelInstance.affectedByLight){
+      this.removeLightFromObject(modelInstance);
     }
   }
 }
@@ -569,6 +627,7 @@ LightHandler.prototype.removeStaticPointLight = function(slotID){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -594,6 +653,15 @@ LightHandler.prototype.removeStaticPointLight = function(slotID){
     }
 
     this.removeStaticPointLightMacros(obj, slotID);
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var model = modelInstancesInScene[instanceName];
+    if (!model.affectedByLight){
+      continue;
+    }
+
+    this.removeStaticPointLightMacros(model, slotID);
   }
 
   this.staticPointLightCount --;
@@ -622,6 +690,7 @@ LightHandler.prototype.addStaticPointLight = function(position, color, strength,
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -647,6 +716,15 @@ LightHandler.prototype.addStaticPointLight = function(position, color, strength,
     this.handleStaticPointLightMacros(foundSlotID, obj, position, color, strength);
   }
 
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+
+    this.handleStaticPointLightMacros(foundSlotID, modelInstance, position, color, strength);
+  }
+
   this.staticPointLightsBySlotId[foundSlotID] = {
     positionX: position.x, positionY: position.y, positionZ: position.z,
     colorR: color.r, colorG: color.g, colorB: color.b,
@@ -669,6 +747,7 @@ LightHandler.prototype.removeStaticDiffuseLight = function(slotID){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -692,6 +771,15 @@ LightHandler.prototype.removeStaticDiffuseLight = function(slotID){
     }
 
     this.removeStaticDiffuseLightMacros(obj, slotID);
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+
+    this.removeStaticDiffuseLightMacros(modelInstance, slotID);
   }
 
   this.staticDiffuseLightCount --;
@@ -720,6 +808,7 @@ LightHandler.prototype.addStaticDiffuseLight = function(direction, color, streng
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -746,6 +835,15 @@ LightHandler.prototype.addStaticDiffuseLight = function(direction, color, streng
     this.handleStaticDiffuseLightMacros(foundSlotID, obj, direction, color, strength);
   }
 
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+
+    this.handleStaticDiffuseLightMacros(foundSlotID, modelInstance, direction, color, strength);
+  }
+
   this.staticDiffuseLightsBySlotId[foundSlotID] = {
     directionX: direction.x, directionY: direction.y, directionZ: direction.z,
     colorR: color.r, colorG: color.g, colorB: color.b,
@@ -762,6 +860,7 @@ LightHandler.prototype.addStaticDiffuseLight = function(direction, color, streng
 LightHandler.prototype.removeStaticAmbientLight = function(){
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -779,6 +878,15 @@ LightHandler.prototype.removeStaticAmbientLight = function(){
     }
 
     this.removeStaticAmbientLightMacros(obj);
+  }
+
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+
+    this.removeStaticAmbientLightMacros(modelInstance);
   }
 
   delete this.staticAmbientColor;
@@ -790,6 +898,7 @@ LightHandler.prototype.removeStaticAmbientLight = function(){
 LightHandler.prototype.setStaticAmbientLight = function(color, strength){
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
+  var modelInstancesInScene = sceneHandler.getModelInstances();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
@@ -809,6 +918,15 @@ LightHandler.prototype.setStaticAmbientLight = function(color, strength){
     this.handleStaticAmbientLightMacros(obj, color, strength);
   }
 
+  for (var instanceName in modelInstancesInScene){
+    var modelInstance = modelInstancesInScene[instanceName];
+    if (!modelInstance.affectedByLight){
+      continue;
+    }
+
+    this.handleStaticAmbientLightMacros(modelInstance, color, strength);
+  }
+
   this.staticAmbientColor = color.clone();
   this.staticAmbientStrength = strength;
 
@@ -818,14 +936,14 @@ LightHandler.prototype.setStaticAmbientLight = function(color, strength){
 LightHandler.prototype.removeStaticPointLightMacros = function(obj, slotID){
   var info = this.staticPointLightsBySlotId[slotID];
   if (info){
-    macroHandler.removeMacro("HAS_STATIC_POINT_LIGHT_" + slotID, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_X " + info.positionX, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_Y " + info.positionY, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_Z " + info.positionZ, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_R " + info.colorR, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_G " + info.colorG, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_B " + info.colorB, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_STRENGTH " + info.strength, obj.mesh.material, true, false);
+    macroHandler.removeMacro("HAS_STATIC_POINT_LIGHT_" + slotID, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_X " + info.positionX, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_Y " + info.positionY, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_Z " + info.positionZ, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_R " + info.colorR, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_G " + info.colorG, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_B " + info.colorB, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_POINT_LIGHT_"+ slotID +"_STRENGTH " + info.strength, obj.mesh.material, true, true);
   }
 }
 
@@ -833,27 +951,27 @@ LightHandler.prototype.handleStaticPointLightMacros = function(slotID, obj, posi
 
   this.removeStaticPointLightMacros(obj, slotID);
 
-  macroHandler.injectMacro("HAS_STATIC_POINT_LIGHT_" + slotID, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_X " + position.x, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_Y " + position.y, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_Z " + position.z, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_R " + color.r, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_G " + color.g, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_B " + color.b, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_STRENGTH " + strength, obj.mesh.material, true, false);
+  macroHandler.injectMacro("HAS_STATIC_POINT_LIGHT_" + slotID, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_X " + position.x, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_Y " + position.y, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_Z " + position.z, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_R " + color.r, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_G " + color.g, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_B " + color.b, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_POINT_LIGHT_"+ slotID +"_STRENGTH " + strength, obj.mesh.material, true, true);
 }
 
 LightHandler.prototype.removeStaticDiffuseLightMacros = function(obj, slotID){
   var info = this.staticDiffuseLightsBySlotId[slotID];
   if (info){
-    macroHandler.removeMacro("HAS_STATIC_DIFFUSE_LIGHT_" + slotID, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_X " + info.directionX, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_Y " + info.directionY, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_Z " + info.directionZ, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_R " + info.colorR, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_G " + info.colorG, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_B " + info.colorB, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_STRENGTH " + info.strength, obj.mesh.material, true, false);
+    macroHandler.removeMacro("HAS_STATIC_DIFFUSE_LIGHT_" + slotID, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_X " + info.directionX, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_Y " + info.directionY, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_Z " + info.directionZ, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_R " + info.colorR, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_G " + info.colorG, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_B " + info.colorB, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_STRENGTH " + info.strength, obj.mesh.material, true, true);
   }
 }
 
@@ -861,23 +979,23 @@ LightHandler.prototype.handleStaticDiffuseLightMacros = function(slotID, obj, di
 
   this.removeStaticDiffuseLightMacros(obj, slotID);
 
-  macroHandler.injectMacro("HAS_STATIC_DIFFUSE_LIGHT_" + slotID, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_X " + direction.x, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_Y " + direction.y, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_Z " + direction.z, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_R " + color.r, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_G " + color.g, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_B " + color.b, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_STRENGTH " + strength, obj.mesh.material, true, false);
+  macroHandler.injectMacro("HAS_STATIC_DIFFUSE_LIGHT_" + slotID, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_X " + direction.x, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_Y " + direction.y, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_DIR_Z " + direction.z, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_R " + color.r, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_G " + color.g, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_B " + color.b, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_DIFFUSE_LIGHT_"+ slotID +"_STRENGTH " + strength, obj.mesh.material, true, true);
 }
 
 LightHandler.prototype.removeStaticAmbientLightMacros = function(obj){
   if (this.staticAmbientColor){
-    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_R " + this.staticAmbientColor.r, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_G " + this.staticAmbientColor.g, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_B " + this.staticAmbientColor.b, obj.mesh.material, true, false);
-    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_STRENGTH " + this.staticAmbientStrength, obj.mesh.material, true, false);
-    macroHandler.removeMacro("HAS_STATIC_AMBIENT_LIGHT", obj.mesh.material, true, false);
+    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_R " + this.staticAmbientColor.r, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_G " + this.staticAmbientColor.g, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_B " + this.staticAmbientColor.b, obj.mesh.material, true, true);
+    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_STRENGTH " + this.staticAmbientStrength, obj.mesh.material, true, true);
+    macroHandler.removeMacro("HAS_STATIC_AMBIENT_LIGHT", obj.mesh.material, true, true);
   }
 }
 
@@ -885,9 +1003,9 @@ LightHandler.prototype.handleStaticAmbientLightMacros = function(obj, color, str
 
   this.removeStaticAmbientLightMacros(obj);
 
-  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_R " + color.r, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_G " + color.g, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_B " + color.b, obj.mesh.material, true, false);
-  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_STRENGTH " + strength, obj.mesh.material, true, false);
-  macroHandler.injectMacro("HAS_STATIC_AMBIENT_LIGHT", obj.mesh.material, true, false);
+  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_R " + color.r, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_G " + color.g, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_B " + color.b, obj.mesh.material, true, true);
+  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_STRENGTH " + strength, obj.mesh.material, true, true);
+  macroHandler.injectMacro("HAS_STATIC_AMBIENT_LIGHT", obj.mesh.material, true, true);
 }

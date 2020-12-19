@@ -5,22 +5,33 @@ var OrbitControls = function(params){
   this.minRadius = (!(typeof params.minRadius == UNDEFINED))? params.minRadius: 50;
   this.zoomDelta = (!(typeof params.zoomDelta == UNDEFINED))? params.zoomDelta: 1;
   this.mouseWheelRotationSpeed = (!(typeof params.mouseWheelRotationSpeed == UNDEFINED))? params.mouseWheelRotationSpeed: 3;
+  this.mouseWheelZoomSpeed = (!(typeof params.mouseWheelZoomSpeed == UNDEFINED))? params.mouseWheelZoomSpeed: 3;
   this.mouseDragRotationSpeed = (!(typeof params.mouseDragRotationSpeed == UNDEFINED))? params.mouseDragRotationSpeed: 20;
   this.fingerSwipeRotationSpeed = (!(typeof params.fingerSwipeRotationSpeed == UNDEFINED))? params.fingerSwipeRotationSpeed: 20;
   this.keyboardRotationSpeed = (!(typeof params.keyboardRotationSpeed == UNDEFINED))? params.keyboardRotationSpeed: 10;
   this.requestFullScreen = (!(typeof params.requestFullScreen == UNDEFINED))? params.requestFullScreen: false;
+  this.initialRadius = (!(typeof params.initialRadius == UNDEFINED))? params.initialRadius: this.maxRadius;
+  this.initialPhi = (!(typeof params.initialPhi == UNDEFINED))? params.initialPhi: Math.PI/4;
+  this.initialTheta = (!(typeof params.initialTheta == UNDEFINED))? params.initialTheta: Math.PI/4;
+
+  if (this.initialRadius > this.maxRadius){
+    this.initialRadius = this.maxRadius;
+  }
+  if (this.initialRadius < this.minRadius){
+    this.initialRadius = this.minRadius;
+  }
+
   this.keyboardActions = [
-    {key: "Right", action: this.rotateAroundYPositiveKeyboard},
-    {key: "D", action: this.rotateAroundYPositiveKeyboard},
-    {key: "Left", action: this.rotateAroundYNegativeKeyboard},
-    {key: "A", action: this.rotateAroundYNegativeKeyboard},
-    {key: "Q", action: this.rotateAroundYNegativeKeyboard},
+    {key: "Right", action: this.rotateAroundYNegativeKeyboard},
+    {key: "D", action: this.rotateAroundYNegativeKeyboard},
+    {key: "Left", action: this.rotateAroundYPositiveKeyboard},
+    {key: "A", action: this.rotateAroundYPositiveKeyboard},
+    {key: "Q", action: this.rotateAroundYPositiveKeyboard},
     {key: "W", action: this.zoomIn},
     {key: "Up", action: this.zoomIn},
     {key: "Z", action: this.zoomIn},
     {key: "S", action: this.zoomOut},
-    {key: "Down", action: this.zoomOut},
-    {key: "Space", action: this.zoom}
+    {key: "Down", action: this.zoomOut}
   ];
 }
 
@@ -43,46 +54,28 @@ OrbitControls.prototype.onFullScreenChange = function(isFullScreen){
   }
 }
 
-OrbitControls.prototype.zoom = function(){
-  if (activeControl.zoomDirectionIn){
-    if (activeControl.zoomedInThisFrame){
-      return;
-    }
-    activeControl.spherical.radius -= activeControl.zoomDelta;
-    if (activeControl.spherical.radius < activeControl.minRadius){
-      activeControl.spherical.radius = activeControl.minRadius;
-      activeControl.zoomDirectionIn = false;
-    }
-    activeControl.zoomedInThisFrame = true;
-  }else{
-    if (activeControl.zoomedOutThisFrame){
-      return;
-    }
-    activeControl.spherical.radius += activeControl.zoomDelta;
-    if (activeControl.spherical.radius > activeControl.maxRadius){
-      activeControl.spherical.radius = activeControl.maxRadius;
-      activeControl.zoomDirectionIn = true;
-    }
-    activeControl.zoomedOutThisFrame = true;
-  }
-}
+OrbitControls.prototype.zoomIn = function(coef){
 
-OrbitControls.prototype.zoomIn = function(){
+  coef = coef || 1;
+
   if (activeControl.zoomedInThisFrame){
     return;
   }
-  activeControl.spherical.radius -= activeControl.zoomDelta;
+  activeControl.spherical.radius -= activeControl.zoomDelta * coef;
   if (activeControl.spherical.radius < activeControl.minRadius){
     activeControl.spherical.radius = activeControl.minRadius;
   }
   activeControl.zoomedInThisFrame = true;
 }
 
-OrbitControls.prototype.zoomOut = function(){
+OrbitControls.prototype.zoomOut = function(coef){
+
+  coef = coef || 1;
+
   if (activeControl.zoomedOutThisFrame){
     return;
   }
-  activeControl.spherical.radius += activeControl.zoomDelta;
+  activeControl.spherical.radius += activeControl.zoomDelta * coef;
   if (activeControl.spherical.radius > activeControl.maxRadius){
     activeControl.spherical.radius = activeControl.maxRadius;
   }
@@ -122,22 +115,32 @@ OrbitControls.prototype.onMouseWheel = function(event){
 
     activeControl.spherical.theta += thetaDelta;
   }else{
-    var phiDelta = deltaY * activeControl.mouseWheelRotationSpeed;
-
-    if (phiDelta > 0.09){
-      phiDelta = 0.09;
+    if (event.ctrlKey){
+      deltaY = -deltaY;
     }
 
-    if (phiDelta < -0.09){
-      phiDelta = -0.09;
+    var zoomDelta = deltaY * activeControl.mouseWheelZoomSpeed;
+
+    var coef = event.ctrlKey? 1500: 100;
+
+    if (zoomDelta > 0.09){
+      zoomDelta = 0.09;
     }
 
-    activeControl.spherical.phi -= phiDelta;
+    if (zoomDelta < -0.09){
+      zoomDelta = -0.09;
+    }
+
+    if (deltaY > 0){
+      activeControl.zoomIn(zoomDelta * coef);
+    }else{
+      activeControl.zoomOut(-zoomDelta * coef);
+    }
   }
 }
 
 OrbitControls.prototype.onDrag = function(x, y, moveX, moveY){
-  activeControl.spherical.theta += (moveX / 10000) * activeControl.mouseDragRotationSpeed;
+  activeControl.spherical.theta -= (moveX / 10000) * activeControl.mouseDragRotationSpeed;
   activeControl.spherical.phi -= (moveY / 10000) * activeControl.mouseDragRotationSpeed;
 }
 
@@ -150,7 +153,7 @@ OrbitControls.prototype.onPinch = function(diff){
 }
 
 OrbitControls.prototype.onSwipe = function(x, y, diffX, diffY){
-  activeControl.spherical.theta += (diffX / 10000) * activeControl.fingerSwipeRotationSpeed;
+  activeControl.spherical.theta -= (diffX / 10000) * activeControl.fingerSwipeRotationSpeed;
   activeControl.spherical.phi -= (diffY / 10000) * activeControl.fingerSwipeRotationSpeed;
 }
 
@@ -163,9 +166,8 @@ OrbitControls.prototype.resetStatus = function(){
 
 OrbitControls.prototype.onActivated = function(){
   camera.position.copy(this.lookPosition);
-  this.spherical = new THREE.Spherical(this.maxRadius, Math.PI/4, Math.PI/4);
+  this.spherical = new THREE.Spherical(this.initialRadius, this.initialPhi, this.initialTheta);
   this.resetStatus();
-  this.zoomDirectionIn = true;
   if (this.requestFullScreen){
     fullScreenRequested = true;
   }
@@ -187,6 +189,7 @@ OrbitControls.prototype.update = function(){
     }
   }
   camera.position.setFromSpherical(this.spherical);
+  camera.position.add(this.lookPosition);
   camera.lookAt(this.lookPosition.x, this.lookPosition.y, this.lookPosition.z);
   this.resetStatus();
 }

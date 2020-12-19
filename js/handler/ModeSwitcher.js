@@ -86,6 +86,9 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
 }
 
 ModeSwitcher.prototype.switchFromDesignToPreview = function(){
+  if (isDeployment){
+    loadTime.modeSwitchTime = performance.now();
+  }
   steeringHandler.onModeSwitch();
   TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;
@@ -288,6 +291,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   this.commonSwitchFunctions();
   handleViewport();
   renderer.setPixelRatio(screenResolution);
+
+  if (isDeployment){
+    loadTime.modeSwitchTime = performance.now() - loadTime.modeSwitchTime;
+  }
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
@@ -295,11 +302,19 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     Rhubarb.destroy();
   } catch(err) {}
 
+  for (var domElementName in domElements){
+    domElements[domElementName].onModeSwitch();
+  }
+
+  domElements = {};
+
   history.replaceState(null, null, ' ');
 
   if (inputText){
     inputText.deactivateInputMode();
   }
+
+  previewModeScreenResolution = null;
 
   steeringHandler.onModeSwitch();
 
@@ -615,6 +630,14 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
     object.mesh.updateMatrixWorld();
     object.updateBoundingBoxes();
+  }
+
+  for (var instanceName in modelInstances){
+    var modelInstance = modelInstances[instanceName];
+
+    if (modelInstance.customTextureMapped){
+      modelInstance.unmapCustomTextures();
+    }
   }
 
   for (var sceneName in sceneHandler.scenes){

@@ -59,6 +59,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   var containerExports = this.state.containers;
   var virtualKeyboardExports = this.state.virtualKeyboards;
   var massesExports = this.state.masses;
+  var modelInstanceExports = this.state.modelInstances;
 
   var addedTextExports = new Object();
   for (var key in this.state.addedTexts3D){
@@ -260,6 +261,57 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     mass.import(massesExports[massName], true);
     masses[massName] = mass;
   }
+  for (var modelInstanceName in modelInstanceExports){
+    var modelInstance = new ModelInstance(modelInstanceName);
+
+    var curExport = modelInstanceExports[modelInstanceName];
+
+    var bb = new THREE.Box3();
+    bb.roygbivObjectName = modelInstanceName;
+    modelInstance.boundingBoxes = [bb];
+    modelInstance.vertices = [];
+    modelInstance.triangles = [];
+    modelInstance.trianglePlanes = [];
+    modelInstance.transformedVertices = [];
+    modelInstance.pseudoFaces = [];
+
+    for (var i = 0; i<curExport.vertices.length; i++){
+      var curVertex = curExport.vertices[i];
+      var vect = new THREE.Vector3(curVertex.x, curVertex.y, curVertex.z)
+      modelInstance.vertices.push(vect.clone());
+    }
+    for (var i = 0; i<curExport.transformedVertices.length; i++){
+      var curTransformedVertex = curExport.transformedVertices[i];
+      var vect = new THREE.Vector3(curTransformedVertex.x, curTransformedVertex.y, curTransformedVertex.z)
+      modelInstance.transformedVertices.push(vect);
+      bb.expandByPoint(vect);
+    }
+    for (var i = 0; i<curExport.triangles.length; i++){
+      var curExp = curExport.triangles[i];
+      var aVec = new THREE.Vector3(curExp.a.x, curExp.a.y, curExp.a.z);
+      var bVec = new THREE.Vector3(curExp.b.x, curExp.b.y, curExp.b.z);
+      var cVec = new THREE.Vector3(curExp.c.x, curExp.c.y, curExp.c.z);
+      var triangle = new THREE.Triangle(aVec, bVec, cVec);
+      var plane = new THREE.Plane();
+      triangle.getPlane(plane);
+      modelInstance.triangles.push(triangle);
+      modelInstance.trianglePlanes.push(plane);
+    }
+    for (var i = 0; i<curExport.pseudoFaces.length; i++){
+      var curExp = curExport.pseudoFaces[i];
+      var a = curExp.a;
+      var b = curExp.b;
+      var c = curExp.c;
+      var materialIndex = curExp.materialIndex;
+      var normal = new THREE.Vector3(curExp.normal.x, curExp.normal.y, curExp.normal.z);
+      modelInstance.pseudoFaces.push(new THREE.Face3(a, b, c, normal));
+    }
+
+    modelInstance.hiddenInDesignMode = curExport.hiddenInDesignMode;
+    modelInstance.isIntersectable = curExport.isIntersectable;
+
+    modelInstances[modelInstanceName] = modelInstance;
+  }
 }
 
 StateLoaderLightweight.prototype.virtualKeyboardImportFunc = function(virtualKeyboardName, curExport){
@@ -291,6 +343,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
   var childAddedObjectExports = this.state.childAddedObjects;
   var objectGroupExports = this.state.objectGroups;
   var massExports = this.state.masses;
+  var modelInstanceExports = this.state.modelInstances;
   var totalAddedObjectExports = new Object();
   var childBodies = new Object();
   for (var objName in addedObjectExports){
@@ -434,6 +487,18 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     physicsWorld.addBody(mass.physicsBody);
     masses[massName] = mass;
   }
+  for (var instanceName in modelInstanceExports){
+    var curInstanceExport = modelInstanceExports[instanceName];
+    var physicsBody = physicsBodyGenerator.generateBoxBody(curInstanceExport.physicsShapeParameters);
+    physicsBody.position.set(curInstanceExport.physicsPosition.x, curInstanceExport.physicsPosition.y, curInstanceExport.physicsPosition.z);
+    physicsBody.quaternion.set(curInstanceExport.physicsQuaternion.x, curInstanceExport.physicsQuaternion.y, curInstanceExport.physicsQuaternion.z, curInstanceExport.physicsQuaternion.w);
+    var modelInstance = new ModelInstance(instanceName);
+    modelInstance.physicsBody = physicsBody;
+    modelInstances[instanceName] = modelInstance;
+    if (!curInstanceExport.noMass){
+      physicsWorld.addBody(physicsBody);
+    }
+  }
 }
 
 StateLoaderLightweight.prototype.loadPhysicsData = function(){
@@ -455,6 +520,7 @@ StateLoaderLightweight.prototype.resetPhysics = function(){
   addedObjects = new Object();
   objectGroups = new Object();
   masses = new Object();
+  modelInstances = new Object();
 }
 
 StateLoaderLightweight.prototype.reset = function(){
@@ -474,6 +540,7 @@ StateLoaderLightweight.prototype.reset = function(){
   childContainers = new Object();
   virtualKeyboards = new Object();
   masses = new Object();
+  modelInstances = new Object();
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;

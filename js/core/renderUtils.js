@@ -2,6 +2,7 @@ function render(){
   if (webglCallbackHandler.shaderCompilationError){
     return;
   }
+
   fpsHandler.begin();
   if (!(mode == 1 && isPaused)){
     requestID = requestAnimationFrame(render);
@@ -54,6 +55,11 @@ function render(){
   cpuOperationsHandler.updateAddedTexts();
   if (mode == 1){
     previewSceneRendered = true;
+
+    if (isDeployment && !firstRenderPerformed){
+      firstRenderPerformed = true;
+      loadTime.firstRendertime = performance.now() - loadTime.firstRendertime;
+    }
   }
   cpuOperationsHandler.updateObjectPicker2D();
   cpuOperationsHandler.updateRaycaster();

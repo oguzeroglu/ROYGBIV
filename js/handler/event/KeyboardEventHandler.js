@@ -15,7 +15,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
     return;
   }
   keyboardEventHandler.isCapsOn = event.getModifierState && event.getModifierState(keyboardEventHandler.CAPSLOCK);
-  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused || lGUIFocused || vkGUIFocused || mmGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused || lGUIFocused || vkGUIFocused || mmGUIFocused || mimGUIFocused){
     return;
   }
   if (keyCodeToChar[event.keyCode] == keyboardEventHandler.SHIFT){
@@ -76,7 +76,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
     return;
   }
   keyboardEventHandler.isCapsOn = event.getModifierState && event.getModifierState(keyboardEventHandler.CAPSLOCK);
-  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused || lGUIFocused || vkGUIFocused || mmGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused || lGUIFocused || vkGUIFocused || mmGUIFocused || mimGUIFocused){
     return;
   }
   var foundKey;
@@ -142,6 +142,8 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
         parseCommand("destroySprite " + currentSelection.name);
       }else if (currentSelection.isContainer){
         parseCommand("destroyContainer " + currentSelection.name);
+      }else if (currentSelection.isModelInstance){
+        parseCommand("destroyModelInstance " + currentSelection.name);
       }
       guiHandler.afterObjectSelection();
     break;
@@ -168,6 +170,12 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
       continue;
     }
     objectGroups[objName].mesh.visible = false;
+  }
+  for (var instanceName in sceneHandler.getModelInstances()){
+    if (modelInstances[instanceName].hiddenInDesignMode){
+      continue;
+    }
+    modelInstances[instanceName].mesh.visible = false;
   }
   for (var textName in sceneHandler.getAddedTexts()){
     if (addedTexts[textName].hiddenInDesignMode){
@@ -208,6 +216,12 @@ KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
       continue;
     }
     objectGroups[objName].mesh.visible = true;
+  }
+  for (var instanceName in sceneHandler.getModelInstances()){
+    if (modelInstances[instanceName].hiddenInDesignMode){
+      continue;
+    }
+    modelInstances[instanceName].mesh.visible = true;
   }
   for (var textName in sceneHandler.getAddedTexts()){
     if (addedTexts[textName].hiddenInDesignMode){

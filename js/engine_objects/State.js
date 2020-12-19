@@ -71,7 +71,7 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   // DYNAMIC TEXTURE FOLDERS ***************************************
   var dynamicTextureFoldersExport = new Object();
   for (var folderName in dynamicTextureFolders){
-    dynamicTextureFoldersExport[folderName] = true;
+    dynamicTextureFoldersExport[folderName] = {noCompress: dynamicTextureFolders[folderName]};
   }
   this.dynamicTextureFolders = dynamicTextureFoldersExport;
   // SKYBOXES ******************************************************
@@ -195,4 +195,21 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   this.shadowBaker = shadowBaker.export(isBuildingForDeploymentMode);
   // MODULE HANDLER ************************************************
   this.modules = moduleHandler.export();
+  // MODELS ********************************************************
+  this.models = new Object();
+  for (var modelName in models){
+    this.models[modelName] = models[modelName].export(isBuildingForDeploymentMode);
+  }
+  // MODEL INSTANCES ***********************************************
+  this.modelInstances = new Object();
+  for (var instanceName in modelInstances){
+    this.modelInstances[instanceName] = modelInstances[instanceName].export();
+  }
+  // BOOTSCREEN ****************************************************
+  this.bootscreenFolderName = bootscreenFolderName;
+  this.bodyBGColor = bodyBGColor;
+  // DISABLED SHADERS **********************************************
+  if (isBuildingForDeploymentMode){
+    this.disabledShaderInfo = ShaderContent.getDisableInfo();
+  }
 }

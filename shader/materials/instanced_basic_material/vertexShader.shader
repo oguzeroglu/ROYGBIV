@@ -118,7 +118,7 @@ varying float vAlpha;
 #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
   uniform mat4 worldMatrix;
 #endif
-#ifdef HAS_SKYBOX_FOG
+#if defined(HAS_SKYBOX_FOG) || defined(HAS_PHONG_LIGHTING)
   varying vec3 vWorldPosition;
 #endif
 
@@ -131,6 +131,14 @@ varying float vAlpha;
   attribute vec4 shadowMapUV;
   varying vec4 vShadowMapUV;
   varying vec2 vUV2;
+#endif
+
+#ifdef HAS_PHONG_LIGHTING
+  varying vec3 vNormal;
+#endif
+
+#if defined(HAS_PHONG_LIGHTING) && defined(IS_AUTO_INSTANCED)
+  varying float vAffectedByLight;
 #endif
 
 vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
@@ -747,7 +755,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     #ifdef IS_AUTO_INSTANCED
       vec3 computedNormal = rotatedNormal;
     #else
-      vec3 computedNormal = mat3(worldInverseTranspose) * rotatedNormal;
+      vec3 computedNormal = normalize(mat3(worldInverseTranspose) * rotatedNormal);
     #endif
 
     #ifdef HAS_STATIC_DIFFUSE_LIGHT_1
@@ -1062,19 +1070,41 @@ void main(){
     vec3 worldPositionComputed = (worldMatrix * vec4(transformedPosition, 1.0)).xyz;
   #endif
 
+  #if defined(HAS_PHONG_LIGHTING) && defined(IS_AUTO_INSTANCED)
+    vAffectedByLight = -100.0;
+  #endif
+
   #ifdef AFFECTED_BY_LIGHT
+    vec3 rotatedNormal = applyQuaternionToVector(normalize(normal), quaternion);
     vec3 selectedWorldPosition;
     #ifdef IS_AUTO_INSTANCED
       if (affectedByLight > 0.0){
-        vColor = handleLighting(transformedPosition, applyQuaternionToVector(normalize(normal), quaternion));
+        #ifdef HAS_PHONG_LIGHTING
+          vColor = color;
+          vAffectedByLight = 100.0;
+        #else
+          vColor = handleLighting(transformedPosition, rotatedNormal);
+        #endif
       }else{
         vColor = color;
       }
     #else
-      vColor = handleLighting(worldPositionComputed, applyQuaternionToVector(normalize(normal), quaternion));
+      #ifdef HAS_PHONG_LIGHTING
+        vColor = color;
+      #else
+        vColor = handleLighting(worldPositionComputed, rotatedNormal);
+      #endif
     #endif
   #else
     vColor = color;
+  #endif
+
+  #ifdef HAS_PHONG_LIGHTING
+    #ifdef IS_AUTO_INSTANCED
+      vNormal = rotatedNormal;
+    #else
+      vNormal = normalize(mat3(worldInverseTranspose) * rotatedNormal);
+    #endif
   #endif
 
   #ifdef HAS_SHADOW_MAP
@@ -1082,7 +1112,7 @@ void main(){
     vUV2 = uv;
   #endif
 
-  #ifdef HAS_SKYBOX_FOG
+  #if defined(HAS_SKYBOX_FOG) || defined(HAS_PHONG_LIGHTING)
     #ifdef IS_AUTO_INSTANCED
       vWorldPosition = transformedPosition;
     #else

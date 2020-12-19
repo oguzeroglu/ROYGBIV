@@ -1,36 +1,35 @@
 precision lowp float;
 precision lowp int;
 
+attribute vec3 color;
 attribute vec3 position;
 attribute vec3 normal;
 attribute vec2 uv;
+attribute vec4 diffuseUV;
+
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 
-uniform vec3 color;
+varying vec2 vUV;
 varying vec3 vColor;
+varying vec4 vDiffuseUV;
 
 #define INSERTION
 
-#ifdef HAS_DISPLACEMENT
-  uniform vec2 displacementInfo;
-  uniform sampler2D texture;
-#endif
-#ifdef HAS_TEXTURE
-  varying vec2 vUV;
-  uniform mat3 textureMatrix;
-#endif
-#ifdef HAS_SHADOW_MAP
-  varying vec2 vShadowMapUV;
-#endif
-#ifdef DISPLACEMENT_SEPARATE_UV
-  uniform mat3 displacementTextureMatrix;
-#endif
-#if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
-  uniform mat4 worldMatrix;
-#endif
-#if defined(HAS_SKYBOX_FOG) || defined(HAS_PHONG_LIGHTING)
+#ifdef HAS_PHONG_LIGHTING
   varying vec3 vWorldPosition;
+  varying vec3 vNormal;
+  #ifdef HAS_NORMAL_MAP
+    attribute vec4 normalUV;
+    attribute vec4 tangent;
+    varying vec3 vTangent;
+    varying vec3 vBitangent;
+    varying vec4 vNormalUV;
+  #endif
+#endif
+
+#ifdef AFFECTED_BY_LIGHT
+  uniform mat4 worldMatrix;
 #endif
 
 #ifdef AFFECTED_BY_LIGHT
@@ -42,8 +41,13 @@ varying vec3 vColor;
   attribute vec3 bakedColor;
 #endif
 
-#ifdef HAS_PHONG_LIGHTING
-  varying vec3 vNormal;
+#ifdef HAS_CUSTOM_TEXTURE
+  attribute float diffuseTextureIndex;
+  varying float vDiffuseTextureIndex;
+  #ifdef HAS_NORMAL_MAP
+    attribute float normalTextureIndex;
+    varying float vNormalTextureIndex;
+  #endif
 #endif
 
 vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
@@ -68,7 +72,6 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 }
 
 #ifdef AFFECTED_BY_LIGHT
-
   float getFloatFromLightMatrix(int index){
     if (index == 0){
       return dynamicLightsMatrix[0][0];
@@ -743,60 +746,17 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
   }
 #endif
 
-
-#ifdef HAS_DISPLACEMENT
-
-  float flipNumber(float num, float min, float max){
-    return (max + min) - num;
-  }
-
-  vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
-    float coordX = (original.x * (endU - startU) + startU);
-    float coordY = (original.y * (startV - endV) + endV);
-
-    #ifdef PREVENT_IOS_TEXTURE_BLEEDING
-      return vec2(coordX, coordY);
-    #endif
-
-    if (coordX > endU){
-      #ifdef MIRROR_S
-        coordX = endU - mod((coordX - endU), (endU - startU));
-      #else
-        coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
-      #endif
-    }
-
-    if (coordX < startU){
-      #ifdef MIRROR_S
-        coordX = startU + mod((startU - coordX), (endU - startU));
-      #else
-        coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
-      #endif
-    }
-
-    if (coordY > startV){
-      #ifdef MIRROR_T
-        coordY = startV - mod((coordY - startV), (startV - endV));
-      #else
-        coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
-      #endif
-    }
-
-    if (coordY < endV){
-      #ifdef MIRROR_T
-        coordY = endV + mod((endV - coordY), (startV - endV));
-      #else
-        coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
-      #endif
-    }
-
-    return vec2(coordX, coordY);
+#if defined(HAS_NORMAL_MAP) && defined(HAS_PHONG_LIGHTING)
+  void handleNormalMap(){
+    vNormalUV = normalUV;
+    vTangent = (modelViewMatrix * vec4(tangent.xyz, 0.0)).xyz;
+    vBitangent = normalize(cross(vNormal, vTangent) * tangent.w);
   }
 #endif
 
 void main(){
 
-  #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
+  #ifdef AFFECTED_BY_LIGHT
     vec3 worldPositionComputed = (worldMatrix * vec4(position, 1.0)).xyz;
   #endif
 
@@ -806,33 +766,23 @@ void main(){
     vColor = color;
   #endif
 
-  #ifdef HAS_TEXTURE
-    vUV = (textureMatrix * vec3(uv, 1.0)).xy;
-  #endif
-
-  #ifdef HAS_SHADOW_MAP
-    vShadowMapUV = uv;
-  #endif
-
   #ifdef HAS_PHONG_LIGHTING
     vNormal = normalize(mat3(worldInverseTranspose) * normal);
-  #endif
-
-  #if defined(HAS_SKYBOX_FOG) || defined(HAS_PHONG_LIGHTING)
     vWorldPosition = worldPositionComputed;
-  #endif
-
-  vec3 transformedPosition = position;
-  #ifdef HAS_DISPLACEMENT
-    vec2 displacementUV = vUV;
-    #ifdef DISPLACEMENT_SEPARATE_UV
-      displacementUV = (displacementTextureMatrix * vec3(uv, 1.0)).xy;
+    #ifdef HAS_NORMAL_MAP
+      handleNormalMap();
     #endif
-    vec4 heightUVFixed = vec4(float(HEIGHT_START_U), float(HEIGHT_START_V), float(HEIGHT_END_U), float(HEIGHT_END_V));
-    vec3 objNormal = normalize(normal);
-    transformedPosition += objNormal * (texture2D(texture, uvAffineTransformation(displacementUV, heightUVFixed.x, heightUVFixed.y, heightUVFixed.z, heightUVFixed.w)).r * displacementInfo.x + displacementInfo.y);
   #endif
 
-  vec4 mvPosition = modelViewMatrix * vec4(transformedPosition, 1.0);
-  gl_Position = projectionMatrix * mvPosition;
+  vUV = uv;
+  vDiffuseUV = diffuseUV;
+
+  #ifdef HAS_CUSTOM_TEXTURE
+    vDiffuseTextureIndex = diffuseTextureIndex;
+    #ifdef HAS_NORMAL_MAP
+      vNormalTextureIndex = normalTextureIndex;
+    #endif
+  #endif
+
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }

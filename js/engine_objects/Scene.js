@@ -31,6 +31,7 @@ Scene.prototype.reset = function(){
   this.containers = new Object();
   this.virtualKeyboards = new Object();
   this.masses = new Object();
+  this.modelInstances = new Object();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
   this.lightInfo = {};
@@ -98,6 +99,9 @@ Scene.prototype.destroy = function(){
   }
   for (var massName in this.masses){
     parseCommand("destroyMass " + massName);
+  }
+  for (var instanceName in this.modelInstances){
+    parseCommand("destroyModelInstance " + instanceName); 
   }
   this.reset();
 
@@ -191,6 +195,9 @@ Scene.prototype.import = function(exportObj){
   for (var i = 0; i<exportObj.virtualKeyboardNames.length; i++){
     this.registerVirtualKeyboard(virtualKeyboards[exportObj.virtualKeyboardNames[i]]);
   }
+  for (var i = 0; i < exportObj.modelInstanceNames.length; i ++){
+    this.registerModelInstance(modelInstances[exportObj.modelInstanceNames[i]]);
+  }
   this.isSkyboxMapped = exportObj.isSkyboxMapped;
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
@@ -227,6 +234,7 @@ Scene.prototype.export = function(){
   exportObj.spriteNames = Object.keys(this.sprites);
   exportObj.containerNames = Object.keys(this.containers);
   exportObj.virtualKeyboardNames = Object.keys(this.virtualKeyboards);
+  exportObj.modelInstanceNames = Object.keys(this.modelInstances);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
 
@@ -491,4 +499,14 @@ Scene.prototype.registerMass = function(mass){
 Scene.prototype.unregisterMass = function(mass){
   delete this.masses[mass.name];
   delete mass.registeredSceneName;
+}
+
+Scene.prototype.registerModelInstance = function(modelInstance){
+  this.modelInstances[modelInstance.name] = modelInstance;
+  modelInstance.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterModelInstance = function(modelInstance){
+  delete this.modelInstances[modelInstance.name];
+  delete modelInstance.registeredSceneName;
 }

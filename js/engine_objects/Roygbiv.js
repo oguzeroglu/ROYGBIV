@@ -12,6 +12,7 @@
 //  * Motion blur functions
 //  * Crosshair functions
 //  * Text functions
+//  * Model functions
 //  * Control functions
 //  * Animation functions
 //  * Muzzleflash functions
@@ -22,6 +23,7 @@
 //  * Virtual keyboard functions
 //  * Script related functions
 //  * Networking functions
+//  * DOM functions
 //  * AI functions
 var Roygbiv = function(){
 
@@ -346,11 +348,25 @@ var Roygbiv = function(){
     "makeObjectLookAt",
     "vectorLength",
     "vectorLengthSquare",
-    "getObjectVelocity"
+    "getObjectVelocity",
+    "getModelInstance",
+    "getMaxTextureSize",
+    "mapTexturesToModelInstance",
+    "setPixelRatio",
+    "createDOMElement",
+    "setDOMElementPosition",
+    "setDOMElementBackgroundColor",
+    "setDOMElementOpacity",
+    "setDOMElementSize",
+    "onDOMElementMouseOver",
+    "removeDOMElementMouseOverListener",
+    "onDOMElementMouseOut",
+    "removeDOMElementMouseOutListener",
+    "onDOMElementClick",
+    "removeDOMElementClickListener"
   ];
 
   this.globals = new Object();
-
 }
 
 // GETTER FUNCTIONS ************************************************************
@@ -409,7 +425,7 @@ Roygbiv.prototype.getRandomColor = function(){
   return ColorNames.generateRandomColor();
 }
 
-//  Returns the (x, y, z) coordinates of an object, glued object or a particle system.
+//  Returns the (x, y, z) coordinates of an object, glued object, particle system or a model instance.
 //  If a specific axis is specified, only the position on the specified axis is returned.
 //  Note that axis should be one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.
 Roygbiv.prototype.getPosition = function(object, targetVector, axis){
@@ -419,7 +435,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   preConditions.checkIfDefined(ROYGBIV.getPosition, preConditions.object, object);
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.getPosition, preConditions.axis, axis);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getPosition, preConditions.targetVector, targetVector);
-  preConditions.checkIfAddedObjectObjectGroupParticleSystem(ROYGBIV.getPosition, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupParticleSystemModelInstance(ROYGBIV.getPosition, preConditions.object, object);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getPosition, object);
   if (object.isAddedObject){
     if (axis){
@@ -502,7 +518,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
         );
       }
     }
-  }else if (object.isParticleSystem){
+  }else if (object.isParticleSystem || object.isModelInstance){
     if (axis){
       if (axis == this.axes.X){
         return object.mesh.position.x;
@@ -907,6 +923,17 @@ Roygbiv.prototype.getObjectVelocity = function(object, targetVector){
   targetVector.y = velocity.y;
   targetVector.z = velocity.z;
   return targetVector;
+}
+
+// Returns a ModelInstance or 0 if ModelInstance of given name does not exist.
+Roygbiv.prototype.getModelInstance = function(modelInstanceName){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.getModelInstance, preConditions.modelInstanceName, modelInstanceName);
+
+  return modelInstances[modelInstanceName] || 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -2886,6 +2913,84 @@ Roygbiv.prototype.removeROYGBIVScoreUpdateListener = function(){
   roygbivScoreUpdateCallbackFunction = noop;
 }
 
+// Sets a mouse over listener for given DOMElement.
+Roygbiv.prototype.onDOMElementMouseOver = function(domElement, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementMouseOver, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfDOMElement(ROYGBIV.onDOMElementMouseOver, domElement);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onDOMElementMouseOver, preConditions.callbackFunction, callbackFunction);
+
+  domElement.mouseoverCallback = callbackFunction;
+}
+
+// Sets a mouse out listener for given DOMElement.
+Roygbiv.prototype.onDOMElementMouseOut = function(domElement, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementMouseOut, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfDOMElement(ROYGBIV.onDOMElementMouseOut, domElement);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onDOMElementMouseOut, preConditions.callbackFunction, callbackFunction);
+
+  domElement.mouseoutCallback = callbackFunction;
+}
+
+// Sets a click listener for given DOMElement.
+Roygbiv.prototype.onDOMElementClick = function(domElement, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementClick, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.onDOMElementClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfDOMElement(ROYGBIV.onDOMElementClick, domElement);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onDOMElementClick, preConditions.callbackFunction, callbackFunction);
+
+  domElement.clickCallback = callbackFunction;
+}
+
+// Removes a click listener from given DOMElement.
+Roygbiv.prototype.removeDOMElementClickListener = function(domElement){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removeDOMElementClickListener, preConditions.domElement, domElement);
+  preConditions.checkIfDOMElement(ROYGBIV.removeDOMElementClickListener, domElement);
+
+  domElement.clickCallback = noop;
+}
+
+// Removes a mouse over listener from given DOMElement.
+Roygbiv.prototype.removeDOMElementMouseOverListener = function(domElement){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removeDOMElementMouseOverListener, preConditions.domElement, domElement);
+  preConditions.checkIfDOMElement(ROYGBIV.removeDOMElementMouseOverListener, domElement);
+
+  domElement.mouseoverCallback = noop;
+}
+
+// Removes a mouse out listener from given DOMElement.
+Roygbiv.prototype.removeDOMElementMouseOutListener = function(domElement){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.removeDOMElementMouseOutListener, preConditions.domElement, domElement);
+  preConditions.checkIfDOMElement(ROYGBIV.removeDOMElementMouseOutListener, domElement);
+
+  domElement.mouseoutCallback = noop;
+}
+
 // TEXT FUNCTIONS **************************************************************
 
 // Sets a text to a text object.
@@ -3050,6 +3155,27 @@ Roygbiv.prototype.deactivateTextInputMode = function(text){
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.activateTextInputMode, text);
   preConditions.checkIfText3D(ROYGBIV.activateTextInputMode, preConditions.text, text);
   text.deactivateInputMode();
+}
+
+// MODEL FUNCTIONS *************************************************************
+
+// Maps given textures to a model instance. texturesObj is an object
+// having:
+// keys -> texture IDs of models instance
+// values -> texture pack objects obtained via loadDynamicTextures API
+// Textures IDs of a model instance may be obtained from the GUI by clicking
+// on a model instance in the design mode and looking under the Textures folder.
+Roygbiv.prototype.mapTexturesToModelInstance = function(modelInstance, texturesObj){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.mapTexturesToModelInstance, preConditions.modelInstance, modelInstance);
+  preConditions.checkIfDefined(ROYGBIV.mapTexturesToModelInstance, preConditions.texturesObj, texturesObj);
+  preConditions.checkIfModelInstance(ROYGBIV.mapTexturesToModelInstance, modelInstance);
+  preConditions.checkIfCustomTexturesEnabled(ROYGBIV.mapTexturesToModelInstance, modelInstance);
+  preConditions.checkIfValidModelTextureSObj(ROYGBIV.mapTexturesToModelInstance, modelInstance, texturesObj);
+  modelInstance.mapCustomTextures(texturesObj);
 }
 
 // CONTROL FUNCTIONS ***********************************************************
@@ -3281,7 +3407,7 @@ Roygbiv.prototype.createFPSControl = function(parameters){
 // For desktop:
 // Mouse wheel/Mouse drag: Rotate
 // Right/Left/D/A/Q: Rotate
-// Up/Down/W/S/Z: Zoom in/out
+// Mouse wheel/Up/Down/W/S/Z: Zoom in/out
 // Space: Zoom in/out
 // For mobile:
 // Finger pinch zoom: Zoom in/out
@@ -3292,8 +3418,12 @@ Roygbiv.prototype.createFPSControl = function(parameters){
 // value is 150.
 // minRadius (optional): The minimum radius of the imaginary sphere that the camera can zoom in to. Default
 // value is 50.
+// initialRadius (optional): The initial radius of the imaginary sphere. Default value is the value of maxRadius.
+// initialTheta (optional): The initial theta angle of the imaginary sphere. Default value is Math.PI/4.
+// initialPhi (optional): The initial phi angle of the imaginary sphere. Default value is Math.PI/4.
 // zoomDelta (optional): The difference of radius when the user performs a zoom in/out. Default value is 1.
 // mouseWheelRotationSpeed (optional): The speed of mouse wheel rotation. Default value is 3.
+// mouseWheelZoomSpeed (optional): The speed of mouse wheel zoom. Default value is 3.
 // mouseDragRotationSpeed (optional): The speed of mouse drag rotation. Default value is 20.
 // fingerSwipeRotationSpeed (optional): The speed of finger touch rotation for mobile devices. Default value is 20.
 // keyboardRotationSpeed (optional): The speed of rotation using keyboard events. Default value is 10.
@@ -3314,6 +3444,10 @@ Roygbiv.prototype.createOrbitControl = function(parameters){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.fingerSwipeRotationSpeed, parameters.fingerSwipeRotationSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.keyboardRotationSpeed, parameters.keyboardRotationSpeed);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.requestFullScreen, parameters.requestFullScreen);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.initialRadius, parameters.initialRadius);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.mouseWheelZoomSpeed, parameters.mouseWheelZoomSpeed);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.initialPhi, parameters.initialPhi);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.initialTheta, parameters.initialTheta);
   return new OrbitControls(parameters);
 }
 
@@ -4065,6 +4199,86 @@ Roygbiv.prototype.onLatencyUpdated = function(callbackFunction){
   preConditions.checkIfDefined(ROYGBIV.onLatencyUpdated, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onLatencyUpdated, preConditions.callbackFunction, callbackFunction);
   Rhubarb.onLatencyUpdated(callbackFunction);
+}
+
+// DOM FUNCTIONS ***************************************************************
+
+// Creates and returns a new DOM element of given type (span, div etc.). Supported
+// properties are:
+// * width (in pixels). Default is 50.
+// * height (in pixels). Default is 50.
+// * backgroundColor. Default is white.
+// * centerXPercent. Default is 0.
+// * centerYPercent. Default is 0.
+// * borderRadiusPercent. Default is none.
+// * opacity. Default is 1.
+Roygbiv.prototype.createDOMElement = function(type, properties){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.createDOMElement, preConditions.type, type);
+  preConditions.checkIfDefined(ROYGBIV.createDOMElement, preConditions.properties, properties);
+  preConditions.checkIfString(ROYGBIV.createDOMElement, preConditions.type, type);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.width, properties.width);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.height, properties.height);
+  preConditions.checkIfStringOnlyIfExists(ROYGBIV.createDOMElement, preConditions.backgroundColor, properties.backgroundColor);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.centerXPercent, properties.centerXPercent);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.centerYPercent, properties.centerYPercent);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.borderRadiusPercent, properties.borderRadiusPercent);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDOMElement, preConditions.opacity, properties.opacity);
+  return new DOMElement(type, properties);
+}
+
+// Sets the center position of given DOM element created via createDOMElement scripting API.
+Roygbiv.prototype.setDOMElementPosition = function(domElement, centerXPercent, centerYPercent){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementPosition, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementPosition, preConditions.centerXPercent, centerXPercent);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementPosition, preConditions.centerYPercent, centerYPercent);
+  preConditions.checkIfDOMElement(ROYGBIV.setDOMElementPosition, domElement);
+  preConditions.checkIfNumber(ROYGBIV.setDOMElementPosition, preConditions.centerXPercent, centerXPercent);
+  preConditions.checkIfNumber(ROYGBIV.setDOMElementPosition, preConditions.centerYPercent, centerYPercent);
+  domElement.setPosition(centerXPercent, centerYPercent);
+}
+
+// Sets the background color of given DOM element created via createDOMElement scripting API.
+Roygbiv.prototype.setDOMElementBackgroundColor = function(domElement, backgroundColor){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementBackgroundColor, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementBackgroundColor, preConditions.backgroundColor, backgroundColor);
+  preConditions.checkIfDOMElement(ROYGBIV.setDOMElementBackgroundColor, domElement);
+  preConditions.checkIfString(ROYGBIV.setDOMElementBackgroundColor, preConditions.backgroundColor, backgroundColor);
+  domElement.setBackgroundColor(backgroundColor);
+}
+
+// Sets the opacity of given DOM element created via createDOMElement scripting API.
+Roygbiv.prototype.setDOMElementOpacity = function(domElement, opacity){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementOpacity, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementOpacity, preConditions.opacity, opacity);
+  preConditions.checkIfDOMElement(ROYGBIV.setDOMElementOpacity, domElement);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setDOMElementOpacity, preConditions.opacity, opacity);
+  domElement.setOpacity(opacity);
+}
+
+// Sets the size in pixels of given DOM element created via createDOMElement scripting API.
+Roygbiv.prototype.setDOMElementSize = function(domElement, width, height){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementSize, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementSize, preConditions.width, width);
+  preConditions.checkIfDefined(ROYGBIV.setDOMElementSize, preConditions.height, height);
+  preConditions.checkIfDOMElement(ROYGBIV.setDOMElementSize, domElement);
+  preConditions.checkIfNumber(ROYGBIV.setDOMElementSize, preConditions.width, width);
+  preConditions.checkIfNumber(ROYGBIV.setDOMElementSize, preConditions.height, height);
+  domElement.setSize(width, height);
 }
 
 // AI FUNCTIONS ****************************************************************
@@ -5102,7 +5316,10 @@ Roygbiv.prototype.isDefined = function(element){
 // with results parameter when the loading process is finished. This results parameter holds either
 // a texture pack object as element if the texture could be loaded, or false if not. The order of
 // elements of results parameter and textureNamesArray are the same. ROYGBIV engine automatically takes care of
-// caching, so a texture is not loaded twice from the same path.
+// caching, so a texture is not loaded twice from the same path. If png, jpg or jpeg file extensions are
+// provided in the texture name, ROYGBIV tries to load non compressed textures. If no extension is provided
+// a compressed texture is loaded in case the dynamic texture folder is created with noCompress parameter set to false.
+// The default format is png if no extension is provided.
 Roygbiv.prototype.loadDynamicTextures = function(dynamicTextureFolderName, textureNamesArray, onLoadedCallback){
   if (mode == 0){
     return;
@@ -5264,4 +5481,28 @@ Roygbiv.prototype.vectorLengthSquare = function(vec){
 
   REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
   return REUSABLE_VECTOR.lengthSq();
+}
+
+// Returns the max texture size the client device supports.
+Roygbiv.prototype.getMaxTextureSize = function(){
+  if (mode == 0){
+    return;
+  }
+
+  return WEBGL_MAX_TEXTURE_SIZE;
+}
+
+// Sets the pixel ratio of the WebGL renderer. More the pixelRatio
+// better the rendering quality however worse the performance. Use this with
+// caution, especially for fullscreen apps.
+Roygbiv.prototype.setPixelRatio = function(pixelRatio){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.setPixelRatio, preConditions.pixelRatio, pixelRatio);
+  preConditions.checkIfNumber(ROYGBIV.setPixelRatio, preConditions.pixelRatio, pixelRatio);
+
+  previewModeScreenResolution = pixelRatio;
+  renderer.setPixelRatio(previewModeScreenResolution);
 }

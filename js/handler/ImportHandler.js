@@ -2,6 +2,129 @@ var ImportHandler = function(){
 
 }
 
+ImportHandler.prototype.importModelInstances = function(obj){
+  for (var instanceName in obj.modelInstances){
+    var curModelInstanceExport = obj.modelInstances[instanceName];
+    var model = models[curModelInstanceExport.modelName];
+    var modelMesh = new MeshGenerator(model.geometry).generateModelMesh(model);
+    modelMesh.position.set(curModelInstanceExport.position.x, curModelInstanceExport.position.y, curModelInstanceExport.position.z);
+    modelMesh.quaternion.set(curModelInstanceExport.quaternion.x, curModelInstanceExport.quaternion.y, curModelInstanceExport.quaternion.z, curModelInstanceExport.quaternion.w);
+    modelMesh.scale.set(curModelInstanceExport.scale, curModelInstanceExport.scale, curModelInstanceExport.scale);
+    var physicsXParam = (model.info.originalBoundingBox.max.x - model.info.originalBoundingBox.min.x) * curModelInstanceExport.scale;
+    var physicsYParam = (model.info.originalBoundingBox.max.y - model.info.originalBoundingBox.min.y) * curModelInstanceExport.scale;
+    var physicsZParam = (model.info.originalBoundingBox.max.z - model.info.originalBoundingBox.min.z) * curModelInstanceExport.scale;
+    var physicsShapeParameters = {x: physicsXParam/2, y: physicsYParam/2, z: physicsZParam/2};
+    var boxPhysicsBody = physicsBodyGenerator.generateBoxBody(physicsShapeParameters);
+    boxPhysicsBody.position.copy(modelMesh.position);
+    boxPhysicsBody.quaternion.copy(modelMesh.quaternion);
+    physicsWorld.addBody(boxPhysicsBody);
+    scene.add(modelMesh);
+
+    var destroyedGrids = {};
+    var gridSystem = gridSystems[curModelInstanceExport.gsName];
+    if (gridSystem){
+      for (var gridName in curModelInstanceExport.destroyedGrids){
+        var gridExport = curModelInstanceExport.destroyedGrids[gridName];
+        var grid = gridSystem.getGridByColRow(gridExport.colNumber, gridExport.rowNumber);
+        if (grid){
+          destroyedGrids[gridName] = grid;
+        }
+      }
+    }
+
+    var modelInstance = new ModelInstance(instanceName, model, modelMesh, boxPhysicsBody, destroyedGrids, curModelInstanceExport.gsName);
+
+    if (curModelInstanceExport.hiddenInDesignMode){
+      modelInstance.hideInDesignMode(true);
+    }
+
+    modelInstances[instanceName] = modelInstance;
+
+    modelInstance.isIntersectable = !!curModelInstanceExport.isIntersectable;
+
+    if (curModelInstanceExport.noMass){
+      modelInstance.noMass = true;
+      physicsWorld.remove(modelInstance.physicsBody);
+    }
+
+    modelInstance.setAffectedByLight(curModelInstanceExport.affectedByLight);
+    if (modelInstance.affectedByLight && curModelInstanceExport.lightingType == lightHandler.lightTypes.PHONG){
+      modelInstance.setPhongLight();
+
+      if (curModelInstanceExport.normalScale){
+        modelInstance.mesh.material.uniforms.normalScale.value.set(curModelInstanceExport.normalScale.x, curModelInstanceExport.normalScale.y);
+      }
+    }
+  }
+}
+
+ImportHandler.prototype.importModels = function(obj, callback){
+  var that = this;
+  for (var modelName in obj.models){
+    var curModelExport = obj.models[modelName];
+
+    if (isDeployment){
+      loadTime.rmfLoadTimes[modelName] = performance.now();
+    }
+
+    rmfHandler.load(curModelExport.folderName, function(positions, normals, uvs, indices, indexedMaterialIndices){
+
+      if (isDeployment){
+        loadTime.rmfLoadTimes[this.curModelExport.name] = performance.now() - loadTime.rmfLoadTimes[this.curModelExport.name];
+      }
+
+      var min = this.curModelExport.originalBoundingBox.min;
+      var max = this.curModelExport.originalBoundingBox.max;
+      this.curModelExport.originalBoundingBox = new THREE.Box3(new THREE.Vector3(min.x, min.y, min.z), new THREE.Vector3(max.x, max.y, max.z));
+
+      var colors = new Float32Array(indexedMaterialIndices.length * 3);
+      var diffuseUVs = new Float32Array(indexedMaterialIndices.length * 4);
+      var normalUVs;
+      if (this.curModelExport.hasNormalMap){
+        normalUVs = new Float32Array(indexedMaterialIndices.length * 4);
+      }
+
+      var x = 0, y = 0, z = 0;
+      for (var i = 0; i < indexedMaterialIndices.length; i ++){
+        var materialIndex = indexedMaterialIndices[i];
+        var curMaterial = this.curModelExport.childInfos[materialIndex];
+        colors[x ++] = curMaterial.colorR;
+        colors[x ++] = curMaterial.colorG;
+        colors[x ++] = curMaterial.colorB;
+        diffuseUVs[y ++] = -100;
+        diffuseUVs[y ++] = -100;
+        diffuseUVs[y ++] = -100;
+        diffuseUVs[y ++] = -100;
+
+        if (this.curModelExport.hasNormalMap){
+          normalUVs[z ++] = -100;
+          normalUVs[z ++] = -100;
+          normalUVs[z ++] = -100;
+          normalUVs[z ++] = -100;
+        }
+      }
+
+      if (isDeployment){
+        loadTime.modelGenerationTimes[this.curModelExport.name] = performance.now();
+      }
+
+      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, normalUVs, null, indices, indexedMaterialIndices);
+
+      if (this.curModelExport.customTexturesEnabled){
+        model.enableCustomTextures();
+      }
+
+      models[this.curModelExport.name] = model;
+      if (!isDeployment){
+        model.loadTextures(callback);
+      }else{
+        loadTime.modelGenerationTimes[this.curModelExport.name] = performance.now() - loadTime.modelGenerationTimes[this.curModelExport.name];
+        callback();
+      }
+    }.bind({curModelExport: curModelExport}));
+  }
+}
+
 ImportHandler.prototype.importModules = function(obj, onReady){
   moduleHandler.import(obj.modules, onReady);
 }
@@ -113,6 +236,8 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   serverWSURL = obj.serverWSURL;
   developmentServerWSURL = obj.developmentServerWSURL;
   skyboxDistance = obj.skyboxDistance || skyboxDistance;
+  bootscreenFolderName = obj.bootscreenFolderName;
+  bodyBGColor = obj.bodyBGColor;
 }
 
 ImportHandler.prototype.importGridSystems = function(obj){
@@ -862,6 +987,9 @@ ImportHandler.prototype.importAddedObjects = function(obj){
        addedObjectInstance.setPosition(curAddedObjectExport.manualPositionInfo.x, curAddedObjectExport.manualPositionInfo.y, curAddedObjectExport.manualPositionInfo.z, true);
      }
      addedObjectInstance.setAffectedByLight(curAddedObjectExport.affectedByLight);
+     if (addedObjectInstance.affectedByLight && curAddedObjectExport.lightingType == lightHandler.lightTypes.PHONG){
+      addedObjectInstance.setPhongLight();
+     }
      if (curAddedObjectExport.customDisplacementTextureMatrixInfo){
        addedObjectInstance.setCustomDisplacementTextureMatrix();
        addedObjectInstance.setCustomDisplacementTextureRepeat(curAddedObjectExport.customDisplacementTextureMatrixInfo.repeatU, curAddedObjectExport.customDisplacementTextureMatrixInfo.repeatV);
@@ -1320,6 +1448,10 @@ ImportHandler.prototype.importObjectGroups = function(obj){
       objectGroupInstance.setPosition(curObjectGroupExport.manualPositionInfo.x, curObjectGroupExport.manualPositionInfo.y, curObjectGroupExport.manualPositionInfo.z, true);
     }
     objectGroupInstance.setAffectedByLight(curObjectGroupExport.affectedByLight);
+    if (objectGroupInstance.affectedByLight && curObjectGroupExport.lightingType == lightHandler.lightTypes.PHONG){
+      objectGroupInstance.setPhongLight();
+    }
+
     objectGroupInstance.usedAsAIEntity = curObjectGroupExport.usedAsAIEntity;
 
     if (curObjectGroupExport.hiddenInDesignMode){

@@ -167,7 +167,9 @@ var Text = function(){
   this.REPEATV_MUST_BE_A_NUMBER = "repeatV must be a number.";
   this.TEXTURE_CREATED = "Texture created.";
   this.SPRITE_NOT_IN_ACTIVE_SCENE = "Sprite not in active scene.";
+  this.MODEL_INSTANCE_NOT_IN_ACTIVE_SCENE = "Model instance not in active scene.";
   this.SPRITE_SELECTED = "Sprite selected.";
+  this.MODEL_INSTANCE_SELECTED = "Model instance selected: [@@1].";
   this.BLUR_AMOUNT_SET = "Blur amount set.";
   this.SOURCE_TEXT_IS_NOT_DEFINED = "Source text is not defined.";
   this.TARGET_TEXT_IS_NOT_DEFINED = "Target text is not defined.";
@@ -239,6 +241,7 @@ var Text = function(){
   this.CREATED_X_SPHERES = "Command executed for @@1 spheres.";
   this.CREATED_X_CYLINDERS = "Command executed for @@1 cylinders.";
   this.DESTROYED_X_TEXTURES = "Command executed for @@1 textures.";
+  this.CREATED_X_MODEL_INSTANCES = "Command executed for @@1 model instances.";
   this.NO_SUCH_GRAPH = "No such graph.";
   this.NO_SUCH_GRAPH_IN_CURRENT_SCENE = "No such graph in current scene.";
   this.GRAPH_NOT_INSIDE_ACTIVE_SCENE = "Graph not inside the active scene.";
@@ -273,6 +276,12 @@ var Text = function(){
   this.TEXTURE_PACK_MAPPED_TO_X_OBJECTS = "Command executed for @@1 objects.";
   this.TEXTURE_PACK_ALREADY_USED = "Texture pack already mapped, cannot be edited.";
   this.NO_GRID_SYSTEM_FOUND = "No grid system found.";
+  this.LOADING_MODELS = "Loading models.";
+  this.LOADING_MODEL = "Loading model.";
+  this.NO_VALID_MODELS_UNDER_MODELS_FOLDER = "No valid models under models folder.";
+  this.MODEL_CREATED = "Model created.";
+  this.MODEL_DESTROYED = "Model destroyed.";
+  this.ANOTHER_MODEL_OF_SAME_FOLDER_EXISTS = "Another model of same folder exists: [@@1].";
   this.DESTROYED_X_GRID_SYTEMS = "Command executed for @@1 grid systems.";
   this.THERE_ARE_OBJECT_GROUPS_CANNOT_PERFORM_THIS_OPERATION = "There are existing object groups. Cannot perform this operation.";
   this.INSTANCING_ENABLED = "Instancing enabled.";
@@ -297,11 +306,13 @@ var Text = function(){
   this.JUMPDESCRIPTORS_IN_THIS_SCENE = "Jump descriptors in this scene";
   this.NO_JUMPDESCRIPTORS_IN_THIS_SCENE = "No jump descriptors in this scene.";
   this.NO_SUCH_JUMPDESCRIPTOR = "No such jump descriptor.";
+  this.THIS_MODEL_HAS_INSTANCES= "This model has instances. Cannot destroy.";
   this.JUMPDESCRIPTOR_NOT_IN_ACTIVE_SCENE = "Jump descriptor not inside the active scene.";
   this.JUMPDESCRIPTOR_DESTROYED = "Jump descriptor destroyed.";
   this.COMPRESSING_FONT = "Compressing font.";
   this.SCENE_CREATED = "Scene created.";
   this.NO_SUCH_SCENE = "No such scene.";
+  this.MODEL_LOADED = "Model loaded.";
   this.CANNOT_SET_MOTION_BLUR_ON_NON_DYNAMIC_CHANGEABLE_OBJECTS = "Cannot set motion blur on non dynamic and non changeable objects.";
   this.CANNOT_ALIGN_SAME_CONTAINER = "Parent and child containers cannot be the same.";
   this.CONTAINER_IS_NOT_ALIGNED = "Container is not aligned.";
@@ -318,6 +329,7 @@ var Text = function(){
   this.OBJECTS_SYNCED = "Objects synced.";
   this.TEXTURE_DESTROYED = "Texture destroyed.";
   this.TEXTURE_NOT_READY = "Texture not ready.";
+  this.ERROR_HAPPENED_LOADING_MODEL_FROM_FOLDER = "Error happened loading model from folder [@@1].";
   this.CONTAINERS = "Containers";
   this.VIRTUAL_KEYBOARDS = "Virtual keyboards.";
   this.NO_VIRTUAL_KEYBOARDS_CREATED = "No virtual keyboards created.";
@@ -380,6 +392,7 @@ var Text = function(){
   this.HEIGHT_MUST_BE_A_NUMBER = "Height must be a number.";
   this.AFTER_VIRTUAL_KEYBOARD_CREATION = "Press Done button to save virtual keyboard.";
   this.VIRTUAL_KEYBOARD_CREATED = "Virtual keyboard created.";
+  this.MODEL_INSTANCE_CREATED = "Model instance created.";
   this.VIRTUAL_KEYBOARD_EDITED = "Virtual keyboard edited.";
   this.NO_ANCHOR_GRIDS_SELECTED = "No anchor grid selected. Use setAnchor command first.";
   this.ONE_OF_THE_GRID_SELECTIONS_MUST_BE_THE_ANCHOR_GRID = "One of the grid selections must be the anchor grid.";
@@ -430,7 +443,7 @@ var Text = function(){
   this.OBJECT_HAS_SOFT_COPY_PARENT_TEXTURE = "Object has a soft copy parent. Run this command on the parent instead.";
   this.AN_ERROR_HAPPENED_CHOOSE_ANOTHER_NAME = "An error happened. Choose another name.";
   this.ERROR_HAPPENED_COMPRESSING_TEXTURE = "Error happened compressing texture @@1. Provide a JPG alternative.";
-  this.DYNAMIC_TEXTURE_FOLDER_PREPARED = "Dynamic texture folder prepared.";
+  this.DYNAMIC_TEXTURE_FOLDER_CREATED = "Dynamic texture folder created.";
   this.MUZZLE_FLASH_USED_IN = "Muzzleflash used in FPS weapon @@1. Cannot destroy.";
   this.MUZZLE_FLASH_DESTROYED = "Muzzleflash destroyed."
   this.HEIGHT_CANNOT_BE_0 = "Height cannot be 0.";
@@ -452,6 +465,7 @@ var Text = function(){
   this.JUMP_DESCRIPTOR_INSERTED_TO_A_GRAPH = "Jump descriptor is inserted to a graph. Cannot delete.";
   this.LIGHTNING_DESTROYED = "Lightning destroyed.";
   this.WALL_COLLECTIONS = "Wall collections";
+  this.MODEL_INSTANCE_DESTROYED = "Model instance destroyed.";
   this.TREE_WALL_COLLECTIONS = "|____@@1: OUTLINE COLOR -> @@2";
   this.PHYSICS_UNSIMPLIFIED = "Physics unsimplified.";
   this.CONTAINER_IS_EMPTY = "Container is empty.";
@@ -559,10 +573,13 @@ var Text = function(){
   this.CROSSHAIRS = "Crosshairs";
   this.LIGHTNINGS = "Lightnings";
   this.SCENES = "Scenes";
+  this.PHONG_LIGHTS_DO_NOT_SUPPORT_THIS_FUNCTION = "Phong lights do not support this function.";
   this.NO_TEXTURE_PACK_FOUND = "No texture pack found.";
+  this.NO_MODELS_FOUND = "No models found.";
   this.COMMAND_EXECUTED_FOR_X_TEXTURES = "Command executed for @@1 textures.";
   this.COMMAND_EXECUTED_FOR_X_TEXTURE_PACKS = "Command executed for @@1 texture packs.";
   this.COMMAND_EXECUTED_FOR_X_SKYBOXES = "Command executed for @@1 skyboxes.";
+  this.COMMAND_EXECUTED_FOR_X_MODELS = "Command executed for @@1 models.";
   this.NO_SKYBOX_FOUND = "No skybox found.";
   this.NO_SCRIPTS_FOUND = "No scripts found.";
   this.BEHAVIOR_IS_NOT_ASSIGNED_TO_THIS_OBJECT = "Steerable is not assigned to this object.";
@@ -592,6 +609,7 @@ var Text = function(){
   this.LIGHT_REMOVED = "Light removed.";
   this.ACCEPTED_TEXTURE_SIZE = "Accepted texture size";
   this.CANNOT_SET_TEXTURE_SIZE_AFTER = "Cannot set accepted texture size after texture pack creation. Delete the texture packs first.";
+  this.HAS_MODELS_WITH_TEXTURES = "Project has models with textures. Cannot modify accepted texture size. Delete the models first.";
   this.TEXTURE_COMPRESSION_ERROR = "Error happened while compressing texture pack @@1. Try using smaller PNGs.";
   this.TEXTURE_COMPRESSION_ENCODE_ERROR = "Error happened while compressing @@1 texture of @@2.\nTry providing a JPEG alternative for this texture under the texture pack folder.";
   this.TEXTURE_PACK_NOT_USABLE = "Texture pack not usable.";
@@ -600,6 +618,7 @@ var Text = function(){
   this.TEXTURE_PACK_REFRESHED = "Texture pack refreshed.";
   this.HEIGHT_TEXTURE_MAPPED = "Height texture mapped.";
   this.MAPS_RESET = "Maps reset.";
+  this.NO_MODEL_INSTANCES_FOUND = "No model instances found.";
   this.LIGHT_NOT_ACTIVE = "Light not active.";
   this.ONLY_MERGED_OBJECTS_SUPPORT_THIS_COMMAND = "Only merged objects support this command.";
   this.INSTANCED_OBJECTS_DO_NOT_SUPPORT_THIS_COMMAND = "Instanced objects do not support this command.";
@@ -621,6 +640,14 @@ var Text = function(){
   this.GUI_CLOSED = "GUI closed.";
   this.GUI_IS_ALREADY_VISIBLE = "GUI is already visible.";
   this.GUI_OPENED = "GUI opened.";
+  this.SHADOWS_WILL_BE_LAZILY_LOADED = "Shadows will be lazily loaded in deployment mode.";
+  this.SHADOWS_WONT_BE_LAZILY_LOADED = "Shadows won't be lazily loaded in deployment mode.";
+  this.CUSTOM_BOOTSCREEN_RESET = "Custom bootscreen reset.";
+  this.NO_SUCH_FOLDER_UNDER_BOOTSCRENS_FOLDER = "No such folder under bootscreens folder.";
+  this.CUSTOM_BOOTSCREEN_SET = "Custom bootscreen set.";
+  this.PROVIDED_FOLDER_DOES_NOT_CONTAIN_COMPONENT_HTML = "Provided folder does not contain a component.html file.";
+  this.CUSTOM_BODY_BG_COLOR_RESET = "Custom body background color reset.";
+  this.CUSTOM_BODY_BG_COLOR_SET = "Custom body background color set.";
   this.SOURCESPRITE_DOES_NOT_EXIST = "sourceSprite does not exist.";
   this.TARGETSPRITE_DOES_NOT_EXIST = "targetSprite does not exist.";
   this.TARGETSPRITE_NOT_IN_ACTIVE_SCENE = "targetSprite is not inside active scene.";
@@ -640,9 +667,14 @@ var Text = function(){
   this.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PS = "Cannot create muzzleflash from a collidable particle system.";
   this.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PARTICLES = "Cannot create muzzleflash from a particle system with collidable particles.";
   this.SKYBOXES = "Skyboxes";
+  this.MODELS = "Models";
+  this.MODEL_INSTANCES = "Model instances";
+  this.OF_MODEL = "of model @@1";
   this.PIVOT_SET = "Pivot set.";
   this.ASTAR_USED_IN_BEHAVIOR = "AStar used in PathFollowingBehavior [@@1]. Cannot destroy.";
   this.NO_SKYBOXES_CREATED = "No skyboxes created.";
+  this.NO_MODELS_CREATED = "No models created.";
+  this.NO_MODEL_INSTANCES_CREATED = "No model instances created.";
   this.NO_SUCH_SKYBOX = "No such skybox.";
   this.SKYBOX_NOT_USABLE = "Skybox not usable. Use the command printSkyboxInfo for the details.";
   this.SKYBOX_MAPPED = "Skybox mapped.";
@@ -822,11 +854,13 @@ var Text = function(){
   this.FAILED_TO_LOAD_SCRIPT = "Failed to load script @@1 from file path @@2.";
   this.SCRIPT_UPLOADED = "Script uploaded.";
   this.SCENE_LOADED = "Scene loaded.";
+  this.NORMAL_MAP_SCALE_SET = "Normal map scale set.";
   this.JUMP_DESCRIPTOR_UPDATED = "Jump descriptor updated.";
   this.NO_SUCH_DYNAMIC_TEXTURE_FOLDER = "No such dynamic texture folder.";
   this.DYNAMIC_TEXTURE_FOLDER_DESTROYED = "Dynamic texture folder destroyed.";
   this.NO_DYNAMIC_TEXTURE_FOLDERS_FOUND = "No dynamic texture folders found.";
   this.COMMAND_EXECUTED_FOR_X_DYNAMIC_TEXTURE_FOLDERS = "Command executed for @@1 dynamic texture folders.";
+  this.COMMAND_EXECUTED_FOR_X_MODEL_INSTANCES = "Command executed for @@1 model instances.";
   this.DYNAMIC_TEXTURE_FOLDERS = "Dynamic texture folders.";
   this.NO_DYNAMIC_TEXTURE_FOLDERS_CREATED = "No dynamic texture folders created.";
   this.AN_UNEXPECTED_ERROR_HAPPENED = "An unexpected error happened.";
@@ -846,6 +880,9 @@ var Text = function(){
   this.TEXTURE_REPEAT_U_MUST_BE_A_POSITIVE_NUMBER = "repeatU must be a positive number.";
   this.TEXTURE_REPEAT_V_MUST_BE_A_POSITIVE_NUMBER = "repeatV must be a positive number.";
   this.WORKS_ONLY_IN_DESIGN_MODE = "This command works only in Design mode.";
+  this.THIS_MODEL_DOES_NOT_SUPPORT_CUSTOM_TEXTURES = "This model does not support custom textures.";
+  this.CUSTOM_TEXTURES_ENABLED_FOR_THIS_MODEL = "Custom textures enabled for this model.";
+  this.CUSTOM_TEXTURES_DISABLED_FOR_THIS_MODEL = "Custom textures disabled for this model.";
   this.INVALID_CHARACTER_IN_OBJECT_NAME = "Invalid character in object name.";
   this.INVALID_CHARACTER_IN_NAME = "Invalid character in name.";
   this.PARAMETER_MUST_BE_ON_OFF = "Parameter must be on or off.";
@@ -942,6 +979,8 @@ var Text = function(){
   this.DECISION_ALREADY_USED = "Decision already used inside this decision tree.";
   this.SWITCHED_TO_TRACK_POSITION = "Steering mode of the object is switched to position tracking.";
   this.POSITION_SET = "Position set.";
+  this.NO_SUCH_MODEL = "No such model.";
+  this.NO_SUCH_MODEL_INSTANCE = "No such model instance.";
   this.STATE_MACHINE_DESTROYED = "State machine destroyed.";
   this.CHILD_CONTAINER_IS_ALREADY_ALIGNED = "Child container is already aligned to another parent. Use unalignContainer command first.";
   this.IS_NOT_POWER_OF_TWO = "@@1 is not power of two.";
@@ -1024,7 +1063,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_COLOR = "Creates a new color object from the given HTML color name.";
   this.ROYGBIV_SCRIPTING_API_SETMASS = "Sets the mass property of an object or a glued object. Objects are considered dynamic if and only if their mass is greater than zero.";
   this.ROYGBIV_SCRIPTING_API_TRANSLATE = "Translates an object or glued object on the given axis by the given amount.\nAxis must be one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.";
-  this.ROYGBIV_SCRIPTING_API_GETPOSITION = "Returns the (x, y, z) coordinates of an object, glued object or a particle system.\nIf a specific axis is specified, only the position on the specified axis is returned.\nNote that axis should be one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.";
+  this.ROYGBIV_SCRIPTING_API_GETPOSITION = "Returns the (x, y, z) coordinates of an object, glued object, particle system or a model instance.\nIf a specific axis is specified, only the position on the specified axis is returned.\nNote that axis should be one of ROYGBIV.axes.X, ROYGBIV.axes.Y or ROYGBIV.axes.Z.";
   this.ROYGBIV_SCRIPTING_API_OPACITY = "Increases/decreases the opacity of given object.";
   this.ROYGBIV_SCRIPTING_API_GETOPACITY = "Returns the opacity of given object.";
   this.ROYGBIV_SCRIPTING_API_SETCOLLISIONLISTENER = "Sets a collision listener for an object, glued object or a particle system."+
@@ -1229,7 +1268,7 @@ var Text = function(){
                                                   "For desktop:\n"+
                                                   "Mouse wheel/Mouse drag: Rotate\n"+
                                                   "Right/Left/D/A/Q: Rotate\n"+
-                                                  "Up/Down/W/S/Z: Zoom in/out\n"+
+                                                  "Mouse wheel/Up/Down/W/S/Z: Zoom in/out\n"+
                                                   "Space: Zoom in/out\n"+
                                                   "For mobile:\n"+
                                                   "Finger pinch zoom: Zoom in/out\n"+
@@ -1238,8 +1277,12 @@ var Text = function(){
                                                   "lookPosition (optional): A vector defining the look position and the center of the imaginary sphere. Default value is (0, 0, 0).\n"+
                                                   "maxRadius (optional): The maximum radius of the imaginary sphere that the camera can zoom out to. Default value is 150.\n"+
                                                   "minRadius (optional): The minimum radius of the imaginary sphere that the camera can zoom in to. Default value is 50.\n"+
+                                                  "initialRadius (optional): The initial radius of the imaginary sphere. Default value is the value of maxRadius.\n"+
+                                                  "initialTheta (optional): The initial theta angle of the imaginary sphere. Default value is Math.PI/4.\n"+
+                                                  "initialPhi (optional): The initial phi angle of the imaginary sphere. Default value is Math.PI/4.\n"+
                                                   "zoomDelta (optional): The difference of radius when the user performs a zoom in/out. Default value is 1.\n"+
                                                   "mouseWheelRotationSpeed (optional): The speed of mouse wheel rotation. Default value is 3.\n"+
+                                                  "mouseWheelZoomSpeed (optional): The speed of mouse wheel zoom. Default value is 3.\n" +
                                                   "mouseDragRotationSpeed (optional): The speed of mouse drag rotation. Default value is 20.\n"+
                                                   "fingerSwipeRotationSpeed (optional): The speed of finger touch rotation for mobile devices. Default value is 20.\n"+
                                                   "keyboardRotationSpeed (optional): The speed of rotation using keyboard events. Default value is 10.\n"+
@@ -1340,7 +1383,8 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETSPRITEMARGINX = "Returns the marginX value of given sprite.";
   this.ROYGBIV_SCRIPTING_API_GETSPRITEMARGINY = "Returns the marginY value of given sprite.";
   this.ROYGBIV_SCRIPTING_API_LOADDYNAMICTEXTURES = "Loads given textures inside provided dynamic texture folder. onLoadedCallback is executed with results parameter\nwhen the loading process is finished. This results parameter holds either a texture pack object as element\nif the texture could be loaded, or false if not. The order of elements of results parameter and textureNamesArray\nare the same." +
-                                                   " ROYGBIV engine automatically takes care of caching, so a texture is not loaded twice from the same path.";
+                                                   " ROYGBIV engine automatically takes care of caching, so a texture is not loaded twice from the same path.\n" +
+                                                   "If png, jpg or jpeg file extensions are provided in the texture name, ROYGBIV tries to load non compressed textures.\nIf no extension is provided a compressed texture is loaded in case the dynamic texture folder is created with noCompress parameter\nset to false. The default format is png if no extension is provided.";
   this.ROYGBIV_SCRIPTING_API_CONNECTTOSERVER = "Connects to a game server, the URL of which is set by setWSServerURL CLI command. The server and the client interacts through\nRhubarb protocol definition files, the path of which is set by setProtocolDefinition CLI command. onReady callback parameter is\nexecuted when the connection is established. onError is executed with errorReason parameter in case there is an error\nestablishing the connection.";
   this.ROYGBIV_SCRIPTING_API_CLEARSERVERCONNECTION = "Disconnects from server and clears Rhubarb context. Does nothing if not connected to server.";
   this.ROYGBIV_SCRIPTING_API_ONDISCONNECTEDFROMSERVER = "Sets a listener for server connection status. The callbackFunction is executed when the connection between\nthe server and the client is lost. If client needs to try reconnecting, ROYGBIV.clearServerConnection API\nneeds to be used before ROYGBIV.connectFromServer.";
@@ -1431,4 +1475,29 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_VECTORLENGTH = "Calculates and returns the length of given vector.";
   this.ROYGBIV_SCRIPTING_API_VECTORLENGTHSQUARE = "Calcualtes and returns the square of the length of given vector.";
   this.ROYGBIV_SCRIPTING_API_GETOBJECTVELOCITY = "Returns the velocity of given object.";
+  this.ROYGBIV_SCRIPTING_API_GETMODELINSTANCE = "Returns a ModelInstance or 0 if ModelInstance of given name does not exist.";
+  this.ROYGBIV_SCRIPTING_API_GETMAXTEXTURESIZE = "Returns the max texture size the client device supports.";
+  this.ROYGBIV_SCRIPTING_API_MAPTEXTURESTOMODELINSTANCE = "Maps given textures to a model instance. texturesObj is an object having:\n" +
+                                                          "keys -> texture IDs of models instance\n" +
+                                                          "values -> texture pack objects obtained via loadDynamicTextures API\n" +
+                                                          "Textures IDs of a model instance may be obtained from the GUI by clicking on a model instance in the design mode\nand looking under the Textures folder.";
+  this.ROYGBIV_SCRIPTING_API_SETPIXELRATIO = "Sets the pixel ratio of the WebGL renderer. More the pixelRatio better the rendering quality however worse the performance.\nUse this with caution, especially for fullscreen apps.";
+  this.ROYGBIV_SCRIPTING_API_CREATEDOMELEMENT = "Creates and returns a new DOM element of given type (span, div etc.). Supported properties are:\n" +
+                                                "* width (in pixels). Default is 50.\n" +
+                                                "* height (in pixels). Default is 50.\n" +
+                                                "* backgroundColor. Default is white.\n" +
+                                                "* centerXPercent. Default is 0.\n" +
+                                                "* centerYPercent. Default is 0.\n" +
+                                                "* borderRadiusPercent. Default is none.\n" +
+                                                "* opacity. Default is 1.";
+  this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTPOSITION = "Sets the center position of given DOM element created via createDOMElement scripting API.";
+  this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTBACKGROUNDCOLOR = "Sets the background color of given DOM element created via createDOMElement scripting API.";
+  this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTOPACITY = "Sets the opacity of given DOM element created via createDOMElement scripting API.";
+  this.ROYGBIV_SCRIPTING_API_SETDOMELEMENTSIZE = "Sets the size in pixels of given DOM element created via createDOMElement scripting API.";
+  this.ROYGBIV_SCRIPTING_API_ONDOMELEMENTMOUSEOVER = "Sets a mouse over listener for given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_ONDOMELEMENTMOUSEOUT = "Sets a mouse out listener for given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_ONDOMELEMENTCLICK = "Sets a click listener for given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEDOMELEMENTCLICKLISTENER = "Removes a click listener from given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEDOMELEMENTMOUSEOVERLISTENER = "Removes a mouse over listener from given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEDOMELEMENTMOUSEOUTLISTENER = "Removes a mouse out listener from given DOMElement.";
 }

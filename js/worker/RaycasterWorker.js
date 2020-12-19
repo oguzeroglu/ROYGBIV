@@ -21,6 +21,7 @@ importScripts("../engine_objects/Sprite.js");
 importScripts("../engine_objects/Container2D.js");
 importScripts("../engine_objects/VirtualKeyboard.js");
 importScripts("../engine_objects/Mass.js");
+importScripts("../engine_objects/ModelInstance.js");
 
 var IS_WORKER_CONTEXT = true;
 var objectPicker2D = new ObjectPicker2D();
@@ -105,6 +106,12 @@ RaycasterWorker.prototype.refresh = function(state){
     idResponse.push({type: "mass", name: massName, id: masses[massName].workerID});
     this.workerIDsByObjectName[massName] = masses[massName].workerID;
     this.objectsByWorkerID[masses[massName].workerID] = masses[massName];
+  }
+  for (var instanceName in modelInstances){
+    modelInstances[instanceName].workerID = idCounter ++;
+    idResponse.push({type: "modelInstance", name: instanceName, id: modelInstances[instanceName].workerID});
+    this.workerIDsByObjectName[instanceName] = modelInstances[instanceName].workerID;
+    this.objectsByWorkerID[modelInstances[instanceName].workerID] = modelInstances[instanceName];
   }
   for (var psName in particleSystemPool){
     particleSystemPool[psName].workerID = psIDCounter ++;

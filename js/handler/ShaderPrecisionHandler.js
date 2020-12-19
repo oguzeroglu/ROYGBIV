@@ -12,7 +12,8 @@ var ShaderPrecisionHandler = function(){
     SKYBOX: 6,
     TEXT: 7,
     LIGHTNING: 8,
-    SPRITE: 9
+    SPRITE: 9,
+    MODEL: 10
   }
   this.reset();
 }
@@ -322,13 +323,28 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
         sprite.mesh.material.needsUpdate = true;
       }
     break;
+    case this.types.MODEL:
+      vertexShader = ShaderContent.basicModelMaterialVertexShader;
+      fragmentShader = ShaderContent.basicModelMaterialFragmentShader;
+      vertexShaderName = "basicModelMaterialVertexShader";
+      fragmentShaderName = "basicModelMaterialFragmentShader";
+      for (var modelInstanceName in modelInstances){
+        var modelInstance = modelInstances[modelInstanceName];
+        modelInstance.mesh.material.vertexShader = this.replace(modelInstance.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
+        modelInstance.mesh.material.fragmentShader = this.replace(modelInstance.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
+        modelInstance.mesh.material.needsUpdate = true;
+      }
+    break;
   }
   if (!vertexShader){
-    throw new Error("Unknown type.");
+    if (!isDeployment){
+      throw new Error("Unknown type.");
+    }
+  }else{
+    vertexShader = this.replace(vertexShader, currentPrecisionForType, newPrecisionForType);
+    fragmentShader = this.replace(fragmentShader, currentPrecisionForType, newPrecisionForType);
+    ShaderContent[vertexShaderName] = vertexShader;
+    ShaderContent[fragmentShaderName] = fragmentShader;
+    this.precisions[type] = precision;
   }
-  vertexShader = this.replace(vertexShader, currentPrecisionForType, newPrecisionForType);
-  fragmentShader = this.replace(fragmentShader, currentPrecisionForType, newPrecisionForType);
-  ShaderContent[vertexShaderName] = vertexShader;
-  ShaderContent[fragmentShaderName] = fragmentShader;
-  this.precisions[type] = precision;
 }

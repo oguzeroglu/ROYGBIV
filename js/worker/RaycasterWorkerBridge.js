@@ -74,6 +74,11 @@ var RaycasterWorkerBridge = function(){
           var massWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[massWorkerID] = mass;
           rayCaster.idsByObjectNames[mass.name] = massWorkerID;
+        }else if (msg.data.ids[i].type == "modelInstance"){
+          var modelInstance = modelInstances[msg.data.ids[i].name];
+          var modelInstanceWorkerID = msg.data.ids[i].id;
+          rayCaster.objectsByWorkerID[modelInstanceWorkerID] = modelInstance;
+          rayCaster.idsByObjectNames[modelInstance.name] = modelInstanceWorkerID;
         }else if (msg.data.ids[i].type == "particleSystem"){
           var particleSystem = particleSystemPool[msg.data.ids[i].name];
           var particleSystemWorkerID = msg.data.ids[i].id;
@@ -369,6 +374,7 @@ RaycasterWorkerBridge.prototype.getAddedObjects = noop;
 RaycasterWorkerBridge.prototype.getObjectGroups = noop;
 RaycasterWorkerBridge.prototype.getAddedTexts = noop;
 RaycasterWorkerBridge.prototype.getMasses = noop;
+RaycasterWorkerBridge.prototype.getModelInstances = noop;
 RaycasterWorkerBridge.prototype.update2D = noop;
 RaycasterWorkerBridge.prototype.hide2D = noop;
 RaycasterWorkerBridge.prototype.show2D = noop;

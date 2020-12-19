@@ -298,6 +298,24 @@ var Preconditions = function(){
   this.yOffset = "yOffset";
   this.object1 = "object1";
   this.object2 = "object2";
+  this.modelInstanceName = "modelInstanceName";
+  this.modelInstance = "modelInstance";
+  this.texturesObj = "texturesObj";
+  this.pixelRatio = "pixelRatio";
+  this.initialRadius = "initialRadius";
+  this.mouseWheelZoomSpeed = "mouseWheelZoomSpeed";
+  this.initialPhi = "initialPhi";
+  this.initialTheta = "initialTheta";
+  this.properties = "properties";
+  this.type = "type";
+  this.width = "width";
+  this.height = "height";
+  this.backgroundColor = "backgroundColor";
+  this.centerXPercent = "centerXPercent";
+  this.centerYPercent = "centerYPercent";
+  this.borderRadiusPercent = "borderRadiusPercent";
+  this.opacity = "opacity";
+  this.domElement = "domElement";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -306,6 +324,38 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfDOMElement = function(callerFunc, obj){
+  if (!obj.isDOMElement){
+    this.throw(callerFunc, "Object is not a DOM element.");
+  }
+}
+
+Preconditions.prototype.checkIfValidModelTextureSObj = function(callerFunc, modelInstance, texturesObj){
+  var usedTextures = modelInstance.model.getUsedTextures();
+
+  for (var i = 0; i < usedTextures.length; i ++){
+    var textureID = usedTextures[i].id;
+    if (!texturesObj[textureID]){
+      this.throw(callerFunc, "Textures object does not have texture: " + textureID);
+    }
+    if (!texturesObj[textureID].isTexturePack){
+      this.throw(callerFunc, "Provided object for texture " + textureID + " is not a texture pack.");
+    }
+  }
+}
+
+Preconditions.prototype.checkIfCustomTexturesEnabled = function(callerFunc, modelInstance){
+  if (!modelInstance.model.info.customTexturesEnabled){
+    this.throw(callerFunc, "Custom textures are not enabled for this model.");
+  }
+}
+
+Preconditions.prototype.checkIfModelInstance = function(callerFunc, modelInstance){
+  if (!modelInstance.isModelInstance){
+    this.throw(callerFunc, "Object is not a model instance.");
+  }
 }
 
 Preconditions.prototype.checkIfSpriteHasFixedHeight = function(callerFunc, sprite){
@@ -889,6 +939,12 @@ Preconditions.prototype.checkIfAddedObjectOrObjectGroupOnlyIfExists = function(c
   }
 }
 
+Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystemModelInstance = function(callerFunc, paramName, obj){
+  if (!obj.isAddedObject && !obj.isObjectGroup && !obj.isParticleSystem && !obj.isModelInstance){
+    this.throw(callerFunc, parameterName+" must be an object, object group, particle system or a model instance.");
+  }
+}
+
 Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystem = function(callerFunc, parameterName, obj){
   if (!obj.isAddedObject && !obj.isObjectGroup && !obj.isParticleSystem){
     this.throw(callerFunc, parameterName+" must be an object, object group or a particle system.");
@@ -997,6 +1053,12 @@ Preconditions.prototype.checkIfNumber = function(callerFunc, parameterName, obj)
 
 Preconditions.prototype.checkIfString = function(callerFunc, parameterName, obj){
   if(!(typeof obj == "string")){
+    this.throw(callerFunc, parameterName+" is not a string.");
+  }
+}
+
+Preconditions.prototype.checkIfStringOnlyIfExists = function(callerFunc, parameterName, obj){
+  if(!(typeof obj == UNDEFINED) && !(typeof obj == "string")){
     this.throw(callerFunc, parameterName+" is not a string.");
   }
 }

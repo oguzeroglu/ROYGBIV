@@ -207,14 +207,14 @@ AddedObject.prototype.onBeforeRender = function(){
 
 AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
 
-  macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+  macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, true);
 
   delete this.mesh.material.uniforms.worldInverseTranspose;
   delete this.mesh.material.uniforms.dynamicLightsMatrix;
   delete this.mesh.material.uniforms.worldMatrix;
 
   if (isAffectedByLight){
-    macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+    macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, true);
 
     this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
     this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
@@ -224,6 +224,10 @@ AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
     lightHandler.addLightToObject(this);
   }else{
     lightHandler.removeLightFromObject(this);
+    if (this.lightingType == lightHandler.lightTypes.PHONG){
+      macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+    }
+    delete this.lightingType;
   }
 
   this.mesh.material.needsUpdate = true;
@@ -237,7 +241,38 @@ AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
         obj.affectedByLight = isAffectedByLight;
         if (isAffectedByLight){
           obj.updateWorldInverseTranspose();
+          obj.lightingType = lightHandler.lightTypes.GOURAUD;
         }
+      }
+    }
+  }
+
+  this.lightingType = lightHandler.lightTypes.GOURAUD;
+}
+
+AddedObject.prototype.setPhongLight = function(){
+  macroHandler.injectMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.PHONG;
+
+  for (var objName in addedObjects){
+    if (objName != this.name){
+      var obj = addedObjects[objName];
+      if (obj.softCopyParentName == this.name){
+        obj.lightingType = lightHandler.lightTypes.PHONG;
+      }
+    }
+  }
+}
+
+AddedObject.prototype.unsetPhongLight = function(){
+  macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.GOURAUD;
+
+  for (var objName in addedObjects){
+    if (objName != this.name){
+      var obj = addedObjects[objName];
+      if (obj.softCopyParentName == this.name){
+        obj.lightingType = lightHandler.lightTypes.GOURAUD;
       }
     }
   }
@@ -998,6 +1033,9 @@ AddedObject.prototype.export = function(){
     exportObject.manualPositionInfo = this.manualPositionInfo;
   }
   exportObject.affectedByLight = this.affectedByLight;
+  if (this.affectedByLight){
+    exportObject.lightingType = this.lightingType;
+  }
   exportObject.customDisplacementTextureMatrixInfo  = this.customDisplacementTextureMatrixInfo;
   exportObject.usedAsAIEntity = this.usedAsAIEntity;
 
@@ -3357,6 +3395,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     copyInstance.softCopyParentName = this.name;
     if (this.affectedByLight){
       copyInstance.affectedByLight = true;
+      copyInstance.lightingType = this.lightingType;
       copyInstance.updateWorldInverseTranspose();
     }
   }

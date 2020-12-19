@@ -41,6 +41,8 @@ window.onload = function() {
   Text = (!isDeployment)? new Text(): 0;
   // SHADOW BAKER
   shadowBaker = new ShadowBaker();
+  // RMF HANDLER
+  rmfHandler = new RMFHandler();
 
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
@@ -100,6 +102,7 @@ window.onload = function() {
     settingsGUIHandler = new SettingsGUIHandler();
     mobileSimulationGUIHandler = new MobileSimulationGUIHandler();
     moduleCreatorGUIHandler = new ModuleCreatorGUIHandler();
+    modelCreatorGUIHandler = new ModelCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
@@ -172,6 +175,9 @@ window.onload = function() {
   // THREEJS RENDER MONITORING HANDLER
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
 
+  // MODEL LOADER
+  modelLoader = new ModelLoader();
+
   if (!isDeployment){
     // GUI HANDLER
     guiHandler = new GUIHandler();
@@ -182,6 +188,7 @@ window.onload = function() {
   // 3D CANVAS
   canvas = document.getElementById("rendererCanvas");
   onCanvasInitiated();
+
 
   // INITIALIZE THREE.JS SCENE AND RENDERER
   scene = new THREE.Scene();
@@ -216,6 +223,7 @@ window.onload = function() {
   PVRTC_SUPPORTED = renderer.isPVRTCSupported();
   INSTANCING_SUPPORTED = renderer.isInstancingSupported();
   HIGH_PRECISION_SUPPORTED = renderer.isHighPrecisionSupported();
+  WEBGL_MAX_TEXTURE_SIZE = renderer.getMaxTextureSize();
   BROWSER_NAME = (navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1? "Opera": (
     navigator.userAgent.indexOf("Chrome") != -1? "Chrome": (
       navigator.userAgent.indexOf("Safari") != -1? "Safari": (
@@ -237,14 +245,17 @@ window.onload = function() {
   // SHADER CONTENT
   ShaderContent = new ShaderContent();
   if (isDeployment){
-    cliDiv.value = "";
-    appendtoDeploymentConsole("Loading shaders.");
-    console.log(
-      "%c"+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
-      BANNERL4+"\n"+BANNERL5 +"\n"+"                                         "
-      + "\nby Oguz Eroglu - github.com/oguzeroglu   ",
-      "background: #40318d; color: white"
-    );
+    loadTime.shaderLoadTime = performance.now();
+    if (!hasCustomBootScreen){
+      cliDiv.value = "";
+      appendtoDeploymentConsole("Loading shaders.");
+      console.log(
+        "%c"+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
+        BANNERL4+"\n"+BANNERL5 +"\n"+"                                         "
+        + "\nby Oguz Eroglu - github.com/oguzeroglu   ",
+        "background: #40318d; color: white"
+      );
+    }
   }
 };
 
@@ -433,6 +444,7 @@ function onCanvasInitiated(){
 
 // DEPLOYMENT
 function startDeployment(){
+  loadTime.shaderLoadTime = performance.now() - loadTime.shaderLoadTime;
   appendtoDeploymentConsole("Project name: "+projectName);
   appendtoDeploymentConsole("Author: "+author);
   appendtoDeploymentConsole("");
@@ -450,18 +462,19 @@ function startDeployment(){
   var xobj = new XMLHttpRequest();
   xobj.overrideMimeType("application/json");
   xobj.open("GET", "js/application.json", true);
+  loadTime.applicationJSONLoadTime = performance.now();
   xobj.onreadystatechange = function(){
     if (!(xobj.readyState === 4 && xobj.status === 200)){
       return;
     }
 
     var data = JSON.parse(xobj.responseText);
-
+    loadTime.applicationJSONLoadTime = performance.now() - loadTime.applicationJSONLoadTime;
     appendtoDeploymentConsole("Initializing.");
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
     if (result){
-      if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasTextureAtlas || stateLoader.hasShadows){
+      if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasTextureAtlas || stateLoader.hasShadows || stateLoader.hasModels){
         appendtoDeploymentConsole("Loading assets.");
       }
     }else{
@@ -474,14 +487,24 @@ function startDeployment(){
 }
 
 function clearDeploymentConsole(){
+  if (hasCustomBootScreen){
+    return;
+  }
   document.getElementById("cliDiv").value = "";
 }
 
 function appendtoDeploymentConsole(val){
+  if (hasCustomBootScreen){
+    return;
+  }
   document.getElementById("cliDiv").value += val + "\n";
 }
 
 function removeCLIDom(){
+  if (hasCustomBootScreen){
+    document.getElementById("customBootscreen").style.display = "none";
+    return;
+  }
   if (webglCallbackHandler.shaderCompilationError){
     return;
   }
@@ -492,6 +515,9 @@ function removeCLIDom(){
 }
 
 function addCLIDom(){
+  if (hasCustomBootScreen){
+    return;
+  }
   if (!(typeof cliDiv == UNDEFINED)){
     document.getElementById("cliDiv").style.display = "";
   }
@@ -530,6 +556,9 @@ function onRaycasterMouseMoveIntersection(){
     if (!object){
       object = masses[intersectionObject];
     }
+    if (!object){
+      object = modelInstances[intersectionObject];
+    }
 
     if (object && object.mouseMoveCallbackFunction){
       object.mouseMoveCallbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
@@ -566,6 +595,9 @@ function onRaycasterMouseMoveIntersection(){
       }
       if (!curObj){
         curObj = masses[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = modelInstances[currentMouseOverObjectName];
       }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
@@ -604,6 +636,9 @@ function onRaycasterMouseMoveIntersection(){
       if (!curObj){
         curObj = masses[currentMouseOverObjectName];
       }
+      if (!curObj){
+        curObj = modelInstances[currentMouseOverObjectName];
+      }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
           curObj.mouseOutCallbackFunction();
@@ -638,7 +673,10 @@ function onRaycasterIntersection(){
      if (!object){
        object = masses[intersectionObject];
      }
-     if (object.isAddedObject || object.isObjectGroup){
+     if (!object){
+       object = modelInstances[intersectionObject];
+     }
+     if (object.isAddedObject || object.isObjectGroup || object.isModelInstance){
        if (!isDeployment && mode == 0){
          terminal.clear();
        }
@@ -664,6 +702,22 @@ function onRaycasterIntersection(){
            object.clickCallbackFunction(point.x, point.y, point.z);
          }
        }else if (object.isObjectGroup){
+         if (!isDeployment && mode == 0){
+           terminal.printInfo(Text.CLICKED_ON.replace(
+             Text.PARAM1, object.name+coordStr
+           ));
+         }
+         if (mode == 0){
+           selectionHandler.resetCurrentSelection();
+         }
+         if (!isDeployment){
+           selectionHandler.select(object);
+           guiHandler.afterObjectSelection();
+         }
+         if (object.clickCallbackFunction){
+           object.clickCallbackFunction(point.x, point.y, point.z);
+         }
+       }else if (object.isModelInstance){
          if (!isDeployment && mode == 0){
            terminal.printInfo(Text.CLICKED_ON.replace(
              Text.PARAM1, object.name+coordStr
@@ -759,6 +813,24 @@ function onRaycasterIntersection(){
               if (!isDeployment){
                 guiHandler.afterObjectSelection();
               }
+           }else if (selectedGrid.destroyedModelInstance && !(keyboardBuffer["Shift"]) && !modelInstances[selectedGrid.destroyedModelInstance].hiddenInDesignMode){
+             var modelInstance = modelInstances [selectedGrid.destroyedModelInstance];
+             terminal.clear();
+             var point = intersectionPoint;
+             var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
+             terminal.printInfo(Text.CLICKED_ON.replace(
+               Text.PARAM1, modelInstance.name+coordStr
+             ));
+             if (mode == 0){
+               selectionHandler.resetCurrentSelection();
+             }
+             if (!isDeployment){
+               selectionHandler.select(modelInstance);
+               guiHandler.afterObjectSelection();
+             }
+             if (modelInstance.clickCallbackFunction){
+               modelInstance.clickCallbackFunction(point.x, point.y, point.z);
+             }
            }else{
              selectedGrid.toggleSelect(false, true);
           }

@@ -36,6 +36,12 @@ TextureAtlasHandler.prototype.refreshUniforms = function(){
   for (var chName in crosshairs){
     crosshairs[chName].onTextureAtlasRefreshed();
   }
+  for (var modelName in models){
+    models[modelName].onTextureAtlasRefreshed();
+  }
+  for (var modelInstanceName in modelInstances){
+    modelInstances[modelInstanceName].onTextureAtlasRefreshed();
+  }
 }
 
 TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallback, errorCallback, textureCount){
@@ -50,6 +56,9 @@ TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallba
       if (resp.error){
         errorCallback();
       }else{
+        if (textureAtlasHandler.atlas){
+          textureAtlasHandler.atlas.mergedTexture.dispose();
+        }
         textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true});
         textureAtlasHandler.atlas.loadTextures(false, function(){
           textureAtlasHandler.currentTextureCount = textureCount;
@@ -83,6 +92,15 @@ TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, erro
     }
     if (tp.hasHeight){
       texturesObj[texturePackName + "#height"] = tp.heightTexture;
+    }
+  }
+  for (var modelName in models){
+    var model = models[modelName];
+    var usedTextures = model.getUsedTextures();
+    for (var i = 0; i < usedTextures.length; i ++){
+      var usedTexture = usedTextures[i];
+      textureCount ++
+      texturesObj[usedTexture.id] = usedTexture.texture;
     }
   }
   if (force || this.currentTextureCount != textureCount){
@@ -123,6 +141,10 @@ TextureAtlasHandler.prototype.import = function(exportObject, readyCallback){
     this.textureMerger.ranges = JSON.parse(JSON.stringify(exportObject.ranges));
     textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true});
     textureAtlasHandler.atlas.loadTextures(false, function(){
+      for (var modelName in models){
+        models[modelName].onTextureAtlasRefreshed();
+      }
+      
       readyCallback();
     });
   }else{

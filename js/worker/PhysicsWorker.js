@@ -5,6 +5,7 @@ importScripts("../engine_objects/AddedObject.js");
 importScripts("../engine_objects/ObjectGroup.js");
 importScripts("../engine_objects/CollisionInfo.js");
 importScripts("../engine_objects/Mass.js");
+importScripts("../engine_objects/ModelInstance.js");
 
 var IS_WORKER_CONTEXT = true;
 

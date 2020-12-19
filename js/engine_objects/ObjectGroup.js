@@ -274,6 +274,10 @@ ObjectGroup.prototype.setAffectedByLight = function(isAffectedByLight){
     lightHandler.addLightToObject(this);
   }else{
     lightHandler.removeLightFromObject(this);
+    if (this.lightingType == lightHandler.lightTypes.PHONG){
+      macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+    }
+    delete this.lightingType;
   }
 
   this.mesh.material.needsUpdate = true;
@@ -287,7 +291,38 @@ ObjectGroup.prototype.setAffectedByLight = function(isAffectedByLight){
         obj.affectedByLight = isAffectedByLight;
         if (isAffectedByLight){
           obj.updateWorldInverseTranspose();
+          obj.lightingType = lightHandler.lightTypes.GOURAUD;
         }
+      }
+    }
+  }
+
+  this.lightingType = lightHandler.lightTypes.GOURAUD;
+}
+
+ObjectGroup.prototype.setPhongLight = function(){
+  macroHandler.injectMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.PHONG;
+
+  for (var objName in objectGroups){
+    if (objName != this.name){
+      var obj = objectGroups[objName];
+      if (obj.softCopyParentName == this.name){
+        obj.lightingType = lightHandler.lightTypes.PHONG;
+      }
+    }
+  }
+}
+
+ObjectGroup.prototype.unsetPhongLight = function(){
+  macroHandler.removeMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
+  this.lightingType = lightHandler.lightTypes.GOURAUD;
+
+  for (var objName in objectGroups){
+    if (objName != this.name){
+      var obj = objectGroups[objName];
+      if (obj.softCopyParentName == this.name){
+        obj.lightingType = lightHandler.lightTypes.GOURAUD;
       }
     }
   }
@@ -3102,6 +3137,10 @@ ObjectGroup.prototype.export = function(isBuildingForDeploymentMode){
   exportObj.affectedByLight = this.affectedByLight;
   exportObj.usedAsAIEntity = this.usedAsAIEntity;
 
+  if (this.affectedByLight){
+    exportObj.lightingType = this.lightingType;
+  }
+
   if (this.steerableInfo){
     exportObj.steerableInfo = {
       mode: this.steerableInfo.mode,
@@ -3639,6 +3678,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.softCopyParentName = this.name;
     if (this.affectedByLight){
       newObjGroup.affectedByLight = true;
+      newObjGroup.lightingType = this.lightingType;
       newObjGroup.updateWorldInverseTranspose();
     }
   }else{

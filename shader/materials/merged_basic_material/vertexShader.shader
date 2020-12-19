@@ -65,7 +65,7 @@ varying float vAlpha;
 #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
   uniform mat4 worldMatrix;
 #endif
-#ifdef HAS_SKYBOX_FOG
+#if defined(HAS_SKYBOX_FOG) || defined(HAS_PHONG_LIGHTING)
   varying vec3 vWorldPosition;
 #endif
 
@@ -82,6 +82,10 @@ varying float vAlpha;
   attribute vec4 shadowMapUV;
   varying vec4 vShadowMapUV;
   varying vec2 vUV2;
+#endif
+
+#ifdef HAS_PHONG_LIGHTING
+  varying vec3 vNormal;
 #endif
 
 vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
@@ -687,7 +691,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
   vec3 handleLighting(vec3 worldPositionComputed){
 
-    vec3 computedNormal = mat3(worldInverseTranspose) * normal;
+    vec3 computedNormal = normalize(mat3(worldInverseTranspose) * normal);
 
     #ifdef IS_LIGHT_BAKED
 
@@ -867,7 +871,7 @@ void main(){
     vec3 worldPositionComputed = (worldMatrix * vec4(position, 1.0)).xyz;
   #endif
 
-  #ifdef AFFECTED_BY_LIGHT
+  #if defined(AFFECTED_BY_LIGHT) && !defined(HAS_PHONG_LIGHTING)
     vColor = handleLighting(worldPositionComputed);
   #else
     vColor = color;
@@ -921,7 +925,12 @@ void main(){
       }
     #endif
   #endif
-  #ifdef HAS_SKYBOX_FOG
+
+  #ifdef HAS_PHONG_LIGHTING
+    vNormal = normalize(mat3(worldInverseTranspose) * normal);
+  #endif
+
+  #if defined(HAS_SKYBOX_FOG) || defined(HAS_PHONG_LIGHTING)
     vWorldPosition = worldPositionComputed;
   #endif
   vec3 transformedPosition = position;

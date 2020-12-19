@@ -132,6 +132,12 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleBakeStaticLightsCommand();
     }else if (this.splitted[0] == "unbakestaticlights"){
       this.handleUnbakeStaticLightsCommand();
+    }else if (this.splitted[0] == "newmodelinstance"){
+      this.handleNewModelInstanceCommand();
+    }else if (this.splitted[0] == "destroymodel"){
+      this.handleDestroyModelCommand();
+    }else if (this.splitted[0] == "destroymodelinstance"){
+      this.handleDestroyModelInstanceCommand();
     }
 
     if (jobHandlerRaycasterRefresh){
@@ -156,6 +162,83 @@ JobHandler.prototype.handle = function(previewModeCommand){
   }
 
   jobHandlerWorking = false;
+}
+
+JobHandler.prototype.handleDestroyModelInstanceCommand = function(){
+  var instanceNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var instanceName in sceneHandler.getModelInstances()){
+    if (instanceName.startsWith(instanceNamePrefix)){
+      parseCommand("destroyModelInstance "+instanceName)
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_MODEL_INSTANCES_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_MODEL_INSTANCES.replace(Text.PARAM1, ctr));
+
+    if (physicsDebugMode){
+      terminal.skip = true;
+      parseCommand("switchPhysicsDebugMode");
+      parseCommand("switchPhysicsDebugMode");
+      terminal.skip = false;
+    }
+  }
+}
+
+JobHandler.prototype.handleDestroyModelCommand = function(){
+  var modelNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  var refreshTextureAtlas = false;
+  for (var modelName in models){
+    if (modelName.startsWith(modelNamePrefix)){
+      if (models[modelName].getUsedTextures().length > 0){
+        refreshTextureAtlas = true;
+      }
+      parseCommand("destroyModel "+modelName);
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_MODELS_FOUND);
+  }else{
+    if (!refreshTextureAtlas){
+      terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_MODELS.replace(Text.PARAM1, ctr));
+      return;
+    }
+    terminal.clear();
+    terminal.disable();
+    terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+    textureAtlasHandler.onTexturePackChange(function(){
+      terminal.clear();
+      terminal.enable();
+      terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_MODELS.replace(Text.PARAM1, ctr));
+    }, function(){
+      terminal.clear();
+      terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+      terminal.enable();
+    }, false);
+  }
+}
+
+JobHandler.prototype.handleNewModelInstanceCommand = function(){
+  var modelNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var gridName in gridSelections){
+    jobHandlerSelectedGrid = gridSelections[gridName];
+    parseCommand(
+      "newModelInstance "+modelNamePrefix+"_"+ctr+" "+this.splitted[2]+" "+this.splitted[3]
+    );
+    ctr ++;
+  }
+  jobHandlerSelectedGrid = 0;
+  if (ctr != 0){
+    terminal.printInfo(Text.CREATED_X_MODEL_INSTANCES.replace(Text.PARAM1, ctr));
+  }else{
+    terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
+  }
 }
 
 JobHandler.prototype.handleUnbakeStaticLightsCommand = function(){

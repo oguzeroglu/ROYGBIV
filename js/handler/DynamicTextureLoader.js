@@ -9,7 +9,20 @@ DynamicTextureLoader.prototype.loadDynamicTextures = function(folderName, textur
   var loader = textureLoaderFactory.get();
   for (var i = 0; i<textureNames.length; i++){
     this.results.push(false)
-    var path = "./dynamic_textures/"+folderName+"/"+textureNames[i] + textureLoaderFactory.getFilePostfix();
+    var textureName = textureNames[i];
+    var path;
+
+    if (textureName.endsWith(".png") || textureName.endsWith("jpg") || textureName.endsWith("jpeg")){
+      path = "./dynamic_textures/"+folderName+"/"+textureNames[i];
+      loader = textureLoaderFactory.getDefault();
+    }else{
+      if (dynamicTextureFolders[folderName].noCompress){
+        path = "./dynamic_textures/"+folderName+"/"+textureNames[i] + ".png";
+        loader = textureLoaderFactory.getDefault();
+      }else{
+        path = "./dynamic_textures/"+folderName+"/"+textureNames[i] + textureLoaderFactory.getFilePostfix();
+      }
+    }
     if (dynamicallyLoadedTextures[path]){
       this.results[i] = dynamicallyLoadedTextures[path];
       this.onTextureLoaded();
@@ -34,6 +47,7 @@ DynamicTextureLoader.prototype.createTexturePack = function(textureData){
   textureData.hasDiffuse = true;
   textureData.wrapS = THREE.RepeatWrapping;
   textureData.wrapT = THREE.RepeatWrapping;
+  textureData.magFilter = THREE.NearestFilter;
   textureData.needsUpdate = true;
   return texturePack;
 }

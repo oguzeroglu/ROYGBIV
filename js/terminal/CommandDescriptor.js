@@ -217,7 +217,7 @@ var CommandDescriptor = function(){
       1, //destroyVirtualKeyboard
       0, //printVirtualKeyboards
       2, //syncSpriteSize
-      1, //newDynamicTextureFolder
+      2, //newDynamicTextureFolder
       1, //destroyDynamicTextureFolder
       0, //printDynamicTextureFolders
       1, //setProtocolDefinition
@@ -279,7 +279,14 @@ var CommandDescriptor = function(){
       1, //unbakeShadow
       0, //mobileSimulation
       1, //selectMass
-      0 //modules
+      0, //modules
+      1, //newModel
+      3, //newModelInstance
+      1, //destroyModel
+      1, //selectModelInstance
+      1, //destroyModelInstance
+      0, //printModels
+      0 //printModelInstances
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -499,7 +506,7 @@ var CommandDescriptor = function(){
     "destroyVirtualKeyboard virtualKeyboardName",
     "printVirtualKeyboards",
     "syncSpriteSize sourceSprite targetSprite",
-    "newDynamicTextureFolder folderName",
+    "newDynamicTextureFolder folderName noCompress",
     "destroyDynamicTextureFolder dynamicTextureFolderName",
     "printDynamicTextureFolders",
     "setProtocolDefinition protocolDefinitionFileName",
@@ -561,7 +568,14 @@ var CommandDescriptor = function(){
     "unbakeShadow objectName[1],objectName[2],...objectName[n]",
     "mobileSimulation",
     "selectMass massName",
-    "modules"
+    "modules",
+    "newModel modelName",
+    "newModelInstance instanceName modelName height",
+    "destroyModel modelName",
+    "selectModelInstance instanceName",
+    "destroyModelInstance instanceName",
+    "printModels",
+    "printModelInstances"
   ];
 
   this.commands = [
@@ -843,7 +857,14 @@ var CommandDescriptor = function(){
     "unbakeShadow",
     "mobileSimulation",
     "selectMass",
-    "modules"
+    "modules",
+    "newModel",
+    "newModelInstance",
+    "destroyModel",
+    "selectModelInstance",
+    "destroyModelInstance",
+    "printModels",
+    "printModelInstances"
   ];
 
   this.commandInfo = [
@@ -1063,7 +1084,7 @@ var CommandDescriptor = function(){
     "destroyVirtualKeyboard: Destroys a virtual keyboard.",
     "printVirtualKeyboards: Prints created virtual keyboards.",
     "syncSpriteSize: Makes the size of targetSprite same with sourceSprite",
-    "newDynamicTextureFolder: Compresses each PNG under dynamic_textures/folderName to be used as dynamic texture.",
+    "newDynamicTextureFolder: Creates a new dynamic texture folder. If noCompress is set to false, it compresses each image under dynamic_textures/folderName.",
     "destroyDynamicTextureFolder: Destroys a dynamic texture folder.",
     "printDynamicTextureFolders: Prints dynamic texture folders.",
     "setProtocolDefinition: Sets a protocol definition from protocol_definitions folder.",
@@ -1125,7 +1146,14 @@ var CommandDescriptor = function(){
     "unbakeShadow: Unbakes shadows on given objects.",
     "mobileSimulation: Opens the mobile simulation GUI.",
     "selectMass: Selects a mass",
-    "modules: Opens module creation GUI."
+    "modules: Opens module creation GUI.",
+    "newModel: Opens model creation GUI.",
+    "newModelInstance: Creates a new model instance from given model.",
+    "destoryModel: Destroys a model.",
+    "selectModelInstance: Selects a model instance.",
+    "destroyModelInstance: Destroys a model instance.",
+    "printModels: Prints a list of created models.",
+    "printModelInstances: Prints model instances."
   ];
 
   this.keyboardInfo = [
@@ -1309,6 +1337,8 @@ var CommandDescriptor = function(){
   this.STEERABLE_NAME                     =   55;
   this.MASS_ID                            =   56;
   this.LIGHT_NAME                         =   57;
+  this.MODEL_NAME                         =   58;
+  this.MODEL_INSTANCE_NAME                =   59;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1850,6 +1880,7 @@ var CommandDescriptor = function(){
   this.newDynamicTextureFolder = new Object();
   this.newDynamicTextureFolder.types = [];
   this.newDynamicTextureFolder.types.push(this.UNKNOWN_INDICATOR); //folderName
+  this.newDynamicTextureFolder.types.push(this.BOOLEAN); //noCompress
 
   // destroyDynamicTextureFolder
   this.destroyDynamicTextureFolder = new Object();
@@ -2035,6 +2066,33 @@ var CommandDescriptor = function(){
   this.selectMass = new Object();
   this.selectMass.types = [];
   this.selectMass.types.push(this.MASS_ID); //massName
+
+  // newModel
+  this.newModel = new Object();
+  this.newModel.types = [];
+  this.newModel.types.push(this.UNKNOWN_INDICATOR); //modelName
+
+  // newModelInstance
+  this.newModelInstance = new Object();
+  this.newModelInstance.types = [];
+  this.newModelInstance.types.push(this.UNKNOWN_INDICATOR); //instanceName
+  this.newModelInstance.types.push(this.MODEL_NAME); //modelName
+  this.newModelInstance.types.push(this.UNKNOWN_INDICATOR); //height
+
+  // destroyModel
+  this.destroyModel = new Object();
+  this.destroyModel.types = [];
+  this.destroyModel.types.push(this.MODEL_NAME); //modelName
+
+  // selectModelInstance
+  this.selectModelInstance = new Object();
+  this.selectModelInstance.types = [];
+  this.selectModelInstance.types.push(this.MODEL_INSTANCE_NAME); //instanceName
+
+  // destroyModelInstance
+  this.destroyModelInstance = new Object();
+  this.destroyModelInstance.types = [];
+  this.destroyModelInstance.types.push(this.MODEL_INSTANCE_NAME); //instanceName
 };
 
 CommandDescriptor.prototype.test = function(){

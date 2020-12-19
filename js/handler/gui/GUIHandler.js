@@ -45,6 +45,7 @@ var GUIHandler = function(){
     "Jump speed": "500",
     "Look speed": 0.1,
     "Hidden": false,
+    "Lighting type": lightHandler.lightTypes.GOURAUD,
     "Light": "diffuse1",
     "Bake shadow": function(){
       terminal.clear();
@@ -148,6 +149,15 @@ var GUIHandler = function(){
     "Mass": "",
     "Intersectable": false
   };
+  this.modelInstanceManipulationParameters = {
+    "Model instance": "",
+    "Hidden": false,
+    "Has mass": false,
+    "Intersectable": false,
+    "Affected by light": false,
+    "Lighting type": lightHandler.lightTypes.GOURAUD,
+    "Normal map scale": "1,1"
+  };
   this.bloomParameters = {
     "Threshold": 0.0,
     "Active": false,
@@ -172,7 +182,7 @@ var GUIHandler = function(){
     CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20, GRAPH_CREATOR: 21, STEERING_BEHAVIOR_CREATION: 22,
     JUMP_DESCRIPTOR_CREATION: 23, KNOWLEDGE_CREATION: 24, DECISION_CREATION: 25, DECISION_TREE_CREATION: 26,
     STATE_CREATION: 27, TRANSITION_CREATION: 28, STATE_MACHINE_CREATION: 29, VIRTUAL_KEYBOARD: 30, SETTINGS: 31,
-    MOBILE_SIMULATION: 32, MASS: 33, MODULE_CREATION: 34
+    MOBILE_SIMULATION: 32, MASS: 33, MODULE_CREATION: 34, MODEL_CREATION: 35, MODEL_INSTANCE: 36
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -182,7 +192,7 @@ var GUIHandler = function(){
     this.guiTypes.STEERING_BEHAVIOR_CREATION, this.guiTypes.JUMP_DESCRIPTOR_CREATION,
     this.guiTypes.KNOWLEDGE_CREATION, this.guiTypes.DECISION_CREATION, this.guiTypes.DECISION_TREE_CREATION,
     this.guiTypes.STATE_CREATION, this.guiTypes.TRANSITION_CREATION, this.guiTypes.STATE_MACHINE_CREATION,
-    this.guiTypes.MODULE_CREATION
+    this.guiTypes.MODULE_CREATION, this.guiTypes.MODEL_CREATION
   ];
 }
 
@@ -299,6 +309,11 @@ GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
           return true;
         }
       break;
+      case this.guiTypes.MODEL_CREATION:
+        if (this.datGuiModelCreation){
+          return true;
+        }
+      break;
       default:
         throw new Error("Not implemented.")
       break;
@@ -385,6 +400,38 @@ GUIHandler.prototype.afterVirtualKeyboardSelection = function(){
   guiHandler.afterMassSelection();
 }
 
+GUIHandler.prototype.afterModelInstanceSelection = function(){
+  if (mode != 0){
+    return;
+  }
+
+  var curSelection = selectionHandler.getSelectedObject();
+  if (curSelection && curSelection.isModelInstance){
+    guiHandler.show(guiHandler.guiTypes.MODEL_INSTANCE);
+    guiHandler.modelInstanceManipulationParameters["Model instance"] = curSelection.name;
+    guiHandler.modelInstanceManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
+    guiHandler.modelInstanceManipulationParameters["Has mass"] = !curSelection.noMass;
+    guiHandler.modelInstanceManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
+    guiHandler.modelInstanceManipulationParameters["Affected by light"] = !!curSelection.affectedByLight;
+    if (curSelection.affectedByLight){
+      guiHandler.modelInstanceManipulationParameters["Lighting type"] = curSelection.lightingType || lightHandler.lightTypes.GOURAUD;
+      guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
+    }else{
+      guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
+      guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
+    }
+
+    if (curSelection.lightingType == lightHandler.lightTypes.PHONG && curSelection.model.info.hasNormalMap){
+      guiHandler.modelInstanceManipulationParameters["Normal map scale"] = curSelection.mesh.material.uniforms.normalScale.value.x + "," + curSelection.mesh.material.uniforms.normalScale.value.y;
+      guiHandler.enableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+    }else{
+      guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+    }
+  }else{
+    guiHandler.hide(guiHandler.guiTypes.MODEL_INSTANCE);
+  }
+}
+
 GUIHandler.prototype.afterMassSelection = function(){
   if (mode != 0){
     return;
@@ -398,6 +445,7 @@ GUIHandler.prototype.afterMassSelection = function(){
   }else{
     guiHandler.hide(guiHandler.guiTypes.MASS);
   }
+  guiHandler.afterModelInstanceSelection();
 }
 
 GUIHandler.prototype.afterSpriteSelection = function(){
@@ -819,6 +867,13 @@ GUIHandler.prototype.afterObjectSelection = function(){
       guiHandler.disableController(guiHandler.omLookSpeedController);
     }
 
+    if (obj.affectedByLight){
+      guiHandler.objectManipulationParameters["Lighting type"] = obj.lightingType;
+    }else{
+      guiHandler.disableController(guiHandler.omLightingTypeController);
+      guiHandler.objectManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
+    }
+
     if (obj.usedAsAIEntity){
       guiHandler.disableController(guiHandler.omFPSWeaponController);
     }
@@ -1024,6 +1079,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omJumpSpeedController);
   guiHandler.enableController(guiHandler.omLookSpeedController);
   guiHandler.enableController(guiHandler.omRotationModeController);
+  guiHandler.enableController(guiHandler.omLightingTypeController);
 }
 
 GUIHandler.prototype.show = function(guiType){
@@ -1062,6 +1118,11 @@ GUIHandler.prototype.show = function(guiType){
     case this.guiTypes.MASS:
       if (!this.datGuiMassManipulation){
         this.initializeMassManipulationGUI();
+      }
+    return;
+    case this.guiTypes.MODEL_INSTANCE:
+      if (!this.datGuiModelInstance){
+        this.initializeModelInstanceManipulationGUI();
       }
     return;
   }
@@ -1294,6 +1355,18 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiModuleCreation){
         this.destroyGUI(this.datGuiModuleCreation);
         this.datGuiModuleCreation = 0;
+      }
+    return;
+    case this.guiTypes.MODEL_CREATION:
+      if (this.datGuiModelCreation){
+        this.destroyGUI(this.datGuiModelCreation);
+        this.datGuiModelCreation = 0;
+      }
+    return;
+    case this.guiTypes.MODEL_INSTANCE:
+      if (this.datGuiModelInstance){
+        this.destroyGUI(this.datGuiModelInstance);
+        this.datGuiModelInstance = 0;
       }
     return;
   }
@@ -1739,9 +1812,19 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.clear();
       obj.setAffectedByLight(val);
       if (val){
+        guiHandler.enableController(guiHandler.omLightingTypeController);
         terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
+        guiHandler.objectManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
       }else{
+        guiHandler.disableController(guiHandler.omLightingTypeController);
         terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
+      }
+    }).listen();
+    guiHandler.omLightingTypeController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Lighting type", Object.keys(lightHandler.lightTypes)).onChange(function(val){
+      if (val == lightHandler.lightTypes.PHONG){
+        selectionHandler.getSelectedObject().setPhongLight();
+      }else{
+        selectionHandler.getSelectedObject().unsetPhongLight();
       }
     }).listen();
 
@@ -2051,6 +2134,103 @@ GUIHandler.prototype.initializeVirtualKeyboardGUI = function(){
       selectionHandler.getSelectedObject().showInDesignMode();
     }
   }).listen();
+}
+
+GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
+  guiHandler.datGuiModelInstance = new dat.GUI({hideable: false, width: 420});
+  guiHandler.datGuiModelInstance.domElement.addEventListener("mousedown", function(e){
+    mimGUIFocused = true;
+  });
+
+  guiHandler.disableController(guiHandler.datGuiModelInstance.add(guiHandler.modelInstanceManipulationParameters, "Model instance").listen());
+  guiHandler.datGuiModelInstance.add(guiHandler.modelInstanceManipulationParameters, "Hidden").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().hideInDesignMode();
+    }else{
+      selectionHandler.getSelectedObject().showInDesignMode();
+    }
+  }).listen();
+
+  var physicsFolder = guiHandler.datGuiModelInstance.addFolder("Physics");
+  physicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Has mass").onChange(function(val){
+    terminal.clear();
+    selectionHandler.getSelectedObject().setNoMass(!val);
+    terminal.printInfo(val? Text.PHYSICS_ENABLED: Text.PHYSICS_DISABLED);
+    if (physicsDebugMode){
+      debugRenderer.refresh();
+    }
+  }).listen();
+
+  var generalFolder = guiHandler.datGuiModelInstance.addFolder("General");
+  generalFolder.add(guiHandler.modelInstanceManipulationParameters, "Intersectable").onChange(function(val){
+    terminal.clear();
+    var obj = selectionHandler.getSelectedObject();
+    obj.setIntersectableStatus(val)
+    if (obj.isIntersectable){
+      terminal.printInfo(Text.OBJECT_INTERSECTABLE);
+    }else{
+      terminal.printInfo(Text.OBJECT_UNINTERSECTABLE);
+    }
+  }).listen();
+
+  var graphicsFolder = guiHandler.datGuiModelInstance.addFolder("Graphics");
+  graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Affected by light").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.setAffectedByLight(val);
+    if (val){
+      guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
+      guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
+      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
+    }else{
+      guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
+      guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+      guiHandler.modelInstanceManipulationParameters["Normal map scale"] = "1,1";
+      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
+    }
+  }).listen();
+  guiHandler.modelInstanceManupulationLightingTypeController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Lighting type", Object.keys(lightHandler.lightTypes)).onChange(function(val){
+    if (val == lightHandler.lightTypes.PHONG){
+      selectionHandler.getSelectedObject().setPhongLight();
+      if (selectionHandler.getSelectedObject().model.info.hasNormalMap){
+        guiHandler.enableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+      }
+    }else{
+      guiHandler.modelInstanceManipulationParameters["Normal map scale"] = "1,1";
+      selectionHandler.getSelectedObject().unsetPhongLight();
+      guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+    }
+  }).listen();
+  guiHandler.modelInstanceManipulationNormalMapScaleController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Normal map scale").onFinishChange(function(val){
+    terminal.clear();
+    var splitted = val.split(",");
+    if (splitted.length != 2){
+      terminal.printError(Text.INVALID_VECTOR_VALUE);
+      return;
+    }
+    var valX = parseFloat(splitted[0]);
+    var valY = parseFloat(splitted[1]);
+    if (isNaN(valX) || isNaN(valY)){
+      terminal.printError(Text.INVALID_VECTOR_VALUE);
+      return;
+    }
+    selectionHandler.getSelectedObject().mesh.material.uniforms.normalScale.value.set(valX, valY);
+    terminal.printInfo(Text.NORMAL_MAP_SCALE_SET);
+  }).listen();
+
+  if (selectionHandler.getSelectedObject().model.info.customTexturesEnabled){
+    var textureFolder = guiHandler.datGuiModelInstance.addFolder("Textures");
+    var usedTextures = selectionHandler.getSelectedObject().model.getUsedTextures();
+    for (var i = 0; i < usedTextures.length; i ++){
+      var usedTexture = usedTextures[i];
+      var childFolder = textureFolder.addFolder(usedTexture.id);
+      childFolder.add({
+        "View": function(){
+          window.open (this.url, "texture","menubar=1,resizable=1,width=500,height=500");
+        }.bind({url: usedTexture.url})
+      }, "View");
+    }
+  }
 }
 
 GUIHandler.prototype.initializeMassManipulationGUI = function(){

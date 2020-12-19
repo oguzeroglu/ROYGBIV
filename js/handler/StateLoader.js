@@ -5,11 +5,13 @@ var StateLoader = function(stateObj){
   this.totalLoadedTexturePackCount = 0;
   this.totalLoadedSkyboxCount = 0;
   this.totalLoadedFontCount = 0;
+  this.totalLoadedModelCount = 0;
   this.importHandler = new ImportHandler();
 }
 
-StateLoader.prototype.onTextureAtlasLoaded = function(texturePacksToMap){
+StateLoader.prototype.onTextureAtlasLoaded = function(){
   this.textureAtlasReady = true;
+  var texturePacksToMap = this.texturePacksToMap || [];
   for (var i = 0; i < texturePacksToMap.length; i ++){
     this.importHandler.mapLoadedTexturePack(texturePacksToMap[i].name, this.stateObj);
   }
@@ -24,11 +26,18 @@ StateLoader.prototype.onSkyboxLoaded = function(){
   this.finalize();
 }
 
+StateLoader.prototype.tryToImportTextureAtlas = function(){
+  if (this.totalLoadedTexturePackCount == this.stateObj.totalTexturePackCount){
+    if (this.totalLoadedModelCount == Object.keys(this.stateObj.models).length){
+      this.importHandler.importTextureAtlas(this.stateObj, this.onTextureAtlasLoaded.bind(this), this.texturePacksToMap);
+    }
+  }
+}
+
 StateLoader.prototype.onTexturePackLoaded = function(texturePacksToMap){
   this.totalLoadedTexturePackCount ++;
-  if (this.totalLoadedTexturePackCount == this.stateObj.totalTexturePackCount){
-    this.importHandler.importTextureAtlas(this.stateObj, this.onTextureAtlasLoaded.bind(this), texturePacksToMap);
-  }
+  this.texturePacksToMap = texturePacksToMap;
+  this.tryToImportTextureAtlas();
   this.finalize();
 }
 
@@ -47,8 +56,27 @@ StateLoader.prototype.onModulesLoaded = function(){
   this.finalize();
 }
 
+StateLoader.prototype.onModelLoaded = function(){
+  this.totalLoadedModelCount ++;
+  if (this.totalLoadedModelCount == Object.keys(this.stateObj.models).length){
+
+    if (isDeployment){
+      loadTime.modelImporttime = performance.now() - loadTime.modelImporttime;
+    }
+
+    this.modelsReady = true;
+    this.tryToImportTextureAtlas();
+    this.finalize();
+  }
+}
+
 StateLoader.prototype.load = function(){
   try{
+
+    if (isDeployment){
+      loadTime.totalLoadTime = performance.now();
+    }
+
     projectLoaded = false;
     this.resetProject();
     var obj = this.stateObj;
@@ -58,9 +86,11 @@ StateLoader.prototype.load = function(){
     this.hasFonts = this.stateObj.totalFontCount > 0;
     this.hasShadows = Object.keys(this.stateObj.shadowBaker.textureRangesByObjectName).length > 0;
     this.hasModules = !isDeployment && this.stateObj.modules.length > 0;
+    this.hasModels = Object.keys(this.stateObj.models).length > 0;
     this.textureAtlasReady = false;
     this.shadowReady = false;
     this.modulesReady = false;
+    this.modelsReady = false;
 
     this.importHandler.importEngineVariables(obj);
     this.importHandler.importGridSystems(obj);
@@ -73,12 +103,17 @@ StateLoader.prototype.load = function(){
     this.importHandler.importSkyboxes(obj, this.onSkyboxLoaded.bind(this));
     this.importHandler.importFonts(obj, this.onFontLoaded.bind(this));
     this.importHandler.importShadowBaker(obj, this.onShadowsLoaded.bind(this));
+    this.importHandler.importModels(obj, this.onModelLoaded.bind(this));
 
-    if (!isDeployment){
+    if (isDeployment && this.hasModels){
+      loadTime.modelImporttime = performance.now();
+    }
+
+    if (!isDeployment && this.hasModules){
       this.importHandler.importModules(obj, this.onModulesLoaded.bind(this));
     }
 
-    if (!this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts && !this.hasTextureAtlas && !this.hasShadows && !this.hasModules){
+    if (!this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts && !this.hasTextureAtlas && !this.hasShadows && !this.hasModules && !this.hasModels){
       this.finalize();
     }
     return true;
@@ -97,7 +132,8 @@ StateLoader.prototype.shouldFinalize = function(){
     (this.hasSkyboxes && parseInt(this.totalLoadedSkyboxCount) < parseInt(this.stateObj.totalSkyboxCount)) ||
     (this.hasFonts && parseInt(this.totalLoadedFontCount) < parseInt(this.stateObj.totalFontCount)) ||
     (this.hasShadows && !this.shadowReady) ||
-    (this.hasModules && !this.modulesReady)
+    (this.hasModules && !this.modulesReady) ||
+    (this.hasModels && !this.modelsReady)
   )
   return res;
 }
@@ -124,6 +160,8 @@ StateLoader.prototype.onAfterFinalized = function(){
       }
     }
 
+    loadTime.totalLoadTime = performance.now() - loadTime.totalLoadTime;
+
     appendtoDeploymentConsole("Initializing workers.");
     modeSwitcher.switchMode();
   }
@@ -132,6 +170,10 @@ StateLoader.prototype.onAfterFinalized = function(){
 StateLoader.prototype.finalize = function(){
   if (!this.shouldFinalize()){
     return;
+  }
+
+  if (isDeployment){
+    loadTime.finalizeTime = performance.now();
   }
 
   this.importHandler.importParticleSystems(this.stateObj);
@@ -144,6 +186,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importSprites(this.stateObj);
   this.importHandler.importContainers(this.stateObj);
   this.importHandler.importVirtualKeyboards(this.stateObj);
+  this.importHandler.importModelInstances(this.stateObj);
   this.importHandler.importScenes(this.stateObj);
   this.importHandler.importSteeringHandler(this.stateObj);
   this.importHandler.importDecisionHandler(this.stateObj);
@@ -152,6 +195,11 @@ StateLoader.prototype.finalize = function(){
   this.closeRaycasterWorkerIfNotUsed();
 
   projectLoaded = true;
+
+  if (isDeployment){
+    loadTime.finalizeTime = performance.now() - loadTime.finalizeTime;
+  }
+
   this.onAfterFinalized();
 }
 
@@ -313,6 +361,8 @@ StateLoader.prototype.resetProject = function(){
   objectGroups = new Object();
   disabledObjectNames = new Object();
   markedPoints = new Object();
+  models = new Object();
+  modelInstances = new Object();
   areas = new Object();
   objectTrails = new Object();
   activeObjectTrails = new Map();
@@ -378,6 +428,7 @@ StateLoader.prototype.resetProject = function(){
   lightningHandler.reset();
   steeringHandler.reset();
   decisionHandler.reset();
+  modelLoader.reset();
   fonts = new Object();
   roygbivAttributeCounter = 1;
   roygbivBufferAttributeCounter = 1;
@@ -405,6 +456,8 @@ StateLoader.prototype.resetProject = function(){
   ENABLE_ANTIALIAS = false;
   lightHandler.reset();
   masses = new Object();
+  bootscreenFolderName = null;
+  bodyBGColor = null;
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;
   INSTANCING_DISABLED = false;

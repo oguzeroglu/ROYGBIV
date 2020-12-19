@@ -547,6 +547,12 @@ GridSystem.prototype.destroy = function(){
       obj.destroyedGrids = new Object();
     }
   }
+  for (var instanceName in modelInstances){
+    var modelInstance = modelInstances[instanceName];
+    if (modelInstance.gsName == this.name){
+      modelInstance.destroyedGrids = new Object();
+    }
+  }
 }
 
 GridSystem.prototype.selectAllGrids = function(){
@@ -1137,6 +1143,135 @@ GridSystem.prototype.newMass = function(selections, height, id){
 
   sceneHandler.onMassCreation(mass);
   masses[id] = mass;
+}
+
+GridSystem.prototype.newModelInstance = function(selections, height, model, instanceName){
+  var boxCenterX, boxCenterY, boxCenterZ;
+  var boxSizeX, boxSizeY, boxSizeZ;
+
+  if (selections.length == 1){
+    var grid = selections[0];
+    boxCenterX = grid.centerX;
+    boxCenterZ = grid.centerZ;
+    boxSizeX = this.cellSize;
+    boxSizeZ = this.cellSize;
+  }else{
+    var grid1 = selections[0];
+    var grid2 = selections[1];
+    boxCenterX = (grid1.centerX + grid2.centerX) / 2;
+    boxCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+    boxSizeX = (Math.abs(grid1.colNumber - grid2.colNumber) + 1) * this.cellSize;
+    boxSizeZ = (Math.abs(grid1.rowNumber - grid2.rowNumber) + 1) * this.cellSize;
+  }
+
+  boxCenterY = this.centerY + (height / 2);
+  boxSizeY = Math.abs(height);
+  if (this.axis == "XY"){
+    var tmp = boxSizeY;
+    boxSizeY = boxSizeZ;
+    boxSizeZ = tmp;
+    boxCenterZ = this.centerZ + (height / 2);
+    if (selections.length == 1){
+        var grid = selections[0];
+        boxCenterY = grid.centerY;
+    }else{
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      boxCenterY = (grid1.centerY + grid2.centerY) / 2;
+    }
+  }else if (this.axis == "YZ"){
+    var oldX = boxSizeX;
+    var oldY = boxSizeY;
+    var oldZ = boxSizeZ;
+    boxSizeZ = oldX;
+    boxSizeX = oldY;
+    boxSizeY = oldZ;
+    if (selections.length == 1){
+      var grid = selections[0];
+      boxCenterY = grid.centerY;
+      boxCenterZ = grid.centerZ;
+      boxCenterX = grid.centerX + (height / 2);
+    }else{
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      boxCenterY = (grid1.centerY + grid2.centerY) / 2;
+      boxCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+      boxCenterX = grid1.centerX + (height / 2);
+    }
+  }
+
+  var modelMesh = new MeshGenerator(model.geometry).generateModelMesh(model);
+
+  var originalHeight = model.info.originalBoundingBox.max.y - model.info.originalBoundingBox.min.y;
+  var modelScale = height / originalHeight;
+  modelMesh.scale.set(modelScale, modelScale, modelScale);
+
+  modelMesh.position.x = boxCenterX;
+  modelMesh.position.y = boxCenterY;
+  modelMesh.position.z = boxCenterZ;
+
+  if (this.axis == "XY"){
+    modelMesh.rotateX(Math.PI/2);
+  }else if (this.axis == "YZ"){
+    modelMesh.rotateZ(-Math.PI/2);
+  }
+
+  scene.add(modelMesh);
+
+  var physicsXParam = (model.info.originalBoundingBox.max.x - model.info.originalBoundingBox.min.x) * modelScale;
+  var physicsYParam = (model.info.originalBoundingBox.max.y - model.info.originalBoundingBox.min.y) * modelScale;
+  var physicsZParam = (model.info.originalBoundingBox.max.z - model.info.originalBoundingBox.min.z) * modelScale;
+  var physicsShapeParameters = {x: physicsXParam/2, y: physicsYParam/2, z: physicsZParam/2};
+  var boxPhysicsBody = physicsBodyGenerator.generateBoxBody(physicsShapeParameters);
+  boxPhysicsBody.position.set(
+    modelMesh.position.x,
+    modelMesh.position.y,
+    modelMesh.position.z
+  );
+  boxPhysicsBody.quaternion.copy(modelMesh.quaternion);
+  physicsWorld.addBody(boxPhysicsBody);
+
+  for (var i = 0; i<selections.length; i++){
+    selections[i].toggleSelect(false, false, false, true);
+    delete gridSelections[selections[i].name];
+  }
+
+  var destroyedGrids = new Object();
+  if(selections.length == 1){
+    destroyedGrids[selections[0].name] = selections[0];
+  }else{
+    var grid1 = selections[0];
+    var grid2 = selections[1];
+    startRow = grid1.rowNumber;
+    if (grid2.rowNumber < grid1.rowNumber){
+      startRow = grid2.rowNumber;
+    }
+    startCol = grid1.colNumber;
+    if (grid2.colNumber < grid1.colNumber){
+      startCol = grid2.colNumber;
+    }
+    finalRow = grid1.rowNumber;
+    if (grid2.rowNumber > grid1.rowNumber){
+      finalRow = grid2.rowNumber;
+    }
+    finalCol = grid1.colNumber;
+    if (grid2.colNumber > grid1.colNumber){
+      finalCol = grid2.colNumber;
+    }
+    for (var row = startRow; row <= finalRow; row++){
+      for (var col = startCol; col <= finalCol; col++ ){
+        var grid = this.getGridByColRow(col, row);
+        if (grid){
+          destroyedGrids[grid.name] = grid;
+        }
+      }
+    }
+  }
+
+  var modelInstance = new ModelInstance(instanceName, model, modelMesh, boxPhysicsBody, destroyedGrids, this.name);
+  modelInstances[instanceName] = modelInstance;
+
+  sceneHandler.onModelInstanceCreation(modelInstance);
 }
 
 GridSystem.prototype.newBox = function(selections, height, material, name){

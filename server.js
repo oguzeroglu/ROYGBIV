@@ -27,6 +27,7 @@ app.use(bodyParser.urlencoded({
   limit: '500mb',
   extended: true
 }));
+app.use(bodyParser.raw({type: 'application/octet-stream', limit : '500mb'}));
 
 app.get("/", function(req, res){
   console.log("[*] A new request received.");
@@ -41,7 +42,8 @@ app.post("/build", function(req, res){
       res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
       return;
     }
-    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS, req.body.modules);
+    
+    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS, req.body.modules, req.body.bootscreenFolderName, req.body.disabledShaderInfo);
     var roygbivPath = "deploy/"+req.body.projectName+"/js/roygbiv.js";
     fs.writeFileSync(roygbivPath, handleScripts(req.body, engineScriptsConcatted));
     minify(roygbivPath).then(function(minified){
@@ -161,15 +163,23 @@ app.post("/getTexturePackInfo", async function(req, res){
 app.post("/prepareDynamicTextures", async function(req, res){
   console.log("[*] Preparing dynamic textures");
   var folderName = req.body.folderName;
+  var noCompress = req.body.noCompress;
   var path = "./dynamic_textures/"+folderName;
   if (!fs.existsSync(path)){
     res.send(JSON.stringify({folderDoesNotExist: true}));
     return;
   }
+
+  if (noCompress){
+    res.send(JSON.stringify({ok: true}));
+    return;
+  }
+
   var files = fs.readdirSync(path);
   var types = ["astc", "pvrtc", "s3tc"];
   for (var i = 0; i<files.length; i++){
-    if (files[i].toLowerCase().endsWith(".png")){
+    var lower = files[i].toLowerCase();
+    if (lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg")){
       var fileName = files[i].split(".")[0];
       for (var i2 = 0; i2<types.length; i2++){
         var result = await compressTexture(types[i2], fileName, path, true, false, false);
@@ -341,6 +351,28 @@ app.post("/compressFont", async function(req, res){
   res.send(JSON.stringify({error: false}));
 });
 
+app.post("/checkBootscreenFolder", function(req, res){
+  console.log("[*] Checking bootscren folder");
+  var folderName = req.body.folderName;
+  if (fs.existsSync("./bootscreens/" + folderName)){
+    if (fs.existsSync("./bootscreens/" + folderName + "/component.html")){
+      res.send(JSON.stringify({}));
+    }else{
+      res.send(JSON.stringify({
+        error: {
+          notValid: true
+        }
+      }));
+    }
+  }else{
+    res.send(JSON.stringify({
+      error: {
+        noFolder: true
+      }
+    }));
+  }
+});
+
 app.post("/checkProtocolDefinitionFile", function(req, res){
   console.log("[*] Checking protocol definition file.");
   var fileName = req.body.fileName;
@@ -349,6 +381,78 @@ app.post("/checkProtocolDefinitionFile", function(req, res){
   }else{
     res.send(JSON.stringify({error: false}));
   }
+});
+
+app.post("/getModels", function(req, res){
+  var modelFolders = [];
+
+  var acceptedTextureSize = req.body.acceptedTextureSize;
+
+  var getAllImagePaths = function(path){
+    var result = [];
+
+    fs.readdirSync(path).forEach(childFileName => {
+      if (fs.lstatSync(path + "/" + childFileName).isDirectory()){
+        result = result.concat(getAllImagePaths(path + "/" + childFileName));
+      }
+
+      var lowerCase = childFileName.toLowerCase();
+      if (lowerCase.endsWith(".png") || lowerCase.endsWith(".jpg") || lowerCase.endsWith(".jpeg")){
+        result.push(path + "/" + childFileName);
+      }
+    });
+
+    return result;
+  }
+
+  fs.readdirSync("./models/").forEach(fileName => {
+    var path = "./models/" + fileName;
+    if (!fs.lstatSync(path).isDirectory()){
+      return;
+    }
+
+    const allImagePaths = getAllImagePaths(path);
+    for (var i = 0; i < allImagePaths.length; i ++){
+      var dimensions = sizeOf(allImagePaths[i]);
+      if (dimensions.width != acceptedTextureSize || dimensions.height != acceptedTextureSize){
+        return;
+      }
+    }
+
+    var mtlFileName = null;
+    var objFileName = null;
+    fs.readdirSync(path + "/").forEach(childFileName => {
+      if (childFileName.toLowerCase().endsWith(".mtl")){
+        mtlFileName = childFileName;
+      }else if (childFileName.toLowerCase().endsWith(".obj")){
+        objFileName = childFileName;
+      }
+    });
+
+    if (mtlFileName != null && objFileName != null){
+      modelFolders.push({
+        folder: fileName,
+        obj: objFileName,
+        mtl: mtlFileName
+      })
+    }
+  });
+
+  res.send(JSON.stringify(modelFolders));
+});
+
+app.post("/createRMFFile", function(req, res){
+  var folderName = req.query.folderName;
+  var buffers = [];
+  req.on("data", function(chunk) {
+    buffers.push(chunk);
+  });
+
+  req.on("end", function(){
+    var data = Buffer.concat(buffers);
+    fs.writeFileSync("./models/" + folderName + "/model.rmf", data);
+    res.send({});
+  });
 });
 
 function getScriptsInFolder(curPath, obj){
@@ -503,6 +607,29 @@ function handleScripts(application, engineScriptsConcatted){
 function copyAssets(application){
   copyFileSync("css/FiraMono-Bold.ttf", "deploy/"+application.projectName+"/css/");
   var htmlContent = fs.readFileSync("template/application.html", "utf8");
+
+  if (application.bodyBGColor){
+    htmlContent = htmlContent.replace('<body style="background-color:black;">', '<body style="background-color:' + application.bodyBGColor + ';">');
+  }
+
+  if (application.bootscreenFolderName){
+    var customBootscreenHTML = fs.readFileSync("./bootscreens/" + application.bootscreenFolderName + "/component.html", "utf8");
+    var customBootscreenDIV = "<div id='customBootscreen'>@@1</div>".replace("@@1", customBootscreenHTML);
+    htmlContent = htmlContent.replace('<textarea id="cliDiv" class="noselect" readonly></textarea>', customBootscreenDIV);
+
+    if (fs.existsSync("./bootscreens/" + application.bootscreenFolderName + "/component.css")){
+      var customCSSContent = fs.readFileSync("./bootscreens/" + application.bootscreenFolderName + "/component.css", "utf8");
+      htmlContent = htmlContent.replace("/* CSS_INJECTION */", customCSSContent);
+    }
+
+    if (fs.existsSync("./bootscreens/" + application.bootscreenFolderName + "/component.ttf")){
+      var fontFaceContent = "@font-face {\n" + "font-family: bootscreen;\n" + "src: url(./bootscreens/" + application.bootscreenFolderName + "/component.ttf);\n}";
+      htmlContent = htmlContent.replace("/* FONT_INJECTION */", fontFaceContent)
+    }
+
+    copyFolderRecursiveSync("./bootscreens/" + application.bootscreenFolderName, "deploy/" + application.projectName + "/bootscreens");
+  }
+
   htmlContent = htmlContent.replace(
     "@@1", application.projectName
   );
@@ -571,6 +698,15 @@ function copyAssets(application){
   for (var folderName in application.dynamicTextureFolders){
     copyFolderRecursiveSync("dynamic_textures/"+folderName, "deploy/"+application.projectName+"/dynamic_textures/");
   }
+  for (var modelName in application.models){
+    var folderName = application.models[modelName].folderName;
+    fs.readdirSync("models").forEach(file => {
+      if (file == folderName){
+        copyFolderRecursiveSync("models/"+file, "deploy/"+application.projectName+"/models/");
+        console.log("[*] Copied a model: " + file);
+      }
+    });
+  }
 }
 
 function generateDeployDirectory(projectName, application){
@@ -590,6 +726,8 @@ function generateDeployDirectory(projectName, application){
   var hasDynamicTextureFolders = (Object.keys(application.dynamicTextureFolders) != 0);
   var hasTextureAtlas = application.textureAtlas.hasTextureAtlas;
   var hasShadowAtlas = Object.keys(application.shadowBaker.textureRangesByObjectName).length > 0;
+  var hasModels = Object.keys(application.models.length != 0);
+  var hasCustomBootScreen = !!application.bootscreenFolderName;
   if (hasTexturePacks){
     fs.mkdirSync("deploy/"+projectName+"/texture_packs");
     console.log("[*] Project has texture packs to load.");
@@ -601,6 +739,12 @@ function generateDeployDirectory(projectName, application){
     console.log("[*] Project has skyboxes to load.");
   }else{
     console.log("[*] Project has no skyboxes to load.");
+  }
+  if (hasModels){
+    fs.mkdirSync("deploy/" + projectName + "/models");
+    console.log("[*] Project has models to load.");
+  }else{
+    console.log("[*] Project has no models to load.");
   }
   if (hasFonts || hasTextureAtlas || hasShadowAtlas){
     fs.mkdirSync("deploy/"+projectName+"/fonts");
@@ -618,10 +762,16 @@ function generateDeployDirectory(projectName, application){
   }else{
     console.log("[*] Project has no dynamic textures.");
   }
+  if (hasCustomBootScreen){
+    fs.mkdirSync("deploy/" + projectName + "/bootscreens");
+    console.log("[*] Project has custom bootscreen.");
+  }else{
+    console.log("[*] Project has no custom bootscreen.");
+  }
   return true;
 }
 
-function readEngineScripts(projectName, author, enableAntialias, modules){
+function readEngineScripts(projectName, author, enableAntialias, modules, bootscreenFolderName, disabledShaderInfo){
   var content = "";
   var htmlContent = fs.readFileSync("roygbiv.html", "utf8");
   htmlContent = htmlContent.replace("three.js", "three.min.js");
@@ -632,9 +782,47 @@ function readEngineScripts(projectName, author, enableAntialias, modules){
       var scriptContent = fs.readFileSync(scriptPath, "utf8");
       if (scriptPath.includes("globalVariables.js")){
         scriptContent = scriptContent.replace("var isDeployment = false;", "var isDeployment = true;");
+        if (bootscreenFolderName) {
+          scriptContent = scriptContent.replace("var hasCustomBootScreen = false;", "var hasCustomBootScreen = true;");
+        }
         scriptContent = scriptContent.replace("var projectName = \"@@1\"", "var projectName = \""+projectName+"\"");
         scriptContent = scriptContent.replace("var author = \"@@2\"", "var author = \""+author+"\"");
         scriptContent = scriptContent.replace("var ENABLE_ANTIALIAS = false;", "var ENABLE_ANTIALIAS = @@1;".replace("@@1", enableAntialias));
+
+        if (disabledShaderInfo.DISABLE_PARTICLE_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_PARTICLE_SHADERS = false;", "var DISABLE_PARTICLE_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_OBJECT_TRAIL_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_OBJECT_TRAIL_SHADERS = false;", "var DISABLE_OBJECT_TRAIL_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_CROSSHAIR_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_CROSSHAIR_SHADERS = false;", "var DISABLE_CROSSHAIR_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_OBJECT_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_OBJECT_SHADERS = false;", "var DISABLE_OBJECT_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_SKYBOX_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_SKYBOX_SHADERS = false;", "var DISABLE_SKYBOX_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_TEXT_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_TEXT_SHADERS = false;", "var DISABLE_TEXT_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_RECTANGLE_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_RECTANGLE_SHADERS = false;", "var DISABLE_RECTANGLE_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_BLOOM_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_BLOOM_SHADERS = false;", "var DISABLE_BLOOM_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_LIGHTNING_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_LIGHTNING_SHADERS = false;", "var DISABLE_LIGHTNING_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_SPRITE_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_SPRITE_SHADERS = false;", "var DISABLE_SPRITE_SHADERS = true;");
+        }
+        if (disabledShaderInfo.DISABLE_MODEL_SHADERS){
+          scriptContent = scriptContent.replace("var DISABLE_MODEL_SHADERS = false;", "var DISABLE_MODEL_SHADERS = true;");
+        }
+
         console.log("[*] isDeployment flag injected into globalVariables.");
       }
       if (scriptPath.includes("Roygbiv.js")){
@@ -688,6 +876,12 @@ function readEngineScripts(projectName, author, enableAntialias, modules){
         continue;
       }else if (scriptPath.includes("ModuleHandler.js")){
         console.log("[*] Skipping ModuleHandler");
+        continue;
+      }else if (scriptPath.includes("OBJLoader.js")){
+        console.log("[*] Skipping OBJLoader.js");
+        continue;
+      }else if (scriptPath.includes("MTLLoader.js")){
+        console.log("[*] Skipping MTLLOader.js");
         continue;
       }
       content += scriptContent +"\n";
