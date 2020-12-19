@@ -27,6 +27,11 @@ FPSHandler.prototype.onUpdate = function(newFPS){
   if (this.log){
     console.log(newFPS);
   }
+
+  if (mode == 1){
+    analyticsHandler.onFPSUpdate(newFPS);
+  }
+
   if (mode == 1 && newFPS < 60){
     if (fpsDropCallbackFunction){
       fpsDropCallbackFunction(60 - newFPS);

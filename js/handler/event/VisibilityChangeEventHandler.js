@@ -21,4 +21,8 @@ var VisibilityChangeEventHandler = function(){
 
 VisibilityChangeEventHandler.prototype.onVisibilityChange = function(event){
   isScreenVisible = !(document[visibilityChangeEventHandler.hiddenText]);
+
+  if (mode == 1){
+    analyticsHandler.handle(false);
+  }
 }

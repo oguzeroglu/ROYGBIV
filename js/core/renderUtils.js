@@ -60,6 +60,8 @@ function render(){
       firstRenderPerformed = true;
       loadTime.firstRendertime = performance.now() - loadTime.firstRendertime;
     }
+
+    analyticsHandler.handle(true);
   }
   cpuOperationsHandler.updateObjectPicker2D();
   cpuOperationsHandler.updateRaycaster();

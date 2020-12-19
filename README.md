@@ -1,6 +1,6 @@
 ![](/screen_shots/banner.png?raw=true)
 
-ROYGBIV is a WebGL game engine for motivated programmers who do not have the budget for buying fancy 3D models or licensing a popular engine but still want to make 60 FPS web games for both mobile and desktop. It is being developed by one of such programmers on top of low level THREE.js features for the graphics and CANNON.js for physics. It is named after this [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).    
+ROYGBIV is a WebGL engine for motivated programmers who do not have the budget for buying fancy 3D models or licensing a popular engine but still want to make 60 FPS web applications for both mobile and desktop. It is being developed by one of such programmers on top of low level THREE.js features for the graphics and CANNON.js for physics. It is named after this [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).    
 
 ![](/screen_shots/roygbiv.gif?raw=true)   
 
@@ -10,8 +10,7 @@ ROYGBIV is a WebGL game engine for motivated programmers who do not have the bud
 * [Blaster](https://oguzeroglu.github.io/ROYGBIV/demo/blaster/application.html)    
 * [Cooking space kebab with a flamethrower](https://oguzeroglu.github.io/ROYGBIV/demo/spaceKebab/application.html)    
 * [Plasma Rifle - Inspired by Doom's Plasma Rifle](https://oguzeroglu.github.io/ROYGBIV/demo/plasmaGun/application.html)    
-* [Jump pads - Inspired by Valve's Ricochet](https://oguzeroglu.github.io/ROYGBIV/demo/jumpPads/application.html)    
-* [aykir.io (2D) - A Multiplayer Cards Against Humanity clone](https://aykir.io)    
+* [Jump pads - Inspired by Valve's Ricochet](https://oguzeroglu.github.io/ROYGBIV/demo/jumpPads/application.html)     
 * [Electro shock](https://oguzeroglu.github.io/ROYGBIV/demo/electroShock/application.html)    
 * [Shooter](https://oguzeroglu.github.io/ROYGBIV/demo/shooter/application.html)   
 * [GPU particles showcase](https://oguzeroglu.github.io/ROYGBIV/demo/psShowcase/application.html)   

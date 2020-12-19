@@ -238,6 +238,11 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   skyboxDistance = obj.skyboxDistance || skyboxDistance;
   bootscreenFolderName = obj.bootscreenFolderName;
   bodyBGColor = obj.bodyBGColor;
+
+  if (obj.analytics){
+    analyticsHandler.serverURL = obj.analytics.serverURL || null;
+    analyticsHandler.devServerURL = obj.analytics.devServerURL || null;
+  }
 }
 
 ImportHandler.prototype.importGridSystems = function(obj){

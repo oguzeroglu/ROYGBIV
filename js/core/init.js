@@ -43,6 +43,8 @@ window.onload = function() {
   shadowBaker = new ShadowBaker();
   // RMF HANDLER
   rmfHandler = new RMFHandler();
+  // ANALYTICS HANDLER
+  analyticsHandler = new AnalyticsHandler();
 
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");

@@ -429,6 +429,7 @@ StateLoader.prototype.resetProject = function(){
   steeringHandler.reset();
   decisionHandler.reset();
   modelLoader.reset();
+  analyticsHandler.reset();
   fonts = new Object();
   roygbivAttributeCounter = 1;
   roygbivBufferAttributeCounter = 1;
