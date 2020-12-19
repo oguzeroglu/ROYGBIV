@@ -42,7 +42,7 @@ app.post("/build", function(req, res){
       res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
       return;
     }
-    
+
     var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.ENABLE_ANTIALIAS, req.body.modules, req.body.bootscreenFolderName, req.body.disabledShaderInfo);
     var roygbivPath = "deploy/"+req.body.projectName+"/js/roygbiv.js";
     fs.writeFileSync(roygbivPath, handleScripts(req.body, engineScriptsConcatted));
