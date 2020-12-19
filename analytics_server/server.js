@@ -67,6 +67,32 @@ app.post("/bye", (req, res) => {
   res.sendStatus(204);
 });
 
+app.get("/analytics", async (req, res) => {
+  var page = req.query.page;
+  var perPage = req.query.per_page;
+  var secretKey = req.query.secret;
+
+  if (!page || !perPage){
+    return res.sendStatus(400);
+  }
+
+  if (isNaN(page) || isNaN(perPage)){
+    return res.sendStatus(400);
+  }
+
+  if (process.env.SECRET_KEY && secretKey != process.env.SECRET_KEY){
+    return res.sendStatus(401);
+  }
+
+  var query = "SELECT * FROM @@X LIMIT @@Y OFFSET @@Z".replace("@@X", tableName).replace("@@Y", perPage).replace("@@Z", (page - 1) * perPage);
+  const result = await pool.query(query);
+
+  res.json({
+    onlineClientLen: Object.keys(onlineClients).length,
+    result: result.rows
+  });
+});
+
 app.use(express.static("public"));
 server = http.Server(app);
 var port = process.env.PORT || 8099;
