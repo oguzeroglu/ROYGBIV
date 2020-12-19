@@ -76,7 +76,7 @@ console.log("Server listening port", port);
 
 async function writeToDatabase(id, info){
   try {
-    var insertQuery = "INSERT INTO @@X (id, total_load_time, shader_load_time, application_json_load_time, mode_switch_time, first_render_time, is_mobile, is_ios, highp_precision_supported, browser, time_spent, avg_fps) VALUES ('@@A', @@B, @@C, @@D, @@E, @@F, '@@G', '@@H', '@@I', '@@J', @@K, @@L);"
+    var insertQuery = "INSERT INTO @@X (id, total_load_time, shader_load_time, application_json_load_time, mode_switch_time, first_render_time, is_mobile, is_ios, highp_precision_supported, browser, time_spent, avg_fps, date) VALUES ('@@A', @@B, @@C, @@D, @@E, @@F, '@@G', '@@H', '@@I', '@@J', @@K, @@L, '@@M');"
     insertQuery = insertQuery.replace("@@X", tableName)
                              .replace("@@A", id)
                              .replace("@@B", info.totalLoadTime || 0)
@@ -90,6 +90,7 @@ async function writeToDatabase(id, info){
                              .replace("@@J", info.browser || "")
                              .replace("@@K", info.timeSpent || 0)
                              .replace("@@L", info.avgFPS || 0)
+                             .replace("@@M", new Date().toISOString());
     await pool.query(insertQuery);
   }catch (err){
     console.log("DB ERR", err);
