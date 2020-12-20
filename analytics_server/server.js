@@ -94,6 +94,8 @@ app.post("/bye", (req, res) => {
 });
 
 app.get("/analytics", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+
   var page = req.query.page;
   var perPage = req.query.per_page;
   var secretKey = req.query.secret;
