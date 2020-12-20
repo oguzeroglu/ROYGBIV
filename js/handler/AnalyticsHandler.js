@@ -21,6 +21,7 @@ AnalyticsHandler.prototype.isEnabled = function(){
 AnalyticsHandler.prototype.reset = function(){
   this.serverURL = null;
   this.devServerURL = null;
+  this.lastPingTime = null;
 }
 
 AnalyticsHandler.prototype.handle = function(isHello){
@@ -30,6 +31,15 @@ AnalyticsHandler.prototype.handle = function(isHello){
 
   if (isHello){
     if (this.isHelloSent){
+      var now = performance.now();
+      if (now - this.lastPingTime >= 10000){
+        navigator.sendBeacon(this.getServerURL() + "/ping", JSON.stringify({
+          id: this.id,
+          avgFPS: this.fpsCounter? (this.totalFPS / this.fpsCounter): 0
+        }))
+
+        this.lastPingTime = now;
+      }
       return;
     }
 
@@ -49,6 +59,8 @@ AnalyticsHandler.prototype.handle = function(isHello){
       highPrecisionSupported: HIGH_PRECISION_SUPPORTED,
       browser: BROWSER_NAME
     }));
+
+    this.lastPingTime = performance.now();
 
     this.fpsCounter = 0;
     this.totalFPS = 0;

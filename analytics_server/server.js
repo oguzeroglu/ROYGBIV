@@ -44,8 +44,34 @@ app.post("/hello", (req, res) => {
     isMobile: body.isMobile,
     isIOS: body.isIOS,
     highPrecisionSupported: body.highPrecisionSupported,
-    browser: body.browser
+    browser: body.browser,
+    avgFPS: 0,
+    lastPingTime: performance.now()
   };
+
+  res.sendStatus(204);
+});
+
+app.post("/ping", (req, res) => {
+  var body = JSON.parse(req.body);
+
+  var id = body.id;
+  var avgFPS = body.avgFPS;
+
+  if (!id || !avgFPS){
+    res.sendStatus(204);
+    return;
+  }
+
+  var clientInfo = onlineClients[id];
+
+  if (!clientInfo){
+    res.sendStatus(204);
+    return;
+  }
+
+  clientInfo.avgFPS = avgFPS;
+  clientInfo.lastPingTime = performance.now();
 
   res.sendStatus(204);
 });
@@ -97,6 +123,18 @@ app.use(express.static("public"));
 server = http.Server(app);
 var port = process.env.PORT || 8099;
 server.listen(port);
+
+setInterval(function(){
+  for (var clientID in onlineClients){
+    var clientInfo = onlineClients[clientID];
+    var lastPingTime = clientInfo.lastPingTime;
+    if (performance.now() - lastPingTime >= 12000){
+      clientInfo.timeSpent = performance.now() - clientInfo.timeSpent;
+      delete onlineClients[clientID];
+      writeToDatabase(clientID, clientInfo);
+    }
+  }
+}, 2000);
 
 console.log("Server listening port", port);
 
