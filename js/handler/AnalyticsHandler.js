@@ -25,7 +25,7 @@ AnalyticsHandler.prototype.reset = function(){
 }
 
 AnalyticsHandler.prototype.handle = function(isHello){
-  if (!this.isEnabled()){
+  if (!this.isEnabled() || this.isByeSent){
     return;
   }
 
@@ -33,12 +33,11 @@ AnalyticsHandler.prototype.handle = function(isHello){
     if (this.isHelloSent){
       var now = performance.now();
       if (now - this.lastPingTime >= 10000){
+        this.lastPingTime = now;
         navigator.sendBeacon(this.getServerURL() + "/ping", JSON.stringify({
           id: this.id,
           avgFPS: this.fpsCounter? (this.totalFPS / this.fpsCounter): 0
         }))
-
-        this.lastPingTime = now;
       }
       return;
     }
@@ -64,9 +63,11 @@ AnalyticsHandler.prototype.handle = function(isHello){
 
     this.fpsCounter = 0;
     this.totalFPS = 0;
-  }else if (this.isHelloSent){
+  }else if (this.isHelloSent && !this.isByeSent){
     if (!isDeployment){
       this.isHelloSent = false;
+    }else{
+      this.isByeSent = true;
     }
 
     navigator.sendBeacon(this.getServerURL() + "/bye", JSON.stringify({

@@ -81,6 +81,7 @@ app.post("/bye", (req, res) => {
   var id = body.id;
   var clientInfo = onlineClients[id];
   if (!clientInfo){
+    res.sendStatus(204);
     return;
   }
 
