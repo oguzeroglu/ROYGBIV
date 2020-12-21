@@ -18,13 +18,6 @@ ResizeEventHandler.prototype.onResize = function(){
   boundingClientRect = renderer.getBoundingClientRect();
   if (isDeployment){
     canvas.oldWidth = (canvas.width / screenResolution) + 'px';
-    if (!isDeployment && terminal.isMadeVisible){
-      ROYGBIV.terminal(false);
-      ROYGBIV.terminal(true);
-      if (!terminal.terminalPromptEnabled){
-        ROYGBIV.terminalPrompt(false);
-      }
-    }
   }
   if (mode == 1){
     handleViewport();
