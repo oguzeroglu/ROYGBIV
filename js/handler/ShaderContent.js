@@ -121,7 +121,7 @@ var ShaderContent = function(){
     }
   }
 
-  var count = this.load(this.aShaderLoadedCallback);
+  var count = isDeployment? this.loadRSF(): this.load(this.aShaderLoadedCallback);
   if (!count){
     renderer.initEffects();
     if (!isDeployment){
@@ -135,6 +135,61 @@ var ShaderContent = function(){
       startDeployment();
     }
   }
+}
+
+ShaderContent.prototype.loadRSF = function(){
+  var count = 0;
+  for (var i = 0; i<this.shaders.length; i++){
+    if (this.shaders[i].disabled){
+      this[this.shaders[i].name] = "DISABLED";
+      continue
+    }
+    count ++;
+  }
+
+  if (count == 0){
+    return count;
+  }
+
+  var constructedShaders = {};
+
+  var req = new XMLHttpRequest();
+  req.open("GET", "./shader/shader.rsf");
+  req.addEventListener("load", function(){
+    var splitted = req.responseText.split("\n");
+    var curFolderName = null;
+    var curType = null;
+    for (var i = 0; i < splitted.length; i ++){
+      var curLine = splitted[i];
+      if (curLine.startsWith("#RSF")){
+        var lineSplitted = curLine.split(" ");
+        curFolderName = lineSplitted[1];
+        curType = lineSplitted[2];
+        if (curType == "v"){
+          constructedShaders[curFolderName] = {v: "", f: ""};
+        }
+      }else{
+        constructedShaders[curFolderName][curType] += curLine + "\n";
+      }
+    }
+
+    for (var i = 0; i < ShaderContent.shaders.length; i ++){
+      var shader = ShaderContent.shaders[i];
+      if (shader.disabled){
+        continue;
+      }
+      if (shader.isVertexShader){
+        ShaderContent[shader.name] = constructedShaders[shader.dir].v;
+      }else{
+        ShaderContent[shader.name] = constructedShaders[shader.dir].f;
+      }
+    }
+
+    ShaderContent.allShadersReadyCallback();
+  });
+  req.send();
+
+  return count;
 }
 
 ShaderContent.prototype.load = function(callback){

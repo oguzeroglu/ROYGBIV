@@ -719,7 +719,7 @@ function generateDeployDirectory(projectName, application){
   fs.mkdirSync("deploy/"+projectName);
   fs.mkdirSync("deploy/"+projectName+"/js");
   fs.mkdirSync("deploy/"+projectName+"/css");
-  copyFolderRecursiveSync("shader", "deploy/"+projectName);
+  fs.mkdirSync("deploy/"+projectName+"/shader");
   var hasTexturePacks = (Object.keys(application.texturePacks).length != 0);
   var hasSkyBoxes = (Object.keys(application.skyBoxes).length != 0);
   var hasFonts = (Object.keys(application.fonts).length != 0);
@@ -776,6 +776,9 @@ function readEngineScripts(projectName, author, enableAntialias, modules, bootsc
   var htmlContent = fs.readFileSync("roygbiv.html", "utf8");
   htmlContent = htmlContent.replace("three.js", "three.min.js");
   var htmlContentSplitted = htmlContent.split("\n");
+
+  var totalShaderContent = "";
+
   for (var i = 0; i<htmlContentSplitted.length; i++){
     if (htmlContentSplitted[i].includes("<script")){
       var scriptPath = extractFirstText(htmlContentSplitted[i]);
@@ -791,37 +794,65 @@ function readEngineScripts(projectName, author, enableAntialias, modules, bootsc
 
         if (disabledShaderInfo.DISABLE_PARTICLE_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_PARTICLE_SHADERS = false;", "var DISABLE_PARTICLE_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("particle");
         }
         if (disabledShaderInfo.DISABLE_OBJECT_TRAIL_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_OBJECT_TRAIL_SHADERS = false;", "var DISABLE_OBJECT_TRAIL_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("object_trail");
         }
         if (disabledShaderInfo.DISABLE_CROSSHAIR_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_CROSSHAIR_SHADERS = false;", "var DISABLE_CROSSHAIR_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("crosshair");
         }
         if (disabledShaderInfo.DISABLE_OBJECT_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_OBJECT_SHADERS = false;", "var DISABLE_OBJECT_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("materials/basic_material");
+          totalShaderContent += generateRSFChunk("materials/merged_basic_material");
+          totalShaderContent += generateRSFChunk("materials/instanced_basic_material");
         }
         if (disabledShaderInfo.DISABLE_SKYBOX_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_SKYBOX_SHADERS = false;", "var DISABLE_SKYBOX_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("skybox");
         }
         if (disabledShaderInfo.DISABLE_TEXT_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_TEXT_SHADERS = false;", "var DISABLE_TEXT_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("text");
         }
         if (disabledShaderInfo.DISABLE_RECTANGLE_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_RECTANGLE_SHADERS = false;", "var DISABLE_RECTANGLE_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("rectangle");
         }
         if (disabledShaderInfo.DISABLE_BLOOM_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_BLOOM_SHADERS = false;", "var DISABLE_BLOOM_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("post_processing/bloom/bright_pass");
+          totalShaderContent += generateRSFChunk("post_processing/bloom/blur_pass");
+          totalShaderContent += generateRSFChunk("post_processing/bloom/combiner");
         }
         if (disabledShaderInfo.DISABLE_LIGHTNING_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_LIGHTNING_SHADERS = false;", "var DISABLE_LIGHTNING_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("lightning");
         }
         if (disabledShaderInfo.DISABLE_SPRITE_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_SPRITE_SHADERS = false;", "var DISABLE_SPRITE_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("sprite");
         }
         if (disabledShaderInfo.DISABLE_MODEL_SHADERS){
           scriptContent = scriptContent.replace("var DISABLE_MODEL_SHADERS = false;", "var DISABLE_MODEL_SHADERS = true;");
+        }else{
+          totalShaderContent += generateRSFChunk("materials/basic_model_material");
         }
+
+        writeRSFFile(projectName, totalShaderContent);
 
         console.log("[*] isDeployment flag injected into globalVariables.");
       }
@@ -945,6 +976,20 @@ function runScript(scriptPath, params, callback) {
       var err = code === 0 ? null : new Error('exit code ' + code);
       callback(err);
   });
+}
+
+function generateRSFChunk(folderName){
+  var chunk = "#RSF " + folderName + " v\n";
+  chunk += fs.readFileSync("./shader/" + folderName + "/vertexShader.shader", "utf8");
+  chunk += "\n";
+  chunk += "#RSF " + folderName + " f\n";
+  chunk += fs.readFileSync("./shader/" + folderName + "/fragmentShader.shader", "utf8");
+  chunk += "\n";
+  return chunk;
+}
+
+function writeRSFFile(projectName, totalShaderContent){
+  fs.writeFileSync("./deploy/"+projectName+"/shader/shader.rsf", totalShaderContent);
 }
 
 app.use(express.static('./'));
