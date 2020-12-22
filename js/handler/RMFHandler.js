@@ -49,9 +49,17 @@ RMFHandler.prototype.generate = function(positions, normals, uvs, indexedMateria
 
   info.push(indices.length);
 
+  var intAry = [];
+
   for (var i = 0; i < indices.length; i ++){
-    info.push(indices[i]);
+    var base127 = this.convertBase127(indices[i]);
+    intAry.push(255 - base127[0]);
+    for (var i2 = 1; i2 < base127.length; i2 ++){
+      intAry.push(base127[i2]);
+    }
   }
+
+  var int8Ary = new Uint8Array(intAry);
 
   var indexedMaterilIndicesInfo = [
     {index: indexedMaterialIndices[0], count: 1}
@@ -74,7 +82,10 @@ RMFHandler.prototype.generate = function(positions, normals, uvs, indexedMateria
     info.push(indexedMaterilIndicesInfo[i].count);
   }
 
-  return new Float32Array(info);
+  return {
+    rmf: new Float32Array(info),
+    rmif: int8Ary
+  };
 }
 
 RMFHandler.prototype.load = function(folderName, onReady){
@@ -82,15 +93,36 @@ RMFHandler.prototype.load = function(folderName, onReady){
   xhr.open("GET", "./models/" + folderName + "/model.rmf", true);
   xhr.responseType = "arraybuffer";
 
-  xhr.onload = function (oEvent) {
+  var xhr2 = new XMLHttpRequest();
+  xhr2.open("GET", "./models/" + folderName + "/model.rmif", true);
+  xhr2.responseType = "arraybuffer";
+
+  var rmfLoaded = false;
+  var rmifLoaded = false;
+  var loadedInfo = {};
+  var positions = null;
+  var normals = null;
+  var uvs = null;
+  var indices = null;
+  var indexedMaterialIndices = null;
+
+  var allLoaded = function(){
+    if (!(rmfLoaded && rmifLoaded)){
+      return;
+    }
+
+    onReady(positions, normals, uvs, indices, indexedMaterialIndices);
+  }
+
+  xhr.onload = function () {
     var arrayBuffer = xhr.response;
     var view = new Float32Array(arrayBuffer);
 
     var indicesLength = view[0];
 
-    var positions = new Float32Array(indicesLength * 3);
-    var normals = new Float32Array(indicesLength * 3);
-    var uvs = new Float32Array(indicesLength * 2);
+    positions = new Float32Array(indicesLength * 3);
+    normals = new Float32Array(indicesLength * 3);
+    uvs = new Float32Array(indicesLength * 2);
 
     var totalRead = 0;
     var i = 1;
@@ -118,29 +150,62 @@ RMFHandler.prototype.load = function(folderName, onReady){
       totalRead ++;
     }
 
-    var indices = new Array(indicesLength);
-
     var i2 = 0;
 
     var len = view[1 + (indicesLength * 8)];
-    var start = 2 + (indicesLength * 8)
-    for (var i = start; i < start + len; i ++){
-      var curIndex = view[i];
-      indices[i2 ++] = curIndex;
-    }
-
-    var indexedMaterialIndices = new Array(indicesLength);
-    var z = 0;
-    for (var x = i; x < view.length; x += 2){
+    var start = 2 + (indicesLength * 8);
+    indexedMaterialIndices = [];
+    var stuff = 0;
+    for (var x = start; x < view.length; x += 2){
       var index = view[x];
       var count = view[x + 1];
       for (var y = 0; y < count; y ++){
-        indexedMaterialIndices[z ++] = index;
+        indexedMaterialIndices.push(index);
       }
     }
-
-    onReady(positions, normals, uvs, indices, indexedMaterialIndices);
+    rmfLoaded = true;
+    allLoaded();
   };
 
+  xhr2.onload = function() {
+    var view = new Uint8Array(xhr2.response);
+
+    indices = [];
+    var i = 0;
+    while (i < view.length){
+      var firstVal = 255 - view[i++];
+      var ary = [firstVal];
+      while (view[i] < 127){
+        ary.push(view[i ++]);
+      }
+      indices.push(rmfHandler.convertFromBase127(ary));
+    }
+
+    rmifLoaded = true;
+    allLoaded();
+  }
+
   xhr.send(null);
+  xhr2.send(null);
+}
+
+RMFHandler.prototype.convertBase127 = function(index){
+  var ary = [];
+  var iterate = true;
+  var val = index;
+  while (val >= 127){
+    ary.push(val % 127);
+    val = Math.floor(val / 127);
+  }
+
+  ary.push(val);
+  return ary;
+}
+
+RMFHandler.prototype.convertFromBase127 = function(ary){
+  var val = 0;
+  for (var i = 0; i < ary.length; i ++){
+    val += Math.pow(127, i) * ary[i];
+  }
+  return val;
 }

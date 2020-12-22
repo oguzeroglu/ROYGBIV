@@ -327,7 +327,13 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     }
   }
 
-  xhr.send(rmfHandler.generate(positions, normals, uvs, modelCreatorGUIHandler.model.indexedMaterialIndices));
+  var generated = rmfHandler.generate(positions, normals, uvs, modelCreatorGUIHandler.model.indexedMaterialIndices);
+  xhr.send(generated.rmf);
+
+  var xhr2 = new XMLHttpRequest();
+  xhr2.open("POST", "/createRMIFFile?folderName=" + folderName, true);
+  xhr2.overrideMimeType("application/octet-stream");
+  xhr2.send(generated.rmif);
 }
 
 ModelCreatorGUIHandler.prototype.triplePush = function(ary, obj1, obj2, obj3, type){

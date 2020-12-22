@@ -441,6 +441,20 @@ app.post("/getModels", function(req, res){
   res.send(JSON.stringify(modelFolders));
 });
 
+app.post("/createRMIFFile", function(req, res){
+  var folderName = req.query.folderName;
+  var buffers = [];
+  req.on("data", function(chunk) {
+    buffers.push(chunk);
+  });
+
+  req.on("end", function(){
+    var data = Buffer.concat(buffers);
+    fs.writeFileSync("./models/" + folderName + "/model.rmif", data);
+    res.send({});
+  });
+});
+
 app.post("/createRMFFile", function(req, res){
   var folderName = req.query.folderName;
   var buffers = [];
