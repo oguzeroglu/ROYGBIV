@@ -45,6 +45,8 @@ window.onload = function() {
   rmfHandler = new RMFHandler();
   // ANALYTICS HANDLER
   analyticsHandler = new AnalyticsHandler();
+  // AUGMENTED REALITY HANDLER
+  augmentedRealityHandler = new AugmentedRealityHandler();
 
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
