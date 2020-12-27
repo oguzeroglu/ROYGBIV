@@ -109,7 +109,7 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
       }
     };
 
-    modelCreatorGUIHandler.renderModel(model, modelName, allFolders[index], function(){
+    modelCreatorGUIHandler.renderModel(model, modelName, allFolders[index], allModels[index].arModelNames, function(){
       terminal.clear();
       terminal.printInfo(Text.MODEL_LOADED);
 
@@ -153,7 +153,7 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
   });
 }
 
-ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName, onReady){
+ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName, arModelNames, onReady){
   if (this.modelMesh){
     scene.remove(this.modelMesh);
   }
@@ -315,6 +315,8 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     originalBoundingBox: boundingBox,
     hasNormalMap: hasNormalMap
   }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, materialIndices);
+
+  modelCreatorGUIHandler.model.setARModelNames(arModelNames);
 
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "/createRMFFile?folderName=" + folderName, true);
