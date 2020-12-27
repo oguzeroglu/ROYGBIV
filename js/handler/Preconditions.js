@@ -316,6 +316,7 @@ var Preconditions = function(){
   this.borderRadiusPercent = "borderRadiusPercent";
   this.opacity = "opacity";
   this.domElement = "domElement";
+  this.arModelName = "arModelName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -324,6 +325,18 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfARSupported = function(callerFunc){
+  if (!augmentedRealityHandler.isSupported()){
+    this.throw(callerFunc, "AR is not supported for this client.");
+  }
+}
+
+Preconditions.prototype.checkIfModelInstanceHasARModel = function(callerFunc, modelInstance, arModelName){
+  if (!modelInstance.model.hasARModel(arModelName)){
+    this.throw(callerFunc, "The mode of model instance does not have such ar model.");
+  }
 }
 
 Preconditions.prototype.checkIfDOMElement = function(callerFunc, obj){
@@ -404,6 +417,12 @@ Preconditions.prototype.checkIfStateMachineHasState = function(callerFunc, state
   }
 
   this.throw(callerFunc, "State machine does not have such state.");
+}
+
+Preconditions.prototype.checkIfModelInstanceInActiveScene = function(callerFunc, modelInstance){
+  if (modelInstance.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Model instance is not inside the active scene.");
+  }
 }
 
 Preconditions.prototype.checkIfStateMachineInActiveScene = function(callerFunc, stateMachine){

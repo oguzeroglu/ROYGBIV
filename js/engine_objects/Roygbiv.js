@@ -24,6 +24,7 @@
 //  * Script related functions
 //  * Networking functions
 //  * DOM functions
+//  * AR functions
 //  * AI functions
 var Roygbiv = function(){
 
@@ -363,7 +364,9 @@ var Roygbiv = function(){
     "onDOMElementMouseOut",
     "removeDOMElementMouseOutListener",
     "onDOMElementClick",
-    "removeDOMElementClickListener"
+    "removeDOMElementClickListener",
+    "isARSupported",
+    "startAugmentedReality"
   ];
 
   this.globals = new Object();
@@ -3175,6 +3178,7 @@ Roygbiv.prototype.mapTexturesToModelInstance = function(modelInstance, texturesO
   preConditions.checkIfModelInstance(ROYGBIV.mapTexturesToModelInstance, modelInstance);
   preConditions.checkIfCustomTexturesEnabled(ROYGBIV.mapTexturesToModelInstance, modelInstance);
   preConditions.checkIfValidModelTextureSObj(ROYGBIV.mapTexturesToModelInstance, modelInstance, texturesObj);
+  preConditions.checkIfModelInstanceInActiveScene(ROYGBIV.mapTexturesToModelInstance, modelInstance);
   modelInstance.mapCustomTextures(texturesObj);
 }
 
@@ -4279,6 +4283,34 @@ Roygbiv.prototype.setDOMElementSize = function(domElement, width, height){
   preConditions.checkIfNumber(ROYGBIV.setDOMElementSize, preConditions.width, width);
   preConditions.checkIfNumber(ROYGBIV.setDOMElementSize, preConditions.height, height);
   domElement.setSize(width, height);
+}
+
+// AR FUNCTIONS ****************************************************************
+
+// Returns if AR is supported in current client device.
+Roygbiv.prototype.isARSupported = function(){
+  if (mode == 0){
+    return;
+  }
+
+  return augmentedRealityHandler.isSupported();
+}
+
+// Opens AR view for given model instance and AR model name. See README of models
+// folder for more details.
+Roygbiv.prototype.startAugmentedReality = function(modelInstance, arModelName){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.startAugmentedReality, preConditions.modelInstance, modelInstance);
+  preConditions.checkIfDefined(ROYGBIV.startAugmentedReality, preConditions.arModelName, arModelName);
+  preConditions.checkIfModelInstance(ROYGBIV.startAugmentedReality, modelInstance);
+  preConditions.checkIfModelInstanceInActiveScene(ROYGBIV.startAugmentedReality, modelInstance);
+  preConditions.checkIfARSupported(ROYGBIV.startAugmentedReality);
+  preConditions.checkIfModelInstanceHasARModel(ROYGBIV.startAugmentedReality, modelInstance, arModelName);
+
+  augmentedRealityHandler.start(modelInstance.model.info.folderName, arModelName);
 }
 
 // AI FUNCTIONS ****************************************************************

@@ -1500,4 +1500,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVEDOMELEMENTCLICKLISTENER = "Removes a click listener from given DOMElement.";
   this.ROYGBIV_SCRIPTING_API_REMOVEDOMELEMENTMOUSEOVERLISTENER = "Removes a mouse over listener from given DOMElement.";
   this.ROYGBIV_SCRIPTING_API_REMOVEDOMELEMENTMOUSEOUTLISTENER = "Removes a mouse out listener from given DOMElement.";
+  this.ROYGBIV_SCRIPTING_API_ISARSUPPORTED = "Returns if AR is supported in current client device.";
+  this.ROYGBIV_SCRIPTING_API_STARTAUGMENTEDREALITY = "Opens AR view for given model instance and AR model name. See README of models folder for more details.";
 }

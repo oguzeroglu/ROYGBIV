@@ -386,3 +386,14 @@ Model.prototype.disableCustomTextures = function(){
     this.geometry.removeAttribute("normalTextureIndex");
   }
 }
+
+Model.prototype.setARModelNames = function(arModelNames){
+  this.info.arModelNames = {};
+  for (var i = 0; i < arModelNames.length; i ++){
+    this.info.arModelNames[arModelNames[i]] = true;
+  }
+}
+
+Model.prototype.hasARModel = function(modelName){
+  return !!this.info.arModelNames[modelName];
+}

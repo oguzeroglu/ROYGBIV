@@ -3,3 +3,16 @@ folder into your project. Each child folder represents a model and must contain
 an .obj and a .mtl file (and/or textures). Note that if the model contains
 any textures, texture images under the model folder must respect
 ACCEPTED_TEXTURE_SIZE parameter.
+
+In order to activate augmented reality view for given model, a folder named
+"ar" may be added under the model folder. This folder should contain .usdz and
+.glb files:
+
+  * model_with_texture1.usdz
+  * model_with_texture1.glb
+  * model_with_texture2.usdz
+  ...
+
+AR view may then be activated via startAugmentedReality scripting API:
+
+  ROYGBIV.startAugmentedReality(modelInstance, "model_with_texture1");

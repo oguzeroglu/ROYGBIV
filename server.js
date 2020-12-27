@@ -421,6 +421,7 @@ app.post("/getModels", function(req, res){
 
     var mtlFileName = null;
     var objFileName = null;
+    var arModelNames = [];
     fs.readdirSync(path + "/").forEach(childFileName => {
       if (childFileName.toLowerCase().endsWith(".mtl")){
         mtlFileName = childFileName;
@@ -429,12 +430,40 @@ app.post("/getModels", function(req, res){
       }
     });
 
+    if (fs.existsSync(path + "/ar/")){
+      var arModelsMap = {};
+      fs.readdirSync(path + "/ar/").forEach(childFileName => {
+        if (childFileName.toLowerCase().endsWith(".usdz")){
+          var arModelName = childFileName.split(".")[0];
+          if (arModelsMap[arModelName]){
+            arModelsMap[arModelName].hasUSDZ = true;
+          }else{
+            arModelsMap[arModelName] = {hasUSDZ: true};
+          }
+        }else if (childFileName.toLowerCase().endsWith(".glb")){
+          var arModelName = childFileName.split(".")[0];
+          if (arModelsMap[arModelName]){
+            arModelsMap[arModelName].hasGLB = true;
+          }else{
+            arModelsMap[arModelName] = {hasGLB: true};
+          }
+        }
+      });
+
+      for (var key in arModelsMap){
+        if (arModelsMap[key].hasUSDZ && arModelsMap[key].hasGLB){
+          arModelNames.push(key);
+        }
+      }
+    }
+
     if (mtlFileName != null && objFileName != null){
       modelFolders.push({
         folder: fileName,
         obj: objFileName,
-        mtl: mtlFileName
-      })
+        mtl: mtlFileName,
+        arModelNames: arModelNames
+      });
     }
   });
 
