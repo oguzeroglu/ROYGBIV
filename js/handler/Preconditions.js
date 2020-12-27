@@ -420,7 +420,7 @@ Preconditions.prototype.checkIfStateMachineHasState = function(callerFunc, state
 }
 
 Preconditions.prototype.checkIfModelInstanceInActiveScene = function(callerFunc, modelInstance){
-  if (modelInstance.registeredSceneName != modelInstance.getActiveSceneName()){
+  if (modelInstance.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Model instance is not inside the active scene.");
   }
 }
