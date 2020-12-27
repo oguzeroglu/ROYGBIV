@@ -365,6 +365,9 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
   var normalTextureIndexByTextureID = model.normalTextureIndexByTextureID;
   for (var i = 0; i < usedTextures.length; i ++){
     var textureID = usedTextures[i].id;
+    if (!texturesObj[textureID]){
+      continue;
+    }
     var diffuseTextureIndex = diffuseTextureIndexByTextureID[textureID];
     if (!(typeof diffuseTextureIndex == UNDEFINED)){
       var texture = texturesObj[textureID].diffuseTexture;
