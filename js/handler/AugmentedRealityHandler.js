@@ -24,4 +24,12 @@ AugmentedRealityHandler.prototype.start = function(modelFolderName, arModelName)
     this.aElement.removeChild(img);
     return;
   }
+
+  var url = new URL("models/" + modelFolderName + "/ar/" + arModelName + ".glb", self.location.toString());
+  var fileParam = "?file=" + url.toString() + "&mode=ar_only";
+  console.log(fileParam);
+  var intent = "intent://arvr.google.com/scene-viewer/1.0" + fileParam + "#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;";
+  console.log(intent);
+  this.aElement.setAttribute("href", intent);
+  this.aElement.click();
 }
