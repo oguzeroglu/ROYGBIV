@@ -351,7 +351,7 @@ Preconditions.prototype.checkIfValidModelTextureSObj = function(callerFunc, mode
   for (var i = 0; i < usedTextures.length; i ++){
     var textureID = usedTextures[i].id;
     if (!texturesObj[textureID]){
-      continue;
+      this.throw(callerFunc, "Textures object does not have texture: " + textureID);
     }
     if (!texturesObj[textureID].isTexturePack){
       this.throw(callerFunc, "Provided object for texture " + textureID + " is not a texture pack.");
