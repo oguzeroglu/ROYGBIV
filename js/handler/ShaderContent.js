@@ -250,7 +250,7 @@ ShaderContent.prototype.getDisableInfo = function(){
   sceneHandler.scenes[sceneHandler.getActiveSceneName()].savePostProcessing();
   for (var sceneName in sceneHandler.scenes){
     var scene = sceneHandler.scenes[sceneName];
-    if (scene.postProcessing && scene.postProcessing.isOn){
+    if (scene.postProcessing && scene.postProcessing.bloom && scene.postProcessing.bloom.isOn){
       hasBloom = true;
       break;
     }
