@@ -1061,6 +1061,12 @@ function checkForUnusedTexturePacks(){
         break;
       }
     }
+    for (var chName in crosshairs){
+      if (crosshairs[chName].texturePack.name == tpName){
+        isUsed = true;
+        break;
+      }
+    }
 
     if (!isUsed){
       return true;
