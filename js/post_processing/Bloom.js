@@ -10,6 +10,11 @@ var Bloom = function(){
     bloomTintColors: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)]
   }
   this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
+
+  if (isDeployment && !ShaderContent.bloomBlurPassVertexShader){
+    return;
+  }
+
   this.generateDirectPass();
   this.generateBrightPass();
   this.generateBlurPass();
@@ -109,16 +114,28 @@ Bloom.prototype.setBloomFactor = function(levelIndex, factor){
 }
 
 Bloom.prototype.setGamma = function(gamma){
+  if (!this.combinerMaterial){
+    return;
+  }
+
   this.configurations.gamma = gamma;
   this.combinerMaterial.uniforms.gamma.value = gamma;
 }
 
 Bloom.prototype.setExposure = function(exposure){
+  if (!this.combinerMaterial){
+    return;
+  }
+
   this.configurations.exposure = exposure;
   this.combinerMaterial.uniforms.exposure.value = exposure;
 }
 
 Bloom.prototype.setBlurStepCount = function(stepCount){
+  if (!this.combinerMaterial){
+    return;
+  }
+
   if (stepCount > 5){
     throw new Error("[!] Bloom.setBlurStepCount error: Max alloed stepCount is 5.");
   }
@@ -137,11 +154,17 @@ Bloom.prototype.setBlurStepCount = function(stepCount){
 }
 
 Bloom.prototype.setBloomStrength = function(strength){
+  if (!this.combinerMaterial){
+    return;
+  }
   this.combinerMaterial.uniforms.bloomStrength.value = strength;
   this.configurations.bloomStrength = strength;
 }
 
 Bloom.prototype.setThreshold = function(threshold){
+  if (!this.brightPassMaterial){
+    return;
+  }
   this.configurations.threshold = threshold;
   this.brightPassMaterial.uniforms.threshold.value = threshold;
 }
@@ -151,6 +174,9 @@ Bloom.prototype.setTapForLevel = function(levelIndex, tap){
 }
 
 Bloom.prototype.setBlurTap = function(tap){
+  if (!this.blurPassMaterial){
+    return;
+  }
   if (tap == 5){
     this.blurPassMaterial.uniforms.numberOfTap.value = -10;
     return;
@@ -167,6 +193,10 @@ Bloom.prototype.setBlurTap = function(tap){
 }
 
 Bloom.prototype.setBlurDirection = function(isX){
+  if (!this.blurPassMaterial){
+    return;
+  }
+
   if (isX){
     this.blurPassMaterial.uniforms.direction.value = this.blurPassDirectionX;
   }else{
@@ -288,6 +318,9 @@ Bloom.prototype.generateBrightPass = function(){
 }
 
 Bloom.prototype.setSize = function(width, height){
+  if (!this.sceneTarget){
+    return;
+  }
   this.sceneTarget.setSize(width, height);
   this.brightTarget.setSize(width / 2, height / 2);
   var coef = 2;
@@ -299,10 +332,16 @@ Bloom.prototype.setSize = function(width, height){
 }
 
 Bloom.prototype.setViewport = function(x, y, z, w){
+  if (!this.sceneTarget){
+    return;
+  }
   this.setSize(z, w);
 }
 
 Bloom.prototype.setPixelRatio = function(ratio){
+  if (!this.sceneTarget){
+    return;
+  }
   this.setSize(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w);
 }
 
