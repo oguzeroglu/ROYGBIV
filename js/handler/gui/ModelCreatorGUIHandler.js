@@ -284,9 +284,20 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
 
     var color = childMesh.material.color;
 
-    var uv1 = faceVertexUVs[i][0];
-    var uv2 = faceVertexUVs[i][1];
-    var uv3 = faceVertexUVs[i][2];
+    var uv1 = null;
+    var uv2 = null;
+    var uv3 = null;
+
+    if (textureMerger){
+      uv1 = faceVertexUVs[i][0];
+      uv2 = faceVertexUVs[i][1];
+      uv3 = faceVertexUVs[i][2];
+    }else{
+      REUSABLE_2_VECTOR.set(0, 0);
+      uv1 = REUSABLE_2_VECTOR;
+      uv2 = REUSABLE_2_VECTOR;
+      uv3 = REUSABLE_2_VECTOR;
+    }
 
     this.triplePush(positions, vertex1, vertex2, vertex3, "xyz");
     this.triplePush(normals, vertexNormal1, vertexNormal2, vertexNormal3, "xyz");
