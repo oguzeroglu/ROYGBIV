@@ -496,3 +496,101 @@ ModelInstance.prototype.unmapEnvironment = function(){
   this.mesh.geometry.removeAttribute("environmentMapInfo");
   macroHandler.removeMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
 }
+
+ModelInstance.prototype.setReflectionMode = function(isReflection, childIndex){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+
+  var forAllChildren = false;
+  if (typeof childIndex == UNDEFINED || childIndex == null){
+    forAllChildren = true;
+  }
+
+  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
+  var y = 0;
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
+      ary[y] = isReflection? 100: -1;
+    }
+
+    y += 3;
+  }
+
+  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
+}
+
+ModelInstance.prototype.setReflectivity = function(reflectivity, childIndex){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+
+  var forAllChildren = false;
+  if (typeof childIndex == UNDEFINED || childIndex == null){
+    forAllChildren = true;
+  }
+
+  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
+  var y = 0;
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
+      ary[y + 1] = reflectivity;
+    }
+
+    y += 3;
+  }
+
+  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
+}
+
+ModelInstance.prototype.setRefractionRatio = function(refractionRatio, childIndex){
+  if (!this.hasEnvironmentMap() || refractionRatio <= 0){
+    return;
+  }
+
+  var forAllChildren = false;
+  if (typeof childIndex == UNDEFINED || childIndex == null){
+    forAllChildren = true;
+  }
+
+  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
+  var y = 0;
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
+      if (ary[y] < 0){
+        ary[y] = -1 * refractionRatio;
+      }
+    }
+
+    y += 3;
+  }
+
+  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
+}
+
+ModelInstance.prototype.setEnvironmentBlendingMode = function(envBlendingMode, childIndex){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+
+  var forAllChildren = false;
+  if (typeof childIndex == UNDEFINED || childIndex == null){
+    forAllChildren = true;
+  }
+
+  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
+  var y = 0;
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
+      ary[y + 2] = envBlendingMode;
+    }
+
+    y += 3;
+  }
+
+  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
+}

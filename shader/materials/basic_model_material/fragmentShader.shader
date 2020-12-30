@@ -840,8 +840,6 @@ void main(){
     colorHandled = handleLighting(vWorldPosition);
   #endif
 
-  vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
-
   #ifdef HAS_ENVIRONMENT_MAP
     vec3 worldNormal = normalize(vWorldNormal);
     vec3 eyeToSurfaceDir = normalize(vWorldPosition - cameraPosition);
@@ -857,13 +855,13 @@ void main(){
     vec4 envColor = textureCube(environmentMap, envVec);
 
     if (vEnvironmentMapInfo[2] > 500.0){
-      diffuseColor.xyz = mix(diffuseColor.xyz, diffuseColor.xyz * envColor.xyz, vEnvironmentMapInfo[1]); // multiply
+      colorHandled = mix(colorHandled, colorHandled * envColor.xyz, vEnvironmentMapInfo[1]); // multiply
     }else if (vEnvironmentMapInfo[2] > 100.0){
-      diffuseColor.xyz = mix(diffuseColor.xyz, envColor.xyz, vEnvironmentMapInfo[1]); //mix
+      colorHandled = mix(colorHandled, envColor.xyz, vEnvironmentMapInfo[1]); //mix
     }else{
-      diffuseColor.xyz += envColor.xyz * vEnvironmentMapInfo[1]; //add
+      colorHandled += envColor.xyz * vEnvironmentMapInfo[1]; //add
     }
   #endif
 
-  gl_FragColor = vec4(colorHandled, 1.0) * diffuseColor;
+  gl_FragColor = vec4(colorHandled, 1.0);
 }
