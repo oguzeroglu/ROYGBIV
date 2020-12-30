@@ -16,8 +16,17 @@ varying vec4 vDiffuseUV;
 
 #define INSERTION
 
-#ifdef HAS_PHONG_LIGHTING
+#if defined(HAS_PHONG_LIGHTING) || defined(HAS_ENVIRONMENT_MAP)
   varying vec3 vWorldPosition;
+#endif
+
+#ifdef HAS_ENVIRONMENT_MAP
+  attribute vec3 environmentMapInfo;
+  varying vec3 vWorldNormal;
+  varying vec3 vEnvironmentMapInfo;
+#endif
+
+#ifdef HAS_PHONG_LIGHTING
   varying vec3 vNormal;
   #ifdef HAS_NORMAL_MAP
     attribute vec4 normalUV;
@@ -28,7 +37,7 @@ varying vec4 vDiffuseUV;
   #endif
 #endif
 
-#ifdef AFFECTED_BY_LIGHT
+#if defined(AFFECTED_BY_LIGHT) || defined(HAS_ENVIRONMENT_MAP)
   uniform mat4 worldMatrix;
 #endif
 
@@ -756,8 +765,17 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
 void main(){
 
-  #ifdef AFFECTED_BY_LIGHT
+  #if defined(AFFECTED_BY_LIGHT) || defined(HAS_ENVIRONMENT_MAP)
     vec3 worldPositionComputed = (worldMatrix * vec4(position, 1.0)).xyz;
+  #endif
+
+  #if defined(HAS_PHONG_LIGHTING) || defined(HAS_ENVIRONMENT_MAP)
+    vWorldPosition = worldPositionComputed;
+  #endif
+
+  #ifdef HAS_ENVIRONMENT_MAP
+    vWorldNormal = mat3(worldMatrix) * normal;
+    vEnvironmentMapInfo = environmentMapInfo;
   #endif
 
   #if defined(AFFECTED_BY_LIGHT) && !defined(HAS_PHONG_LIGHTING)
@@ -768,7 +786,6 @@ void main(){
 
   #ifdef HAS_PHONG_LIGHTING
     vNormal = normalize(mat3(worldInverseTranspose) * normal);
-    vWorldPosition = worldPositionComputed;
     #ifdef HAS_NORMAL_MAP
       handleNormalMap();
     #endif

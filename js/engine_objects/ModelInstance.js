@@ -283,7 +283,10 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
 
   delete this.mesh.material.uniforms.worldInverseTranspose;
   delete this.mesh.material.uniforms.dynamicLightsMatrix;
-  delete this.mesh.material.uniforms.worldMatrix;
+
+  if (!this.hasEnvironmentMap()){
+    delete this.mesh.material.uniforms.worldMatrix;
+  }
 
   if (isAffectedByLight){
     macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
@@ -453,4 +456,43 @@ ModelInstance.prototype.getBBs = function(){
   }
 
   return bbs;
+}
+
+ModelInstance.prototype.hasEnvironmentMap = function(){
+  return !!this.mesh.material.uniforms.environmentMap;
+}
+
+ModelInstance.prototype.mapEnvironment = function(skybox){
+  if (this.hasEnvironmentMap()){
+    this.unmapEnvironment();
+  }
+
+  this.mesh.material.uniforms.environmentMap = new THREE.Uniform(skybox.cubeTexture);
+  this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+  this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+
+  var environmentInfoArray = new Float32Array(this.mesh.geometry.attributes.position.array.length);
+  for (var i = 0; i < environmentInfoArray.length; i +=3){
+    environmentInfoArray[i] = 100;
+    environmentInfoArray[i + 1] = 1;
+    environmentInfoArray[i + 2] = 1000;
+  }
+
+  this.mesh.geometry.addAttribute("environmentMapInfo", new THREE.BufferAttribute(environmentInfoArray, 3));
+
+  macroHandler.injectMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
+}
+
+ModelInstance.prototype.unmapEnvironment = function(){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+
+  delete this.mesh.material.uniforms.environmentMap;
+  delete this.mesh.material.uniforms.cameraPosition;
+  if (!this.affectedByLight){
+    delete this.mesh.material.uniforms.worldMatrix;
+  }
+  this.mesh.geometry.removeAttribute("environmentMapInfo");
+  macroHandler.removeMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
 }
