@@ -2231,6 +2231,9 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       }, "View");
     }
   }
+
+  var environmentMapFolder = guiHandler.datGuiModelInstance.addFolder("Environment Map");
+  
 }
 
 GUIHandler.prototype.initializeMassManipulationGUI = function(){

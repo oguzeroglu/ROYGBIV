@@ -71,6 +71,10 @@ ModelInstance.prototype.export = function(){
     }
   }
 
+  if (this.hasEnvironmentMap()){
+    exportObj.environmentMapInfo = this.environmentMapInfo;
+  }
+
   return exportObj;
 }
 
@@ -475,12 +479,25 @@ ModelInstance.prototype.mapEnvironment = function(skybox){
   for (var i = 0; i < environmentInfoArray.length; i +=3){
     environmentInfoArray[i] = 100;
     environmentInfoArray[i + 1] = 1;
-    environmentInfoArray[i + 2] = 1000;
+    environmentInfoArray[i + 2] = environmentMapBlendingModes.MULTIPLY;
   }
 
   this.mesh.geometry.addAttribute("environmentMapInfo", new THREE.BufferAttribute(environmentInfoArray, 3));
 
   macroHandler.injectMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
+
+  this.environmentMapInfo = {
+    skyboxName: skybox.name,
+    childInfos: []
+  };
+
+  for (var i = 0; i < this.model.info.childInfos.length; i ++){
+    this.environmentMapInfo.childInfos.push({
+      isReflection: true,
+      reflectivity: 1,
+      blendingMode: environmentMapBlendingModes.MULTIPLY
+    });
+  }
 }
 
 ModelInstance.prototype.unmapEnvironment = function(){
@@ -495,6 +512,8 @@ ModelInstance.prototype.unmapEnvironment = function(){
   }
   this.mesh.geometry.removeAttribute("environmentMapInfo");
   macroHandler.removeMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
+
+  delete this.environmentMapInfo;
 }
 
 ModelInstance.prototype.setReflectionMode = function(isReflection, childIndex){
@@ -512,6 +531,12 @@ ModelInstance.prototype.setReflectionMode = function(isReflection, childIndex){
   for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
     if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
       ary[y] = isReflection? 100: -1;
+      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].isReflection = isReflection;
+      if (!isReflection){
+        this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].refractionRatio = 1;
+      }else{
+        delete this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].refractionRatio;
+      }
     }
 
     y += 3;
@@ -536,6 +561,7 @@ ModelInstance.prototype.setReflectivity = function(reflectivity, childIndex){
   for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
     if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
       ary[y + 1] = reflectivity;
+      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].reflectivity = reflectivity;
     }
 
     y += 3;
@@ -561,6 +587,7 @@ ModelInstance.prototype.setRefractionRatio = function(refractionRatio, childInde
     if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
       if (ary[y] < 0){
         ary[y] = -1 * refractionRatio;
+        this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].refractionRatio = refractionRatio;
       }
     }
 
@@ -586,6 +613,7 @@ ModelInstance.prototype.setEnvironmentBlendingMode = function(envBlendingMode, c
   for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
     if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
       ary[y + 2] = envBlendingMode;
+      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].blendingMode = envBlendingMode;
     }
 
     y += 3;
