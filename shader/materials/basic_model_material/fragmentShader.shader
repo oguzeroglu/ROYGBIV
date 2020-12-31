@@ -863,5 +863,40 @@ void main(){
     }
   #endif
 
-  gl_FragColor = vec4(colorHandled, 1.0);
+  vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+  if (vDiffuseUV.x >= 0.0) {
+    #ifdef HAS_CUSTOM_TEXTURE
+      int diffuseTextureIndexInt = int(vDiffuseTextureIndex);
+      #ifdef CUSTOM_TEXTURE_0
+        if (diffuseTextureIndexInt == 0){
+          diffuseColor = texture2D(customDiffuseTexture0, vUV);
+        }
+      #endif
+      #ifdef CUSTOM_TEXTURE_1
+        if (diffuseTextureIndexInt == 1){
+          diffuseColor = texture2D(customDiffuseTexture1, vUV);
+        }
+      #endif
+      #ifdef CUSTOM_TEXTURE_2
+        if (diffuseTextureIndexInt == 2){
+          diffuseColor = texture2D(customDiffuseTexture2, vUV);
+        }
+      #endif
+      #ifdef CUSTOM_TEXTURE_3
+        if (diffuseTextureIndexInt == 3){
+          diffuseColor = texture2D(customDiffuseTexture3, vUV);
+        }
+      #endif
+      #ifdef CUSTOM_TEXTURE_4
+        if (diffuseTextureIndexInt == 4){
+          diffuseColor = texture2D(customDiffuseTexture4, vUV);
+          }
+      #endif
+    #else
+      diffuseColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w));
+    #endif
+  }
+
+  gl_FragColor = vec4(colorHandled, 1.0) * diffuseColor;
 }

@@ -466,6 +466,15 @@ ModelInstance.prototype.hasEnvironmentMap = function(){
   return !!this.mesh.material.uniforms.environmentMap;
 }
 
+ModelInstance.prototype.updateEnvironmentMap = function(skybox){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+  
+  this.mesh.material.uniforms.environmentMap = new THREE.Uniform(skybox.cubeTexture);
+  this.environmentMapInfo.skyboxName = skybox.name;
+}
+
 ModelInstance.prototype.mapEnvironment = function(skybox){
   if (this.hasEnvironmentMap()){
     this.unmapEnvironment();
