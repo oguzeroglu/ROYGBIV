@@ -71,6 +71,10 @@ ModelInstance.prototype.export = function(){
     }
   }
 
+  if (this.hasEnvironmentMap()){
+    exportObj.environmentMapInfo = this.environmentMapInfo;
+  }
+
   return exportObj;
 }
 
@@ -283,7 +287,10 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
 
   delete this.mesh.material.uniforms.worldInverseTranspose;
   delete this.mesh.material.uniforms.dynamicLightsMatrix;
-  delete this.mesh.material.uniforms.worldMatrix;
+
+  if (!this.hasEnvironmentMap()){
+    delete this.mesh.material.uniforms.worldMatrix;
+  }
 
   if (isAffectedByLight){
     macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
@@ -453,4 +460,174 @@ ModelInstance.prototype.getBBs = function(){
   }
 
   return bbs;
+}
+
+ModelInstance.prototype.hasEnvironmentMap = function(){
+  return !!this.mesh.material.uniforms.environmentMap;
+}
+
+ModelInstance.prototype.updateEnvironmentMap = function(skybox){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+
+  this.mesh.material.uniforms.environmentMap = skybox.getUniform();
+  this.environmentMapInfo.skyboxName = skybox.name;
+}
+
+ModelInstance.prototype.mapEnvironment = function(skybox){
+  if (this.hasEnvironmentMap()){
+    this.unmapEnvironment();
+  }
+
+  this.mesh.material.uniforms.environmentMap = skybox.getUniform();
+  this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+  this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+
+  var environmentInfoArray = new Float32Array(this.mesh.geometry.attributes.position.array.length);
+  for (var i = 0; i < environmentInfoArray.length; i +=3){
+    environmentInfoArray[i] = 100;
+    environmentInfoArray[i + 1] = 1;
+    environmentInfoArray[i + 2] = environmentMapBlendingModes.MULTIPLY;
+  }
+
+  this.mesh.geometry.addAttribute("environmentMapInfo", new THREE.BufferAttribute(environmentInfoArray, 3));
+
+  macroHandler.injectMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
+
+  this.environmentMapInfo = {
+    skyboxName: skybox.name,
+    childInfos: []
+  };
+
+  for (var i = 0; i < this.model.info.childInfos.length; i ++){
+    this.environmentMapInfo.childInfos.push({
+      isReflection: true,
+      reflectivity: 1,
+      blendingMode: environmentMapBlendingModes.MULTIPLY
+    });
+  }
+}
+
+ModelInstance.prototype.unmapEnvironment = function(){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+
+  delete this.mesh.material.uniforms.environmentMap;
+  delete this.mesh.material.uniforms.cameraPosition;
+  if (!this.affectedByLight){
+    delete this.mesh.material.uniforms.worldMatrix;
+  }
+  this.mesh.geometry.removeAttribute("environmentMapInfo");
+  macroHandler.removeMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
+
+  delete this.environmentMapInfo;
+}
+
+ModelInstance.prototype.setReflectionMode = function(isReflection, childIndex){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+
+  var forAllChildren = false;
+  if (typeof childIndex == UNDEFINED || childIndex == null){
+    forAllChildren = true;
+  }
+
+  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
+  var y = 0;
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
+      ary[y] = isReflection? 100: -1;
+      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].isReflection = isReflection;
+      if (!isReflection){
+        this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].refractionRatio = 1;
+      }else{
+        delete this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].refractionRatio;
+      }
+    }
+
+    y += 3;
+  }
+
+  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
+}
+
+ModelInstance.prototype.setReflectivity = function(reflectivity, childIndex){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+
+  var forAllChildren = false;
+  if (typeof childIndex == UNDEFINED || childIndex == null){
+    forAllChildren = true;
+  }
+
+  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
+  var y = 0;
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
+      ary[y + 1] = reflectivity;
+      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].reflectivity = reflectivity;
+    }
+
+    y += 3;
+  }
+
+  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
+}
+
+ModelInstance.prototype.setRefractionRatio = function(refractionRatio, childIndex){
+  if (!this.hasEnvironmentMap() || refractionRatio <= 0){
+    return;
+  }
+
+  var forAllChildren = false;
+  if (typeof childIndex == UNDEFINED || childIndex == null){
+    forAllChildren = true;
+  }
+
+  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
+  var y = 0;
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
+      if (ary[y] < 0){
+        ary[y] = -1 * refractionRatio;
+        this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].refractionRatio = refractionRatio;
+      }
+    }
+
+    y += 3;
+  }
+
+  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
+}
+
+ModelInstance.prototype.setEnvironmentBlendingMode = function(envBlendingMode, childIndex){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+
+  var forAllChildren = false;
+  if (typeof childIndex == UNDEFINED || childIndex == null){
+    forAllChildren = true;
+  }
+
+  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
+  var y = 0;
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
+      ary[y + 2] = envBlendingMode;
+      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].blendingMode = envBlendingMode;
+    }
+
+    y += 3;
+  }
+
+  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
 }

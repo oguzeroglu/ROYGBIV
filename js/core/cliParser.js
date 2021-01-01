@@ -1686,11 +1686,18 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
           }
+          for (var modelInstanceName in modelInstances){
+            if (modelInstances[modelInstanceName].environmentMapInfo && modelInstances[modelInstanceName].environmentMapInfo.skyboxName == name){
+              terminal.printError(Text.SKYBOX_USED_IN_A_MODEL_INSTANCE.replace(Text.PARAM1, modelInstanceName));
+              return true;
+            }
+          }
           sceneHandler.onSkyboxDeletion(skybox);
           skyboxHandler.destroySkybox(skybox);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SKYBOX_DESTROYED);
           }
+          selectionHandler.resetCurrentSelection();
           return true;
         break;
         case 74: //skybox

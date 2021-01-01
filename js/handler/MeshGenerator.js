@@ -26,6 +26,12 @@ MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
   mesh.renderOrder = renderOrders.OBJECT;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
 
+  if (uniforms.texture){
+    macroHandler.injectMacro("HAS_TEXTURE", material, true, true);
+  }else{
+    this.geometry.removeAttribute("uv");
+  }
+
   return mesh;
 }
 
@@ -241,7 +247,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
 MeshGenerator.prototype.generateSkybox = function(skybox, isMock){
   var cubeTextureUniform;
   if (!isMock){
-    GLOBAL_CUBE_TEXTURE_UNIFORM.value = skybox.cubeTexture;
+    GLOBAL_CUBE_TEXTURE_UNIFORM = skybox.getUniform();
     cubeTextureUniform = GLOBAL_CUBE_TEXTURE_UNIFORM;
   }else{
     cubeTextureUniform = new THREE.Uniform(skybox.cubeTexture);

@@ -481,6 +481,13 @@ var rotationModes = {
   WORLD: "WORLD"
 };
 
+// ENV MAP BLENDING MODES
+var environmentMapBlendingModes = {
+  MULTIPLY: 1000,
+  MIX: 300,
+  ADD: -100
+};
+
 // AXES
 var axes = {"X": "x", "Y": "y", "Z": "z"};
 

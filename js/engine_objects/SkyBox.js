@@ -8,6 +8,16 @@ var SkyBox = function(name, directoryName, color){
   this.hasLeft = false;
   this.hasRight = false;
   this.hasUp = false;
+
+  this.uniformCache = null;
+}
+
+SkyBox.prototype.getUniform = function(){
+  if (!this.uniformCache){
+    this.uniformCache = new THREE.Uniform(this.cubeTexture);
+  }
+
+  return this.uniformCache;
 }
 
 SkyBox.prototype.clone = function(){

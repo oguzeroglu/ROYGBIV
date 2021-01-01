@@ -1,5 +1,4 @@
 var SkyboxHandler = function(){
-  GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform();
   this.visible = false;
 }
 

@@ -1,14 +1,27 @@
 precision lowp float;
 precision lowp int;
 
-varying vec2 vUV;
 varying vec3 vColor;
-varying vec4 vDiffuseUV;
 
 #define INSERTION
 
-#ifdef HAS_PHONG_LIGHTING
+#ifdef HAS_TEXTURE
+  varying vec2 vUV;
+  varying vec4 vDiffuseUV;
+#endif
+
+#if defined(HAS_PHONG_LIGHTING) || defined(HAS_ENVIRONMENT_MAP)
   varying vec3 vWorldPosition;
+#endif
+
+#ifdef HAS_ENVIRONMENT_MAP
+  varying vec3 vWorldNormal;
+  varying vec3 vEnvironmentMapInfo;
+  uniform samplerCube environmentMap;
+  uniform vec3 cameraPosition;
+#endif
+
+#ifdef HAS_PHONG_LIGHTING
   varying vec3 vNormal;
   uniform mat4 dynamicLightsMatrix;
   #ifdef HAS_NORMAL_MAP
@@ -830,40 +843,65 @@ void main(){
     colorHandled = handleLighting(vWorldPosition);
   #endif
 
+  #ifdef HAS_ENVIRONMENT_MAP
+    vec3 worldNormal = normalize(vWorldNormal);
+    vec3 eyeToSurfaceDir = normalize(vWorldPosition - cameraPosition);
+    vec3 envVec;
+
+    if (vEnvironmentMapInfo[0] > 0.0){
+      envVec = reflect(eyeToSurfaceDir, worldNormal);
+    }else{
+      float refractionRatio = -vEnvironmentMapInfo[0];
+      envVec = refract(eyeToSurfaceDir, worldNormal, refractionRatio);
+    }
+
+    vec4 envColor = textureCube(environmentMap, envVec);
+
+    if (vEnvironmentMapInfo[2] > 500.0){
+      colorHandled = mix(colorHandled, colorHandled * envColor.xyz, vEnvironmentMapInfo[1]); // multiply
+    }else if (vEnvironmentMapInfo[2] > 100.0){
+      colorHandled = mix(colorHandled, envColor.xyz, vEnvironmentMapInfo[1]); //mix
+    }else{
+      colorHandled += envColor.xyz * vEnvironmentMapInfo[1]; //add
+    }
+  #endif
+
   vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
 
-  if (vDiffuseUV.x >= 0.0) {
-    #ifdef HAS_CUSTOM_TEXTURE
-      int diffuseTextureIndexInt = int(vDiffuseTextureIndex);
-      #ifdef CUSTOM_TEXTURE_0
-        if (diffuseTextureIndexInt == 0){
-          diffuseColor = texture2D(customDiffuseTexture0, vUV);
-        }
-      #endif
-      #ifdef CUSTOM_TEXTURE_1
-        if (diffuseTextureIndexInt == 1){
-          diffuseColor = texture2D(customDiffuseTexture1, vUV);
-        }
-      #endif
-      #ifdef CUSTOM_TEXTURE_2
-        if (diffuseTextureIndexInt == 2){
-          diffuseColor = texture2D(customDiffuseTexture2, vUV);
-        }
-      #endif
-      #ifdef CUSTOM_TEXTURE_3
-        if (diffuseTextureIndexInt == 3){
-          diffuseColor = texture2D(customDiffuseTexture3, vUV);
-        }
-      #endif
-      #ifdef CUSTOM_TEXTURE_4
-        if (diffuseTextureIndexInt == 4){
-          diffuseColor = texture2D(customDiffuseTexture4, vUV);
+  #ifdef HAS_TEXTURE
+    if (vDiffuseUV.x >= 0.0) {
+      #ifdef HAS_CUSTOM_TEXTURE
+        int diffuseTextureIndexInt = int(vDiffuseTextureIndex);
+        #ifdef CUSTOM_TEXTURE_0
+          if (diffuseTextureIndexInt == 0){
+            diffuseColor = texture2D(customDiffuseTexture0, vUV);
           }
+        #endif
+        #ifdef CUSTOM_TEXTURE_1
+          if (diffuseTextureIndexInt == 1){
+            diffuseColor = texture2D(customDiffuseTexture1, vUV);
+          }
+        #endif
+        #ifdef CUSTOM_TEXTURE_2
+          if (diffuseTextureIndexInt == 2){
+            diffuseColor = texture2D(customDiffuseTexture2, vUV);
+          }
+        #endif
+        #ifdef CUSTOM_TEXTURE_3
+          if (diffuseTextureIndexInt == 3){
+            diffuseColor = texture2D(customDiffuseTexture3, vUV);
+          }
+        #endif
+        #ifdef CUSTOM_TEXTURE_4
+          if (diffuseTextureIndexInt == 4){
+            diffuseColor = texture2D(customDiffuseTexture4, vUV);
+            }
+        #endif
+      #else
+        diffuseColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w));
       #endif
-    #else
-      diffuseColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w));
-    #endif
-  }
+    }
+  #endif
 
   gl_FragColor = vec4(colorHandled, 1.0) * diffuseColor;
 }
