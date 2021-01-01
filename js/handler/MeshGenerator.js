@@ -247,7 +247,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
 MeshGenerator.prototype.generateSkybox = function(skybox, isMock){
   var cubeTextureUniform;
   if (!isMock){
-    GLOBAL_CUBE_TEXTURE_UNIFORM.value = skybox.cubeTexture;
+    GLOBAL_CUBE_TEXTURE_UNIFORM = skybox.getUniform();
     cubeTextureUniform = GLOBAL_CUBE_TEXTURE_UNIFORM;
   }else{
     cubeTextureUniform = new THREE.Uniform(skybox.cubeTexture);

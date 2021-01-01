@@ -470,8 +470,8 @@ ModelInstance.prototype.updateEnvironmentMap = function(skybox){
   if (!this.hasEnvironmentMap()){
     return;
   }
-  
-  this.mesh.material.uniforms.environmentMap = new THREE.Uniform(skybox.cubeTexture);
+
+  this.mesh.material.uniforms.environmentMap = skybox.getUniform();
   this.environmentMapInfo.skyboxName = skybox.name;
 }
 
@@ -480,7 +480,7 @@ ModelInstance.prototype.mapEnvironment = function(skybox){
     this.unmapEnvironment();
   }
 
-  this.mesh.material.uniforms.environmentMap = new THREE.Uniform(skybox.cubeTexture);
+  this.mesh.material.uniforms.environmentMap = skybox.getUniform();
   this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
   this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
 
