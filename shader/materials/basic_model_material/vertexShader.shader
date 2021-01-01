@@ -4,17 +4,20 @@ precision lowp int;
 attribute vec3 color;
 attribute vec3 position;
 attribute vec3 normal;
-attribute vec2 uv;
 attribute vec4 diffuseUV;
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 
-varying vec2 vUV;
 varying vec3 vColor;
-varying vec4 vDiffuseUV;
 
 #define INSERTION
+
+#ifdef HAS_TEXTURE
+  attribute vec2 uv;
+  varying vec2 vUV;
+  varying vec4 vDiffuseUV;
+#endif
 
 #if defined(HAS_PHONG_LIGHTING) || defined(HAS_ENVIRONMENT_MAP)
   varying vec3 vWorldPosition;
@@ -791,8 +794,10 @@ void main(){
     #endif
   #endif
 
-  vUV = uv;
-  vDiffuseUV = diffuseUV;
+  #ifdef HAS_TEXTURE
+    vUV = uv;
+    vDiffuseUV = diffuseUV;
+  #endif
 
   #ifdef HAS_CUSTOM_TEXTURE
     vDiffuseTextureIndex = diffuseTextureIndex;

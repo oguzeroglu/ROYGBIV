@@ -26,6 +26,12 @@ MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
   mesh.renderOrder = renderOrders.OBJECT;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
 
+  if (uniforms.texture){
+    macroHandler.injectMacro("HAS_TEXTURE", material, true, true);
+  }else{
+    this.geometry.removeAttribute("uv");
+  }
+
   return mesh;
 }
 
