@@ -2261,6 +2261,7 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
         modelInstance.setReflectivity(childParams[i]["Reflectivity"], i);
         modelInstance.setEnvironmentBlendingMode(environmentMapBlendingModes[childParams[i]["Blending mode"]], i);
         modelInstance.setRefractionRatio(childParams[i]["Refraction ratio"], i);
+        modelInstance.setRoughness(childParams[i]["Roughness"], i);
       }
 
       terminal.printInfo(Text.ENVIRONMENT_MAP_CREATED);
