@@ -34,17 +34,29 @@ SkyBox.prototype.dispose = function(){
   this.cubeTexture.dispose();
 }
 
-SkyBox.prototype.export = function(){
+SkyBox.prototype.export = function(isBuildingForDeploymentMode){
   var exportObject = new Object();
   exportObject.name = this.name;
   exportObject.directoryName = this.directoryName;
   exportObject.color = this.color;
+
+  if (isBuildingForDeploymentMode){
+    for (var instanceName in modelInstances){
+      var modelInstance = modelInstances[instanceName];
+      if (modelInstance.environmentMapInfo && modelInstance.environmentMapInfo.skyboxName == this.name){
+        exportObject.noCompress = true;
+        break;
+      }
+    }
+  }
+
   return exportObject;
 }
 
 SkyBox.prototype.loadTexture = function(textureName, textureObjectName, textureAvailibilityObjectName, callback){
-  var loader = textureLoaderFactory.get()
-  var path = skyBoxRootDirectory + "/" + this.directoryName + "/" +textureName + textureLoaderFactory.getFilePostfix();
+  var loader = (isDeployment && this.noCompress)? textureLoaderFactory.getDefault(): textureLoaderFactory.get();
+  var postfix = (isDeployment && this.noCompress)? textureLoaderFactory.getDefaultFilePostfix(): textureLoaderFactory.getFilePostfix();
+  var path = skyBoxRootDirectory + this.directoryName + "/" +textureName + postfix;
   var that = this;
   loader.load(path, function(textureData){
     that[textureObjectName] = textureData;
@@ -92,7 +104,7 @@ SkyBox.prototype.handleCompressedCubemap = function(cubemap){
 
 SkyBox.prototype.callbackCheck = function(callback){
   if (this.isUsable()){
-    if (textureLoaderFactory.isCompressionSupported()){
+    if (textureLoaderFactory.isCompressionSupported() && !(isDeployment && this.noCompress)){
       this.cubeTexture = new THREE.CubeTexture([
         this.rightTexture, this.leftTexture,
         this.upTexture, this.downTexture,

@@ -7,6 +7,10 @@ TextureLoaderFactory.prototype.isCompressionSupported = function(){
   return ASTC_SUPPORTED || PVRTC_SUPPORTED || S3TC_SUPPORTED;
 }
 
+TextureLoaderFactory.prototype.getDefaultFilePostfix = function(){
+  return ".png";
+}
+
 TextureLoaderFactory.prototype.getFilePostfix = function(){
   if (ASTC_SUPPORTED){
     return "-astc.ktx";
@@ -17,7 +21,7 @@ TextureLoaderFactory.prototype.getFilePostfix = function(){
   if (S3TC_SUPPORTED){
     return "-s3tc.ktx";
   }
-  return ".png";
+  return this.getDefaultFilePostfix();
 }
 
 TextureLoaderFactory.prototype.get = function(){
