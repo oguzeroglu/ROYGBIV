@@ -473,6 +473,11 @@ ModelInstance.prototype.updateEnvironmentMap = function(skybox){
 
   this.mesh.material.uniforms.environmentMap = skybox.getUniform();
   this.environmentMapInfo.skyboxName = skybox.name;
+
+  var macroVal = macroHandler.getMacroValue("ENVIRONMENT_MAP_SIZE", this.mesh.material, false);
+
+  macroHandler.removeMacro("ENVIRONMENT_MAP_SIZE " + macroVal, this.mesh.material, false, true);
+  macroHandler.injectMacro("ENVIRONMENT_MAP_SIZE " + skybox.imageSize, this.mesh.material, false, true);
 }
 
 ModelInstance.prototype.mapEnvironment = function(skybox){
@@ -494,6 +499,7 @@ ModelInstance.prototype.mapEnvironment = function(skybox){
   this.mesh.geometry.addAttribute("environmentMapInfo", new THREE.BufferAttribute(environmentInfoArray, 3));
 
   macroHandler.injectMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
+  macroHandler.injectMacro("ENVIRONMENT_MAP_SIZE " + skybox.imageSize, this.mesh.material, false, true);
 
   this.environmentMapInfo = {
     skyboxName: skybox.name,
@@ -523,6 +529,9 @@ ModelInstance.prototype.unmapEnvironment = function(){
   macroHandler.removeMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
 
   delete this.environmentMapInfo;
+
+  var macroVal = macroHandler.getMacroValue("ENVIRONMENT_MAP_SIZE", this.mesh.material, false);
+  macroHandler.removeMacro("ENVIRONMENT_MAP_SIZE " + macroVal, this.mesh.material, false, true);
 }
 
 ModelInstance.prototype.setReflectionMode = function(isReflection, childIndex){

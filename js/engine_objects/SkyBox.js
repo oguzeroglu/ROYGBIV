@@ -54,8 +54,8 @@ SkyBox.prototype.export = function(isBuildingForDeploymentMode){
 }
 
 SkyBox.prototype.loadTexture = function(textureName, textureObjectName, textureAvailibilityObjectName, callback){
-  var loader = (isDeployment && this.noCompress)? textureLoaderFactory.getDefault(): textureLoaderFactory.get();
-  var postfix = (isDeployment && this.noCompress)? textureLoaderFactory.getDefaultFilePostfix(): textureLoaderFactory.getFilePostfix();
+  var loader = (isDeployment && !this.noCompress)? textureLoaderFactory.get(): textureLoaderFactory.getDefault();
+  var postfix = (isDeployment && !this.noCompress)? textureLoaderFactory.getFilePostfix(): textureLoaderFactory.getDefaultFilePostfix();
   var path = skyBoxRootDirectory + this.directoryName + "/" +textureName + postfix;
   var that = this;
   loader.load(path, function(textureData){
@@ -104,7 +104,7 @@ SkyBox.prototype.handleCompressedCubemap = function(cubemap){
 
 SkyBox.prototype.callbackCheck = function(callback){
   if (this.isUsable()){
-    if (textureLoaderFactory.isCompressionSupported() && !(isDeployment && this.noCompress)){
+    if (textureLoaderFactory.isCompressionSupported() && isDeployment && !this.noCompress){
       this.cubeTexture = new THREE.CubeTexture([
         this.rightTexture, this.leftTexture,
         this.upTexture, this.downTexture,
@@ -120,6 +120,7 @@ SkyBox.prototype.callbackCheck = function(callback){
     }
     this.cubeTexture.needsUpdate = true;
     if (callback){
+      this.imageSize = this.rightTexture.image.width;
       callback();
     }
   }
