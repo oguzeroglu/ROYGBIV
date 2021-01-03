@@ -4,6 +4,10 @@ var Renderer = function(){
   }else{
     this.webglRenderer = new THREE.WebGLRenderer({canvas: canvas, antialias: ENABLE_ANTIALIAS});
   }
+
+  var context = this.webglRenderer.context;
+  context.getExtension("EXT_shader_texture_lod");
+  context.getExtension("OES_standard_derivatives");
 }
 
 Renderer.prototype.initEffects = function(){
