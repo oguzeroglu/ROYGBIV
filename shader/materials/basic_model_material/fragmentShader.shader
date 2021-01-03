@@ -20,6 +20,7 @@ varying vec3 vColor;
 #ifdef HAS_ENVIRONMENT_MAP
   varying vec3 vWorldNormal;
   varying vec3 vEnvironmentMapInfo;
+  varying float vRoughness;
   uniform samplerCube environmentMap;
   uniform vec3 cameraPosition;
 #endif
@@ -836,6 +837,20 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
 
     return totalColor;
+  }
+#endif
+
+#ifdef HAS_ENVIRONMENT_MAP
+  float mipMapLevel(vec2 textureCoord){
+    #ifdef GL_OES_standard_derivatives
+      vec2 dx = dFdx(textureCoord);
+      vec2 dy = dFdy(textureCoord);
+      float deltaMaxSqr = max(dot(dx, dx), dot(dy, dy));
+      float mml = 0.5 * log2(deltaMaxSqr);
+      return max(0.0, mml);
+    #else
+      return 3.0;
+    #endif
   }
 #endif
 

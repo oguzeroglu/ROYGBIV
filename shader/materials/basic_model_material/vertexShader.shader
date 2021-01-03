@@ -25,8 +25,10 @@ varying vec3 vColor;
 
 #ifdef HAS_ENVIRONMENT_MAP
   attribute vec3 environmentMapInfo;
+  attribute float roughness;
   varying vec3 vWorldNormal;
   varying vec3 vEnvironmentMapInfo;
+  varying float vRoughness;
 #endif
 
 #ifdef HAS_PHONG_LIGHTING
@@ -779,6 +781,7 @@ void main(){
   #ifdef HAS_ENVIRONMENT_MAP
     vWorldNormal = mat3(worldMatrix) * normal;
     vEnvironmentMapInfo = environmentMapInfo;
+    vRoughness = roughness;
   #endif
 
   #if defined(AFFECTED_BY_LIGHT) && !defined(HAS_PHONG_LIGHTING)

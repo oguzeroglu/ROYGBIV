@@ -68,6 +68,7 @@ ImportHandler.prototype.importModelInstances = function(obj){
         }
 
         modelInstance.setReflectivity(envMapChildInfo.reflectivity, i);
+        modelInstance.setRoughness(envMapChildInfo.roughness, i);
         modelInstance.setEnvironmentBlendingMode(envMapChildInfo.blendingMode, i);
       }
     }
