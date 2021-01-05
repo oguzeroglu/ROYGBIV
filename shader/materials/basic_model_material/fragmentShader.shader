@@ -1,3 +1,6 @@
+#extension GL_EXT_shader_texture_lod : enable
+#extension GL_OES_standard_derivatives : enable
+
 precision lowp float;
 precision lowp int;
 
@@ -17,6 +20,7 @@ varying vec3 vColor;
 #ifdef HAS_ENVIRONMENT_MAP
   varying vec3 vWorldNormal;
   varying vec3 vEnvironmentMapInfo;
+  varying float vRoughness;
   uniform samplerCube environmentMap;
   uniform vec3 cameraPosition;
 #endif
@@ -836,12 +840,28 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
   }
 #endif
 
+#ifdef HAS_ENVIRONMENT_MAP
+  float mipMapLevel(vec2 textureCoord){
+    #ifdef GL_OES_standard_derivatives
+      vec2 dx = dFdx(textureCoord);
+      vec2 dy = dFdy(textureCoord);
+      float deltaMaxSqr = max(dot(dx, dx), dot(dy, dy));
+      float mml = 0.5 * log2(deltaMaxSqr);
+      return max(0.0, mml);
+    #else
+      return 3.0;
+    #endif
+  }
+#endif
+
 void main(){
 
   vec3 colorHandled = vColor;
   #ifdef HAS_PHONG_LIGHTING
     colorHandled = handleLighting(vWorldPosition);
   #endif
+
+  vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
 
   #ifdef HAS_ENVIRONMENT_MAP
     vec3 worldNormal = normalize(vWorldNormal);
@@ -855,18 +875,28 @@ void main(){
       envVec = refract(eyeToSurfaceDir, worldNormal, refractionRatio);
     }
 
-    vec4 envColor = textureCube(environmentMap, envVec);
+    float exponent = pow(2.0, (1.0 - vRoughness) * 18.0 + 2.0);
+    float maxMIPLevel = log2(float(ENVIRONMENT_MAP_SIZE));
+    float minMIPLevel = mipMapLevel(vec2(envVec.z, envVec.x) * float(ENVIRONMENT_MAP_SIZE));
+    float MIPLevel = max(minMIPLevel, log2(float(ENVIRONMENT_MAP_SIZE) * sqrt(3.0)) - 0.5 * log2(exponent + 1.0));
+    vec3 N2 = vec3(vWorldNormal.z, vWorldNormal.y, vWorldNormal.x);
+    float f0 = 0.935;
+    float fresnel = f0 + (1.0 + f0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0);
+
+    #ifdef GL_EXT_shader_texture_lod
+      vec3 envColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
+    #else
+      vec3 envColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x)).rgb;
+    #endif
 
     if (vEnvironmentMapInfo[2] > 500.0){
-      colorHandled = mix(colorHandled, colorHandled * envColor.xyz, vEnvironmentMapInfo[1]); // multiply
+      colorHandled = mix(colorHandled, colorHandled * envColor, vEnvironmentMapInfo[1]); // multiply
     }else if (vEnvironmentMapInfo[2] > 100.0){
-      colorHandled = mix(colorHandled, envColor.xyz, vEnvironmentMapInfo[1]); //mix
+      colorHandled = mix(colorHandled, envColor, vEnvironmentMapInfo[1]); //mix
     }else{
-      colorHandled += envColor.xyz * vEnvironmentMapInfo[1]; //add
+      colorHandled += envColor * vEnvironmentMapInfo[1]; //add
     }
   #endif
-
-  vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
 
   #ifdef HAS_TEXTURE
     if (vDiffuseUV.x >= 0.0) {
@@ -903,5 +933,5 @@ void main(){
     }
   #endif
 
-  gl_FragColor = vec4(colorHandled, 1.0) * diffuseColor;
+  gl_FragColor = (vec4(colorHandled, 1.0) * diffuseColor);
 }

@@ -68,6 +68,7 @@ ImportHandler.prototype.importModelInstances = function(obj){
         }
 
         modelInstance.setReflectivity(envMapChildInfo.reflectivity, i);
+        modelInstance.setRoughness(envMapChildInfo.roughness, i);
         modelInstance.setEnvironmentBlendingMode(envMapChildInfo.blendingMode, i);
       }
     }
@@ -1155,6 +1156,7 @@ ImportHandler.prototype.importSkyboxes = function(obj, callback){
   for (var skyboxName in skyboxExports){
     var skyboxExport = skyboxExports[skyboxName];
     var skybox = new SkyBox(skyboxExport.name, skyboxExport.directoryName, skyboxExport.color);
+    skybox.noCompress = !!skyboxExport.noCompress;
     skyBoxes[skyboxExport.name] = skybox;
     skybox.loadTextures(callback);
   }

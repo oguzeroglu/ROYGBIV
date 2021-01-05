@@ -79,7 +79,7 @@ var State = function(projectName, author, isBuildingForDeploymentMode){
   this.totalSkyboxCount = 0;
   for (var skyBoxName in skyBoxes){
     this.totalSkyboxCount ++;
-    skyBoxExport[skyBoxName] = skyBoxes[skyBoxName].export();
+    skyBoxExport[skyBoxName] = skyBoxes[skyBoxName].export(isBuildingForDeploymentMode);
   }
   this.skyBoxes = skyBoxExport;
   this.skyboxHandlerInfo = skyboxHandler.export();

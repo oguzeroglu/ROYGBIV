@@ -473,6 +473,11 @@ ModelInstance.prototype.updateEnvironmentMap = function(skybox){
 
   this.mesh.material.uniforms.environmentMap = skybox.getUniform();
   this.environmentMapInfo.skyboxName = skybox.name;
+
+  var macroVal = macroHandler.getMacroValue("ENVIRONMENT_MAP_SIZE", this.mesh.material, false);
+
+  macroHandler.removeMacro("ENVIRONMENT_MAP_SIZE " + macroVal, this.mesh.material, false, true);
+  macroHandler.injectMacro("ENVIRONMENT_MAP_SIZE " + skybox.imageSize, this.mesh.material, false, true);
 }
 
 ModelInstance.prototype.mapEnvironment = function(skybox){
@@ -485,15 +490,21 @@ ModelInstance.prototype.mapEnvironment = function(skybox){
   this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
 
   var environmentInfoArray = new Float32Array(this.mesh.geometry.attributes.position.array.length);
-  for (var i = 0; i < environmentInfoArray.length; i +=3){
+  var roughnessArray = new Float32Array(this.mesh.geometry.attributes.position.array.length / 3);
+  var i2 = 0;
+  for (var i = 0; i < environmentInfoArray.length; i += 3){
     environmentInfoArray[i] = 100;
     environmentInfoArray[i + 1] = 1;
     environmentInfoArray[i + 2] = environmentMapBlendingModes.MULTIPLY;
+
+    roughnessArray[i2 ++] = 0;
   }
 
   this.mesh.geometry.addAttribute("environmentMapInfo", new THREE.BufferAttribute(environmentInfoArray, 3));
+  this.mesh.geometry.addAttribute("roughness", new THREE.BufferAttribute(roughnessArray, 1));
 
   macroHandler.injectMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
+  macroHandler.injectMacro("ENVIRONMENT_MAP_SIZE " + skybox.imageSize, this.mesh.material, false, true);
 
   this.environmentMapInfo = {
     skyboxName: skybox.name,
@@ -504,6 +515,7 @@ ModelInstance.prototype.mapEnvironment = function(skybox){
     this.environmentMapInfo.childInfos.push({
       isReflection: true,
       reflectivity: 1,
+      roughness: 0,
       blendingMode: environmentMapBlendingModes.MULTIPLY
     });
   }
@@ -520,9 +532,13 @@ ModelInstance.prototype.unmapEnvironment = function(){
     delete this.mesh.material.uniforms.worldMatrix;
   }
   this.mesh.geometry.removeAttribute("environmentMapInfo");
+  this.mesh.geometry.removeAttribute("roughness");
   macroHandler.removeMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
 
   delete this.environmentMapInfo;
+
+  var macroVal = macroHandler.getMacroValue("ENVIRONMENT_MAP_SIZE", this.mesh.material, false);
+  macroHandler.removeMacro("ENVIRONMENT_MAP_SIZE " + macroVal, this.mesh.material, false, true);
 }
 
 ModelInstance.prototype.setReflectionMode = function(isReflection, childIndex){
@@ -630,4 +646,27 @@ ModelInstance.prototype.setEnvironmentBlendingMode = function(envBlendingMode, c
 
   this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
   this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
+}
+
+ModelInstance.prototype.setRoughness = function(roughness, childIndex){
+  if (!this.hasEnvironmentMap()){
+    return;
+  }
+
+  var forAllChildren = false;
+  if (typeof childIndex == UNDEFINED || childIndex == null){
+    forAllChildren = true;
+  }
+
+  var ary = this.mesh.geometry.attributes.roughness.array;
+
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
+      ary[i] = roughness;
+      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].roughness = roughness;
+    }
+  }
+
+  this.mesh.geometry.attributes.roughness.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.roughness.needsUpdate = true;
 }
