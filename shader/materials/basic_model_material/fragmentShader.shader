@@ -864,8 +864,6 @@ void main(){
     handleLighting(vWorldPosition);
   #endif
 
-  vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
-
   #ifdef HAS_ENVIRONMENT_MAP
     vec3 worldNormal = normalize(vWorldNormal);
     vec3 eyeToSurfaceDir = normalize(vWorldPosition - cameraPosition);
@@ -901,37 +899,39 @@ void main(){
     }
   #endif
 
+  vec3 textureColor = vec3(1.0, 1.0, 1.0);
+
   #ifdef HAS_TEXTURE
     if (vDiffuseUV.x >= 0.0) {
       #ifdef HAS_CUSTOM_TEXTURE
         int diffuseTextureIndexInt = int(vDiffuseTextureIndex);
         #ifdef CUSTOM_TEXTURE_0
           if (diffuseTextureIndexInt == 0){
-            diffuseColor = texture2D(customDiffuseTexture0, vUV);
+            textureColor = texture2D(customDiffuseTexture0, vUV).rgb;
           }
         #endif
         #ifdef CUSTOM_TEXTURE_1
           if (diffuseTextureIndexInt == 1){
-            diffuseColor = texture2D(customDiffuseTexture1, vUV);
+            textureColor = texture2D(customDiffuseTexture1, vUV).rgb;
           }
         #endif
         #ifdef CUSTOM_TEXTURE_2
           if (diffuseTextureIndexInt == 2){
-            diffuseColor = texture2D(customDiffuseTexture2, vUV);
+            textureColor = texture2D(customDiffuseTexture2, vUV).rgb;
           }
         #endif
         #ifdef CUSTOM_TEXTURE_3
           if (diffuseTextureIndexInt == 3){
-            diffuseColor = texture2D(customDiffuseTexture3, vUV);
+            textureColor = texture2D(customDiffuseTexture3, vUV).rgb;
           }
         #endif
         #ifdef CUSTOM_TEXTURE_4
           if (diffuseTextureIndexInt == 4){
-            diffuseColor = texture2D(customDiffuseTexture4, vUV);
+            textureColor = texture2D(customDiffuseTexture4, vUV).rgb;
             }
         #endif
       #else
-        diffuseColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w));
+        textureColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w)).rgb;
       #endif
     }
   #endif
@@ -939,6 +939,6 @@ void main(){
   vec3 diffuseTotal = vLightDiffuse + lightDiffuse;
   vec3 specularTotal = vLightSpecular + lightSpecular;
 
-  gl_FragColor.rgb = (diffuseTotal * color) + specularTotal;
+  gl_FragColor.rgb = (diffuseTotal * color * textureColor) + specularTotal;
   gl_FragColor.a = 1.0;
 }
