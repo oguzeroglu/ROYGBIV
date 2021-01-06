@@ -298,6 +298,7 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
     this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
     this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
     this.mesh.material.uniforms.dynamicLightsMatrix = lightHandler.getUniform();
+    this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     this.updateWorldInverseTranspose();
 
     lightHandler.addLightToObject(this);
@@ -311,6 +312,10 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
       }
     }
     delete this.lightingType;
+
+    if (!this.hasEnvironmentMap()){
+      delete this.mesh.material.uniforms.cameraPosition;
+    }
   }
 
   this.mesh.material.needsUpdate = true;
@@ -510,7 +515,9 @@ ModelInstance.prototype.unmapEnvironment = function(){
   }
 
   delete this.mesh.material.uniforms.environmentMap;
-  delete this.mesh.material.uniforms.cameraPosition;
+  if (!this.affectedByLight){
+    delete this.mesh.material.uniforms.cameraPosition;
+  }
   if (!this.affectedByLight){
     delete this.mesh.material.uniforms.worldMatrix;
   }

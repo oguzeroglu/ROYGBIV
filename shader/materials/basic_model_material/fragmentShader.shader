@@ -24,12 +24,12 @@ varying float vMetalness;
 
 #if defined(HAS_PHONG_LIGHTING) || defined(HAS_ENVIRONMENT_MAP)
   varying vec3 vWorldPosition;
+  uniform vec3 cameraPosition;
 #endif
 
 #ifdef HAS_ENVIRONMENT_MAP
   varying vec3 vWorldNormal;
   uniform samplerCube environmentMap;
-  uniform vec3 cameraPosition;
 #endif
 
 #ifdef HAS_PHONG_LIGHTING
