@@ -864,6 +864,9 @@ void main(){
     handleLighting(vWorldPosition);
   #endif
 
+  vec3 diffuseTotal = vLightDiffuse + lightDiffuse;
+  vec3 specularTotal = vLightSpecular + lightSpecular;
+
   #ifdef HAS_ENVIRONMENT_MAP
     vec3 worldNormal = normalize(vWorldNormal);
     vec3 eyeToSurfaceDir = normalize(vWorldPosition - cameraPosition);
@@ -885,17 +888,22 @@ void main(){
     float fresnel = f0 + (1.0 + f0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0);
 
     #ifdef GL_EXT_shader_texture_lod
-      vec3 envColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
+      vec3 envDiffuseColor = textureCubeLodEXT(environmentMap, N2, maxMIPLevel).rgb;
+      vec3 envSpecularColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
     #else
-      vec3 envColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x)).rgb;
+      vec3 envDiffuseColor = textureCube(environmentMap, N2, maxMIPLevel).rgb;
+      vec3 envSpecularColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x)).rgb;
     #endif
 
     if (vEnvironmentMapInfo[2] > 500.0){
-      color = mix(color, color * envColor, vEnvironmentMapInfo[1]); // multiply
+      diffuseTotal = mix(diffuseTotal, diffuseTotal * envDiffuseColor, vEnvironmentMapInfo[1]);
+      specularTotal = mix(specularTotal, specularTotal * envSpecularColor, vEnvironmentMapInfo[1]);
     }else if (vEnvironmentMapInfo[2] > 100.0){
-      color = mix(color, envColor, vEnvironmentMapInfo[1]); //mix
+      diffuseTotal = mix(diffuseTotal, envDiffuseColor, vEnvironmentMapInfo[1]);
+      specularTotal = mix(specularTotal, envSpecularColor, vEnvironmentMapInfo[1]);
     }else{
-      color += envColor * vEnvironmentMapInfo[1]; //add
+      diffuseTotal += envDiffuseColor * vEnvironmentMapInfo[1];
+      specularTotal += envSpecularColor * vEnvironmentMapInfo[1];
     }
   #endif
 
@@ -935,9 +943,6 @@ void main(){
       #endif
     }
   #endif
-
-  vec3 diffuseTotal = vLightDiffuse + lightDiffuse;
-  vec3 specularTotal = vLightSpecular + lightSpecular;
 
   gl_FragColor.rgb = (diffuseTotal * color * textureColor) + specularTotal;
   gl_FragColor.a = 1.0;
