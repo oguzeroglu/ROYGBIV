@@ -2218,6 +2218,24 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     terminal.printInfo(Text.NORMAL_MAP_SCALE_SET);
   }).listen();
 
+  var modelInstance = selectionHandler.getSelectedObject();
+
+  var metalnessRoughnessFolder = graphicsFolder.addFolder("Metalness/Roughness");
+  for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
+    var childInfo = modelInstance.model.info.childInfos[i];
+    var subFolder = metalnessRoughnessFolder.addFolder(childInfo.name);
+    var params = {
+      "Metalness": childInfo.metalness,
+      "Roughness": childInfo.roughness
+    };
+    subFolder.add(params, "Metalness").min(0).max(1).step(0.01).onChange(function(val){
+      modelInstance.model.setMetalnessRoughness(true, val, this.index);
+    }.bind({index: i}));
+    subFolder.add(params, "Roughness").min(0).max(1).step(0.01).onChange(function(val){
+      modelInstance.model.setMetalnessRoughness(false, val, this.index);
+    }.bind({index: i}));
+  }
+
   if (selectionHandler.getSelectedObject().model.info.customTexturesEnabled){
     var textureFolder = guiHandler.datGuiModelInstance.addFolder("Textures");
     var usedTextures = selectionHandler.getSelectedObject().model.getUsedTextures();
@@ -2232,7 +2250,6 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     }
   }
 
-  var modelInstance = selectionHandler.getSelectedObject();
   var environmentMapFolder = guiHandler.datGuiModelInstance.addFolder("Environment Map");
   var firstSkyboxName = Object.keys(skyBoxes)[0] || "";
   var childParams = [];
