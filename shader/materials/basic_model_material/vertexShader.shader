@@ -11,6 +11,11 @@ uniform mat4 modelViewMatrix;
 
 varying vec3 vColor;
 
+vec3 lightDiffuse = vec3(1.0, 1.0, 1.0);
+vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
+varying vec3 vLightDiffuse;
+varying vec3 vLightSpecular;
+
 #define INSERTION
 
 #ifdef HAS_TEXTURE
@@ -664,7 +669,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     return (ambient + diffuse);
   }
 
-  vec3 handleLighting(vec3 worldPositionComputed){
+  void handleLighting(vec3 worldPositionComputed){
 
     vec3 computedNormal = normalize(mat3(worldInverseTranspose) * normal);
 
@@ -752,11 +757,9 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         );
       #endif
 
-      vec3 totalColor = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed)) * color;
+      lightDiffuse = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed));
 
     #endif
-
-    return totalColor;
   }
 #endif
 
@@ -784,10 +787,12 @@ void main(){
     vRoughness = roughness;
   #endif
 
+  #ifdef AFFECTED_BY_LIGHT
+    lightDiffuse = vec3(0.0, 0.0, 0.0);
+  #endif
+
   #if defined(AFFECTED_BY_LIGHT) && !defined(HAS_PHONG_LIGHTING)
-    vColor = handleLighting(worldPositionComputed);
-  #else
-    vColor = color;
+    handleLighting(worldPositionComputed);
   #endif
 
   #ifdef HAS_PHONG_LIGHTING
@@ -808,6 +813,10 @@ void main(){
       vNormalTextureIndex = normalTextureIndex;
     #endif
   #endif
+
+  vLightDiffuse = lightDiffuse;
+  vLightSpecular = lightSpecular;
+  vColor = color;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }

@@ -6,6 +6,11 @@ precision lowp int;
 
 varying vec3 vColor;
 
+vec3 lightDiffuse = vec3(0.0, 0.0, 0.0);
+vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
+varying vec3 vLightDiffuse;
+varying vec3 vLightSpecular;
+
 #define INSERTION
 
 #ifdef HAS_TEXTURE
@@ -703,7 +708,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     return (ambient + diffuse);
   }
 
-  vec3 handleLighting(vec3 worldPositionComputed){
+  void handleLighting(vec3 worldPositionComputed){
 
     #ifdef HAS_NORMAL_MAP
       vec3 computedNormal;
@@ -833,10 +838,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
       );
     #endif
 
-    vec3 totalColor = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed)) * vColor;
-
-
-    return totalColor;
+    lightDiffuse = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed));
   }
 #endif
 
@@ -856,9 +858,10 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
 void main(){
 
-  vec3 colorHandled = vColor;
+  vec3 color = vColor;
   #ifdef HAS_PHONG_LIGHTING
-    colorHandled = handleLighting(vWorldPosition);
+    lightDiffuse = vec3(0.0, 0.0, 0.0);
+    handleLighting(vWorldPosition);
   #endif
 
   vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
@@ -890,11 +893,11 @@ void main(){
     #endif
 
     if (vEnvironmentMapInfo[2] > 500.0){
-      colorHandled = mix(colorHandled, colorHandled * envColor, vEnvironmentMapInfo[1]); // multiply
+      color = mix(color, color * envColor, vEnvironmentMapInfo[1]); // multiply
     }else if (vEnvironmentMapInfo[2] > 100.0){
-      colorHandled = mix(colorHandled, envColor, vEnvironmentMapInfo[1]); //mix
+      color = mix(color, envColor, vEnvironmentMapInfo[1]); //mix
     }else{
-      colorHandled += envColor * vEnvironmentMapInfo[1]; //add
+      color += envColor * vEnvironmentMapInfo[1]; //add
     }
   #endif
 
@@ -933,5 +936,9 @@ void main(){
     }
   #endif
 
-  gl_FragColor = (vec4(colorHandled, 1.0) * diffuseColor);
+  vec3 diffuseTotal = vLightDiffuse + lightDiffuse;
+  vec3 specularTotal = vLightSpecular + lightSpecular;
+
+  gl_FragColor.rgb = (diffuseTotal * color) + specularTotal;
+  gl_FragColor.a = 1.0;
 }
