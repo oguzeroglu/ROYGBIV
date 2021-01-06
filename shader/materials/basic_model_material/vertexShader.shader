@@ -5,6 +5,10 @@ attribute vec3 color;
 attribute vec3 position;
 attribute vec3 normal;
 attribute vec4 diffuseUV;
+attribute vec2 metalnessRoughness;
+
+varying float vMetalness;
+varying float vRoughness;
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
@@ -29,11 +33,7 @@ varying vec3 vLightSpecular;
 #endif
 
 #ifdef HAS_ENVIRONMENT_MAP
-  attribute vec3 environmentMapInfo;
-  attribute float roughness;
   varying vec3 vWorldNormal;
-  varying vec3 vEnvironmentMapInfo;
-  varying float vRoughness;
 #endif
 
 #ifdef HAS_PHONG_LIGHTING
@@ -783,8 +783,6 @@ void main(){
 
   #ifdef HAS_ENVIRONMENT_MAP
     vWorldNormal = mat3(worldMatrix) * normal;
-    vEnvironmentMapInfo = environmentMapInfo;
-    vRoughness = roughness;
   #endif
 
   #ifdef AFFECTED_BY_LIGHT
@@ -817,6 +815,9 @@ void main(){
   vLightDiffuse = lightDiffuse;
   vLightSpecular = lightSpecular;
   vColor = color;
+
+  vMetalness = metalnessRoughness[0];
+  vRoughness = metalnessRoughness[1];
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }

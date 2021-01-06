@@ -58,19 +58,6 @@ ImportHandler.prototype.importModelInstances = function(obj){
 
     if (curModelInstanceExport.environmentMapInfo){
       modelInstance.mapEnvironment(skyBoxes[curModelInstanceExport.environmentMapInfo.skyboxName]);
-      for (var i = 0; i < curModelInstanceExport.environmentMapInfo.childInfos.length; i ++){
-        var envMapChildInfo = curModelInstanceExport.environmentMapInfo.childInfos[i];
-        if (envMapChildInfo.isReflection){
-          modelInstance.setReflectionMode(true, i);
-        }else{
-          modelInstance.setReflectionMode(false, i);
-          modelInstance.setRefractionRatio(envMapChildInfo.refractionRatio, i);
-        }
-
-        modelInstance.setReflectivity(envMapChildInfo.reflectivity, i);
-        modelInstance.setRoughness(envMapChildInfo.roughness, i);
-        modelInstance.setEnvironmentBlendingMode(envMapChildInfo.blendingMode, i);
-      }
     }
   }
 }

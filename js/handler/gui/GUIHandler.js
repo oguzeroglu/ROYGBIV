@@ -2255,90 +2255,12 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       }
 
       modelInstance.mapEnvironment(skyBoxes[environmentMapParams["Skybox"]]);
-
-      for (var i = 0; i < childParams.length; i ++){
-        modelInstance.setReflectionMode(childParams[i]["Mode"] == "Reflection", i);
-        modelInstance.setReflectivity(childParams[i]["Reflectivity"], i);
-        modelInstance.setEnvironmentBlendingMode(environmentMapBlendingModes[childParams[i]["Blending mode"]], i);
-        modelInstance.setRefractionRatio(childParams[i]["Refraction ratio"], i);
-        modelInstance.setRoughness(childParams[i]["Roughness"], i);
-      }
-
       terminal.printInfo(Text.ENVIRONMENT_MAP_CREATED);
     }else{
       modelInstance.unmapEnvironment();
       terminal.printInfo(Text.ENVIRONMENT_MAP_REMOVED);
     }
   });
-  for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
-    var childName = modelInstance.model.info.childInfos[i].name;
-    var envMapChildFolder = environmentMapFolder.addFolder(childName);
-    var envModeText = "Reflection";
-    var reflectivity = 1;
-    var refractionRatio = 1;
-    var roughness = 0;
-    var envBlendingMode = "MULTIPLY";
-    if (modelInstance.hasEnvironmentMap()){
-      envModeText = modelInstance.environmentMapInfo.childInfos[i].isReflection? "Reflection": "Refraction";
-      reflectivity = modelInstance.environmentMapInfo.childInfos[i].reflectivity;
-      roughness = modelInstance.environmentMapInfo.childInfos[i].roughness;
-      if (!modelInstance.environmentMapInfo.childInfos[i].isReflection){
-        refractionRatio = modelInstance.environmentMapInfo.childInfos[i].refractionRatio;
-      }
-      if (modelInstance.environmentMapInfo.childInfos[i].blendingMode == environmentMapBlendingModes.MULTIPLY){
-        envBlendingMode = "MULTIPLY";
-      }else if (modelInstance.environmentMapInfo.childInfos[i].blendingMode == environmentMapBlendingModes.MIX){
-        envBlendingMode = "MIX";
-      }else{
-        envBlendingMode = "ADD";
-      }
-    }
-
-    var envChildParams = {
-      "Mode": envModeText,
-      "Reflectivity": reflectivity,
-      "Refraction ratio": refractionRatio,
-      "Roughness": roughness,
-      "Blending mode": envBlendingMode
-    };
-
-    childParams.push(envChildParams);
-
-    envMapChildFolder.add(envChildParams, "Mode", ["Reflection", "Refraction"]).onChange(function(val){
-      if (!modelInstance.hasEnvironmentMap()){
-        return;
-      }
-      modelInstance.setReflectionMode(val == "Reflection", this.index);
-
-      if (val != "Reflection"){
-        modelInstance.setRefractionRatio(childParams[this.index]["Refraction ratio"], this.index);
-      }
-    }.bind({index: i}));
-    envMapChildFolder.add(envChildParams, "Reflectivity").min(0).max(1).step(0.01).onChange(function(val){
-      if (!modelInstance.hasEnvironmentMap()){
-        return;
-      }
-      modelInstance.setReflectivity(val, this.index);
-    }.bind({index: i}));
-    envMapChildFolder.add(envChildParams, "Refraction ratio").min(0).max(1).step(0.01).onChange(function(val){
-      if (!modelInstance.hasEnvironmentMap()){
-        return;
-      }
-      modelInstance.setRefractionRatio(val, this.index);
-    }.bind({index: i}));
-    envMapChildFolder.add(envChildParams, "Roughness").min(0).max(1).step(0.01).onChange(function(val){
-      if (!modelInstance.hasEnvironmentMap()){
-        return;
-      }
-      modelInstance.setRoughness(val, this.index);
-    }.bind({index: i}));
-    envMapChildFolder.add(envChildParams, "Blending mode", Object.keys(environmentMapBlendingModes)).onChange(function(val){
-      if (!modelInstance.hasEnvironmentMap()){
-        return;
-      }
-      modelInstance.setEnvironmentBlendingMode(environmentMapBlendingModes[val], this.index);
-    }.bind({index: i}));
-  }
 }
 
 GUIHandler.prototype.initializeMassManipulationGUI = function(){

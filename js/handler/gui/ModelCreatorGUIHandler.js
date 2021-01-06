@@ -173,7 +173,9 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       name: childMesh.name,
       colorR: childMesh.material.color.r,
       colorG: childMesh.material.color.g,
-      colorB: childMesh.material.color.b
+      colorB: childMesh.material.color.b,
+      metalness: 0,
+      roughness: 0
     };
 
     var childBB = new THREE.Box3().setFromObject(childMesh);

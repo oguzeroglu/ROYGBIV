@@ -1,6 +1,8 @@
 #extension GL_EXT_shader_texture_lod : enable
 #extension GL_OES_standard_derivatives : enable
 
+#define PI 3.1415926
+
 precision lowp float;
 precision lowp int;
 
@@ -10,6 +12,8 @@ vec3 lightDiffuse = vec3(0.0, 0.0, 0.0);
 vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
 varying vec3 vLightDiffuse;
 varying vec3 vLightSpecular;
+varying float vRoughness;
+varying float vMetalness;
 
 #define INSERTION
 
@@ -24,8 +28,6 @@ varying vec3 vLightSpecular;
 
 #ifdef HAS_ENVIRONMENT_MAP
   varying vec3 vWorldNormal;
-  varying vec3 vEnvironmentMapInfo;
-  varying float vRoughness;
   uniform samplerCube environmentMap;
   uniform vec3 cameraPosition;
 #endif
@@ -872,20 +874,16 @@ void main(){
     vec3 eyeToSurfaceDir = normalize(vWorldPosition - cameraPosition);
     vec3 envVec;
 
-    if (vEnvironmentMapInfo[0] > 0.0){
-      envVec = reflect(eyeToSurfaceDir, worldNormal);
-    }else{
-      float refractionRatio = -vEnvironmentMapInfo[0];
-      envVec = refract(eyeToSurfaceDir, worldNormal, refractionRatio);
-    }
+
+    envVec = reflect(eyeToSurfaceDir, worldNormal);
 
     float exponent = pow(2.0, (1.0 - vRoughness) * 18.0 + 2.0);
     float maxMIPLevel = log2(float(ENVIRONMENT_MAP_SIZE));
     float minMIPLevel = mipMapLevel(vec2(envVec.z, envVec.x) * float(ENVIRONMENT_MAP_SIZE));
     float MIPLevel = max(minMIPLevel, log2(float(ENVIRONMENT_MAP_SIZE) * sqrt(3.0)) - 0.5 * log2(exponent + 1.0));
     vec3 N2 = vec3(vWorldNormal.z, vWorldNormal.y, vWorldNormal.x);
-    float f0 = 0.935;
-    float fresnel = f0 + (1.0 + f0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0);
+    vec3 f0 = mix(vec3(0.04, 0.04, 0.04), color, vMetalness);
+    vec3 fresnel = f0 + (vec3(1.0, 1.0, 1.0) + f0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0);
 
     #ifdef GL_EXT_shader_texture_lod
       vec3 envDiffuseColor = textureCubeLodEXT(environmentMap, N2, maxMIPLevel).rgb;
@@ -895,16 +893,8 @@ void main(){
       vec3 envSpecularColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x)).rgb;
     #endif
 
-    if (vEnvironmentMapInfo[2] > 500.0){
-      diffuseTotal = mix(diffuseTotal, diffuseTotal * envDiffuseColor, vEnvironmentMapInfo[1]);
-      specularTotal = mix(specularTotal, specularTotal * envSpecularColor, vEnvironmentMapInfo[1]);
-    }else if (vEnvironmentMapInfo[2] > 100.0){
-      diffuseTotal = mix(diffuseTotal, envDiffuseColor, vEnvironmentMapInfo[1]);
-      specularTotal = mix(specularTotal, envSpecularColor, vEnvironmentMapInfo[1]);
-    }else{
-      diffuseTotal += envDiffuseColor * vEnvironmentMapInfo[1];
-      specularTotal += envSpecularColor * vEnvironmentMapInfo[1];
-    }
+    specularTotal += envSpecularColor;
+    diffuseTotal += envDiffuseColor * (1.0 / PI);
   #endif
 
   vec3 textureColor = vec3(1.0, 1.0, 1.0);
@@ -944,6 +934,6 @@ void main(){
     }
   #endif
 
-  gl_FragColor.rgb = (diffuseTotal * color * textureColor) + specularTotal;
+  gl_FragColor.rgb = (diffuseTotal * mix(color, vec3(0.0, 0.0, 0.0), vMetalness) * textureColor) + specularTotal;
   gl_FragColor.a = 1.0;
 }

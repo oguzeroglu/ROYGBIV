@@ -181,6 +181,17 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
   for (var i = 0; i < modelInfo.childInfos.length; i ++){
     this.group.add(new THREE.Object3D());
   }
+
+  var metalnessRoughnessArray = new Float32Array(this.indexedMaterialIndices.length * 2);
+  var i2 = 0;
+  for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
+    var childIndex = this.indexedMaterialIndices[i];
+    var childInfo = this.info.childInfos[childIndex];
+    metalnessRoughnessArray[i2 ++] = childInfo.metalness;
+    metalnessRoughnessArray[i2 ++] = childInfo.roughness;
+  }
+
+  this.geometry.addAttribute("metalnessRoughness", new THREE.BufferAttribute(metalnessRoughnessArray, 2));
 }
 
 Model.prototype.export = function(isBuildingForDeploymentMode){
@@ -396,4 +407,32 @@ Model.prototype.setARModelNames = function(arModelNames){
 
 Model.prototype.hasARModel = function(modelName){
   return !!this.info.arModelNames[modelName];
+}
+
+Model.prototype.setMetalnessRoughness = function(isMetalness, val, childIndex){
+  var ary = this.indexedMaterialIndices;
+  var metalnessRoughnessArray = this.geometry.attributes.metalnessRoughness.array;
+
+  var i2 = 0;
+  for (var i = 0; i < ary.length; i ++){
+    var index = ary[i];
+    if (index == childIndex){
+      if (isMetalness){
+        metalnessRoughnessArray[i2] = val;
+      }else{
+        metalnessRoughnessArray[i2 + 1] = val;
+      }
+    }
+
+    i2 += 2;
+  }
+
+  this.geometry.attributes.metalnessRoughness.updateRange.set(0, metalnessRoughnessArray.length);
+  this.geometry.attributes.metalnessRoughness.needsUpdate = true;
+
+  if (isMetalness){
+    this.info.childInfos[childIndex].metalness = val;
+  }else{
+    this.info.childInfos[childIndex].roughness = val;
+  }
 }
