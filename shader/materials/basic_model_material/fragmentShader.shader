@@ -115,6 +115,13 @@ vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float s
   float diffuseFactor = dot(normal, toLight);
   if (diffuseFactor > 0.0){
     vec3 lightColor = vec3(r, g, b);
+
+    vec3 toCamera = normalize(cameraPosition - worldPosition);
+    vec3 halfVector = normalize(toLight + toCamera);
+    float shininess = 4.0 / pow(vRoughness, 4.0) - 2.0;
+    float specular = pow(dot(normal, halfVector), shininess);
+    lightSpecular.rgb += specular;
+
     return (strength * diffuseFactor * lightColor);
   }
   return vec3(0.0, 0.0, 0.0);
