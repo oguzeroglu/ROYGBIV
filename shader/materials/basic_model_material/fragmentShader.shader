@@ -109,33 +109,35 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
   return vec2(coordX, coordY);
 }
 
-vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
-  vec3 pointLightPosition = vec3(pX, pY, pZ);
-  vec3 toLight = normalize(pointLightPosition - worldPosition);
-  float diffuseFactor = dot(normal, toLight);
-  if (diffuseFactor > 0.0){
-    vec3 lightColor = vec3(r, g, b);
+#ifdef HAS_PHONG_LIGHTING
+  vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
+    vec3 pointLightPosition = vec3(pX, pY, pZ);
+    vec3 toLight = normalize(pointLightPosition - worldPosition);
+    float diffuseFactor = dot(normal, toLight);
+    if (diffuseFactor > 0.0){
+      vec3 lightColor = vec3(r, g, b);
 
-    vec3 toCamera = normalize(cameraPosition - worldPosition);
-    vec3 halfVector = normalize(toLight + toCamera);
-    float shininess = 4.0 / pow(vRoughness, 4.0) - 2.0;
-    float specular = pow(dot(normal, halfVector), shininess);
-    lightSpecular.rgb += specular;
+      vec3 toCamera = normalize(cameraPosition - worldPosition);
+      vec3 halfVector = normalize(toLight + toCamera);
+      float shininess = 4.0 / pow(vRoughness, 4.0) - 2.0;
+      float specular = pow(dot(normal, halfVector), shininess);
+      lightSpecular.rgb += specular;
 
-    return (strength * diffuseFactor * lightColor);
+      return (strength * diffuseFactor * lightColor);
+    }
+    return vec3(0.0, 0.0, 0.0);
   }
-  return vec3(0.0, 0.0, 0.0);
-}
 
-vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b, float strength, vec3 normal){
-  vec3 lightDir = normalize(vec3(dirX, dirY, dirZ));
-  float diffuseFactor = dot(normal, -lightDir);
-  if (diffuseFactor > 0.0){
-     vec3 lightColor = vec3(r, g, b);
-     return (strength * diffuseFactor * lightColor);
+  vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b, float strength, vec3 normal){
+    vec3 lightDir = normalize(vec3(dirX, dirY, dirZ));
+    float diffuseFactor = dot(normal, -lightDir);
+    if (diffuseFactor > 0.0){
+       vec3 lightColor = vec3(r, g, b);
+       return (strength * diffuseFactor * lightColor);
+    }
+    return vec3(0.0, 0.0, 0.0);
   }
-  return vec3(0.0, 0.0, 0.0);
-}
+#endif
 
 #ifdef HAS_PHONG_LIGHTING
 
