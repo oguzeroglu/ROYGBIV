@@ -167,18 +167,49 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
 
   var hasNormalMap = false;
 
+  var flatInfo = [];
   for (var i = 0; i < model.children.length; i ++){
-    var childMesh = model.children[i];
+    var mesh = model.children[i];
+    var geometry = mesh.geometry;
+    var mat = mesh.material;
+    if (mat instanceof Array){
+      var groups = geometry.groups;
+      for (var i2 = 0; i2 < groups.length; i2 ++){
+        var curGroupInfo = groups[i2];
+        var start = curGroupInfo.start;
+        var count = curGroupInfo.count;
+        var curMat = mat[curGroupInfo.materialIndex];
+        flatInfo.push({
+          geometry: this.splitGeometry(geometry, start, count),
+          material: curMat,
+          name: mesh.name + "_" + i2,
+          mesh: mesh
+        });
+      }
+    }else{
+      flatInfo.push({geometry: geometry, material: mat, name: mesh.name, mesh: mesh});
+    }
+  }
+
+  for (var i = 0; i < flatInfo.length; i ++){
+    var childGeom = flatInfo[i].geometry;
+    var childMat = flatInfo[i].material;
+    var childName = flatInfo[i].name;
+    var childMesh = flatInfo[i].mesh;
+
+    var childBB = childGeom.computeBoundingBox();
+
     var childInfo = {
-      name: childMesh.name,
-      colorR: childMesh.material.color.r,
-      colorG: childMesh.material.color.g,
-      colorB: childMesh.material.color.b,
+      name: childName,
+      colorR: childMat.color.r,
+      colorG: childMat.color.g,
+      colorB: childMat.color.b,
       metalness: 0,
       roughness: 0
     };
 
-    var childBB = new THREE.Box3().setFromObject(childMesh);
+    childGeom.computeBoundingBox();
+    var childBB = childGeom.boundingBox;
     childInfo.bb = {
       minX: childBB.min.x,
       minY: childBB.min.y,
@@ -188,7 +219,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       maxZ: childBB.max.z
     };
 
-    var normalGeometry = new THREE.Geometry().fromBufferGeometry(childMesh.geometry);
+    var normalGeometry = new THREE.Geometry().fromBufferGeometry(childGeom);
     for (var i2 = 0; i2 < normalGeometry.faces.length; i2++){
       normalGeometry.faces[i2].materialIndex = i;
     }
@@ -196,16 +227,16 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     childMesh.updateMatrix(true);
     pseudoGeometry.merge(normalGeometry, childMesh.matrix);
 
-    if (childMesh.material.map){
+    if (childMat.map){
       var tmpCanvas = document.createElement("canvas");
-      tmpCanvas.width = childMesh.material.map.image.width;
-      tmpCanvas.height = childMesh.material.map.image.height;
-      tmpCanvas.getContext("2d").drawImage(childMesh.material.map.image, 0, 0);
-      texturesObj[childMesh.material.map.image.src] = new THREE.CanvasTexture(tmpCanvas);
-      childInfo.diffuseTextureURL = childMesh.material.map.image.src;
+      tmpCanvas.width = childMat.map.image.width;
+      tmpCanvas.height = childMat.map.image.height;
+      tmpCanvas.getContext("2d").drawImage(childMat.map.image, 0, 0);
+      texturesObj[childMat.map.image.src] = new THREE.CanvasTexture(tmpCanvas);
+      childInfo.diffuseTextureURL = childMat.map.image.src;
       var diffuseTextureID = null;
       for (var i2 = 0; i2 < childInfos.length; i2 ++){
-        if (childInfos[i2].diffuseTextureURL == childMesh.material.map.image.src){
+        if (childInfos[i2].diffuseTextureURL == childMat.map.image.src){
           diffuseTextureID = childInfos[i2].diffuseTextureID;
           break;
         }
@@ -217,17 +248,17 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       }
     }
 
-    if (childMesh.material.normalMap){
+    if (childMat.normalMap){
       hasNormalMap = true;
       var tmpCanvas = document.createElement("canvas");
-      tmpCanvas.width = childMesh.material.normalMap.image.width;
-      tmpCanvas.height = childMesh.material.normalMap.image.height;
-      tmpCanvas.getContext("2d").drawImage(childMesh.material.normalMap.image, 0, 0);
-      texturesObj[childMesh.material.normalMap.image.src] = new THREE.CanvasTexture(tmpCanvas);
-      childInfo.normalTextureURL = childMesh.material.normalMap.image.src;
+      tmpCanvas.width = childMat.normalMap.image.width;
+      tmpCanvas.height = childMat.normalMap.image.height;
+      tmpCanvas.getContext("2d").drawImage(childMat.normalMap.image, 0, 0);
+      texturesObj[childMat.normalMap.image.src] = new THREE.CanvasTexture(tmpCanvas);
+      childInfo.normalTextureURL = childMat.normalMap.image.src;
       var normalTextureID = null;
       for (var i2 = 0; i2 < childInfos.length; i2 ++){
-        if (childInfos[i2].normalTextureURL == childMesh.material.normalMap.image.src){
+        if (childInfos[i2].normalTextureURL == childMat.normalMap.image.src){
           normalTextureID = childInfos[i2].normalTextureID;
           break;
         }
@@ -261,7 +292,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
 
   for (var i = 0; i<pseudoGeometry.faces.length; i++){
     var face = pseudoGeometry.faces[i];
-    var childMesh = model.children[face.materialIndex];
+    var curFlatInfo = flatInfo[face.materialIndex];
 
     materialIndices.push(face.materialIndex);
     materialIndices.push(face.materialIndex);
@@ -284,7 +315,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     var vertexNormal2 = vertexNormals[1];
     var vertexNormal3 = vertexNormals[2];
 
-    var color = childMesh.material.color;
+    var color = curFlatInfo.material.color;
 
     var uv1 = null;
     var uv2 = null;
@@ -306,15 +337,15 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     this.triplePush(colors, color, color, color, "rgb");
     this.triplePush(uvs, uv1, uv2, uv3, "xy");
 
-    if (childMesh.material.map){
-      var uvInfo = textureMerger.ranges[childMesh.material.map.image.src];
+    if (curFlatInfo.material.map){
+      var uvInfo = textureMerger.ranges[curFlatInfo.material.map.image.src];
       this.quadruplePush(diffuseUVs, uvInfo.startU, uvInfo.startV, uvInfo.endU, uvInfo.endV, "number");
     }else{
       this.quadruplePush(diffuseUVs, -100, -100, -100, -100, "number");
     }
 
-    if (childMesh.material.normalMap){
-      var uvInfo = textureMerger.ranges[childMesh.material.normalMap.image.src];
+    if (curFlatInfo.material.normalMap){
+      var uvInfo = textureMerger.ranges[curFlatInfo.material.normalMap.image.src];
       this.quadruplePush(normalUVs, uvInfo.startU, uvInfo.startV, uvInfo.endU, uvInfo.endV, "number");
     }else if (hasNormalMap){
       this.quadruplePush(normalUVs, -100, -100, -100, -100, "number");
@@ -405,4 +436,40 @@ ModelCreatorGUIHandler.prototype.quadruplePush = function(ary, obj1, obj2, obj3,
     ary.push(obj3);
     ary.push(obj4);
   }
+}
+
+ModelCreatorGUIHandler.prototype.splitGeometry = function(geometry, start, count){
+  var positionAry = new Float32Array(count * 3);
+  var normalAry = new Float32Array(count * 3);
+  var uvAry = new Float32Array(count * 2);
+
+  var pos = geometry.attributes.position.array;
+  var norm = geometry.attributes.normal.array;
+  var uv = geometry.attributes.uv.array;
+
+  var x = 0;
+  var y = 0;
+  var z = 0;
+  for (var i = start; i < pos.length / 3 ; i ++){
+    var cs = 3 * i;
+    var cs2 = 2 * i;
+
+    positionAry[x ++] = pos[cs];
+    positionAry[x ++] = pos[cs + 1];
+    positionAry[x ++] = pos[cs + 2];
+
+    normalAry[y ++] = norm[cs];
+    normalAry[y ++] = norm[cs + 1];
+    normalAry[y ++] = norm[cs + 2];
+
+    uvAry[z ++] = uv[cs2];
+    uvAry[z ++] = uv[cs2 + 1];
+  }
+
+  var geom = new THREE.BufferGeometry();
+  geom.addAttribute("position", new THREE.BufferAttribute(positionAry, 3));
+  geom.addAttribute("normal", new THREE.BufferAttribute(normalAry, 3));
+  geom.addAttribute("uv", new THREE.BufferAttribute(uvAry, 2));
+
+  return geom;
 }
