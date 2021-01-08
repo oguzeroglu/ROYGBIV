@@ -12,7 +12,11 @@ vec3 lightDiffuse = vec3(0.0, 0.0, 0.0);
 vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
 varying vec3 vLightDiffuse;
 varying vec3 vLightSpecular;
-varying float vRoughness;
+
+#if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
+  varying float vRoughness;
+#endif
+
 varying float vMetalness;
 
 #define INSERTION

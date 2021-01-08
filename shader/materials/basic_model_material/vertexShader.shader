@@ -8,7 +8,10 @@ attribute vec4 diffuseUV;
 attribute vec2 metalnessRoughness;
 
 varying float vMetalness;
-varying float vRoughness;
+
+#if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
+  varying float vRoughness;
+#endif
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
@@ -833,7 +836,10 @@ void main(){
   vColor = color;
 
   vMetalness = metalnessRoughness[0];
-  vRoughness = metalnessRoughness[1];
+
+  #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
+    vRoughness = metalnessRoughness[1];
+  #endif
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
