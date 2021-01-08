@@ -75,6 +75,8 @@ ModelInstance.prototype.export = function(){
     exportObj.environmentMapInfo = this.environmentMapInfo;
   }
 
+  exportObj.isSpecularityEnabled = !!this.isSpecularityEnabled;
+
   return exportObj;
 }
 
@@ -316,6 +318,8 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
     if (!this.hasEnvironmentMap()){
       delete this.mesh.material.uniforms.cameraPosition;
     }
+
+    this.disableSpecularity();
   }
 
   this.mesh.material.needsUpdate = true;
@@ -526,4 +530,22 @@ ModelInstance.prototype.unmapEnvironment = function(){
 
   var macroVal = macroHandler.getMacroValue("ENVIRONMENT_MAP_SIZE", this.mesh.material, false);
   macroHandler.removeMacro("ENVIRONMENT_MAP_SIZE " + macroVal, this.mesh.material, false, true);
+}
+
+ModelInstance.prototype.disableSpecularity = function(){
+  if (!this.isSpecularityEnabled){
+    return;
+  }
+
+  macroHandler.removeMacro("ENABLE_SPECULARITY", this.mesh.material, true, true);
+  this.isSpecularityEnabled = false;
+}
+
+ModelInstance.prototype.enableSpecularity = function(){
+  if (this.isSpecularityEnabled){
+    return;
+  }
+
+  macroHandler.injectMacro("ENABLE_SPECULARITY", this.mesh.material, true, true);
+  this.isSpecularityEnabled = true;
 }

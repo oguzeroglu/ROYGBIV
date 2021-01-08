@@ -114,14 +114,17 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     vec3 pointLightPosition = vec3(pX, pY, pZ);
     vec3 toLight = normalize(pointLightPosition - worldPosition);
     float diffuseFactor = dot(normal, toLight);
+
     if (diffuseFactor > 0.0){
       vec3 lightColor = vec3(r, g, b);
 
-      vec3 toCamera = normalize(cameraPosition - worldPosition);
-      vec3 halfVector = normalize(toLight + toCamera);
-      float shininess = 4.0 / pow(vRoughness, 4.0) - 2.0;
-      float specular = pow(dot(normal, halfVector), shininess);
-      lightSpecular.rgb += specular;
+      #ifdef ENABLE_SPECULARITY
+        vec3 toCamera = normalize(cameraPosition - worldPosition);
+        vec3 halfVector = normalize(toLight + toCamera);
+        float shininess = 4.0 / pow(vRoughness, 4.0) - 2.0;
+        float specular = pow(dot(normal, halfVector), shininess);
+        lightSpecular.rgb += specular;
+      #endif
 
       return (strength * diffuseFactor * lightColor);
     }

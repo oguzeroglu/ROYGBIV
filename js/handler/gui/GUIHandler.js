@@ -156,7 +156,8 @@ var GUIHandler = function(){
     "Intersectable": false,
     "Affected by light": false,
     "Lighting type": lightHandler.lightTypes.GOURAUD,
-    "Normal map scale": "1,1"
+    "Normal map scale": "1,1",
+    "Has specularity": false
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -413,12 +414,16 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Has mass"] = !curSelection.noMass;
     guiHandler.modelInstanceManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
     guiHandler.modelInstanceManipulationParameters["Affected by light"] = !!curSelection.affectedByLight;
+    guiHandler.modelInstanceManipulationParameters["Has specularity"] = !!curSelection.isSpecularityEnabled;
+
     if (curSelection.affectedByLight){
       guiHandler.modelInstanceManipulationParameters["Lighting type"] = curSelection.lightingType || lightHandler.lightTypes.GOURAUD;
       guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
+      guiHandler.enableController(guiHandler.modelInstanceHasSpecularityController);
     }else{
       guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
       guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
+      guiHandler.disableController(guiHandler.modelInstanceHasSpecularityController);
     }
 
     if (curSelection.lightingType == lightHandler.lightTypes.PHONG && curSelection.model.info.hasNormalMap){
@@ -2181,12 +2186,27 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     if (val){
       guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
       guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
+      guiHandler.enableController(guiHandler.modelInstanceHasSpecularityController);
       terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
     }else{
       guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
       guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+      guiHandler.disableController(guiHandler.modelInstanceHasSpecularityController);
       guiHandler.modelInstanceManipulationParameters["Normal map scale"] = "1,1";
+      guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
       terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
+    }
+  }).listen();
+  guiHandler.modelInstanceHasSpecularityController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Has specularity").onChange(function(val){
+    var modelInstance = selectionHandler.getSelectedObject();
+    if (!modelInstance.affectedByLight){
+      guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
+      return;
+    }
+    if (val){
+      modelInstance.enableSpecularity();
+    }else{
+      modelInstance.disableSpecularity();
     }
   }).listen();
   guiHandler.modelInstanceManupulationLightingTypeController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Lighting type", Object.keys(lightHandler.lightTypes)).onChange(function(val){
