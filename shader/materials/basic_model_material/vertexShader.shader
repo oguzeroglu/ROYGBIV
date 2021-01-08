@@ -5,11 +5,23 @@ attribute vec3 color;
 attribute vec3 position;
 attribute vec3 normal;
 attribute vec4 diffuseUV;
+attribute vec2 metalnessRoughness;
+
+varying float vMetalness;
+
+#if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
+  varying float vRoughness;
+#endif
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 
 varying vec3 vColor;
+
+vec3 lightDiffuse = vec3(1.0, 1.0, 1.0);
+vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
+varying vec3 vLightDiffuse;
+varying vec3 vLightSpecular;
 
 #define INSERTION
 
@@ -19,16 +31,16 @@ varying vec3 vColor;
   varying vec4 vDiffuseUV;
 #endif
 
+#ifdef AFFECTED_BY_LIGHT
+  uniform vec3 cameraPosition;
+#endif
+
 #if defined(HAS_PHONG_LIGHTING) || defined(HAS_ENVIRONMENT_MAP)
   varying vec3 vWorldPosition;
 #endif
 
 #ifdef HAS_ENVIRONMENT_MAP
-  attribute vec3 environmentMapInfo;
-  attribute float roughness;
   varying vec3 vWorldNormal;
-  varying vec3 vEnvironmentMapInfo;
-  varying float vRoughness;
 #endif
 
 #ifdef HAS_PHONG_LIGHTING
@@ -64,26 +76,38 @@ varying vec3 vColor;
   #endif
 #endif
 
-vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
-  vec3 pointLightPosition = vec3(pX, pY, pZ);
-  vec3 toLight = normalize(pointLightPosition - worldPosition);
-  float diffuseFactor = dot(normal, toLight);
-  if (diffuseFactor > 0.0){
-    vec3 lightColor = vec3(r, g, b);
-    return (strength * diffuseFactor * lightColor);
-  }
-  return vec3(0.0, 0.0, 0.0);
-}
+#ifdef AFFECTED_BY_LIGHT
+  vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
+    vec3 pointLightPosition = vec3(pX, pY, pZ);
+    vec3 toLight = normalize(pointLightPosition - worldPosition);
+    float diffuseFactor = dot(normal, toLight);
 
-vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b, float strength, vec3 normal){
-  vec3 lightDir = normalize(vec3(dirX, dirY, dirZ));
-  float diffuseFactor = dot(normal, -lightDir);
-  if (diffuseFactor > 0.0){
-     vec3 lightColor = vec3(r, g, b);
-     return (strength * diffuseFactor * lightColor);
+    if (diffuseFactor > 0.0){
+      vec3 lightColor = vec3(r, g, b);
+
+      #ifdef ENABLE_SPECULARITY
+        vec3 toCamera = normalize(cameraPosition - worldPosition);
+        vec3 halfVector = normalize(toLight + toCamera);
+        float shininess = 4.0 / pow(metalnessRoughness[1], 4.0) - 2.0;
+        float specular = pow(dot(normal, halfVector), shininess);
+        lightSpecular.rgb += specular;
+      #endif
+
+      return (strength * diffuseFactor * lightColor);
+    }
+    return vec3(0.0, 0.0, 0.0);
   }
-  return vec3(0.0, 0.0, 0.0);
-}
+
+  vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b, float strength, vec3 normal){
+    vec3 lightDir = normalize(vec3(dirX, dirY, dirZ));
+    float diffuseFactor = dot(normal, -lightDir);
+    if (diffuseFactor > 0.0){
+       vec3 lightColor = vec3(r, g, b);
+       return (strength * diffuseFactor * lightColor);
+    }
+    return vec3(0.0, 0.0, 0.0);
+  }
+#endif
 
 #ifdef AFFECTED_BY_LIGHT
   float getFloatFromLightMatrix(int index){
@@ -664,12 +688,12 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     return (ambient + diffuse);
   }
 
-  vec3 handleLighting(vec3 worldPositionComputed){
+  void handleLighting(vec3 worldPositionComputed){
 
     vec3 computedNormal = normalize(mat3(worldInverseTranspose) * normal);
 
     #ifdef IS_LIGHT_BAKED
-      vec3 totalColor = handleDynamicLights(computedNormal, worldPositionComputed) + bakedColor;
+      lightDiffuse = handleDynamicLights(computedNormal, worldPositionComputed) + bakedColor;
     #else
 
       vec3 ambient = vec3(0.0, 0.0, 0.0);
@@ -752,11 +776,9 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         );
       #endif
 
-      vec3 totalColor = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed)) * color;
+      lightDiffuse = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed));
 
     #endif
-
-    return totalColor;
   }
 #endif
 
@@ -780,14 +802,14 @@ void main(){
 
   #ifdef HAS_ENVIRONMENT_MAP
     vWorldNormal = mat3(worldMatrix) * normal;
-    vEnvironmentMapInfo = environmentMapInfo;
-    vRoughness = roughness;
+  #endif
+
+  #ifdef AFFECTED_BY_LIGHT
+    lightDiffuse = vec3(0.0, 0.0, 0.0);
   #endif
 
   #if defined(AFFECTED_BY_LIGHT) && !defined(HAS_PHONG_LIGHTING)
-    vColor = handleLighting(worldPositionComputed);
-  #else
-    vColor = color;
+    handleLighting(worldPositionComputed);
   #endif
 
   #ifdef HAS_PHONG_LIGHTING
@@ -807,6 +829,16 @@ void main(){
     #ifdef HAS_NORMAL_MAP
       vNormalTextureIndex = normalTextureIndex;
     #endif
+  #endif
+
+  vLightDiffuse = lightDiffuse;
+  vLightSpecular = lightSpecular;
+  vColor = color;
+
+  vMetalness = metalnessRoughness[0];
+
+  #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
+    vRoughness = metalnessRoughness[1];
   #endif
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);

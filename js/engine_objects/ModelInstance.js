@@ -75,6 +75,8 @@ ModelInstance.prototype.export = function(){
     exportObj.environmentMapInfo = this.environmentMapInfo;
   }
 
+  exportObj.isSpecularityEnabled = !!this.isSpecularityEnabled;
+
   return exportObj;
 }
 
@@ -298,6 +300,7 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
     this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
     this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
     this.mesh.material.uniforms.dynamicLightsMatrix = lightHandler.getUniform();
+    this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     this.updateWorldInverseTranspose();
 
     lightHandler.addLightToObject(this);
@@ -311,6 +314,12 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
       }
     }
     delete this.lightingType;
+
+    if (!this.hasEnvironmentMap()){
+      delete this.mesh.material.uniforms.cameraPosition;
+    }
+
+    this.disableSpecularity();
   }
 
   this.mesh.material.needsUpdate = true;
@@ -490,35 +499,18 @@ ModelInstance.prototype.mapEnvironment = function(skybox){
   this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
 
   var environmentInfoArray = new Float32Array(this.mesh.geometry.attributes.position.array.length);
-  var roughnessArray = new Float32Array(this.mesh.geometry.attributes.position.array.length / 3);
   var i2 = 0;
   for (var i = 0; i < environmentInfoArray.length; i += 3){
     environmentInfoArray[i] = 100;
     environmentInfoArray[i + 1] = 1;
-    environmentInfoArray[i + 2] = environmentMapBlendingModes.MULTIPLY;
-
-    roughnessArray[i2 ++] = 0;
   }
-
-  this.mesh.geometry.addAttribute("environmentMapInfo", new THREE.BufferAttribute(environmentInfoArray, 3));
-  this.mesh.geometry.addAttribute("roughness", new THREE.BufferAttribute(roughnessArray, 1));
 
   macroHandler.injectMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
   macroHandler.injectMacro("ENVIRONMENT_MAP_SIZE " + skybox.imageSize, this.mesh.material, false, true);
 
   this.environmentMapInfo = {
-    skyboxName: skybox.name,
-    childInfos: []
+    skyboxName: skybox.name
   };
-
-  for (var i = 0; i < this.model.info.childInfos.length; i ++){
-    this.environmentMapInfo.childInfos.push({
-      isReflection: true,
-      reflectivity: 1,
-      roughness: 0,
-      blendingMode: environmentMapBlendingModes.MULTIPLY
-    });
-  }
 }
 
 ModelInstance.prototype.unmapEnvironment = function(){
@@ -527,146 +519,33 @@ ModelInstance.prototype.unmapEnvironment = function(){
   }
 
   delete this.mesh.material.uniforms.environmentMap;
-  delete this.mesh.material.uniforms.cameraPosition;
+  if (!this.affectedByLight){
+    delete this.mesh.material.uniforms.cameraPosition;
+  }
   if (!this.affectedByLight){
     delete this.mesh.material.uniforms.worldMatrix;
   }
-  this.mesh.geometry.removeAttribute("environmentMapInfo");
-  this.mesh.geometry.removeAttribute("roughness");
-  macroHandler.removeMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
 
-  delete this.environmentMapInfo;
+  macroHandler.removeMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
 
   var macroVal = macroHandler.getMacroValue("ENVIRONMENT_MAP_SIZE", this.mesh.material, false);
   macroHandler.removeMacro("ENVIRONMENT_MAP_SIZE " + macroVal, this.mesh.material, false, true);
 }
 
-ModelInstance.prototype.setReflectionMode = function(isReflection, childIndex){
-  if (!this.hasEnvironmentMap()){
+ModelInstance.prototype.disableSpecularity = function(){
+  if (!this.isSpecularityEnabled){
     return;
   }
 
-  var forAllChildren = false;
-  if (typeof childIndex == UNDEFINED || childIndex == null){
-    forAllChildren = true;
-  }
-
-  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
-  var y = 0;
-  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
-    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
-      ary[y] = isReflection? 100: -1;
-      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].isReflection = isReflection;
-      if (!isReflection){
-        this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].refractionRatio = 1;
-      }else{
-        delete this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].refractionRatio;
-      }
-    }
-
-    y += 3;
-  }
-
-  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
-  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
+  macroHandler.removeMacro("ENABLE_SPECULARITY", this.mesh.material, true, true);
+  this.isSpecularityEnabled = false;
 }
 
-ModelInstance.prototype.setReflectivity = function(reflectivity, childIndex){
-  if (!this.hasEnvironmentMap()){
+ModelInstance.prototype.enableSpecularity = function(){
+  if (this.isSpecularityEnabled){
     return;
   }
 
-  var forAllChildren = false;
-  if (typeof childIndex == UNDEFINED || childIndex == null){
-    forAllChildren = true;
-  }
-
-  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
-  var y = 0;
-  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
-    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
-      ary[y + 1] = reflectivity;
-      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].reflectivity = reflectivity;
-    }
-
-    y += 3;
-  }
-
-  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
-  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
-}
-
-ModelInstance.prototype.setRefractionRatio = function(refractionRatio, childIndex){
-  if (!this.hasEnvironmentMap() || refractionRatio <= 0){
-    return;
-  }
-
-  var forAllChildren = false;
-  if (typeof childIndex == UNDEFINED || childIndex == null){
-    forAllChildren = true;
-  }
-
-  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
-  var y = 0;
-  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
-    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
-      if (ary[y] < 0){
-        ary[y] = -1 * refractionRatio;
-        this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].refractionRatio = refractionRatio;
-      }
-    }
-
-    y += 3;
-  }
-
-  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
-  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
-}
-
-ModelInstance.prototype.setEnvironmentBlendingMode = function(envBlendingMode, childIndex){
-  if (!this.hasEnvironmentMap()){
-    return;
-  }
-
-  var forAllChildren = false;
-  if (typeof childIndex == UNDEFINED || childIndex == null){
-    forAllChildren = true;
-  }
-
-  var ary = this.mesh.geometry.attributes.environmentMapInfo.array;
-  var y = 0;
-  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
-    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
-      ary[y + 2] = envBlendingMode;
-      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].blendingMode = envBlendingMode;
-    }
-
-    y += 3;
-  }
-
-  this.mesh.geometry.attributes.environmentMapInfo.updateRange.set(0, ary.length);
-  this.mesh.geometry.attributes.environmentMapInfo.needsUpdate = true;
-}
-
-ModelInstance.prototype.setRoughness = function(roughness, childIndex){
-  if (!this.hasEnvironmentMap()){
-    return;
-  }
-
-  var forAllChildren = false;
-  if (typeof childIndex == UNDEFINED || childIndex == null){
-    forAllChildren = true;
-  }
-
-  var ary = this.mesh.geometry.attributes.roughness.array;
-
-  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
-    if (forAllChildren || this.model.indexedMaterialIndices[i] == childIndex){
-      ary[i] = roughness;
-      this.environmentMapInfo.childInfos[this.model.indexedMaterialIndices[i]].roughness = roughness;
-    }
-  }
-
-  this.mesh.geometry.attributes.roughness.updateRange.set(0, ary.length);
-  this.mesh.geometry.attributes.roughness.needsUpdate = true;
+  macroHandler.injectMacro("ENABLE_SPECULARITY", this.mesh.material, true, true);
+  this.isSpecularityEnabled = true;
 }

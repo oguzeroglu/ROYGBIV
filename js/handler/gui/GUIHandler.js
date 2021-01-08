@@ -156,7 +156,8 @@ var GUIHandler = function(){
     "Intersectable": false,
     "Affected by light": false,
     "Lighting type": lightHandler.lightTypes.GOURAUD,
-    "Normal map scale": "1,1"
+    "Normal map scale": "1,1",
+    "Has specularity": false
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -413,12 +414,16 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Has mass"] = !curSelection.noMass;
     guiHandler.modelInstanceManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
     guiHandler.modelInstanceManipulationParameters["Affected by light"] = !!curSelection.affectedByLight;
+    guiHandler.modelInstanceManipulationParameters["Has specularity"] = !!curSelection.isSpecularityEnabled;
+
     if (curSelection.affectedByLight){
       guiHandler.modelInstanceManipulationParameters["Lighting type"] = curSelection.lightingType || lightHandler.lightTypes.GOURAUD;
       guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
+      guiHandler.enableController(guiHandler.modelInstanceHasSpecularityController);
     }else{
       guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
       guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
+      guiHandler.disableController(guiHandler.modelInstanceHasSpecularityController);
     }
 
     if (curSelection.lightingType == lightHandler.lightTypes.PHONG && curSelection.model.info.hasNormalMap){
@@ -2181,12 +2186,27 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     if (val){
       guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
       guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
+      guiHandler.enableController(guiHandler.modelInstanceHasSpecularityController);
       terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
     }else{
       guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
       guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+      guiHandler.disableController(guiHandler.modelInstanceHasSpecularityController);
       guiHandler.modelInstanceManipulationParameters["Normal map scale"] = "1,1";
+      guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
       terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
+    }
+  }).listen();
+  guiHandler.modelInstanceHasSpecularityController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Has specularity").onChange(function(val){
+    var modelInstance = selectionHandler.getSelectedObject();
+    if (!modelInstance.affectedByLight){
+      guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
+      return;
+    }
+    if (val){
+      modelInstance.enableSpecularity();
+    }else{
+      modelInstance.disableSpecularity();
     }
   }).listen();
   guiHandler.modelInstanceManupulationLightingTypeController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Lighting type", Object.keys(lightHandler.lightTypes)).onChange(function(val){
@@ -2218,6 +2238,24 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     terminal.printInfo(Text.NORMAL_MAP_SCALE_SET);
   }).listen();
 
+  var modelInstance = selectionHandler.getSelectedObject();
+
+  var metalnessRoughnessFolder = graphicsFolder.addFolder("Metalness/Roughness");
+  for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
+    var childInfo = modelInstance.model.info.childInfos[i];
+    var subFolder = metalnessRoughnessFolder.addFolder(childInfo.name);
+    var params = {
+      "Metalness": childInfo.metalness,
+      "Roughness": childInfo.roughness
+    };
+    subFolder.add(params, "Metalness").min(0).max(1).step(0.01).onChange(function(val){
+      modelInstance.model.setMetalnessRoughness(true, val, this.index);
+    }.bind({index: i}));
+    subFolder.add(params, "Roughness").min(0).max(1).step(0.01).onChange(function(val){
+      modelInstance.model.setMetalnessRoughness(false, val, this.index);
+    }.bind({index: i}));
+  }
+
   if (selectionHandler.getSelectedObject().model.info.customTexturesEnabled){
     var textureFolder = guiHandler.datGuiModelInstance.addFolder("Textures");
     var usedTextures = selectionHandler.getSelectedObject().model.getUsedTextures();
@@ -2232,7 +2270,6 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     }
   }
 
-  var modelInstance = selectionHandler.getSelectedObject();
   var environmentMapFolder = guiHandler.datGuiModelInstance.addFolder("Environment Map");
   var firstSkyboxName = Object.keys(skyBoxes)[0] || "";
   var childParams = [];
@@ -2255,90 +2292,12 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       }
 
       modelInstance.mapEnvironment(skyBoxes[environmentMapParams["Skybox"]]);
-
-      for (var i = 0; i < childParams.length; i ++){
-        modelInstance.setReflectionMode(childParams[i]["Mode"] == "Reflection", i);
-        modelInstance.setReflectivity(childParams[i]["Reflectivity"], i);
-        modelInstance.setEnvironmentBlendingMode(environmentMapBlendingModes[childParams[i]["Blending mode"]], i);
-        modelInstance.setRefractionRatio(childParams[i]["Refraction ratio"], i);
-        modelInstance.setRoughness(childParams[i]["Roughness"], i);
-      }
-
       terminal.printInfo(Text.ENVIRONMENT_MAP_CREATED);
     }else{
       modelInstance.unmapEnvironment();
       terminal.printInfo(Text.ENVIRONMENT_MAP_REMOVED);
     }
   });
-  for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
-    var childName = modelInstance.model.info.childInfos[i].name;
-    var envMapChildFolder = environmentMapFolder.addFolder(childName);
-    var envModeText = "Reflection";
-    var reflectivity = 1;
-    var refractionRatio = 1;
-    var roughness = 0;
-    var envBlendingMode = "MULTIPLY";
-    if (modelInstance.hasEnvironmentMap()){
-      envModeText = modelInstance.environmentMapInfo.childInfos[i].isReflection? "Reflection": "Refraction";
-      reflectivity = modelInstance.environmentMapInfo.childInfos[i].reflectivity;
-      roughness = modelInstance.environmentMapInfo.childInfos[i].roughness;
-      if (!modelInstance.environmentMapInfo.childInfos[i].isReflection){
-        refractionRatio = modelInstance.environmentMapInfo.childInfos[i].refractionRatio;
-      }
-      if (modelInstance.environmentMapInfo.childInfos[i].blendingMode == environmentMapBlendingModes.MULTIPLY){
-        envBlendingMode = "MULTIPLY";
-      }else if (modelInstance.environmentMapInfo.childInfos[i].blendingMode == environmentMapBlendingModes.MIX){
-        envBlendingMode = "MIX";
-      }else{
-        envBlendingMode = "ADD";
-      }
-    }
-
-    var envChildParams = {
-      "Mode": envModeText,
-      "Reflectivity": reflectivity,
-      "Refraction ratio": refractionRatio,
-      "Roughness": roughness,
-      "Blending mode": envBlendingMode
-    };
-
-    childParams.push(envChildParams);
-
-    envMapChildFolder.add(envChildParams, "Mode", ["Reflection", "Refraction"]).onChange(function(val){
-      if (!modelInstance.hasEnvironmentMap()){
-        return;
-      }
-      modelInstance.setReflectionMode(val == "Reflection", this.index);
-
-      if (val != "Reflection"){
-        modelInstance.setRefractionRatio(childParams[this.index]["Refraction ratio"], this.index);
-      }
-    }.bind({index: i}));
-    envMapChildFolder.add(envChildParams, "Reflectivity").min(0).max(1).step(0.01).onChange(function(val){
-      if (!modelInstance.hasEnvironmentMap()){
-        return;
-      }
-      modelInstance.setReflectivity(val, this.index);
-    }.bind({index: i}));
-    envMapChildFolder.add(envChildParams, "Refraction ratio").min(0).max(1).step(0.01).onChange(function(val){
-      if (!modelInstance.hasEnvironmentMap()){
-        return;
-      }
-      modelInstance.setRefractionRatio(val, this.index);
-    }.bind({index: i}));
-    envMapChildFolder.add(envChildParams, "Roughness").min(0).max(1).step(0.01).onChange(function(val){
-      if (!modelInstance.hasEnvironmentMap()){
-        return;
-      }
-      modelInstance.setRoughness(val, this.index);
-    }.bind({index: i}));
-    envMapChildFolder.add(envChildParams, "Blending mode", Object.keys(environmentMapBlendingModes)).onChange(function(val){
-      if (!modelInstance.hasEnvironmentMap()){
-        return;
-      }
-      modelInstance.setEnvironmentBlendingMode(environmentMapBlendingModes[val], this.index);
-    }.bind({index: i}));
-  }
 }
 
 GUIHandler.prototype.initializeMassManipulationGUI = function(){

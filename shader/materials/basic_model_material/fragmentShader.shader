@@ -1,10 +1,23 @@
 #extension GL_EXT_shader_texture_lod : enable
 #extension GL_OES_standard_derivatives : enable
 
+#define PI 3.1415926
+
 precision lowp float;
 precision lowp int;
 
 varying vec3 vColor;
+
+vec3 lightDiffuse = vec3(0.0, 0.0, 0.0);
+vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
+varying vec3 vLightDiffuse;
+varying vec3 vLightSpecular;
+
+#if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
+  varying float vRoughness;
+#endif
+
+varying float vMetalness;
 
 #define INSERTION
 
@@ -15,14 +28,12 @@ varying vec3 vColor;
 
 #if defined(HAS_PHONG_LIGHTING) || defined(HAS_ENVIRONMENT_MAP)
   varying vec3 vWorldPosition;
+  uniform vec3 cameraPosition;
 #endif
 
 #ifdef HAS_ENVIRONMENT_MAP
   varying vec3 vWorldNormal;
-  varying vec3 vEnvironmentMapInfo;
-  varying float vRoughness;
   uniform samplerCube environmentMap;
-  uniform vec3 cameraPosition;
 #endif
 
 #ifdef HAS_PHONG_LIGHTING
@@ -102,26 +113,38 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
   return vec2(coordX, coordY);
 }
 
-vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
-  vec3 pointLightPosition = vec3(pX, pY, pZ);
-  vec3 toLight = normalize(pointLightPosition - worldPosition);
-  float diffuseFactor = dot(normal, toLight);
-  if (diffuseFactor > 0.0){
-    vec3 lightColor = vec3(r, g, b);
-    return (strength * diffuseFactor * lightColor);
-  }
-  return vec3(0.0, 0.0, 0.0);
-}
+#ifdef HAS_PHONG_LIGHTING
+  vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
+    vec3 pointLightPosition = vec3(pX, pY, pZ);
+    vec3 toLight = normalize(pointLightPosition - worldPosition);
+    float diffuseFactor = dot(normal, toLight);
 
-vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b, float strength, vec3 normal){
-  vec3 lightDir = normalize(vec3(dirX, dirY, dirZ));
-  float diffuseFactor = dot(normal, -lightDir);
-  if (diffuseFactor > 0.0){
-     vec3 lightColor = vec3(r, g, b);
-     return (strength * diffuseFactor * lightColor);
+    if (diffuseFactor > 0.0){
+      vec3 lightColor = vec3(r, g, b);
+
+      #ifdef ENABLE_SPECULARITY
+        vec3 toCamera = normalize(cameraPosition - worldPosition);
+        vec3 halfVector = normalize(toLight + toCamera);
+        float shininess = 4.0 / pow(vRoughness, 4.0) - 2.0;
+        float specular = pow(dot(normal, halfVector), shininess);
+        lightSpecular.rgb += specular;
+      #endif
+
+      return (strength * diffuseFactor * lightColor);
+    }
+    return vec3(0.0, 0.0, 0.0);
   }
-  return vec3(0.0, 0.0, 0.0);
-}
+
+  vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b, float strength, vec3 normal){
+    vec3 lightDir = normalize(vec3(dirX, dirY, dirZ));
+    float diffuseFactor = dot(normal, -lightDir);
+    if (diffuseFactor > 0.0){
+       vec3 lightColor = vec3(r, g, b);
+       return (strength * diffuseFactor * lightColor);
+    }
+    return vec3(0.0, 0.0, 0.0);
+  }
+#endif
 
 #ifdef HAS_PHONG_LIGHTING
 
@@ -703,7 +726,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     return (ambient + diffuse);
   }
 
-  vec3 handleLighting(vec3 worldPositionComputed){
+  void handleLighting(vec3 worldPositionComputed){
 
     #ifdef HAS_NORMAL_MAP
       vec3 computedNormal;
@@ -833,10 +856,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
       );
     #endif
 
-    vec3 totalColor = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed)) * vColor;
-
-
-    return totalColor;
+    lightDiffuse = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed));
   }
 #endif
 
@@ -856,47 +876,44 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
 void main(){
 
-  vec3 colorHandled = vColor;
+  vec3 color = vColor;
   #ifdef HAS_PHONG_LIGHTING
-    colorHandled = handleLighting(vWorldPosition);
+    lightDiffuse = vec3(0.0, 0.0, 0.0);
+    handleLighting(vWorldPosition);
   #endif
 
-  vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
+  vec3 diffuseTotal = vLightDiffuse + lightDiffuse;
+  vec3 specularTotal = vLightSpecular + lightSpecular;
 
   #ifdef HAS_ENVIRONMENT_MAP
     vec3 worldNormal = normalize(vWorldNormal);
     vec3 eyeToSurfaceDir = normalize(vWorldPosition - cameraPosition);
     vec3 envVec;
 
-    if (vEnvironmentMapInfo[0] > 0.0){
-      envVec = reflect(eyeToSurfaceDir, worldNormal);
-    }else{
-      float refractionRatio = -vEnvironmentMapInfo[0];
-      envVec = refract(eyeToSurfaceDir, worldNormal, refractionRatio);
-    }
+
+    envVec = reflect(eyeToSurfaceDir, worldNormal);
 
     float exponent = pow(2.0, (1.0 - vRoughness) * 18.0 + 2.0);
     float maxMIPLevel = log2(float(ENVIRONMENT_MAP_SIZE));
     float minMIPLevel = mipMapLevel(vec2(envVec.z, envVec.x) * float(ENVIRONMENT_MAP_SIZE));
     float MIPLevel = max(minMIPLevel, log2(float(ENVIRONMENT_MAP_SIZE) * sqrt(3.0)) - 0.5 * log2(exponent + 1.0));
     vec3 N2 = vec3(vWorldNormal.z, vWorldNormal.y, vWorldNormal.x);
-    float f0 = 0.935;
-    float fresnel = f0 + (1.0 + f0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0);
+    vec3 f0 = mix(vec3(0.04, 0.04, 0.04), color, vMetalness);
+    vec3 fresnel = f0 + (vec3(1.0, 1.0, 1.0) + f0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0);
 
     #ifdef GL_EXT_shader_texture_lod
-      vec3 envColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
+      vec3 envDiffuseColor = textureCubeLodEXT(environmentMap, N2, maxMIPLevel).rgb;
+      vec3 envSpecularColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
     #else
-      vec3 envColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x)).rgb;
+      vec3 envDiffuseColor = textureCube(environmentMap, N2, maxMIPLevel).rgb;
+      vec3 envSpecularColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x)).rgb;
     #endif
 
-    if (vEnvironmentMapInfo[2] > 500.0){
-      colorHandled = mix(colorHandled, colorHandled * envColor, vEnvironmentMapInfo[1]); // multiply
-    }else if (vEnvironmentMapInfo[2] > 100.0){
-      colorHandled = mix(colorHandled, envColor, vEnvironmentMapInfo[1]); //mix
-    }else{
-      colorHandled += envColor * vEnvironmentMapInfo[1]; //add
-    }
+    specularTotal += envSpecularColor;
+    diffuseTotal += envDiffuseColor * (1.0 / PI);
   #endif
+
+  vec3 textureColor = vec3(1.0, 1.0, 1.0);
 
   #ifdef HAS_TEXTURE
     if (vDiffuseUV.x >= 0.0) {
@@ -904,34 +921,35 @@ void main(){
         int diffuseTextureIndexInt = int(vDiffuseTextureIndex);
         #ifdef CUSTOM_TEXTURE_0
           if (diffuseTextureIndexInt == 0){
-            diffuseColor = texture2D(customDiffuseTexture0, vUV);
+            textureColor = texture2D(customDiffuseTexture0, vUV).rgb;
           }
         #endif
         #ifdef CUSTOM_TEXTURE_1
           if (diffuseTextureIndexInt == 1){
-            diffuseColor = texture2D(customDiffuseTexture1, vUV);
+            textureColor = texture2D(customDiffuseTexture1, vUV).rgb;
           }
         #endif
         #ifdef CUSTOM_TEXTURE_2
           if (diffuseTextureIndexInt == 2){
-            diffuseColor = texture2D(customDiffuseTexture2, vUV);
+            textureColor = texture2D(customDiffuseTexture2, vUV).rgb;
           }
         #endif
         #ifdef CUSTOM_TEXTURE_3
           if (diffuseTextureIndexInt == 3){
-            diffuseColor = texture2D(customDiffuseTexture3, vUV);
+            textureColor = texture2D(customDiffuseTexture3, vUV).rgb;
           }
         #endif
         #ifdef CUSTOM_TEXTURE_4
           if (diffuseTextureIndexInt == 4){
-            diffuseColor = texture2D(customDiffuseTexture4, vUV);
+            textureColor = texture2D(customDiffuseTexture4, vUV).rgb;
             }
         #endif
       #else
-        diffuseColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w));
+        textureColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w)).rgb;
       #endif
     }
   #endif
 
-  gl_FragColor = (vec4(colorHandled, 1.0) * diffuseColor);
+  gl_FragColor.rgb = (diffuseTotal * mix(color, vec3(0.0, 0.0, 0.0), vMetalness) * textureColor) + specularTotal;
+  gl_FragColor.a = 1.0;
 }
