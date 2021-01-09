@@ -293,15 +293,10 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
   delete this.mesh.material.uniforms.worldInverseTranspose;
   delete this.mesh.material.uniforms.dynamicLightsMatrix;
 
-  if (!this.hasEnvironmentMap()){
-    delete this.mesh.material.uniforms.worldMatrix;
-  }
-
   if (isAffectedByLight){
     macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
 
     this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
-    this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
     this.mesh.material.uniforms.dynamicLightsMatrix = lightHandler.getUniform();
     this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     this.updateWorldInverseTranspose();
@@ -499,7 +494,6 @@ ModelInstance.prototype.mapEnvironment = function(skybox){
 
   this.mesh.material.uniforms.environmentMap = skybox.getUniform();
   this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
-  this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
 
   var environmentInfoArray = new Float32Array(this.mesh.geometry.attributes.position.array.length);
   var i2 = 0;
@@ -524,9 +518,6 @@ ModelInstance.prototype.unmapEnvironment = function(){
   delete this.mesh.material.uniforms.environmentMap;
   if (!this.affectedByLight){
     delete this.mesh.material.uniforms.cameraPosition;
-  }
-  if (!this.affectedByLight){
-    delete this.mesh.material.uniforms.worldMatrix;
   }
 
   macroHandler.removeMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);

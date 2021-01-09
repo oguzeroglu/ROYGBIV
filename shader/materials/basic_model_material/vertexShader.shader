@@ -10,7 +10,8 @@ attribute vec2 metalnessRoughness;
 varying float vMetalness;
 
 uniform mat4 projectionMatrix;
-uniform mat4 modelViewMatrix;
+uniform mat4 worldMatrix;
+uniform mat4 viewMatrix;
 
 varying vec3 vColor;
 
@@ -57,10 +58,6 @@ varying vec3 vLightSpecular;
     varying vec3 vBitangent;
     varying vec4 vNormalUV;
   #endif
-#endif
-
-#if defined(AFFECTED_BY_LIGHT) || defined(HAS_ENVIRONMENT_MAP)
-  uniform mat4 worldMatrix;
 #endif
 
 #ifdef AFFECTED_BY_LIGHT
@@ -787,15 +784,13 @@ varying vec3 vLightSpecular;
   }
 #endif
 
-#if defined(HAS_NORMAL_MAP) && defined(HAS_PHONG_LIGHTING)
-  void handleNormalMap(){
-    vNormalUV = normalUV;
-    vTangent = (modelViewMatrix * vec4(tangent.xyz, 0.0)).xyz;
-    vBitangent = normalize(cross(vNormal, vTangent) * tangent.w);
-  }
-#endif
-
 void main(){
+
+  #ifdef HAS_ANIMATION
+    #ANIMATION_MATRIX_CODE
+  #else
+    mat4 mvMatrixComputed = viewMatrix * worldMatrix;
+  #endif
 
   #ifdef CHILDREN_HIDEABLE
     vHiddenFlag = hiddenFlag;
@@ -827,7 +822,9 @@ void main(){
   #ifdef HAS_PHONG_LIGHTING
     vNormal = normalize(mat3(worldInverseTranspose) * normal);
     #ifdef HAS_NORMAL_MAP
-      handleNormalMap();
+      vNormalUV = normalUV;
+      vTangent = (mvMatrixComputed * vec4(tangent.xyz, 0.0)).xyz;
+      vBitangent = normalize(cross(vNormal, vTangent) * tangent.w);
     #endif
   #endif
 
@@ -853,5 +850,5 @@ void main(){
     vRoughness = metalnessRoughness[1];
   #endif
 
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mvMatrixComputed * vec4(position, 1.0);
 }
