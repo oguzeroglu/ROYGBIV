@@ -35,6 +35,14 @@ ModelInstanceAnimationGroup.prototype.getWorldMatrix = function(){
   return this.group.matrixWorld;
 }
 
+ModelInstanceAnimationGroup.prototype.rotateAroundXYZ = function(x, y, z, axisVector, radians){
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.group.position.sub(point);
+  this.group.position.applyAxisAngle(axisVector, radians);
+  this.group.position.add(point);
+  this.group.rotateOnAxis(axisVector, radians);
+}
+
 ModelInstanceAnimationGroup.prototype.getInitialCenter = function(modelInstance){
   var centerX = 0;
   var centerY = 0;
