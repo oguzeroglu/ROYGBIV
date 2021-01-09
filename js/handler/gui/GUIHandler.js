@@ -2344,9 +2344,6 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
         ary.splice(ary.indexOf(this.index), 1);
         var newAG = new ModelInstanceAnimationGroup(ag.name, modelInstance, ary);
         modelInstance.addAnimationGroup(newAG);
-        newAG = modelInstance.getAnimationGroupByName(val);
-        newAG.childrenIndices.push(this.index);
-        modelInstance.addAnimationGroup(new ModelInstanceAnimationGroup(newAG.name, modelInstance, newAG.childrenIndices));
       }
     }.bind({index: i}));
   }
