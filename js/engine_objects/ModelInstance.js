@@ -80,6 +80,13 @@ ModelInstance.prototype.export = function(){
 
   exportObj.isSpecularityEnabled = !!this.isSpecularityEnabled;
 
+  if (this.animationGroup1){
+    exportObj.animationGroup1 = this.animationGroup1.export();
+  }
+  if (this.animationGroup2){
+    exportObj.animationGroup2 = this.animationGroup2.export();
+  }
+
   return exportObj;
 }
 

@@ -23,6 +23,13 @@ var ModelInstanceAnimationGroup = function(name, modelInstance, childrenIndices)
   this.group.quaternion.copy(modelInstance.mesh.quaternion);
 }
 
+ModelInstanceAnimationGroup.prototype.export = function(){
+  return {
+    name: this.name,
+    childrenIndices: this.childrenIndices
+  };
+}
+
 ModelInstanceAnimationGroup.prototype.getWorldMatrix = function(){
   this.group.updateMatrixWorld(true);
   return this.group.matrixWorld;

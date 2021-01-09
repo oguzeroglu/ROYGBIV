@@ -63,6 +63,15 @@ ImportHandler.prototype.importModelInstances = function(obj){
     if (curModelInstanceExport.isSpecularityEnabled){
       modelInstance.enableSpecularity();
     }
+
+    modelInstance.generateBoundingBoxes();
+
+    if (curModelInstanceExport.animationGroup1){
+      modelInstance.addAnimationGroup(new ModelInstanceAnimationGroup(curModelInstanceExport.animationGroup1.name, modelInstance, curModelInstanceExport.animationGroup1.childrenIndices));
+    }
+    if (curModelInstanceExport.animationGroup2){
+      modelInstance.addAnimationGroup(new ModelInstanceAnimationGroup(curModelInstanceExport.animationGroup2.name, modelInstance, curModelInstanceExport.animationGroup2.childrenIndices));
+    }
   }
 }
 
