@@ -2258,6 +2258,24 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
 
   var visibilityFolder = graphicsFolder.addFolder("Visibility");
   var allVisibilityParams = [];
+
+  var visibilityConf = {
+    "Show All": function(){
+      for (var i2 = 0; i2 < modelInstance.model.info.childInfos.length; i2 ++){
+        modelInstance.showChild(i2);
+        allVisibilityParams[i2]["Visible"] = true;
+      }
+    },
+    "Hide All": function(){
+      for (var i2 = 0; i2 < modelInstance.model.info.childInfos.length; i2 ++){
+        modelInstance.hideChild(i2);
+        allVisibilityParams[i2]["Visible"] = false;
+      }
+    }
+  }
+  visibilityFolder.add(visibilityConf, "Show All");
+  visibilityFolder.add(visibilityConf, "Hide All");
+
   for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
     var childInfo = modelInstance.model.info.childInfos[i];
     var subFolder = visibilityFolder.addFolder(childInfo.name);
