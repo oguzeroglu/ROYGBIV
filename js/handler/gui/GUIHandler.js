@@ -2170,6 +2170,13 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   generalFolder.add(guiHandler.modelInstanceManipulationParameters, "Intersectable").onChange(function(val){
     terminal.clear();
     var obj = selectionHandler.getSelectedObject();
+
+    if (obj.animationGroup1 || obj.animationGroup2){
+      guiHandler.modelInstanceManipulationParameters["Intersectable"] = false;
+      terminal.printError(Text.MODEL_INSTANCE_HAS_ANIMATIONS_CANNOT_MARK_AS_INTERSECTABLE);
+      return;
+    }
+
     obj.setIntersectableStatus(val)
     if (obj.isIntersectable){
       terminal.printInfo(Text.OBJECT_INTERSECTABLE);
@@ -2364,6 +2371,10 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     "Create": function(){
       terminal.clear();
       var animationGroupName = this["Name"];
+      if (modelInstance.isIntersectable){
+        terminal.printError(Text.CANNOT_ADD_ANIMATIONS_TO_INTERSECTABLE_MODEL_INSTANCES);
+        return;
+      }
       if (!animationGroupName){
         terminal.printError(Text.NAME_CANNOT_BE_EMPTY);
         return;
