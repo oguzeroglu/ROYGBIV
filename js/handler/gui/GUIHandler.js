@@ -2257,11 +2257,22 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   }
 
   var visibilityFolder = graphicsFolder.addFolder("Visibility");
+  var allVisibilityParams = [];
   for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
     var childInfo = modelInstance.model.info.childInfos[i];
     var subFolder = visibilityFolder.addFolder(childInfo.name);
     var params = {
-      "Visible": modelInstance.isChildVisible(i)
+      "Visible": modelInstance.isChildVisible(i),
+      "Isolate": function(){
+        modelInstance.showChild(this.index);
+        allVisibilityParams[this.index]["Visible"] = true;
+        for (var i2 = 0; i2 < modelInstance.model.info.childInfos.length; i2 ++){
+          if (i2 != this.index){
+            modelInstance.hideChild(i2);
+            allVisibilityParams[i2]["Visible"] = false;
+          }
+        }
+      }.bind({index: i})
     };
     subFolder.add(params, "Visible").onChange(function(val){
       if (val){
@@ -2269,7 +2280,10 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       }else{
         modelInstance.hideChild(this.index);
       }
-    }.bind({index: i}));
+    }.bind({index: i})).listen();
+    subFolder.add(params, "Isolate");
+
+    allVisibilityParams.push(params);
   }
 
   if (selectionHandler.getSelectedObject().model.info.customTexturesEnabled){
