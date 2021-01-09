@@ -676,6 +676,9 @@ ModelInstance.prototype.addAnimationGroup = function(animationGroup){
     ifText2 = "mi == -100";
   }
 
+  ifText1 = ifText1 || "mi == -200";
+  ifText2 = ifText2 || "mi == -100";
+
   this.animationVertexShaderCode = "if(@@1){ @@3 }else if(@@2){ @@4 }else{ @@5 }\n";
   this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@1", ifText1);
   this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@2", ifText2);
@@ -687,4 +690,28 @@ ModelInstance.prototype.addAnimationGroup = function(animationGroup){
   macroHandler.injectMacro("HAS_ANIMATION", this.mesh.material, true, false);
   this.mesh.frustumCulled = false;
   return true;
+}
+
+ModelInstance.prototype.getAnimationGroupOfChild = function(childIndex){
+  if (this.animationGroup1){
+    if (this.animationGroup1.childrenIndices.indexOf(childIndex) >= 0){
+      return this.animationGroup1;
+    }
+  }
+  if (this.animationGroup2){
+    if (this.animationGroup2.childrenIndices.indexOf(childIndex) >= 0){
+      return this.animationGroup2;
+    }
+  }
+  return null;
+}
+
+ModelInstance.prototype.getAnimationGroupByName = function(agName){
+  if (this.animationGroup1 && this.animationGroup1.name == agName){
+    return this.animationGroup1;
+  }
+  if (this.animationGroup2 && this.animationGroup2.name == agName){
+    return this.animationGroup2;
+  }
+  return null;
 }

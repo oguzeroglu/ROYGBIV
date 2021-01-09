@@ -2240,23 +2240,6 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
 
   var modelInstance = selectionHandler.getSelectedObject();
 
-  var metalnessRoughnessFolder = graphicsFolder.addFolder("Metalness/Roughness");
-  for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
-    var childInfo = modelInstance.model.info.childInfos[i];
-    var subFolder = metalnessRoughnessFolder.addFolder(childInfo.name);
-    var params = {
-      "Metalness": childInfo.metalness,
-      "Roughness": childInfo.roughness
-    };
-    subFolder.add(params, "Metalness").min(0).max(1).step(0.01).onChange(function(val){
-      modelInstance.model.setMetalnessRoughness(true, val, this.index);
-    }.bind({index: i}));
-    subFolder.add(params, "Roughness").min(0).max(1).step(0.01).onChange(function(val){
-      modelInstance.model.setMetalnessRoughness(false, val, this.index);
-    }.bind({index: i}));
-  }
-
-  var visibilityFolder = graphicsFolder.addFolder("Visibility");
   var allVisibilityParams = [];
 
   var visibilityConf = {
@@ -2273,13 +2256,34 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       }
     }
   }
-  visibilityFolder.add(visibilityConf, "Show All");
-  visibilityFolder.add(visibilityConf, "Hide All");
+
+  graphicsFolder.add(visibilityConf, "Show All");
+  graphicsFolder.add(visibilityConf, "Hide All");
+
+  var allAnimationGroupNames = ["None"];
+  if (modelInstance.animationGroup1){
+    allAnimationGroupNames.push(modelInstance.animationGroup1.name);
+  }
+  if (modelInstance.animationGroup2){
+    allAnimationGroupNames.push(modelInstance.animationGroup2.name);
+  }
 
   for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
     var childInfo = modelInstance.model.info.childInfos[i];
-    var subFolder = visibilityFolder.addFolder(childInfo.name);
-    var params = {
+    var childFolder = graphicsFolder.addFolder(childInfo.name);
+    var mrParams = {
+      "Metalness": childInfo.metalness,
+      "Roughness": childInfo.roughness
+    };
+
+    childFolder.add(mrParams, "Metalness").min(0).max(1).step(0.01).onChange(function(val){
+      modelInstance.model.setMetalnessRoughness(true, val, this.index);
+    }.bind({index: i}));
+    childFolder.add(mrParams, "Roughness").min(0).max(1).step(0.01).onChange(function(val){
+      modelInstance.model.setMetalnessRoughness(false, val, this.index);
+    }.bind({index: i}));
+
+    var vp = {
       "Visible": modelInstance.isChildVisible(i),
       "Isolate": function(){
         modelInstance.showChild(this.index);
@@ -2292,16 +2296,52 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
         }
       }.bind({index: i})
     };
-    subFolder.add(params, "Visible").onChange(function(val){
+
+    childFolder.add(vp, "Visible").onChange(function(val){
       if (val){
         modelInstance.showChild(this.index);
       }else{
         modelInstance.hideChild(this.index);
       }
     }.bind({index: i})).listen();
-    subFolder.add(params, "Isolate");
+    childFolder.add(vp, "Isolate");
 
-    allVisibilityParams.push(params);
+    allVisibilityParams.push(vp);
+
+    var animGroupOfChild = modelInstance.getAnimationGroupOfChild(i);
+    var animationGroupParams = {
+      "Animation group": animGroupOfChild? animGroupOfChild.name: "None"
+    };
+
+    childFolder.add(animationGroupParams, "Animation group", allAnimationGroupNames).onChange(function(val){
+      if (val != "None"){
+        var oldAG = modelInstance.getAnimationGroupOfChild(this.index);
+        var newAG = modelInstance.getAnimationGroupByName(val);
+
+        if (oldAG){
+          modelInstance.removeAnimationGroup(oldAG);
+          var ary = oldAG.childrenIndices;
+          ary.splice(ary.indexOf(this.index), 1);
+          modelInstance.addAnimationGroup(new ModelInstanceAnimationGroup(oldAG.name, modelInstance, ary));
+        }
+
+        var ary = newAG.childrenIndices;
+        ary.push(this.index);
+        var ag = new ModelInstanceAnimationGroup(newAG.name, modelInstance, ary);
+        modelInstance.removeAnimationGroup(newAG);
+        modelInstance.addAnimationGroup(ag);
+      }else{
+        var ag = modelInstance.getAnimationGroupOfChild(this.index);
+        modelInstance.removeAnimationGroup(ag);
+        var ary = ag.childrenIndices;
+        ary.splice(ary.indexOf(this.index), 1);
+        var newAG = new ModelInstanceAnimationGroup(ag.name, modelInstance, ary);
+        modelInstance.addAnimationGroup(newAG);
+        newAG = modelInstance.getAnimationGroupByName(val);
+        newAG.childrenIndices.push(this.index);
+        modelInstance.addAnimationGroup(new ModelInstanceAnimationGroup(newAG.name, modelInstance, newAG.childrenIndices));
+      }
+    }.bind({index: i}));
   }
 
   if (selectionHandler.getSelectedObject().model.info.customTexturesEnabled){
@@ -2316,6 +2356,57 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
         }.bind({url: usedTexture.url})
       }, "View");
     }
+  }
+
+  var animationGroupsFolder = guiHandler.datGuiModelInstance.addFolder("Animation Groups");
+  var animationGroupsParams = {
+    "Name": "",
+    "Create": function(){
+      terminal.clear();
+      var animationGroupName = this["Name"];
+      if (!animationGroupName){
+        terminal.printError(Text.NAME_CANNOT_BE_EMPTY);
+        return;
+      }
+      if ((modelInstance.animationGroup1 && modelInstance.animationGroup1.name == animationGroupName) || (modelInstance.animationGroup2 && modelInstance.animationGroup2.name == animationGroupName)){
+        terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+        return;
+      }
+      if (modelInstance.animationGroup1 && modelInstance.animationGroup2){
+        terminal.printError(Text.CANNOT_ADD_MORE_THAN_TWO_ANIMATION_GROUP_TO_MODEL_INSTANCE);
+        return;
+      }
+      if (animationGroupName == "None"){
+        terminal.printError(Text.NAME_RESERVED);
+        return;
+      }
+      var animGroup = new ModelInstanceAnimationGroup(animationGroupName, modelInstance, []);
+      modelInstance.addAnimationGroup(animGroup);
+      selectionHandler.resetCurrentSelection();
+      terminal.printInfo(Text.ANIMATION_GROUP_CREATED);
+    }
+  }
+  animationGroupsFolder.add(animationGroupsParams, "Name");
+  animationGroupsFolder.add(animationGroupsParams, "Create");
+  var existingAnimationGroups = [];
+  if (modelInstance.animationGroup1){
+    existingAnimationGroups.push(modelInstance.animationGroup1);
+  }
+  if (modelInstance.animationGroup2){
+    existingAnimationGroups.push(modelInstance.animationGroup2);
+  }
+  for (var i = 0; i < existingAnimationGroups.length; i ++){
+    var ag = existingAnimationGroups[i];
+    var subFolder = animationGroupsFolder.addFolder(ag.name);
+    var params = {
+      "Remove": function(){
+        terminal.clear();
+        modelInstance.removeAnimationGroup(modelInstance.getAnimationGroupByName(this.ag.name));
+        selectionHandler.resetCurrentSelection();
+        terminal.printInfo(Text.ANIMATION_GROUP_REMOVED);
+      }.bind({ag: ag})
+    };
+    subFolder.add(params, "Remove");
   }
 
   var environmentMapFolder = guiHandler.datGuiModelInstance.addFolder("Environment Map");
