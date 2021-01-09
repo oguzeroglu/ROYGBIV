@@ -1,8 +1,8 @@
-var ModelInstanceAnimationGroup = function(modelInstance, childrenIndices){
-  this.modelInstance = modelInstance;
+var ModelInstanceAnimationGroup = function(name, modelInstance, childrenIndices){
+  this.name = name;
   this.childrenIndices = childrenIndices;
 
-  this.center = this.getInitialCenter();
+  this.center = this.getInitialCenter(modelInstance);
   this.group = new THREE.Group();
   var refVector = this.center.clone();
   this.group.position.copy(refVector);
@@ -28,12 +28,12 @@ ModelInstanceAnimationGroup.prototype.getWorldMatrix = function(){
   return this.group.matrixWorld;
 }
 
-ModelInstanceAnimationGroup.prototype.getInitialCenter = function(){
+ModelInstanceAnimationGroup.prototype.getInitialCenter = function(modelInstance){
   var centerX = 0;
   var centerY = 0;
   var centerZ = 0;
   var count = 0;
-  var bbs = this.modelInstance.boundingBoxes;
+  var bbs = modelInstance.boundingBoxes;
   for (var i = 0; i < this.childrenIndices.length; i ++){
     var index = this.childrenIndices[i];
     var bb = bbs[index];
@@ -49,10 +49,4 @@ ModelInstanceAnimationGroup.prototype.getInitialCenter = function(){
   centerZ = centerZ / count;
 
   return new THREE.Vector3(centerX, centerY, centerZ);
-}
-
-ModelInstanceAnimationGroup.prototype.debugCenter = function(){
-  var mesh = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({color: "red"}));
-  mesh.position.copy(this.center);
-  scene.add(mesh);
 }

@@ -603,3 +603,88 @@ ModelInstance.prototype.showChild = function(childIndex){
   this.mesh.geometry.attributes.hiddenFlag.updateRange.set(0, ary.length);
   this.mesh.geometry.attributes.hiddenFlag.needsUpdate = true;
 }
+
+ModelInstance.prototype.hasAnimationGroup = function(animationGroup){
+  return (this.animationGroup1 === animationGroup || this.animationGroup2 === animationGroup);
+}
+
+ModelInstance.prototype.removeAnimationGroup = function(animationGroup){
+  if (!this.hasAnimationGroup(animationGroup)){
+    return false;
+  }
+
+  macroHandler.replaceText(this.animationVertexShaderCode, "#ANIMATION_MATRIX_CODE" + "\n", this.mesh.material, true, false);
+  macroHandler.removeMacro("HAS_ANIMATION", this.mesh.material, true, false);
+  this.animationVertexShaderCode = null;
+
+  if (animationGroup == this.animationGroup1){
+    this.animationGroup1 = null;
+    if (this.animationGroup2){
+      var group2 = this.animationGroup2;
+      this.animationGroup2 = null;
+      this.addAnimationGroup(group2);
+    }else{
+      this.mesh.frustumCulled = true;
+    }
+  }else{
+    this.animationGroup2 = null;
+    var group1 = this.animationGroup1;
+    this.animationGroup1 = null;
+    this.addAnimationGroup(group1);
+  }
+}
+
+ModelInstance.prototype.addAnimationGroup = function(animationGroup){
+  if (this.hasAnimationGroup(animationGroup) || (this.animationGroup1 && this.animationGroup2)){
+    return false;
+  }
+
+  if (this.animationGroup1){
+    this.animationGroup2 = animationGroup;
+    this.mesh.material.uniforms.animMatrix2 = new THREE.Uniform(new THREE.Matrix4());
+  }else{
+    this.animationGroup1 = animationGroup;
+    this.mesh.material.uniforms.animMatrix1 = new THREE.Uniform(new THREE.Matrix4());
+  }
+
+  if (this.animationVertexShaderCode){
+    macroHandler.replaceText(this.animationVertexShaderCode, "#ANIMATION_MATRIX_CODE" + "\n", this.mesh.material, true, false);
+    macroHandler.removeMacro("HAS_ANIMATION", this.mesh.material, true, false);
+  }
+
+  var ifText1 = "";
+  var ifText2 = "";
+  for (var i = 0; i < this.animationGroup1.childrenIndices.length; i ++){
+    var index = this.animationGroup1.childrenIndices[i];
+    if (i != this.animationGroup1.childrenIndices.length - 1){
+      ifText1 += "mi == " + index + " || ";
+    }else{
+      ifText1 += "mi == " + index;
+    }
+  }
+
+  if (this.animationGroup2){
+    for (var i = 0; i < this.animationGroup2.childrenIndices.length; i ++){
+      var index = this.animationGroup2.childrenIndices[i];
+      if (i != this.animationGroup2.childrenIndices.length - 1){
+        ifText2 += "mi == " + index + " || ";
+      }else{
+        ifText2 += "mi == " + index;
+      }
+    }
+  }else{
+    ifText2 = "mi == -100";
+  }
+
+  this.animationVertexShaderCode = "if(@@1){ @@3 }else if(@@2){ @@4 }else{ @@5 }\n";
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@1", ifText1);
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@2", ifText2);
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@3", "mvMatrixComputed = viewMatrix * animMatrix1;");
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@4", "mvMatrixComputed = viewMatrix * animMatrix2;");
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@5", "mvMatrixComputed = viewMatrix * worldMatrix;");
+
+  macroHandler.replaceText("#ANIMATION_MATRIX_CODE", this.animationVertexShaderCode, this.mesh.material, true, false);
+  macroHandler.injectMacro("HAS_ANIMATION", this.mesh.material, true, false);
+  this.mesh.frustumCulled = false;
+  return true;
+}

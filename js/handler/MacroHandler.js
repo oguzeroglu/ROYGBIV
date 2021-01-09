@@ -218,3 +218,13 @@ MacroHandler.prototype.removeUniform = function(material, uniformName){
   material.fragmentShader = newFragmentShaderLines.join("\n");
   material.needsUpdate = true;
 }
+
+MacroHandler.prototype.replaceText = function(oldText, newText, material, insertVertexShader, insertFragmentShader){
+  if (insertVertexShader){
+    material.vertexShader = material.vertexShader.replace(oldText, newText);
+  }
+  if (insertFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace(oldText, newText);
+  }
+  material.needsUpdate = true;
+}
