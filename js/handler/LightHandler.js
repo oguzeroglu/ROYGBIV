@@ -360,7 +360,7 @@ LightHandler.prototype.findBakeableObjects = function(){
 
   for (var instanceName in modelInstances){
     var modelInstance = modelInstances[instanceName];
-    if (modelInstance.isChangeable || modelInstance.isDynamicObject || !modelInstance.affectedByLight || modelInstance.lightingType == lightHandler.lightTypes.PHONG || modelInstance.isSpecularityEnabled){
+    if (modelInstance.isChangeable || modelInstance.isDynamicObject || !modelInstance.affectedByLight || modelInstance.lightingType == lightHandler.lightTypes.PHONG || modelInstance.isSpecularityEnabled || modelInstance.animationGroup1 || modelInstance.animationGroup2){
       continue;
     }
 
@@ -368,7 +368,7 @@ LightHandler.prototype.findBakeableObjects = function(){
     for (var instanceName2 in modelInstances){
       if (instanceName != instanceName2){
         var modelInstance2 = modelInstances[instanceName2];
-        if (modelInstance.model.name == modelInstance2.model.name && modelInstance2.affectedByLight && modelInstance2.lightingType == lightHandler.lightTypes.GOURAUD && !modelInstance2.isSpecularityEnabled){
+        if (modelInstance.model.name == modelInstance2.model.name && modelInstance2.affectedByLight && modelInstance2.lightingType == lightHandler.lightTypes.GOURAUD && !modelInstance2.isSpecularityEnabled && !(modelInstance2.animationGroup1 || modelInstance2.animationGroup2)){
           isBakeable = false;
           break;
         }
