@@ -20,6 +20,9 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
 
   this.matrixCache = new THREE.Matrix4();
 
+  this.animationGroup1 = null;
+  this.animationGroup2 = null;
+
   webglCallbackHandler.registerEngineObject(this);
 }
 
@@ -347,6 +350,13 @@ ModelInstance.prototype.unsetPhongLight = function(){
 }
 
 ModelInstance.prototype.onBeforeRender = function(){
+  if (this.animationGroup1){
+    this.mesh.material.uniforms.animMatrix1.value.copy(this.animationGroup1.getWorldMatrix());
+  }
+  if (this.animationGroup2){
+    this.mesh.material.uniforms.animMatrix2.value.copy(this.animationGroup2.getWorldMatrix());
+  }
+
   if (!this.affectedByLight){
     return;
   }

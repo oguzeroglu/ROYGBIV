@@ -6,6 +6,7 @@ attribute vec3 position;
 attribute vec3 normal;
 attribute vec4 diffuseUV;
 attribute vec2 metalnessRoughness;
+attribute float materialIndex;
 
 varying float vMetalness;
 
@@ -21,6 +22,10 @@ varying vec3 vLightDiffuse;
 varying vec3 vLightSpecular;
 
 #define INSERTION
+
+#ifdef HAS_ANIMATION
+  uniform mat4 animMatrix1;
+#endif
 
 #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
   varying float vRoughness;
@@ -787,7 +792,14 @@ varying vec3 vLightSpecular;
 void main(){
 
   #ifdef HAS_ANIMATION
-    #ANIMATION_MATRIX_CODE
+    //#ANIMATION_MATRIX_CODE
+    int mi = int(materialIndex);
+    mat4 mvMatrixComputed;
+    if (mi == 0 || mi == 3){
+      mvMatrixComputed = viewMatrix * animMatrix1;
+    }else{
+      mvMatrixComputed = viewMatrix * worldMatrix;
+    }
   #else
     mat4 mvMatrixComputed = viewMatrix * worldMatrix;
   #endif

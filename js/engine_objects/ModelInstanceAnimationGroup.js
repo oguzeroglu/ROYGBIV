@@ -17,6 +17,15 @@ var ModelInstanceAnimationGroup = function(modelInstance, childrenIndices){
     pseudoMesh.position.sub(refVector);
     this.group.add(pseudoMesh);
   }
+
+  this.group.scale.copy(modelInstance.mesh.scale);
+  this.group.position.copy(modelInstance.mesh.position);
+  this.group.quaternion.copy(modelInstance.mesh.quaternion);
+}
+
+ModelInstanceAnimationGroup.prototype.getWorldMatrix = function(){
+  this.group.updateMatrixWorld(true);
+  return this.group.matrixWorld;
 }
 
 ModelInstanceAnimationGroup.prototype.getInitialCenter = function(){
