@@ -179,7 +179,7 @@ ModelInstance.prototype.generateBoundingBoxes = function(){
   }
 }
 
-ModelInstance.prototype.visualiseBoundingBoxes = function(){
+ModelInstance.prototype.visualiseBoundingBoxes = function(indices){
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
   }
@@ -190,6 +190,9 @@ ModelInstance.prototype.visualiseBoundingBoxes = function(){
   }
   this.bbHelpers = [];
   for (var i = 0; i<this.boundingBoxes.length; i++){
+    if (indices && indices.indexOf(i) < 0){
+      continue;
+    }
     var bbHelper = new THREE.Box3Helper(this.boundingBoxes[i], LIME_COLOR);
     scene.add(bbHelper);
     this.bbHelpers.push(bbHelper);
