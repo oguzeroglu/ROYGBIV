@@ -2256,6 +2256,22 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     }.bind({index: i}));
   }
 
+  var visibilityFolder = graphicsFolder.addFolder("Visibility");
+  for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
+    var childInfo = modelInstance.model.info.childInfos[i];
+    var subFolder = visibilityFolder.addFolder(childInfo.name);
+    var params = {
+      "Visible": modelInstance.isChildVisible(i)
+    };
+    subFolder.add(params, "Visible").onChange(function(val){
+      if (val){
+        modelInstance.showChild(this.index);
+      }else{
+        modelInstance.hideChild(this.index);
+      }
+    }.bind({index: i}));
+  }
+
   if (selectionHandler.getSelectedObject().model.info.customTexturesEnabled){
     var textureFolder = guiHandler.datGuiModelInstance.addFolder("Textures");
     var usedTextures = selectionHandler.getSelectedObject().model.getUsedTextures();

@@ -32,6 +32,10 @@ MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
     this.geometry.removeAttribute("uv");
   }
 
+  if (!isDeployment){
+    macroHandler.injectMacro("CHILDREN_HIDEABLE", material, true, true);
+  }
+
   return mesh;
 }
 

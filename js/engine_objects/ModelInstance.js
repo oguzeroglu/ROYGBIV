@@ -549,3 +549,53 @@ ModelInstance.prototype.enableSpecularity = function(){
   macroHandler.injectMacro("ENABLE_SPECULARITY", this.mesh.material, true, true);
   this.isSpecularityEnabled = true;
 }
+
+ModelInstance.prototype.isChildVisible = function(childIndex){
+  if (isDeployment){
+    return;
+  }
+
+  var ary = this.mesh.geometry.attributes.hiddenFlag.array;
+
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (this.model.indexedMaterialIndices[i] == childIndex){
+      return ary[i] != 100;
+    }
+  }
+
+  return false;
+}
+
+ModelInstance.prototype.hideChild = function(childIndex){
+  if (isDeployment){
+    return;
+  }
+
+  var ary = this.mesh.geometry.attributes.hiddenFlag.array;
+
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (this.model.indexedMaterialIndices[i] == childIndex){
+      ary[i] = 100;
+    }
+  }
+
+  this.mesh.geometry.attributes.hiddenFlag.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.hiddenFlag.needsUpdate = true;
+}
+
+ModelInstance.prototype.showChild = function(childIndex){
+  if (isDeployment){
+    return;
+  }
+
+  var ary = this.mesh.geometry.attributes.hiddenFlag.array;
+
+  for (var i = 0; i < this.model.indexedMaterialIndices.length; i ++){
+    if (typeof childIndex == UNDEFINED || childIndex == null || this.model.indexedMaterialIndices[i] == childIndex){
+      ary[i] = -100;
+    }
+  }
+
+  this.mesh.geometry.attributes.hiddenFlag.updateRange.set(0, ary.length);
+  this.mesh.geometry.attributes.hiddenFlag.needsUpdate = true;
+}

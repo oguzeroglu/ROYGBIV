@@ -182,16 +182,31 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
     this.group.add(new THREE.Object3D());
   }
 
+  var hiddenFlagsArray;
+
+  if (!isDeployment){
+    hiddenFlagsArray = new Float32Array(this.indexedMaterialIndices.length);
+  }
+
   var metalnessRoughnessArray = new Float32Array(this.indexedMaterialIndices.length * 2);
   var i2 = 0;
+  var i3 = 0;
   for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
     var childIndex = this.indexedMaterialIndices[i];
     var childInfo = this.info.childInfos[childIndex];
     metalnessRoughnessArray[i2 ++] = childInfo.metalness;
     metalnessRoughnessArray[i2 ++] = childInfo.roughness;
+
+    if (!isDeployment){
+      hiddenFlagsArray[i3 ++] = -100.0;
+    }
   }
 
   this.geometry.addAttribute("metalnessRoughness", new THREE.BufferAttribute(metalnessRoughnessArray, 2));
+
+  if (!isDeployment){
+    this.geometry.addAttribute("hiddenFlag", new THREE.BufferAttribute(hiddenFlagsArray, 1));
+  }
 }
 
 Model.prototype.export = function(isBuildingForDeploymentMode){

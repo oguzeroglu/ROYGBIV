@@ -285,6 +285,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       sceneHandler.onClickableContainerAddition(containers[containerName]);
     }
   }
+  for (var modelInstanceName in modelInstances){
+    modelInstances[modelInstanceName].showChild(null);
+  }
+
   lightHandler.onSwitchFromDesignToPreview();
   sceneHandler.onSwitchFromDesignToPreview();
   decisionHandler.onSwitchFromDesignToPreview();

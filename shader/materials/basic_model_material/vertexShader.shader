@@ -9,10 +9,6 @@ attribute vec2 metalnessRoughness;
 
 varying float vMetalness;
 
-#if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
-  varying float vRoughness;
-#endif
-
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 
@@ -24,6 +20,15 @@ varying vec3 vLightDiffuse;
 varying vec3 vLightSpecular;
 
 #define INSERTION
+
+#if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
+  varying float vRoughness;
+#endif
+
+#ifdef CHILDREN_HIDEABLE
+  attribute float hiddenFlag;
+  varying float vHiddenFlag;
+#endif
 
 #ifdef HAS_TEXTURE
   attribute vec2 uv;
@@ -791,6 +796,13 @@ varying vec3 vLightSpecular;
 #endif
 
 void main(){
+
+  #ifdef CHILDREN_HIDEABLE
+    vHiddenFlag = hiddenFlag;
+    if (hiddenFlag > 0.0){
+      return;
+    }
+  #endif
 
   #if defined(AFFECTED_BY_LIGHT) || defined(HAS_ENVIRONMENT_MAP)
     vec3 worldPositionComputed = (worldMatrix * vec4(position, 1.0)).xyz;

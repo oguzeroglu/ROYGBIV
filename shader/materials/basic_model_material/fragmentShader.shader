@@ -13,13 +13,17 @@ vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
 varying vec3 vLightDiffuse;
 varying vec3 vLightSpecular;
 
+varying float vMetalness;
+
+#define INSERTION
+
 #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
   varying float vRoughness;
 #endif
 
-varying float vMetalness;
-
-#define INSERTION
+#ifdef CHILDREN_HIDEABLE
+  varying float vHiddenFlag;
+#endif
 
 #ifdef HAS_TEXTURE
   varying vec2 vUV;
@@ -875,6 +879,13 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
 #endif
 
 void main(){
+
+  #ifdef CHILDREN_HIDEABLE
+    if (vHiddenFlag > 0.0){
+      discard;
+      return;
+    }
+  #endif
 
   vec3 color = vColor;
   #ifdef HAS_PHONG_LIGHTING
