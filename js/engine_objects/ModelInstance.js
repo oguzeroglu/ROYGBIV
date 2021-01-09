@@ -18,8 +18,6 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
 
   this.scale = this.mesh.scale.x;
 
-  this.matrixCache = new THREE.Matrix4();
-
   this.animationGroup1 = null;
   this.animationGroup2 = null;
 
@@ -287,29 +285,17 @@ ModelInstance.prototype.destroy = function(){
   }
 }
 
-ModelInstance.prototype.updateWorldInverseTranspose = function(overrideMatrix){
-  if (!projectLoaded){
-    return;
-  }
-  var val = overrideMatrix? overrideMatrix: this.mesh.material.uniforms.worldInverseTranspose.value;
-  val.getInverse(this.mesh.matrixWorld).transpose();
-  this.matrixCache.copy(this.mesh.matrixWorld);
-}
-
 ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
 
   macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
 
-  delete this.mesh.material.uniforms.worldInverseTranspose;
   delete this.mesh.material.uniforms.dynamicLightsMatrix;
 
   if (isAffectedByLight){
     macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
 
-    this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
     this.mesh.material.uniforms.dynamicLightsMatrix = lightHandler.getUniform();
     this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
-    this.updateWorldInverseTranspose();
 
     lightHandler.addLightToObject(this);
   }else{
@@ -366,9 +352,6 @@ ModelInstance.prototype.onBeforeRender = function(){
 
   if (!this.affectedByLight){
     return;
-  }
-  if (!this.matrixCache.equals(this.mesh.matrixWorld)){
-    this.updateWorldInverseTranspose();
   }
 }
 
@@ -689,9 +672,9 @@ ModelInstance.prototype.addAnimationGroup = function(animationGroup){
   this.animationVertexShaderCode = "if(@@1){ @@3 }else if(@@2){ @@4 }else{ @@5 }\n";
   this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@1", ifText1);
   this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@2", ifText2);
-  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@3", "mvMatrixComputed = viewMatrix * animMatrix1;");
-  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@4", "mvMatrixComputed = viewMatrix * animMatrix2;");
-  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@5", "mvMatrixComputed = viewMatrix * worldMatrix;");
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@3", "selectedWorldMatrix = animMatrix1;\nmvMatrixComputed = viewMatrix * animMatrix1;");
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@4", "selectedWorldMatrix = animMatrix2;\nmvMatrixComputed = viewMatrix * animMatrix2;");
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@5", "selectedWorldMatrix = worldMatrix;\nmvMatrixComputed = viewMatrix * worldMatrix;");
 
   macroHandler.replaceText("#ANIMATION_MATRIX_CODE", this.animationVertexShaderCode, this.mesh.material, true, false);
   macroHandler.injectMacro("HAS_ANIMATION", this.mesh.material, true, false);
