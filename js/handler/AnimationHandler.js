@@ -962,20 +962,23 @@ AnimationHandler.prototype.updateModelInstancePositionYFunc = function(params){
 AnimationHandler.prototype.updateModelInstancePositionZFunc = function(params){
   params.object.getAnimationGroupByName(params.animGroupName).group.position.z = params.value;
 }
-AnimationHandler.prototype.updateModelInstanceRotateAroundXFunc = function(params){
+AnimationHandler.prototype.updateModelInstanceRotateAroundXFunc = function(params, increaseTick){
+  var coef = increaseTick? 1: -1;
   var animationGroup = params.object.getAnimationGroupByName(params.animGroupName);
   var pivot = animationGroup.rotationPivot;
-  animationGroup.rotateAroundXYZ(pivot.x, pivot.y, pivot.z, THREE_AXIS_VECTOR_X, params.value);
+  animationGroup.rotateAroundXYZ(pivot.x, pivot.y, pivot.z, THREE_AXIS_VECTOR_X, params.value * coef);
 }
-AnimationHandler.prototype.updateModelInstanceRotateAroundYFunc = function(params){
+AnimationHandler.prototype.updateModelInstanceRotateAroundYFunc = function(params, increaseTick){
+  var coef = increaseTick? 1: -1;
   var animationGroup = params.object.getAnimationGroupByName(params.animGroupName);
   var pivot = animationGroup.rotationPivot;
-  animationGroup.rotateAroundXYZ(pivot.x, pivot.y, pivot.z, THREE_AXIS_VECTOR_Y, params.value);
+  animationGroup.rotateAroundXYZ(pivot.x, pivot.y, pivot.z, THREE_AXIS_VECTOR_Y, params.value * coef);
 }
-AnimationHandler.prototype.updateModelInstanceRotateAroundZFunc = function(params){
+AnimationHandler.prototype.updateModelInstanceRotateAroundZFunc = function(params, increaseTick){
+  var coef = increaseTick? 1: -1;
   var animationGroup = params.object.getAnimationGroupByName(params.animGroupName);
   var pivot = animationGroup.rotationPivot;
-  animationGroup.rotateAroundXYZ(pivot.x, pivot.y, pivot.z, THREE_AXIS_VECTOR_Z, params.value);
+  animationGroup.rotateAroundXYZ(pivot.x, pivot.y, pivot.z, THREE_AXIS_VECTOR_Z, params.value * coef);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
