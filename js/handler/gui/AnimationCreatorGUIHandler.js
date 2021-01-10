@@ -56,6 +56,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     "Target value": targetValue,
     "Rewind": animation.rewind,
     "Repeat": animation.repeat,
+    "Animation group": animation.description.animGroupName || null,
     "Play": true,
     "Delete": function(){
       var anim = animationCreatorGUIHandler.animationsByFolderID[this.folderID];
@@ -74,7 +75,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
   var folder = guiHandler.datGuiAnimationCreation.addFolder(animation.name);
   folder.add(folderConfigurations, "Type", this.animationTypesAry).onChange(function(val){
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], val, confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"], confs["Repeat"], confs["Target value"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], val, confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"], confs["Repeat"], confs["Target value"], confs["Animation group"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
@@ -99,7 +100,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
       guiHandler.disableController(colorController);
     }
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], val, confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"], confs["Repeat"], confs["Target value"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], val, confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"], confs["Repeat"], confs["Target value"], confs["Animation group"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
@@ -111,7 +112,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     }
     val = parseFloat(val);
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], val, confs["Total delta"], confs["Rewind"], confs["Target color"], confs["Repeat"], confs["Target value"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], val, confs["Total delta"], confs["Rewind"], confs["Target color"], confs["Repeat"], confs["Target value"], confs["Animation group"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
@@ -123,7 +124,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     }
     val = parseFloat(val);
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], val, confs["Rewind"], confs["Target color"], confs["Repeat"], confs["Target value"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], val, confs["Rewind"], confs["Target color"], confs["Repeat"], confs["Target value"], confs["Animation group"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
@@ -136,7 +137,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     }
     val = parseFloat(val);
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"], confs["Repeat"], val);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"], confs["Repeat"], val, confs["Animation group"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
@@ -144,22 +145,37 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
   this.targetValueControllersByFolderID[folderID] = targetValueController;
   var colorController = folder.add(folderConfigurations, "Target color").onFinishChange(function(val){
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], val, confs["Repeat"], confs["Target value"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], val, confs["Repeat"], confs["Target value"], confs["Animation group"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
   }.bind({folderID: folderID, object: object})).listen();
+
+  if (object.isModelInstance){
+    var allAnimGroups = [object.animationGroup1.name];
+    if (object.animationGroup2){
+      allAnimGroups.push(object.animationGroup2.name);
+    }
+    folder.add(folderConfigurations, "Animation group", allAnimGroups).onChange(function(val){
+      var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
+      var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"], confs["Repeat"], confs["Target value"], val);
+      animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
+      animationCreatorGUIHandler.refreshAnimations(this.object);
+      animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
+    }.bind({folderID: folderID, object: object})).listen();
+  }
+
   this.colorControllersByFolderID[folderID] = colorController;
   folder.add(folderConfigurations, "Repeat").onChange(function(val){
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"], val, confs["Target value"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"], val, confs["Target value"], confs["Animation group"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
   }.bind({folderID: folderID, object: object})).listen();
   folder.add(folderConfigurations, "Rewind").onChange(function(val){
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], val, confs["Target color"], confs["Repeat"], confs["Target value"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], val, confs["Target color"], confs["Repeat"], confs["Target value"], confs["Animation group"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
@@ -244,6 +260,10 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
     for (var key in animationHandler.actionTypes.CONTAINER){
       this.objectAnimationActionsAry.push(animationHandler.actionTypes.CONTAINER[key]);
     }
+  }else if (object.isModelInstance){
+    for (var key in animationHandler.actionTypes.MODEL_INSTANCE){
+      this.objectAnimationActionsAry.push(animationHandler.actionTypes.MODEL_INSTANCE[key]);
+    }
   }else{
     throw new Error("Not implemented.");
   }
@@ -276,14 +296,16 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
       var name = animationCreatorGUIHandler.newAnimationConfigurations["Name"];
       var animation;
       if (object.isAddedObject || object.isObjectGroup){
-        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.OBJECT.TRANSPARENCY, 3, -1, false, "#ffffff", false, 0);
+        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.OBJECT.TRANSPARENCY, 3, -1, false, "#ffffff", false, 0, null);
       }else if (object.isAddedText){
-        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.TEXT.TRANSPARENCY, 3, -1, false, "#ffffff", false, 0);
+        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.TEXT.TRANSPARENCY, 3, -1, false, "#ffffff", false, 0, null);
       } else if (object.isSprite){
-        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.SPRITE.TRANSPARENCY, 3, -1, false, "#ffffff", false, 0);
+        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.SPRITE.TRANSPARENCY, 3, -1, false, "#ffffff", false, 0, null);
       } else if (object.isContainer){
-        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.CONTAINER.POSITION_X, 3, -50, false, "#ffffff", false, 0);
-      }else {
+        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.CONTAINER.POSITION_X, 3, -50, false, "#ffffff", false, 0, null);
+      }else if (object.isModelInstance){
+        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.MODEL_INSTANCE.POSITION_X, 3, -50, false, "#ffffff", false, 0, object.animationGroup1.name);
+      }else{
         throw new Error("Not implemented.");
       }
       animationCreatorGUIHandler.addAnimationFolder(animation, object);
@@ -293,7 +315,7 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
   }
 }
 
-AnimationCreatorGUIHandler.prototype.createAnimation = function(object, name, updateType, actionType, totalTimeInSeconds, changeInValue, rewind, targetColor, repeat, targetValue){
+AnimationCreatorGUIHandler.prototype.createAnimation = function(object, name, updateType, actionType, totalTimeInSeconds, changeInValue, rewind, targetColor, repeat, targetValue, animGroupName){
   if (object.animations[name]){
     animationHandler.purgeAnimation(object.animations[name]);
   }
@@ -304,7 +326,8 @@ AnimationCreatorGUIHandler.prototype.createAnimation = function(object, name, up
     targetColor: targetColor,
     targetPosition: targetValue,
     targetRotation: targetValue,
-    targetScale: targetValue
+    targetScale: targetValue,
+    animGroupName: animGroupName
   }, rewind, repeat);
   object.addAnimation(animation);
   return animation;
@@ -322,7 +345,7 @@ AnimationCreatorGUIHandler.prototype.commonStartFunctions = function(object){
     }
   }
   if (!object.isFPSWeapon){
-    activeControl = new OrbitControls({maxRadius: 500, zoomDelta: 5});
+    activeControl = new OrbitControls({maxRadius: 500, zoomDelta: 5, lookPosition: object.isModelInstance? object.mesh.position.clone(): undefined});
   }else{
     activeControl = new CustomControls({});
   }
@@ -372,7 +395,15 @@ AnimationCreatorGUIHandler.prototype.close = function(object){
       this.hiddenEngineObjects[i].visible = true;
     }
   }
-  if (!object.isContainer){
+  if (object.isModelInstance){
+    object.mesh.position.copy(object.beforeAnimationCreatorGUIHandlerPosition);
+    if (object.animationGroup1){
+      object.animationGroup1.group.position.copy(object.mesh.position);
+    }
+    if (object.animationGroup2){
+      object.animationGroup2.group.position.copy(object.mesh.position);
+    }
+  }else if (!object.isContainer){
     if (!object.isFPSWeapon){
       object.mesh.position.copy(object.beforeAnimationCreatorGUIHandlerPosition);
       delete object.beforeAnimationCreatorGUIHandlerPosition;
@@ -406,7 +437,10 @@ AnimationCreatorGUIHandler.prototype.show = function(object){
   this.createGUI(object);
   this.handleTerminal(null, null, object);
 
-  if (!object.isContainer){
+  if (object.isModelInstance){
+    object.mesh.visible = true;
+    object.beforeAnimationCreatorGUIHandlerPosition = object.mesh.position.clone();
+  }else if (!object.isContainer){
     object.mesh.visible = true;
     if (!object.isFPSWeapon){
       object.beforeAnimationCreatorGUIHandlerPosition = object.mesh.position.clone();

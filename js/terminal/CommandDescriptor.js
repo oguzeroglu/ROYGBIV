@@ -1054,7 +1054,7 @@ var CommandDescriptor = function(){
     "destroyCrosshair: Destroys a Crosshair object.",
     "printCrosshairs: Prints created crosshairs.",
     "scripts: Opens the script handler GUI.",
-    "animations: Opens the Animation editor GUI for an object or a text.",
+    "animations: Opens the Animation editor GUI for an object, text, sprite, container or a model instance.",
     "newScene: Creates a new scene.",
     "switchScene: Switches the active scene.",
     "printScenes: Prints created scenes.",
@@ -1279,66 +1279,67 @@ var CommandDescriptor = function(){
     }
   }
 
-  this.UNKNOWN_INDICATOR                  =   0;
-  this.GRID_SYSTEM_AXIS                   =   1;
-  this.GRID_SYSTEM_NAME                   =   2;
-  this.COLOR                              =   3;
-  this.BOOLEAN                            =   4;
-  this.MATERIAL_NAME                      =   5;
-  this.MATERIAL_NAME_WITH_NULL            =   6;
-  this.OBJECT_NAME                        =   7;
-  this.OBJECT_AXIS                        =   8;
-  this.STATE_ON_OFF                       =   9;
-  this.S_T_ST                             =   10;
-  this.WALL_COLLECTION_NAME               =   11;
-  this.DEFAULT_MATERIAL_TYPE              =   12;
-  this.TEXTURE_PACK_NAME                  =   13;
-  this.HIDE_SHOW                          =   14;
-  this.SKYBOX_NAME                        =   15;
-  this.ANY_OBJECT                         =   16;
-  this.GLUED_OBJECT_NAME                  =   17;
-  this.MARKED_POINT_NAME                  =   18;
-  this.API_FUNCTION_NAME                  =   19;
-  this.BLENDING_MODE                      =   20;
-  this.OBJECT_CREATION_NAME               =   21;
-  this.AREA_NAME                          =   22;
-  this.AREA_NAME_WITH_DEFAULT             =   23;
-  this.RENDER_SIDE                        =   24;
-  this.CHILD_OBJECT_NAME                  =   25;
-  this.FONT_NAME                          =   26;
-  this.TEXT_NAME                          =   27;
-  this.EFFECT_NAME                        =   28;
-  this.FPS_WEAPON                         =   29;
-  this.PRECONFIGURED_PS_NAME              =   30;
-  this.PRECONFOGURED_PS_POOL_NAME         =   31;
-  this.MUZZLE_FLASH_NAME                  =   32;
-  this.CROSSHAIR_NAME                     =   33;
-  this.OBJECT_AND_TEXT_NAME               =   34;
-  this.SCENE_NAME                         =   35;
-  this.GS_NAME_NO_WC                      =   36;
-  this.LIGHTNING_NAME                     =   37;
-  this.SPRITE_NAME                        =   38;
-  this.OBJECT_OR_SPRITE_NAME              =   39;
-  this.OBJECT_TEXT_SPRITE_CONTAINER_NAME  =   40;
-  this.CONTAINER_NAME                     =   41;
-  this.SPRITE_OR_2D_TEXT_NAME             =   42;
-  this.CONTAINER_ALIGNMENT_TYPE           =   43;
-  this.VIRTUAL_KEYBOARD_NAME              =   44;
-  this.RESOLUTION_PARAM                   =   45;
-  this.DYNAMIC_TEXTURE_FOLDER_NAME        =   46;
-  this.AI_OBSTACLE_ID                     =   47;
-  this.JUMP_DESCRIPTOR_ID                 =   48;
-  this.ANY_MARKED_POINT                   =   49;
-  this.PATH_ID                            =   50;
-  this.GRAPH_ID                           =   51;
-  this.ANY_GRAPH_ID                       =   52;
-  this.STEERING_BEHAVIOR_NAME             =   53;
-  this.ASTAR_ID                           =   54;
-  this.STEERABLE_NAME                     =   55;
-  this.MASS_ID                            =   56;
-  this.LIGHT_NAME                         =   57;
-  this.MODEL_NAME                         =   58;
-  this.MODEL_INSTANCE_NAME                =   59;
+  this.UNKNOWN_INDICATOR                                =   0;
+  this.GRID_SYSTEM_AXIS                                 =   1;
+  this.GRID_SYSTEM_NAME                                 =   2;
+  this.COLOR                                            =   3;
+  this.BOOLEAN                                          =   4;
+  this.MATERIAL_NAME                                    =   5;
+  this.MATERIAL_NAME_WITH_NULL                          =   6;
+  this.OBJECT_NAME                                      =   7;
+  this.OBJECT_AXIS                                      =   8;
+  this.STATE_ON_OFF                                     =   9;
+  this.S_T_ST                                           =   10;
+  this.WALL_COLLECTION_NAME                             =   11;
+  this.DEFAULT_MATERIAL_TYPE                            =   12;
+  this.TEXTURE_PACK_NAME                                =   13;
+  this.HIDE_SHOW                                        =   14;
+  this.SKYBOX_NAME                                      =   15;
+  this.ANY_OBJECT                                       =   16;
+  this.GLUED_OBJECT_NAME                                =   17;
+  this.MARKED_POINT_NAME                                =   18;
+  this.API_FUNCTION_NAME                                =   19;
+  this.BLENDING_MODE                                    =   20;
+  this.OBJECT_CREATION_NAME                             =   21;
+  this.AREA_NAME                                        =   22;
+  this.AREA_NAME_WITH_DEFAULT                           =   23;
+  this.RENDER_SIDE                                      =   24;
+  this.CHILD_OBJECT_NAME                                =   25;
+  this.FONT_NAME                                        =   26;
+  this.TEXT_NAME                                        =   27;
+  this.EFFECT_NAME                                      =   28;
+  this.FPS_WEAPON                                       =   29;
+  this.PRECONFIGURED_PS_NAME                            =   30;
+  this.PRECONFOGURED_PS_POOL_NAME                       =   31;
+  this.MUZZLE_FLASH_NAME                                =   32;
+  this.CROSSHAIR_NAME                                   =   33;
+  this.OBJECT_AND_TEXT_NAME                             =   34;
+  this.SCENE_NAME                                       =   35;
+  this.GS_NAME_NO_WC                                    =   36;
+  this.LIGHTNING_NAME                                   =   37;
+  this.SPRITE_NAME                                      =   38;
+  this.OBJECT_OR_SPRITE_NAME                            =   39;
+  this.OBJECT_TEXT_SPRITE_CONTAINER_NAME                =   40;
+  this.CONTAINER_NAME                                   =   41;
+  this.SPRITE_OR_2D_TEXT_NAME                           =   42;
+  this.CONTAINER_ALIGNMENT_TYPE                         =   43;
+  this.VIRTUAL_KEYBOARD_NAME                            =   44;
+  this.RESOLUTION_PARAM                                 =   45;
+  this.DYNAMIC_TEXTURE_FOLDER_NAME                      =   46;
+  this.AI_OBSTACLE_ID                                   =   47;
+  this.JUMP_DESCRIPTOR_ID                               =   48;
+  this.ANY_MARKED_POINT                                 =   49;
+  this.PATH_ID                                          =   50;
+  this.GRAPH_ID                                         =   51;
+  this.ANY_GRAPH_ID                                     =   52;
+  this.STEERING_BEHAVIOR_NAME                           =   53;
+  this.ASTAR_ID                                         =   54;
+  this.STEERABLE_NAME                                   =   55;
+  this.MASS_ID                                          =   56;
+  this.LIGHT_NAME                                       =   57;
+  this.MODEL_NAME                                       =   58;
+  this.MODEL_INSTANCE_NAME                              =   59;
+  this.OBJECT_TEXT_SPRITE_CONTAINER_MODEL_INSTANCE_NAME =   60;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1753,7 +1754,7 @@ var CommandDescriptor = function(){
   // animations
   this.animations = new Object();
   this.animations.types = [];
-  this.animations.types.push(this.OBJECT_TEXT_SPRITE_CONTAINER_NAME); //animations
+  this.animations.types.push(this.OBJECT_TEXT_SPRITE_CONTAINER_MODEL_INSTANCE_NAME); //animations
 
   // newScene
   this.newScene = new Object();

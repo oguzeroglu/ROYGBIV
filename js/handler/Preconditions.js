@@ -988,6 +988,12 @@ Preconditions.prototype.checkIfAddedObjectObjectGroupAddedTextSpriteContainer = 
   }
 }
 
+Preconditions.prototype.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance = function(callerFunc, parameterName, obj){
+  if (!(obj.isAddedObject) && !(obj.isObjectGroup) && !(obj.isAddedText) && !(obj.isSprite) && !(obj.isContainer) && !(obj.isModelInstance)){
+    this.throw(callerFunc, parameterName+" must be an object, object group, text, sprite, container or model instance.");
+  }
+}
+
 Preconditions.prototype.checkIfAddedObjectObjectGroupAddedTextSprite = function(callerFunc, parameterName, obj){
   if (!(obj.isAddedObject) && !(obj.isObjectGroup) && !(obj.isAddedText) && !(obj.isSprite)){
     this.throw(callerFunc, parameterName+" must be an object, object group, text or sprite.");

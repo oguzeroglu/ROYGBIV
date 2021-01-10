@@ -474,6 +474,7 @@ var mobileSimulation = {
   orientation: 'portrait'
 };
 var modelLoader;
+var DUMMY_MATERIAL = new THREE.MeshBasicMaterial({color: "lime"});
 
 // ROTATION MODES
 var rotationModes = {

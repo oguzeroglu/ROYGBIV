@@ -644,6 +644,11 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     if (modelInstance.customTextureMapped){
       modelInstance.unmapCustomTextures();
     }
+
+    for (var animationName in modelInstance.animations){
+      animationHandler.forceFinish(modelInstance.animations[animationName]);
+      modelInstance.animations[animationName].finishCallbackFunction = 0;
+    }
   }
 
   for (var sceneName in sceneHandler.scenes){

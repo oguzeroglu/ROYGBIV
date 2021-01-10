@@ -18,9 +18,28 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
 
   this.scale = this.mesh.scale.x;
 
-  this.matrixCache = new THREE.Matrix4();
+  this.animationGroup1 = null;
+  this.animationGroup2 = null;
 
+  this.animations = new Object();
+
+  this.matrixCache1 = new THREE.Matrix4();
+  this.matrixCache2 = new THREE.Matrix4();
+
+  mesh.updateMatrixWorld(true);
+  var worldInverseTranspose = new THREE.Matrix4().getInverse(mesh.matrixWorld).transpose();
+
+  macroHandler.injectMat4("worldMatrix", mesh.matrixWorld, mesh.material, true, false);
+  macroHandler.injectMat4("worldInverseTranspose", worldInverseTranspose, mesh.material, true, false);
   webglCallbackHandler.registerEngineObject(this);
+}
+
+ModelInstance.prototype.updateWorldInverseTranspose = function(val){
+  if (!projectLoaded){
+    return;
+  }
+  this.mesh.updateMatrixWorld(true);
+  val.getInverse(this.mesh.matrixWorld).transpose();
 }
 
 ModelInstance.prototype.onTextureAtlasRefreshed = function(){
@@ -76,6 +95,18 @@ ModelInstance.prototype.export = function(){
   }
 
   exportObj.isSpecularityEnabled = !!this.isSpecularityEnabled;
+
+  if (this.animationGroup1){
+    exportObj.animationGroup1 = this.animationGroup1.export();
+  }
+  if (this.animationGroup2){
+    exportObj.animationGroup2 = this.animationGroup2.export();
+  }
+
+  exportObj.animations = new Object();
+  for (var animationName in this.animations){
+    exportObj.animations[animationName] = this.animations[animationName].export();
+  }
 
   return exportObj;
 }
@@ -179,7 +210,7 @@ ModelInstance.prototype.generateBoundingBoxes = function(){
   }
 }
 
-ModelInstance.prototype.visualiseBoundingBoxes = function(){
+ModelInstance.prototype.visualiseBoundingBoxes = function(indices){
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
   }
@@ -190,6 +221,9 @@ ModelInstance.prototype.visualiseBoundingBoxes = function(){
   }
   this.bbHelpers = [];
   for (var i = 0; i<this.boundingBoxes.length; i++){
+    if (indices && indices.indexOf(i) < 0){
+      continue;
+    }
     var bbHelper = new THREE.Box3Helper(this.boundingBoxes[i], LIME_COLOR);
     scene.add(bbHelper);
     this.bbHelpers.push(bbHelper);
@@ -274,34 +308,17 @@ ModelInstance.prototype.destroy = function(){
   }
 }
 
-ModelInstance.prototype.updateWorldInverseTranspose = function(overrideMatrix){
-  if (!projectLoaded){
-    return;
-  }
-  var val = overrideMatrix? overrideMatrix: this.mesh.material.uniforms.worldInverseTranspose.value;
-  val.getInverse(this.mesh.matrixWorld).transpose();
-  this.matrixCache.copy(this.mesh.matrixWorld);
-}
-
 ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
 
   macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
 
-  delete this.mesh.material.uniforms.worldInverseTranspose;
   delete this.mesh.material.uniforms.dynamicLightsMatrix;
-
-  if (!this.hasEnvironmentMap()){
-    delete this.mesh.material.uniforms.worldMatrix;
-  }
 
   if (isAffectedByLight){
     macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
 
-    this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
-    this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
     this.mesh.material.uniforms.dynamicLightsMatrix = lightHandler.getUniform();
     this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
-    this.updateWorldInverseTranspose();
 
     lightHandler.addLightToObject(this);
   }else{
@@ -349,11 +366,28 @@ ModelInstance.prototype.unsetPhongLight = function(){
 }
 
 ModelInstance.prototype.onBeforeRender = function(){
-  if (!this.affectedByLight){
-    return;
+  if (this.animationGroup1){
+    this.mesh.material.uniforms.animMatrix1.value.copy(this.animationGroup1.getWorldMatrix());
+    this.mesh.material.uniforms.animModelViewMatrix1.value.multiplyMatrices(camera.matrixWorldInverse, this.mesh.material.uniforms.animMatrix1.value);
+    if (this.affectedByLight){
+      if (!this.matrixCache1.equals(this.mesh.material.uniforms.animMatrix1.value)){
+        var matVal = this.mesh.material.uniforms.animWorldInverseTransposeMatrix1.value;
+        matVal.getInverse(this.mesh.material.uniforms.animMatrix1.value).transpose();
+
+        this.matrixCache1.copy(this.mesh.material.uniforms.animMatrix1.value);
+      }
+    }
   }
-  if (!this.matrixCache.equals(this.mesh.matrixWorld)){
-    this.updateWorldInverseTranspose();
+  if (this.animationGroup2){
+    this.mesh.material.uniforms.animMatrix2.value.copy(this.animationGroup2.getWorldMatrix());
+    this.mesh.material.uniforms.animModelViewMatrix2.value.multiplyMatrices(camera.matrixWorldInverse, this.mesh.material.uniforms.animMatrix2.value);
+    if (this.affectedByLight){
+      if (!this.matrixCache2.equals(this.mesh.material.uniforms.animMatrix2.value)){
+        var matVal = this.mesh.material.uniforms.animWorldInverseTransposeMatrix2.value;
+        matVal.getInverse(this.mesh.material.uniforms.animMatrix2.value).transpose();
+        this.matrixCache2.copy(this.mesh.material.uniforms.animMatrix2.value);
+      }
+    }
   }
 }
 
@@ -496,7 +530,6 @@ ModelInstance.prototype.mapEnvironment = function(skybox){
 
   this.mesh.material.uniforms.environmentMap = skybox.getUniform();
   this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
-  this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
 
   var environmentInfoArray = new Float32Array(this.mesh.geometry.attributes.position.array.length);
   var i2 = 0;
@@ -521,9 +554,6 @@ ModelInstance.prototype.unmapEnvironment = function(){
   delete this.mesh.material.uniforms.environmentMap;
   if (!this.affectedByLight){
     delete this.mesh.material.uniforms.cameraPosition;
-  }
-  if (!this.affectedByLight){
-    delete this.mesh.material.uniforms.worldMatrix;
   }
 
   macroHandler.removeMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
@@ -598,4 +628,137 @@ ModelInstance.prototype.showChild = function(childIndex){
 
   this.mesh.geometry.attributes.hiddenFlag.updateRange.set(0, ary.length);
   this.mesh.geometry.attributes.hiddenFlag.needsUpdate = true;
+}
+
+ModelInstance.prototype.hasAnimationGroup = function(animationGroup){
+  return (this.animationGroup1 === animationGroup || this.animationGroup2 === animationGroup);
+}
+
+ModelInstance.prototype.removeAnimationGroup = function(animationGroup){
+  if (!this.hasAnimationGroup(animationGroup)){
+    return false;
+  }
+
+  macroHandler.replaceText(this.animationVertexShaderCode, "#ANIMATION_MATRIX_CODE" + "\n", this.mesh.material, true, false);
+  macroHandler.removeMacro("HAS_ANIMATION", this.mesh.material, true, false);
+  this.animationVertexShaderCode = null;
+
+  if (animationGroup == this.animationGroup1){
+    this.animationGroup1 = null;
+    if (this.animationGroup2){
+      var group2 = this.animationGroup2;
+      this.animationGroup2 = null;
+      this.addAnimationGroup(group2);
+    }else{
+      this.mesh.frustumCulled = true;
+    }
+  }else{
+    this.animationGroup2 = null;
+    var group1 = this.animationGroup1;
+    this.animationGroup1 = null;
+    this.addAnimationGroup(group1);
+  }
+
+  if (!this.animationGroup1){
+    delete this.mesh.material.uniforms.animMatrix1;
+    delete this.mesh.material.uniforms.animWorldInverseTransposeMatrix1;
+  }
+  if (!this.animationGroup2){
+    delete this.mesh.material.uniforms.animMatrix2;
+    delete this.mesh.material.uniforms.animWorldInverseTransposeMatrix2;
+  }
+}
+
+ModelInstance.prototype.addAnimationGroup = function(animationGroup){
+  if (this.hasAnimationGroup(animationGroup) || (this.animationGroup1 && this.animationGroup2)){
+    return false;
+  }
+
+  if (this.animationGroup1){
+    this.animationGroup2 = animationGroup;
+    this.mesh.material.uniforms.animMatrix2 = new THREE.Uniform(new THREE.Matrix4());
+    this.mesh.material.uniforms.animWorldInverseTransposeMatrix2 = new THREE.Uniform(new THREE.Matrix4());
+    this.mesh.material.uniforms.animModelViewMatrix2 = new THREE.Uniform(new THREE.Matrix4());
+  }else{
+    this.animationGroup1 = animationGroup;
+    this.mesh.material.uniforms.animMatrix1 = new THREE.Uniform(new THREE.Matrix4());
+    this.mesh.material.uniforms.animWorldInverseTransposeMatrix1 = new THREE.Uniform(new THREE.Matrix4());
+    this.mesh.material.uniforms.animModelViewMatrix1 = new THREE.Uniform(new THREE.Matrix4());
+  }
+
+  if (this.animationVertexShaderCode){
+    macroHandler.replaceText(this.animationVertexShaderCode, "#ANIMATION_MATRIX_CODE" + "\n", this.mesh.material, true, false);
+    macroHandler.removeMacro("HAS_ANIMATION", this.mesh.material, true, false);
+  }
+
+  var ifText1 = "";
+  var ifText2 = "";
+  for (var i = 0; i < this.animationGroup1.childrenIndices.length; i ++){
+    var index = this.animationGroup1.childrenIndices[i];
+    if (i != this.animationGroup1.childrenIndices.length - 1){
+      ifText1 += "mi == " + index + " || ";
+    }else{
+      ifText1 += "mi == " + index;
+    }
+  }
+
+  if (this.animationGroup2){
+    for (var i = 0; i < this.animationGroup2.childrenIndices.length; i ++){
+      var index = this.animationGroup2.childrenIndices[i];
+      if (i != this.animationGroup2.childrenIndices.length - 1){
+        ifText2 += "mi == " + index + " || ";
+      }else{
+        ifText2 += "mi == " + index;
+      }
+    }
+  }else{
+    ifText2 = "mi == -100";
+  }
+
+  ifText1 = ifText1 || "mi == -200";
+  ifText2 = ifText2 || "mi == -100";
+
+  this.animationVertexShaderCode = "if(@@1){ @@3 }else if(@@2){ @@4 }else{ @@5 }\n";
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@1", ifText1);
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@2", ifText2);
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@3", "selectedWorldMatrix = animMatrix1;\nselectedWorldInverseTranspose = animWorldInverseTransposeMatrix1;\nselectedMVMatrix = animModelViewMatrix1;");
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@4", "selectedWorldMatrix = animMatrix2;\nselectedWorldInverseTranspose = animWorldInverseTransposeMatrix2;\nselectedMVMatrix = animModelViewMatrix2;");
+  this.animationVertexShaderCode = this.animationVertexShaderCode.replace("@@5", "selectedWorldMatrix = worldMatrix;\nselectedWorldInverseTranspose = worldInverseTranspose;\nselectedMVMatrix = modelViewMatrix;");
+
+  macroHandler.replaceText("#ANIMATION_MATRIX_CODE", this.animationVertexShaderCode, this.mesh.material, true, false);
+  macroHandler.injectMacro("HAS_ANIMATION", this.mesh.material, true, false);
+  this.mesh.frustumCulled = false;
+  return true;
+}
+
+ModelInstance.prototype.getAnimationGroupOfChild = function(childIndex){
+  if (this.animationGroup1){
+    if (this.animationGroup1.childrenIndices.indexOf(childIndex) >= 0){
+      return this.animationGroup1;
+    }
+  }
+  if (this.animationGroup2){
+    if (this.animationGroup2.childrenIndices.indexOf(childIndex) >= 0){
+      return this.animationGroup2;
+    }
+  }
+  return null;
+}
+
+ModelInstance.prototype.getAnimationGroupByName = function(agName){
+  if (this.animationGroup1 && this.animationGroup1.name == agName){
+    return this.animationGroup1;
+  }
+  if (this.animationGroup2 && this.animationGroup2.name == agName){
+    return this.animationGroup2;
+  }
+  return null;
+}
+
+ModelInstance.prototype.addAnimation = function(animation){
+  this.animations[animation.name] = animation;
+}
+
+ModelInstance.prototype.removeAnimation = function(animation){
+  delete this.animations[animation.name];
 }

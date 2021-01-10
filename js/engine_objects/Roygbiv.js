@@ -726,7 +726,7 @@ Roygbiv.prototype.getAnimationState = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.getAnimationState, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainer(ROYGBIV.getAnimationState, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance(ROYGBIV.getAnimationState, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.getAnimationState, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.getAnimationState, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getAnimationState, object);
@@ -2335,7 +2335,7 @@ Roygbiv.prototype.removeScreenOrientationChangeListener = function(){
   screenOrientationChangeCallbackFunction = noop;
 }
 
-// Sets a finish listener for an animation of given object, object group, text, sprite or container.
+// Sets a finish listener for an animation of given object, object group, text, sprite, container or model instance.
 // For repeating animations the callbackFunction is executed before each repeat.
 // For rewinding animations the callbackFunction is executed when the rewind is finished.
 Roygbiv.prototype.onAnimationFinished = function(object, animationName, callbackFunction){
@@ -2345,21 +2345,21 @@ Roygbiv.prototype.onAnimationFinished = function(object, animationName, callback
   preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.animationName, animationName);
   preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
-  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainer(ROYGBIV.onAnimationFinished, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance(ROYGBIV.onAnimationFinished, preConditions.object, object);
   preConditions.checkIfAnimationExists(ROYGBIV.onAnimationFinished, object, animationName);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.onAnimationFinished, object);
   object.animations[animationName].setFinishCallbackFunction(callbackFunction);
 }
 
-// Removes the finish listener for an animation of given object, object group, text, sprite or container.
+// Removes the finish listener for an animation of given object, object group, text, sprite, container or model instance.
 Roygbiv.prototype.removeAnimationFinishListener = function(object, animationName){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.removeAnimationFinishListener, preConditions.animationName, animationName);
-  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainer(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
   preConditions.checkIfAnimationExists(ROYGBIV.removeAnimationFinishListener, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeAnimationFinishListener, object);
   object.animations[animationName].finishCallbackFunction = noop;
@@ -3489,13 +3489,13 @@ Roygbiv.prototype.createPathFollowingControl = function(parameters){
 
 // ANIMATION FUNCTIONS *********************************************************
 
-// Starts an animation of given object, object group, text, sprite or container.
+// Starts an animation of given object, object group, text, sprite, container or model instance.
 Roygbiv.prototype.startAnimation = function(object, animationName){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainer(ROYGBIV.startAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance(ROYGBIV.startAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.startAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.startAnimation, object);
@@ -3504,13 +3504,13 @@ Roygbiv.prototype.startAnimation = function(object, animationName){
   animationHandler.startAnimation(animation);
 }
 
-// Stops an animation of given object, object group, text, sprite or container.
+// Stops an animation of given object, object group, text, sprite, container or model instance.
 Roygbiv.prototype.stopAnimation = function(object, animationName){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainer(ROYGBIV.stopAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance(ROYGBIV.stopAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
@@ -3527,7 +3527,7 @@ Roygbiv.prototype.freezeAnimationOnFinish = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.freezeAnimationOnFinish, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainer(ROYGBIV.freezeAnimationOnFinish, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance(ROYGBIV.freezeAnimationOnFinish, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.freezeAnimationOnFinish, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.freezeAnimationOnFinish, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.freezeAnimationOnFinish, object);
@@ -3541,7 +3541,7 @@ Roygbiv.prototype.unfreezeAnimation = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.unfreezeAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainer(ROYGBIV.unfreezeAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance(ROYGBIV.unfreezeAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.unfreezeAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.unfreezeAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.unfreezeAnimation, object);
@@ -3556,7 +3556,7 @@ Roygbiv.prototype.cancelAnimationRewind = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainer(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.cancelAnimationRewind, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.cancelAnimationRewind, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.cancelAnimationRewind, object);
@@ -3571,20 +3571,20 @@ Roygbiv.prototype.rewindAnimation = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.rewindAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainer(ROYGBIV.rewindAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance(ROYGBIV.rewindAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.rewindAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.rewindAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.rewindAnimation, object);
   animationHandler.forceRewind(object.animations[animationName]);
 }
 
-// Starts all animations of given object, object group, text, sprite or container.
+// Starts all animations of given object, object group, text, sprite, container or model instance.
 Roygbiv.prototype.startAllAnimations = function(object) {
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.startAllAnimations, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainer(ROYGBIV.startAllAnimations, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSpriteContainerModelInstance(ROYGBIV.startAllAnimations, preConditions.object, object);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.startAllAnimations, object);
   animationHandler.startAllAnimations(object);
 }

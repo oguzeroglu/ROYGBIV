@@ -207,6 +207,10 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
   if (!isDeployment){
     this.geometry.addAttribute("hiddenFlag", new THREE.BufferAttribute(hiddenFlagsArray, 1));
   }
+
+  var materialIndexBufferAttribute = new THREE.BufferAttribute(new Float32Array(this.indexedMaterialIndices), 1);
+  materialIndexBufferAttribute.setDynamic(false);
+  this.geometry.addAttribute("materialIndex", materialIndexBufferAttribute);
 }
 
 Model.prototype.export = function(isBuildingForDeploymentMode){
