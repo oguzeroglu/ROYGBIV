@@ -21,12 +21,19 @@ var ModelInstanceAnimationGroup = function(name, modelInstance, childrenIndices)
   this.group.scale.copy(modelInstance.mesh.scale);
   this.group.position.copy(modelInstance.mesh.position);
   this.group.quaternion.copy(modelInstance.mesh.quaternion);
+
+  this.rotationPivot = modelInstance.mesh.position.clone();
 }
 
 ModelInstanceAnimationGroup.prototype.export = function(){
   return {
     name: this.name,
-    childrenIndices: this.childrenIndices
+    childrenIndices: this.childrenIndices,
+    rotationPivot: {
+      x: this.rotationPivot.x,
+      y: this.rotationPivot.y,
+      z: this.rotationPivot.z
+    }
   };
 }
 

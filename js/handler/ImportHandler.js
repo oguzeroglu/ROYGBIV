@@ -67,10 +67,18 @@ ImportHandler.prototype.importModelInstances = function(obj){
     modelInstance.generateBoundingBoxes();
 
     if (curModelInstanceExport.animationGroup1){
-      modelInstance.addAnimationGroup(new ModelInstanceAnimationGroup(curModelInstanceExport.animationGroup1.name, modelInstance, curModelInstanceExport.animationGroup1.childrenIndices));
+      var animGroup = new ModelInstanceAnimationGroup(curModelInstanceExport.animationGroup1.name, modelInstance, curModelInstanceExport.animationGroup1.childrenIndices);
+      if (curModelInstanceExport.animationGroup1.rotationPivot){
+        animGroup.rotationPivot.set(curModelInstanceExport.animationGroup1.rotationPivot.x, curModelInstanceExport.animationGroup1.rotationPivot.y, curModelInstanceExport.animationGroup1.rotationPivot.z);
+      }
+      modelInstance.addAnimationGroup(animGroup);
     }
     if (curModelInstanceExport.animationGroup2){
-      modelInstance.addAnimationGroup(new ModelInstanceAnimationGroup(curModelInstanceExport.animationGroup2.name, modelInstance, curModelInstanceExport.animationGroup2.childrenIndices));
+      var animGroup = new ModelInstanceAnimationGroup(curModelInstanceExport.animationGroup2.name, modelInstance, curModelInstanceExport.animationGroup2.childrenIndices);
+      if (curModelInstanceExport.animationGroup2.rotationPivot){
+        animGroup.rotationPivot.set(curModelInstanceExport.animationGroup2.rotationPivot.x, curModelInstanceExport.animationGroup2.rotationPivot.y, curModelInstanceExport.animationGroup2.rotationPivot.z);
+      }
+      modelInstance.addAnimationGroup(animGroup);
     }
   }
 }

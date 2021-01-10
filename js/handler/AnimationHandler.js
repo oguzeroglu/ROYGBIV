@@ -32,13 +32,14 @@ var AnimationHandler = function(){
       TRANSPARENCY: "SPRITE_TRANSPARENCY", SCALE_X: "SPRITE_SCALE_X", SCALE_Y: "SPRITE_SCALE_Y", ROTATION: "SPRITE_ROTATION",
       COLOR: "SPRITE_COLOR", POSITION_X: "SPRITE_POSITION_X", POSITION_Y: "SPRITE_POSITION_Y", TARGET_POSITION_X: "SPRITE_TARGET_POSITION_X",
       TARGET_POSITION_Y: "SPRITE_TARGET_POSITION_Y", TARGET_ROTATION: "SPRITE_TARGET_ROTATION", TARGET_SCALE_X: "SPRITE_TARGET_SCALE_X",
-      TARGET_SCALE_Y: "SPRITE_TARGET_SCALE_Y"
+      TARGET_SCALE_Y: "d"
     },
     CONTAINER: {
       POSITION_X: "CONTAINER_POSITION_X", POSITION_Y: "CONTAINER_POSITION_Y"
     },
     MODEL_INSTANCE: {
-      POSITION_X: "MODEL_INSTANCE_POSITION_X", POSITION_Y: "MODEL_INSTANCE_POSIITON_Y", POSITION_Z: "MODEL_INSTANCE_POSITION_Z"
+      POSITION_X: "MODEL_INSTANCE_POSITION_X", POSITION_Y: "MODEL_INSTANCE_POSIITON_Y", POSITION_Z: "MODEL_INSTANCE_POSITION_Z",
+      ROTATE_AROUND_X: "MODEL_INSTANCE_ROTATE_AROUND_X", ROTATE_AROUND_Y: "MODEL_INSTANCE_ROTATE_AROUND_Y", ROTATE_AROUND_Z: "MODEL_INSTANCE_ROTATE_AROUND_Z"
     }
   };
   // INITIAL VALUE GETTERS
@@ -207,6 +208,15 @@ var AnimationHandler = function(){
   }
   this.initialValueGetterFunctionsByType[this.actionTypes.MODEL_INSTANCE.POSITION_Z] = function(object){
     return object.mesh.position.z;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.MODEL_INSTANCE.ROTATE_AROUND_X] = function(object){
+    return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.MODEL_INSTANCE.ROTATE_AROUND_Y] = function(object){
+    return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.MODEL_INSTANCE.ROTATE_AROUND_Z] = function(object){
+    return 0;
   }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
@@ -466,6 +476,21 @@ var AnimationHandler = function(){
     var animGroupName = animation.description.animGroupName;
     animation.attachedObject.getAnimationGroupByName(animGroupName).group.position.z = animation.initialValue;
   }
+  this.afterAnimationSettersByType[this.actionTypes.MODEL_INSTANCE.ROTATE_AROUND_X] = function(animation){
+    var animGroupName = animation.description.animGroupName;
+    animation.attachedObject.getAnimationGroupByName(animGroupName).group.quaternion.copy(animation.attachedObject.mesh.quaternion);
+    animation.attachedObject.getAnimationGroupByName(animGroupName).group.position.copy(animation.attachedObject.mesh.position);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.MODEL_INSTANCE.ROTATE_AROUND_Y] = function(animation){
+    var animGroupName = animation.description.animGroupName;
+    animation.attachedObject.getAnimationGroupByName(animGroupName).group.quaternion.copy(animation.attachedObject.mesh.quaternion);
+    animation.attachedObject.getAnimationGroupByName(animGroupName).group.position.copy(animation.attachedObject.mesh.position);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.MODEL_INSTANCE.ROTATE_AROUND_Z] = function(animation){
+    var animGroupName = animation.description.animGroupName;
+    animation.attachedObject.getAnimationGroupByName(animGroupName).group.quaternion.copy(animation.attachedObject.mesh.quaternion);
+    animation.attachedObject.getAnimationGroupByName(animGroupName).group.position.copy(animation.attachedObject.mesh.position);
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -517,6 +542,9 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.MODEL_INSTANCE.POSITION_X] = this.updateModelInstancePositionXFunc;
   this.actionFunctionsByType[this.actionTypes.MODEL_INSTANCE.POSITION_Y] = this.updateModelInstancePositionYFunc;
   this.actionFunctionsByType[this.actionTypes.MODEL_INSTANCE.POSITION_Z] = this.updateModelInstancePositionZFunc;
+  this.actionFunctionsByType[this.actionTypes.MODEL_INSTANCE.ROTATE_AROUND_X] = this.updateModelInstanceRotateAroundXFunc;
+  this.actionFunctionsByType[this.actionTypes.MODEL_INSTANCE.ROTATE_AROUND_Y] = this.updateModelInstanceRotateAroundYFunc;
+  this.actionFunctionsByType[this.actionTypes.MODEL_INSTANCE.ROTATE_AROUND_Z] = this.updateModelInstanceRotateAroundZFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -933,6 +961,21 @@ AnimationHandler.prototype.updateModelInstancePositionYFunc = function(params){
 }
 AnimationHandler.prototype.updateModelInstancePositionZFunc = function(params){
   params.object.getAnimationGroupByName(params.animGroupName).group.position.z = params.value;
+}
+AnimationHandler.prototype.updateModelInstanceRotateAroundXFunc = function(params){
+  var animationGroup = params.object.getAnimationGroupByName(params.animGroupName);
+  var pivot = animationGroup.rotationPivot;
+  animationGroup.rotateAroundXYZ(pivot.x, pivot.y, pivot.z, THREE_AXIS_VECTOR_X, params.value);
+}
+AnimationHandler.prototype.updateModelInstanceRotateAroundYFunc = function(params){
+  var animationGroup = params.object.getAnimationGroupByName(params.animGroupName);
+  var pivot = animationGroup.rotationPivot;
+  animationGroup.rotateAroundXYZ(pivot.x, pivot.y, pivot.z, THREE_AXIS_VECTOR_Y, params.value);
+}
+AnimationHandler.prototype.updateModelInstanceRotateAroundZFunc = function(params){
+  var animationGroup = params.object.getAnimationGroupByName(params.animGroupName);
+  var pivot = animationGroup.rotationPivot;
+  animationGroup.rotateAroundXYZ(pivot.x, pivot.y, pivot.z, THREE_AXIS_VECTOR_Z, params.value);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){

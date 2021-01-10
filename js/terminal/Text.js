@@ -746,6 +746,7 @@ var Text = function(){
   this.SCRIPT_IS_NOT_RUNNING = "Script is not running.";
   this.SCRIPT_STOPPED = "Script stopped.";
   this.NO_SCRIPTS_CREATED = "No scripts created.";
+  this.ROTATION_PIVOT_UPDATED = "Rotation pivot updated.";
   this.PARTICLE_SYSTEM_USED_IN_A_POOL = "Particle system is used in a pool. Cannot delete.";
   this.PARTICLE_SYSTEM_USED_IN_A_MUZZLEFLASH = "Particle system is used in a muzzle flash. Cannot delete.";
   this.PARTICLE_SYSTEM_DESTROYED = "Particle system destroyed.";

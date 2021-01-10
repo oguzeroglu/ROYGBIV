@@ -2407,6 +2407,7 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     var ag = existingAnimationGroups[i];
     var subFolder = animationGroupsFolder.addFolder(ag.name);
     var params = {
+      "Rotation pivot": ag.rotationPivot.x + "," + ag.rotationPivot.y + "," + ag.rotationPivot.z,
       "Remove": function(){
         terminal.clear();
         modelInstance.removeAnimationGroup(modelInstance.getAnimationGroupByName(this.ag.name));
@@ -2415,6 +2416,19 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       }.bind({ag: ag})
     };
     subFolder.add(params, "Remove");
+    subFolder.add(params, "Rotation pivot").onFinishChange(function(val){
+      terminal.clear();
+      var splitted = val.split(",");
+      var xVal = parseFloat(splitted[0]);
+      var yVal = parseFloat(splitted[1]);
+      var zVal = parseFloat(splitted[2]);
+      if (splitted.length != 3 || isNaN(xVal) || isNaN(yVal) || isNaN(zVal)){
+        terminal.printError(Text.INVALID_VECTOR_VALUE);
+        return;
+      }
+      modelInstance.getAnimationGroupByName(this.ag.name).rotationPivot.set(xVal, yVal, zVal);
+      terminal.printInfo(Text.ROTATION_PIVOT_UPDATED);
+    }.bind({ag: ag}));
   }
 
   var environmentMapFolder = guiHandler.datGuiModelInstance.addFolder("Environment Map");

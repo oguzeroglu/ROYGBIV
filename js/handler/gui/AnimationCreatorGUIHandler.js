@@ -345,7 +345,7 @@ AnimationCreatorGUIHandler.prototype.commonStartFunctions = function(object){
     }
   }
   if (!object.isFPSWeapon){
-    activeControl = new OrbitControls({maxRadius: 500, zoomDelta: 5});
+    activeControl = new OrbitControls({maxRadius: 500, zoomDelta: 5, lookPosition: object.isModelInstance? object.mesh.position.clone(): undefined});
   }else{
     activeControl = new CustomControls({});
   }
@@ -440,13 +440,6 @@ AnimationCreatorGUIHandler.prototype.show = function(object){
   if (object.isModelInstance){
     object.mesh.visible = true;
     object.beforeAnimationCreatorGUIHandlerPosition = object.mesh.position.clone();
-    object.mesh.position.set(0, 0, 0);
-    if (object.animationGroup1){
-      object.animationGroup1.group.position.set(0, 0, 0);
-    }
-    if (object.animationGroup2){
-      object.animationGroup2.group.position.set(0, 0, 0);
-    }
   }else if (!object.isContainer){
     object.mesh.visible = true;
     if (!object.isFPSWeapon){
