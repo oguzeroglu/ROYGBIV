@@ -368,6 +368,10 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   xhr.onreadystatechange = function(){
     if (xhr.readyState == 4 && xhr.status == 200){
       modelCreatorGUIHandler.modelMesh = new MeshGenerator(modelCreatorGUIHandler.model.geometry).generateModelMesh(modelCreatorGUIHandler.model, textureMerger? textureMerger.mergedTexture: null);
+      modelCreatorGUIHandler.modelMesh.updateMatrixWorld(true);
+      macroHandler.injectMat4("worldMatrix", modelCreatorGUIHandler.modelMesh.matrixWorld, modelCreatorGUIHandler.modelMesh.material, true, false);
+      var worldInverseTranspose = new THREE.Matrix4().getInverse(modelCreatorGUIHandler.modelMesh.matrixWorld).transpose();
+      macroHandler.injectMat4("worldInverseTranspose", worldInverseTranspose, modelCreatorGUIHandler.modelMesh.material, true, false);
       scene.add(modelCreatorGUIHandler.modelMesh);
       onReady();
     }

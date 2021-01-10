@@ -2410,6 +2410,12 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       "Rotation pivot": ag.rotationPivot.x + "," + ag.rotationPivot.y + "," + ag.rotationPivot.z,
       "Remove": function(){
         terminal.clear();
+        for (var animName in modelInstance.animations){
+          if (modelInstance.animations[animName].description.animGroupName == this.ag.name){
+            terminal.printError(Text.ANIMATION_GROUP_HAS_ANIMATION.replace(Text.PARAM1, animName));
+            return;
+          }
+        }
         modelInstance.removeAnimationGroup(modelInstance.getAnimationGroupByName(this.ag.name));
         selectionHandler.resetCurrentSelection();
         terminal.printInfo(Text.ANIMATION_GROUP_REMOVED);

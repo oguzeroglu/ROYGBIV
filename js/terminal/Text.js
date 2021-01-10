@@ -547,6 +547,7 @@ var Text = function(){
   this.OBJECT_HAS_BAKED_LIGHTS_CANNOT_MARK_AS_DYNAMIC = "Object has baked lights. Cannot mark as dynamic.";
   this.OBJECT_HAS_BAKED_SHADOW_CANNOT_MARK_AS_DYNAMIC = "Object has baked shadow. Cannot mark as dynamic.";
   this.NO_LIGHTS_BAKED_FOR_GIVEN_OBJECT = "No lights baked for given object.";
+  this.ANIMATION_GROUP_HAS_ANIMATION = "Animatin group has a created animation [@@1]. Cannot remove.";
   this.EDGE_ADDED = "Edge added: @@1 -> @@2";
   this.EDGE_REMOVED = "Edge removed: @@1 -> @@2";
   this.EDGES_REMOVED = "@@1 edge(s) removed";
