@@ -87,6 +87,11 @@ ModelInstance.prototype.export = function(){
     exportObj.animationGroup2 = this.animationGroup2.export();
   }
 
+  exportObj.animations = new Object();
+  for (var animationName in this.animations){
+    exportObj.animations[animationName] = this.animations[animationName].export();
+  }
+
   return exportObj;
 }
 

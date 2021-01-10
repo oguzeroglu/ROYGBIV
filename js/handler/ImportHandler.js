@@ -80,6 +80,11 @@ ImportHandler.prototype.importModelInstances = function(obj){
       }
       modelInstance.addAnimationGroup(animGroup);
     }
+
+    for (var animationName in curModelInstanceExport.animations){
+      var curAnimationExport = curModelInstanceExport.animations[animationName];
+      modelInstance.addAnimation(new Animation(animationName, curAnimationExport.type, modelInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
+    }
   }
 }
 
