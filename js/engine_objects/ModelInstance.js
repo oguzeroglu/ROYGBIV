@@ -23,6 +23,9 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
 
   this.animations = new Object();
 
+  mesh.updateMatrixWorld(true);
+  macroHandler.injectMat4("worldMatrix", mesh.matrixWorld, mesh.material, true, false);
+
   webglCallbackHandler.registerEngineObject(this);
 }
 

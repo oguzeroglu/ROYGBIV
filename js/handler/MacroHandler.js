@@ -61,6 +61,31 @@ MacroHandler.prototype.injectVec2 = function(variableName, vec, material, insert
   material.needsUpdate = true;
 }
 
+MacroHandler.prototype.injectMat4 = function(variableName, mat4, material, insertVertexShader, insertFragmentShader){
+  var macroText = "mat4 " + variableName + " = " + "mat4(@@1);";
+
+  var str = "";
+  for (var i = 0; i < mat4.elements.length; i ++){
+    if (i != mat4.elements.length - 1){
+      str += "float(" + mat4.elements[i] + "),";
+    }else{
+      str += "float(" + mat4.elements[i] + ")";
+    }
+  }
+
+  macroText = macroText.replace("@@1", str);
+
+  if (insertVertexShader){
+    material.vertexShader = material.vertexShader.replace("\n"+macroText, "");
+    material.vertexShader = material.vertexShader.replace("#define INSERTION", "#define INSERTION\n"+macroText);
+  }
+  if (insertFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace("\n"+macroText, "");
+    material.fragmentShader = material.fragmentShader.replace("#define INSERTION", "#define INSERTION\n"+macroText);
+  }
+  material.needsUpdate = true;
+}
+
 MacroHandler.prototype.removeMacro = function(macro, material, removeVertexShader, removeFragmentShader){
   if (removeVertexShader){
     material.vertexShader = material.vertexShader.replace("\n#define "+macro, "");

@@ -11,7 +11,6 @@ attribute float materialIndex;
 varying float vMetalness;
 
 uniform mat4 projectionMatrix;
-uniform mat4 worldMatrix;
 uniform mat4 viewMatrix;
 
 varying vec3 vColor;
@@ -859,7 +858,7 @@ void main(){
   #endif
 
   #if defined(AFFECTED_BY_LIGHT) || defined(HAS_ENVIRONMENT_MAP)
-    vec3 worldPositionComputed = (worldMatrix * vec4(position, 1.0)).xyz;
+    vec3 worldPositionComputed = (selectedWorldMatrix * vec4(position, 1.0)).xyz;
   #endif
 
   #if defined(HAS_PHONG_LIGHTING) || defined(HAS_ENVIRONMENT_MAP)
@@ -867,7 +866,7 @@ void main(){
   #endif
 
   #ifdef HAS_ENVIRONMENT_MAP
-    vWorldNormal = mat3(worldMatrix) * normal;
+    vWorldNormal = mat3(selectedWorldMatrix) * normal;
   #endif
 
   #ifdef AFFECTED_BY_LIGHT
