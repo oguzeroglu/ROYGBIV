@@ -36,6 +36,9 @@ var AnimationHandler = function(){
     },
     CONTAINER: {
       POSITION_X: "CONTAINER_POSITION_X", POSITION_Y: "CONTAINER_POSITION_Y"
+    },
+    MODEL_INSTANCE: {
+      POSITION_X: "MODEL_INSTANCE_POSITION_X", POSITION_Y: "MODEL_INSTANCE_POSIITON_Y", POSITION_Z: "MODEL_INSTANCE_POSITION_Z"
     }
   };
   // INITIAL VALUE GETTERS
@@ -195,6 +198,15 @@ var AnimationHandler = function(){
   }
   this.initialValueGetterFunctionsByType[this.actionTypes.CONTAINER.POSITION_Y] = function(object){
     return object.centerYPercent;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.MODEL_INSTANCE.POSITION_X] = function(object){
+    return object.mesh.position.x;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.MODEL_INSTANCE.POSITION_Y] = function(object){
+    return object.mesh.position.y;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.MODEL_INSTANCE.POSITION_Z] = function(object){
+    return object.mesh.position.z;
   }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
@@ -442,6 +454,18 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.CONTAINER.POSITION_Y] = function(animation){
     animation.attachedObject.setCenter(animation.attachedObject.centerXPercent, animation.initialValue);
   }
+  this.afterAnimationSettersByType[this.actionTypes.MODEL_INSTANCE.POSITION_X] = function(animation){
+    var animGroupName = animation.description.animGroupName;
+    animation.attachedObject.getAnimationGroupByName(animGroupName).group.position.x = animation.initialValue;
+  }
+  this.afterAnimationSettersByType[this.actionTypes.MODEL_INSTANCE.POSITION_Y] = function(animation){
+    var animGroupName = animation.description.animGroupName;
+    animation.attachedObject.getAnimationGroupByName(animGroupName).group.position.y = animation.initialValue;
+  }
+  this.afterAnimationSettersByType[this.actionTypes.MODEL_INSTANCE.POSITION_Z] = function(animation){
+    var animGroupName = animation.description.animGroupName;
+    animation.attachedObject.getAnimationGroupByName(animGroupName).group.position.z = animation.initialValue;
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -490,6 +514,9 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_SCALE_Y] = this.updateSpriteTargetScaleYFunc;
   this.actionFunctionsByType[this.actionTypes.CONTAINER.POSITION_X] = this.updateContainerPositionXFunc;
   this.actionFunctionsByType[this.actionTypes.CONTAINER.POSITION_Y] = this.updateContainerPositionYFunc;
+  this.actionFunctionsByType[this.actionTypes.MODEL_INSTANCE.POSITION_X] = this.updateModelInstancePositionXFunc;
+  this.actionFunctionsByType[this.actionTypes.MODEL_INSTANCE.POSITION_Y] = this.updateModelInstancePositionYFunc;
+  this.actionFunctionsByType[this.actionTypes.MODEL_INSTANCE.POSITION_Z] = this.updateModelInstancePositionZFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -897,6 +924,15 @@ AnimationHandler.prototype.updateContainerPositionXFunc = function(params){
 }
 AnimationHandler.prototype.updateContainerPositionYFunc = function(params){
   params.object.setCenter(params.object.centerXPercent, params.value);
+}
+AnimationHandler.prototype.updateModelInstancePositionXFunc = function(params){
+  params.object.getAnimationGroupByName(params.animGroupName).group.position.x = params.value;
+}
+AnimationHandler.prototype.updateModelInstancePositionYFunc = function(params){
+  params.object.getAnimationGroupByName(params.animGroupName).group.position.y = params.value;
+}
+AnimationHandler.prototype.updateModelInstancePositionZFunc = function(params){
+  params.object.getAnimationGroupByName(params.animGroupName).group.position.z = params.value;
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){

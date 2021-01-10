@@ -21,6 +21,8 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
   this.animationGroup1 = null;
   this.animationGroup2 = null;
 
+  this.animations = new Object();
+
   webglCallbackHandler.registerEngineObject(this);
 }
 
@@ -704,4 +706,12 @@ ModelInstance.prototype.getAnimationGroupByName = function(agName){
     return this.animationGroup2;
   }
   return null;
+}
+
+ModelInstance.prototype.addAnimation = function(animation){
+  this.animations[animation.name] = animation;
+}
+
+ModelInstance.prototype.removeAnimation = function(animation){
+  delete this.animations[animation.name];
 }

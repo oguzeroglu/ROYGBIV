@@ -4185,7 +4185,7 @@ function parse(input){
             return true;
           }
           var objName = splitted[1];
-          var obj = addedObjects[objName] || objectGroups[objName] || addedTexts[objName] || sprites[objName] || containers[objName];
+          var obj = addedObjects[objName] || objectGroups[objName] || addedTexts[objName] || sprites[objName] || containers[objName] || modelInstances[objName];
           if (!obj){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
@@ -4195,11 +4195,19 @@ function parse(input){
               terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             }else if (obj.isAddedText){
               terminal.printError(Text.TEXT_NOT_IN_SCENE);
-            }else{
+            }else if (obj.isSprite){
               terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
+            }else if (obj.isModelInstance){
+              terminal.printError(Text.MODEL_INSTANCE_NOT_IN_ACTIVE_SCENE);
             }
             return true;
           }
+
+          if (obj.isModelInstance && (!obj.animationGroup1 && !obj.animationGroup2)){
+            terminal.printError(Text.MODEL_INSTANCE_HAS_NO_ANIMATION_GROUPS);
+            return true;
+          }
+
           animationCreatorGUIHandler.show(obj);
           return true;
         break;

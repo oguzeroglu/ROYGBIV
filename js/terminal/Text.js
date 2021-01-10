@@ -786,6 +786,7 @@ var Text = function(){
   this.JUMP_IS_ACHIEVABLE_FOR_STEERABLE = "The jump is achievable for steerable [@@1].";
   this.JUMP_IS_UNACHIEVABLE_FOR_STEERABLE = "The jump is unachivable for steerable [@@1].";
   this.MARKED_POINTS_TOGGLED = "Marked points toggled.";
+  this.MODEL_INSTANCE_HAS_NO_ANIMATION_GROUPS = "Model instance has no animation groups.";
   this.CENTERX_MUST_BE_A_NUMBER = "CenterX must be a number.";
   this.CENTERY_MUST_BE_A_NUMBER = "CenterY must be a number.";
   this.CENTERZ_MUST_BE_A_NUMBER = "CenterZ must be a number.";

@@ -8,7 +8,7 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
   this.actionFunction = animationHandler.actionFunctionsByType[description.action];
   this.totalTimeInSeconds = this.description.totalTimeInSeconds;
   this.repeat = repeat;
-  this.params = {object: this.attachedObject};
+  this.params = {object: this.attachedObject, animGroupName: description.animGroupName};
   if (description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || description.action == animationHandler.actionTypes.TEXT.TEXT_COLOR || description.action == animationHandler.actionTypes.TEXT.BACKGROUND_COLOR || description.action == animationHandler.actionTypes.SPRITE.COLOR){
     this.changeInValue = 1;
     this.params.targetColor = new THREE.Color(description.targetColor);
