@@ -6,7 +6,7 @@ var MeshGenerator = function(geometry, material){
 MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
   var uniforms = {
     projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
-    viewMatrix: GLOBAL_VIEW_UNIFORM
+    modelViewMatrix: new THREE.Uniform(new THREE.Matrix4())
   }
 
   if (overrideTexture){
@@ -24,6 +24,7 @@ MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
 
   var mesh = new THREE.Mesh(this.geometry, material);
   mesh.renderOrder = renderOrders.OBJECT;
+  material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
 
   if (uniforms.texture){
     macroHandler.injectMacro("HAS_TEXTURE", material, true, true);

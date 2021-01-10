@@ -11,7 +11,7 @@ attribute float materialIndex;
 varying float vMetalness;
 
 uniform mat4 projectionMatrix;
-uniform mat4 viewMatrix;
+uniform mat4 modelViewMatrix;
 
 varying vec3 vColor;
 
@@ -27,6 +27,8 @@ varying vec3 vLightSpecular;
   uniform mat4 animMatrix2;
   uniform mat4 animWorldInverseTransposeMatrix1;
   uniform mat4 animWorldInverseTransposeMatrix2;
+  uniform mat4 animModelViewMatrix1;
+  uniform mat4 animModelViewMatrix2;
 #endif
 
 #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
@@ -794,14 +796,14 @@ void main(){
 
   #ifdef HAS_ANIMATION
     int mi = int(materialIndex);
-    mat4 mvMatrixComputed;
+    mat4 selectedMVMatrix;
     mat4 selectedWorldMatrix;
     mat4 selectedWorldInverseTranspose;
     #ANIMATION_MATRIX_CODE
   #else
     mat4 selectedWorldMatrix = worldMatrix;
     mat4 selectedWorldInverseTranspose = worldInverseTranspose;
-    mat4 mvMatrixComputed = viewMatrix * worldMatrix;
+    mat4 selectedMVMatrix = modelViewMatrix;
   #endif
 
   #ifdef CHILDREN_HIDEABLE
@@ -835,7 +837,7 @@ void main(){
     vNormal = normalize(mat3(selectedWorldInverseTranspose) * normal);
     #ifdef HAS_NORMAL_MAP
       vNormalUV = normalUV;
-      vTangent = (mvMatrixComputed * vec4(tangent.xyz, 0.0)).xyz;
+      vTangent = (selectedMVMatrix * vec4(tangent.xyz, 0.0)).xyz;
       vBitangent = normalize(cross(vNormal, vTangent) * tangent.w);
     #endif
   #endif
@@ -862,5 +864,5 @@ void main(){
     vRoughness = metalnessRoughness[1];
   #endif
 
-  gl_Position = projectionMatrix * mvMatrixComputed * vec4(position, 1.0);
+  gl_Position = projectionMatrix * selectedMVMatrix * vec4(position, 1.0);
 }
