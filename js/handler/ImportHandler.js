@@ -89,6 +89,8 @@ ImportHandler.prototype.importModelInstances = function(obj){
     if (curModelInstanceExport.alpha != 1){
       modelInstance.setAlpha(curModelInstanceExport.alpha);
     }
+
+    modelInstance.setDepthWrite(curModelInstanceExport.depthWrite);
   }
 }
 

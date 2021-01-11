@@ -158,7 +158,8 @@ var GUIHandler = function(){
     "Lighting type": lightHandler.lightTypes.GOURAUD,
     "Normal map scale": "1,1",
     "Has specularity": false,
-    "Alpha": "1"
+    "Alpha": "1",
+    "Depth write": true
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -417,6 +418,7 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Affected by light"] = !!curSelection.affectedByLight;
     guiHandler.modelInstanceManipulationParameters["Has specularity"] = !!curSelection.isSpecularityEnabled;
     guiHandler.modelInstanceManipulationParameters["Alpha"] = "" + curSelection.alpha;
+    guiHandler.modelInstanceManipulationParameters["Depth write"] = !!curSelection.depthWrite;
 
     if (curSelection.affectedByLight){
       guiHandler.modelInstanceManipulationParameters["Lighting type"] = curSelection.lightingType || lightHandler.lightTypes.GOURAUD;
@@ -2197,7 +2199,10 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     }
     selectionHandler.getSelectedObject().setAlpha(parsedVal);
     terminal.printInfo(Text.ALPHA_UPDATED);
-  });
+  }).listen();
+  graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Depth write").onChange(function(val){
+    selectionHandler.getSelectedObject().setDepthWrite(val);
+  }).listen();
   graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Affected by light").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();

@@ -33,6 +33,7 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
   macroHandler.injectMat4("worldInverseTranspose", worldInverseTranspose, mesh.material, true, false);
 
   this.alpha = 1;
+  this.depthWrite = true;
 
   webglCallbackHandler.registerEngineObject(this);
 }
@@ -70,7 +71,8 @@ ModelInstance.prototype.export = function(){
     },
     scale: this.mesh.scale.x,
     affectedByLight: !!this.affectedByLight,
-    alpha: this.alpha
+    alpha: this.alpha,
+    depthWrite: this.depthWrite
   };
 
   var destroyedGridsExport = {};
@@ -775,4 +777,10 @@ ModelInstance.prototype.setAlpha = function(alpha){
   }else{
     this.mesh.material.transparent = false;
   }
+}
+
+ModelInstance.prototype.setDepthWrite = function(depthWrite){
+  this.mesh.material.depthWrite = depthWrite;
+  this.depthWrite = depthWrite;
+  console.log(depthWrite);
 }
