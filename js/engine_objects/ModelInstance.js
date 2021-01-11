@@ -34,6 +34,7 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
 
   this.alpha = 1;
   this.depthWrite = true;
+  this.blending = NORMAL_BLENDING;
 
   webglCallbackHandler.registerEngineObject(this);
 }
@@ -72,7 +73,8 @@ ModelInstance.prototype.export = function(){
     scale: this.mesh.scale.x,
     affectedByLight: !!this.affectedByLight,
     alpha: this.alpha,
-    depthWrite: this.depthWrite
+    depthWrite: this.depthWrite,
+    blending: this.blending
   };
 
   var destroyedGridsExport = {};
@@ -782,5 +784,9 @@ ModelInstance.prototype.setAlpha = function(alpha){
 ModelInstance.prototype.setDepthWrite = function(depthWrite){
   this.mesh.material.depthWrite = depthWrite;
   this.depthWrite = depthWrite;
-  console.log(depthWrite);
+}
+
+ModelInstance.prototype.setBlending = function(blending){
+  this.mesh.material.blending = blending;
+  this.blending = blending;
 }

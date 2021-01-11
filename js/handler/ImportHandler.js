@@ -91,6 +91,7 @@ ImportHandler.prototype.importModelInstances = function(obj){
     }
 
     modelInstance.setDepthWrite(curModelInstanceExport.depthWrite);
+    modelInstance.setBlending(curModelInstanceExport.blending);
   }
 }
 

@@ -159,7 +159,8 @@ var GUIHandler = function(){
     "Normal map scale": "1,1",
     "Has specularity": false,
     "Alpha": "1",
-    "Depth write": true
+    "Depth write": true,
+    "Blending": "Normal"
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -419,6 +420,19 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Has specularity"] = !!curSelection.isSpecularityEnabled;
     guiHandler.modelInstanceManipulationParameters["Alpha"] = "" + curSelection.alpha;
     guiHandler.modelInstanceManipulationParameters["Depth write"] = !!curSelection.depthWrite;
+
+    var blendingText = "NO_BLENDING";
+    if (curSelection.blending == NORMAL_BLENDING){
+      blendingText = "NORMAL_BLENDING";
+    }else if (curSelection.blending == ADDITIVE_BLENDING){
+      blendingText = "ADDITIVE_BLENDING";
+    }else if (curSelection.blending == SUBTRACTIVE_BLENDING){
+      blendingText = "SUBTRACTIVE_BLENDING";
+    }else if (curSelection.blending == MULTIPLY_BLENDING){
+      blendingText = "MULTIPLY_BLENDING";
+    }
+
+    guiHandler.modelInstanceManipulationParameters["Blending"] = blendingText;
 
     if (curSelection.affectedByLight){
       guiHandler.modelInstanceManipulationParameters["Lighting type"] = curSelection.lightingType || lightHandler.lightTypes.GOURAUD;
@@ -2202,6 +2216,9 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   }).listen();
   graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Depth write").onChange(function(val){
     selectionHandler.getSelectedObject().setDepthWrite(val);
+  }).listen();
+  graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Blending", ["NO_BLENDING", "NORMAL_BLENDING", "ADDITIVE_BLENDING", "SUBTRACTIVE_BLENDING", "MULTIPLY_BLENDING"]).onChange(function(val){
+    selectionHandler.getSelectedObject().setBlending(window[val]);
   }).listen();
   graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Affected by light").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
