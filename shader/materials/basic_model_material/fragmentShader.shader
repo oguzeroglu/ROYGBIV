@@ -3,6 +3,8 @@
 
 #define PI 3.1415926
 
+#define ALPHA 1
+
 precision lowp float;
 precision lowp int;
 
@@ -962,5 +964,5 @@ void main(){
   #endif
 
   gl_FragColor.rgb = (diffuseTotal * mix(color, vec3(0.0, 0.0, 0.0), vMetalness) * textureColor) + specularTotal;
-  gl_FragColor.a = 1.0;
+  gl_FragColor.a = float(ALPHA);
 }

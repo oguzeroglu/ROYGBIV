@@ -507,6 +507,7 @@ var Text = function(){
   this.ENVIRONMENT_TEXTURE_MAPPED = "Environment texture mapped";
   this.AMBIENT_OCCULSION_TEXTURE_MAPPED = "Ambient occulsion texture mapped";
   this.ALPHA_TEXTURE_MAPPED = "Alpha texture mapped";
+  this.ALPHA_UPDATED = "Alpha updated.";
   this.STEERING_BEHAVIOR_CREATED = "Steering behavior created.";
   this.TEXTURE_MAPPED = "Texture mapped.";
   this.TREE_LIGHTS = "|____@@1 @@2";

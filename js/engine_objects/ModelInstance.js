@@ -31,6 +31,9 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
 
   macroHandler.injectMat4("worldMatrix", mesh.matrixWorld, mesh.material, true, false);
   macroHandler.injectMat4("worldInverseTranspose", worldInverseTranspose, mesh.material, true, false);
+
+  this.alpha = 1;
+
   webglCallbackHandler.registerEngineObject(this);
 }
 
@@ -66,7 +69,8 @@ ModelInstance.prototype.export = function(){
       w: this.mesh.quaternion.w
     },
     scale: this.mesh.scale.x,
-    affectedByLight: !!this.affectedByLight
+    affectedByLight: !!this.affectedByLight,
+    alpha: this.alpha
   };
 
   var destroyedGridsExport = {};
@@ -761,4 +765,14 @@ ModelInstance.prototype.addAnimation = function(animation){
 
 ModelInstance.prototype.removeAnimation = function(animation){
   delete this.animations[animation.name];
+}
+
+ModelInstance.prototype.setAlpha = function(alpha){
+  macroHandler.replaceText("#define ALPHA " + this.alpha, "#define ALPHA " + alpha, this.mesh.material, false, true);
+  this.alpha = alpha;
+  if (alpha != 1){
+    this.mesh.material.transparent = true;
+  }else{
+    this.mesh.material.transparent = false;
+  }
 }

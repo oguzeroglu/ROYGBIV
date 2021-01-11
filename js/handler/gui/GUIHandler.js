@@ -157,7 +157,8 @@ var GUIHandler = function(){
     "Affected by light": false,
     "Lighting type": lightHandler.lightTypes.GOURAUD,
     "Normal map scale": "1,1",
-    "Has specularity": false
+    "Has specularity": false,
+    "Alpha": "1"
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -415,6 +416,7 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
     guiHandler.modelInstanceManipulationParameters["Affected by light"] = !!curSelection.affectedByLight;
     guiHandler.modelInstanceManipulationParameters["Has specularity"] = !!curSelection.isSpecularityEnabled;
+    guiHandler.modelInstanceManipulationParameters["Alpha"] = "" + curSelection.alpha;
 
     if (curSelection.affectedByLight){
       guiHandler.modelInstanceManipulationParameters["Lighting type"] = curSelection.lightingType || lightHandler.lightTypes.GOURAUD;
@@ -2186,6 +2188,16 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   }).listen();
 
   var graphicsFolder = guiHandler.datGuiModelInstance.addFolder("Graphics");
+  graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Alpha").onFinishChange(function(val){
+    terminal.clear();
+    var parsedVal = parseFloat(val);
+    if (isNaN(parsedVal)){
+      terminal.printError(Text.INVALID_NUMERICAL_VALUE);
+      return;
+    }
+    selectionHandler.getSelectedObject().setAlpha(parsedVal);
+    terminal.printInfo(Text.ALPHA_UPDATED);
+  });
   graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Affected by light").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
