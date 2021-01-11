@@ -790,3 +790,40 @@ ModelInstance.prototype.setBlending = function(blending){
   this.mesh.material.blending = blending;
   this.blending = blending;
 }
+
+ModelInstance.prototype.syncOrientation = function(targetModelInstance){
+  this.mesh.updateMatrixWorld(true);
+  targetModelInstance.mesh.updateMatrixWorld(true);
+
+  var oldWorldInverseTranspose = new THREE.Matrix4().getInverse(this.mesh.matrixWorld).transpose();
+  var newWorldInverseTranspose = new THREE.Matrix4().getInverse(targetModelInstance.mesh.matrixWorld).transpose();
+
+  macroHandler.replaceMat4("worldMatrix", this.mesh.matrixWorld, targetModelInstance.mesh.matrixWorld, this.mesh.material, true, false);
+  macroHandler.replaceMat4("worldInverseTranspose", oldWorldInverseTranspose, newWorldInverseTranspose, this.mesh.material, true, false);
+
+  this.mesh.position.copy(targetModelInstance.mesh.position);
+  this.mesh.quaternion.copy(targetModelInstance.mesh.quaternion);
+  this.mesh.scale.copy(targetModelInstance.mesh.scale);
+  this.mesh.updateMatrixWorld(true);
+
+  this.scale = targetModelInstance.scale;
+  this.generateBoundingBoxes();
+
+  if (!this.noMass){
+    physicsWorld.remove(this.physicsBody);
+  }
+
+  var physicsXParam = (this.model.info.originalBoundingBox.max.x - this.model.info.originalBoundingBox.min.x) * this.scale;
+  var physicsYParam = (this.model.info.originalBoundingBox.max.y - this.model.info.originalBoundingBox.min.y) * this.scale;
+  var physicsZParam = (this.model.info.originalBoundingBox.max.z - this.model.info.originalBoundingBox.min.z) * this.scale;
+  var physicsShapeParameters = {x: physicsXParam/2, y: physicsYParam/2, z: physicsZParam/2};
+  var boxPhysicsBody = physicsBodyGenerator.generateBoxBody(physicsShapeParameters);
+  boxPhysicsBody.position.set(this.mesh.position.x, this.mesh.position.y, this.mesh.position.z);
+  boxPhysicsBody.quaternion.copy(this.mesh.quaternion);
+
+  if (!this.noMass){
+    physicsWorld.addBody(boxPhysicsBody);
+  }
+
+  this.physicsBody = boxPhysicsBody;
+}

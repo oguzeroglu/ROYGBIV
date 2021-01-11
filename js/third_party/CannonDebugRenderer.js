@@ -49,7 +49,9 @@ THREE.CannonDebugRenderer.prototype = {
         }
       }
       for (var instanceName in sceneHandler.getModelInstances()){
-        this.world.add(modelInstances[instanceName].physicsBody);
+        if (!modelInstances[instanceName].noMass){
+          this.world.add(modelInstances[instanceName].physicsBody);
+        }
       }
 
       var masses = sceneHandler.getMasses();

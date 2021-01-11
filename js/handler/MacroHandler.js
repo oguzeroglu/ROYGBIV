@@ -86,6 +86,41 @@ MacroHandler.prototype.injectMat4 = function(variableName, mat4, material, inser
   material.needsUpdate = true;
 }
 
+MacroHandler.prototype.replaceMat4 = function(variableName, oldMat4, mat4, material, insertVertexShader, insertFragmentShader){
+  var macroText = "mat4 " + variableName + " = " + "mat4(@@1);";
+  var oldMacroText = "mat4 " + variableName + " = " + "mat4(@@1);";
+
+  var str = "";
+  var str2 = "";
+  for (var i = 0; i < mat4.elements.length; i ++){
+    if (i != mat4.elements.length - 1){
+      str += "float(" + mat4.elements[i] + "),";
+    }else{
+      str += "float(" + mat4.elements[i] + ")";
+    }
+  }
+  for (var i = 0; i < oldMat4.elements.length; i ++){
+    if (i != oldMat4.elements.length - 1){
+      str2 += "float(" + oldMat4.elements[i] + "),";
+    }else{
+      str2 += "float(" + oldMat4.elements[i] + ")";
+    }
+  }
+
+  macroText = macroText.replace("@@1", str);
+  oldMacroText = oldMacroText.replace("@@1", str2);
+
+  if (insertVertexShader){
+    material.vertexShader = material.vertexShader.replace("\n"+macroText, "");
+    material.vertexShader = material.vertexShader.replace(oldMacroText, "#define INSERTION\n"+macroText);
+  }
+  if (insertFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace("\n"+macroText, "");
+    material.fragmentShader = material.fragmentShader.replace(oldMacroText, "#define INSERTION\n"+macroText);
+  }
+  material.needsUpdate = true;
+}
+
 MacroHandler.prototype.removeMacro = function(macro, material, removeVertexShader, removeFragmentShader){
   if (removeVertexShader){
     material.vertexShader = material.vertexShader.replace("\n#define "+macro, "");
