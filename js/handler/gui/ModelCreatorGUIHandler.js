@@ -32,7 +32,7 @@ ModelCreatorGUIHandler.prototype.show = function(modelName){
         return;
       }
 
-      modelCreatorGUIHandler.renderControls(resp, 0, modelName);
+      modelCreatorGUIHandler.renderControls(resp, 0, modelName, true);
     }
   }
   xhr.send(JSON.stringify({acceptedTextureSize: ACCEPTED_TEXTURE_SIZE}));
@@ -65,7 +65,7 @@ ModelCreatorGUIHandler.prototype.close = function(message, isError){
   }
 }
 
-ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, modelName){
+ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, modelName, centerGeometry){
   terminal.clear();
   terminal.printInfo(Text.LOADING_MODEL);
 
@@ -79,6 +79,7 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
     var params = {
       "Folder": allFolders[index],
       "Enable custom textures": false,
+      "Center geometry": centerGeometry,
       "Scale": 1,
       "Done": function(){
         var folderName = modelCreatorGUIHandler.model.info.folderName;
@@ -119,14 +120,23 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
         guiHandler.datGuiModelCreation = new dat.GUI({hideable: false, width: 420});
       }
 
-      var folderController, scaleController, customTextureController;
+      var folderController, scaleController, customTextureController, centerGeometryController;
 
       folderController = guiHandler.datGuiModelCreation.add(params, "Folder", allFolders).onChange(function(val){
         guiHandler.disableController(folderController);
         guiHandler.disableController(scaleController);
         guiHandler.disableController(customTextureController);
-        modelCreatorGUIHandler.renderControls(allModels, allFolders.indexOf(val), modelName);
+        guiHandler.disableController(centerGeometryController);
+        modelCreatorGUIHandler.renderControls(allModels, allFolders.indexOf(val), modelName, centerGeometry);
       });
+      centerGeometryController = guiHandler.datGuiModelCreation.add(params, "Center geometry").onChange(function(val){
+        centerGeometry = val;
+        guiHandler.disableController(folderController);
+        guiHandler.disableController(scaleController);
+        guiHandler.disableController(customTextureController);
+        guiHandler.disableController(centerGeometryController);
+        modelCreatorGUIHandler.renderControls(allModels, allFolders.indexOf(params["Folder"]), modelName, centerGeometry);
+      }).listen();
       customTextureController = guiHandler.datGuiModelCreation.add(params, "Enable custom textures").onChange(function(val){
         terminal.clear();
         if (!modelCreatorGUIHandler.model.supportsCustomTextures()){
@@ -147,13 +157,13 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
       });
       guiHandler.datGuiModelCreation.add(params, "Done");
       guiHandler.datGuiModelCreation.add(params, "Cancel");
-    });
+    }, centerGeometry);
   }, function(){
     modelCreatorGUIHandler.close(Text.ERROR_HAPPENED_LOADING_MODEL_FROM_FOLDER.replace(Text.PARAM1, modelToLoad.folder), true);
   });
 }
 
-ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName, arModelNames, onReady){
+ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName, arModelNames, onReady, centerGeometry){
   if (this.modelMesh){
     scene.remove(this.modelMesh);
   }
@@ -357,7 +367,8 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     folderName: folderName,
     childInfos: childInfos,
     originalBoundingBox: boundingBox,
-    hasNormalMap: hasNormalMap
+    hasNormalMap: hasNormalMap,
+    centerGeometry: centerGeometry
   }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, materialIndices);
 
   modelCreatorGUIHandler.model.setARModelNames(arModelNames);

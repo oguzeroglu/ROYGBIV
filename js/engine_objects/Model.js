@@ -168,7 +168,9 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
     }
   }
 
-  this.geometry.center();
+  if (modelInfo.centerGeometry){
+    this.geometry.center();
+  }
 
   this.info = modelInfo;
   this.texturesObj = texturesObj;
