@@ -2177,6 +2177,15 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   var physicsFolder = guiHandler.datGuiModelInstance.addFolder("Physics");
   physicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Has mass").onChange(function(val){
     terminal.clear();
+
+    if (val){
+      if (selectionHandler.getSelectedObject().animationGroup1 || selectionHandler.getSelectedObject().animationGroup2){
+        guiHandler.modelInstanceManipulationParameters["Has mass"] = false;
+        terminal.printError(Text.MODEL_INSTANCE_HAS_ANIMATIONS_CANNOT_SET_MASS);
+        return;
+      }
+    }
+
     selectionHandler.getSelectedObject().setNoMass(!val);
     terminal.printInfo(val? Text.PHYSICS_ENABLED: Text.PHYSICS_DISABLED);
     if (physicsDebugMode){
@@ -2416,6 +2425,10 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       }
       if (modelInstance.animationGroup1 && modelInstance.animationGroup2){
         terminal.printError(Text.CANNOT_ADD_MORE_THAN_TWO_ANIMATION_GROUP_TO_MODEL_INSTANCE);
+        return;
+      }
+      if (!modelInstance.noMass){
+        terminal.printError(Text.CANNOT_ADD_ANIMATION_TO_MODEL_INSTANCES_WITH_MASS);
         return;
       }
       if (animationGroupName == "None"){
