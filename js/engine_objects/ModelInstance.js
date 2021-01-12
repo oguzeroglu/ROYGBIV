@@ -35,8 +35,16 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
   this.alpha = 1;
   this.depthWrite = true;
   this.blending = NORMAL_BLENDING;
+  this.specularColor = {r: 1, g: 1, b: 1};
 
   webglCallbackHandler.registerEngineObject(this);
+}
+
+ModelInstance.prototype.setSpecularColor = function(r, g, b){
+  macroHandler.replaceVec3("SPECULAR_COLOR", {x: this.specularColor.r, y: this.specularColor.g, z: this.specularColor.b}, {x: r, y: g, z: b}, this.mesh.material, false, true);
+  this.specularColor.r = r;
+  this.specularColor.g = g;
+  this.specularColor.b = b;
 }
 
 ModelInstance.prototype.updateWorldInverseTranspose = function(val){
@@ -74,7 +82,8 @@ ModelInstance.prototype.export = function(){
     affectedByLight: !!this.affectedByLight,
     alpha: this.alpha,
     depthWrite: this.depthWrite,
-    blending: this.blending
+    blending: this.blending,
+    specularColor: this.specularColor
   };
 
   var destroyedGridsExport = {};

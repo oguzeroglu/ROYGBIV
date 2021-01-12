@@ -19,6 +19,8 @@ varying float vMetalness;
 
 #define INSERTION
 
+vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
+
 #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
   varying float vRoughness;
 #endif
@@ -963,6 +965,6 @@ void main(){
     }
   #endif
 
-  gl_FragColor.rgb = (diffuseTotal * mix(color, vec3(0.0, 0.0, 0.0), vMetalness) * textureColor) + specularTotal;
+  gl_FragColor.rgb = (diffuseTotal * mix(color, vec3(0.0, 0.0, 0.0), vMetalness) * textureColor) + (SPECULAR_COLOR * specularTotal);
   gl_FragColor.a = float(ALPHA);
 }

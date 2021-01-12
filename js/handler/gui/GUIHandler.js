@@ -160,7 +160,8 @@ var GUIHandler = function(){
     "Has specularity": false,
     "Alpha": "1",
     "Depth write": true,
-    "Blending": "Normal"
+    "Blending": "Normal",
+    "Specular color": "1,1,1"
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -420,6 +421,7 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Has specularity"] = !!curSelection.isSpecularityEnabled;
     guiHandler.modelInstanceManipulationParameters["Alpha"] = "" + curSelection.alpha;
     guiHandler.modelInstanceManipulationParameters["Depth write"] = !!curSelection.depthWrite;
+    guiHandler.modelInstanceManipulationParameters["Specular color"] = curSelection.specularColor.r + "," + curSelection.specularColor.g + "," + curSelection.specularColor.b;
 
     var blendingText = "NO_BLENDING";
     if (curSelection.blending == NORMAL_BLENDING){
@@ -2246,6 +2248,23 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
       terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
     }
+  }).listen();
+  graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Specular color").onFinishChange(function(val){
+    terminal.clear();
+    var splitted = val.split(",");
+    var rVal = parseFloat(splitted[0]);
+    var gVal = parseFloat(splitted[1]);
+    var bVal = parseFloat(splitted[2]);
+    if (isNaN(rVal) || isNaN(gVal) || isNaN(bVal)){
+      terminal.printError(Text.INVALID_VECTOR_VALUE);
+      return;
+    }
+    if (rVal < 0 || rVal > 1 || gVal < 0 || gVal > 1 || bVal < 0 || bVal > 1){
+      terminal.printError(Text.VALUES_MUST_BE_BETWEEN_0_1);
+      return;
+    }
+    selectionHandler.getSelectedObject().setSpecularColor(rVal, gVal, bVal);
+    terminal.printInfo(Text.SPECULAR_COLOR_SET);
   }).listen();
   guiHandler.modelInstanceHasSpecularityController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Has specularity").onChange(function(val){
     var modelInstance = selectionHandler.getSelectedObject();

@@ -86,6 +86,24 @@ MacroHandler.prototype.injectMat4 = function(variableName, mat4, material, inser
   material.needsUpdate = true;
 }
 
+MacroHandler.prototype.replaceVec3 = function(variableName, oldVec3, newVec3, material, insertVertexShader, insertFragmentShader){
+  var macroText = "vec3 " + variableName + " = vec3(float(@@1), float(@@2), float(@@3));";
+  var oldMacroText = "vec3 " + variableName + " = vec3(float(@@1), float(@@2), float(@@3));";
+
+  macroText = macroText.replace("@@1", newVec3.x).replace("@@2", newVec3.y).replace("@@3", newVec3.z);
+  oldMacroText = oldMacroText.replace("@@1", oldVec3.x).replace("@@2", oldVec3.y).replace("@@3", oldVec3.z);
+
+  if (insertVertexShader){
+    material.vertexShader = material.vertexShader.replace("\n"+macroText, "");
+    material.vertexShader = material.vertexShader.replace(oldMacroText, "#define INSERTION\n"+macroText);
+  }
+  if (insertFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace("\n"+macroText, "");
+    material.fragmentShader = material.fragmentShader.replace(oldMacroText, "#define INSERTION\n"+macroText);
+  }
+  material.needsUpdate = true;
+}
+
 MacroHandler.prototype.replaceMat4 = function(variableName, oldMat4, mat4, material, insertVertexShader, insertFragmentShader){
   var macroText = "mat4 " + variableName + " = " + "mat4(@@1);";
   var oldMacroText = "mat4 " + variableName + " = " + "mat4(@@1);";

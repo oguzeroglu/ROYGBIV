@@ -92,6 +92,10 @@ ImportHandler.prototype.importModelInstances = function(obj){
 
     modelInstance.setDepthWrite(curModelInstanceExport.depthWrite);
     modelInstance.setBlending(curModelInstanceExport.blending);
+
+    if (curModelInstanceExport.specularColor){
+      modelInstance.setSpecularColor(curModelInstanceExport.specularColor.r, curModelInstanceExport.specularColor.g, curModelInstanceExport.specularColor.b);
+    }
   }
 }
 
