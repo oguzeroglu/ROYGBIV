@@ -2318,13 +2318,28 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     allAnimationGroupNames.push(modelInstance.animationGroup2.name);
   }
 
+  allMRParams = [];
+
   for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
     var childInfo = modelInstance.model.info.childInfos[i];
     var childFolder = graphicsFolder.addFolder(childInfo.name);
     var mrParams = {
       "Metalness": childInfo.metalness,
-      "Roughness": childInfo.roughness
+      "Roughness": childInfo.roughness,
+      "Sync all": function(){
+        var metalness = allMRParams[this.index]["Metalness"];
+        var roughness = allMRParams[this.index]["Roughness"];
+        for (var i2 = 0; i2 < modelInstance.model.info.childInfos.length; i2 ++){
+          if (i2 == this.index){
+            continue;
+          }
+          modelInstance.model.setMetalnessRoughness(true, metalness, i2);
+          modelInstance.model.setMetalnessRoughness(false, roughness, i2);
+        }
+      }.bind({index: i})
     };
+
+    allMRParams.push(mrParams);
 
     childFolder.add(mrParams, "Metalness").min(0).max(1).step(0.01).onChange(function(val){
       modelInstance.model.setMetalnessRoughness(true, val, this.index);
@@ -2332,6 +2347,7 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     childFolder.add(mrParams, "Roughness").min(0).max(1).step(0.01).onChange(function(val){
       modelInstance.model.setMetalnessRoughness(false, val, this.index);
     }.bind({index: i}));
+    childFolder.add(mrParams, "Sync all");
 
     var vp = {
       "Visible": modelInstance.isChildVisible(i),
