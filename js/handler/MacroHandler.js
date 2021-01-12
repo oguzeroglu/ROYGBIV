@@ -87,6 +87,9 @@ MacroHandler.prototype.injectMat4 = function(variableName, mat4, material, inser
 }
 
 MacroHandler.prototype.replaceVec3 = function(variableName, oldVec3, newVec3, material, insertVertexShader, insertFragmentShader){
+  if (oldVec3.x == newVec3.x && oldVec3.y == newVec3.y && oldVec3.z == newVec3.z){
+    return;
+  }
   var macroText = "vec3 " + variableName + " = vec3(float(@@1), float(@@2), float(@@3));";
   var oldMacroText = "vec3 " + variableName + " = vec3(float(@@1), float(@@2), float(@@3));";
 
