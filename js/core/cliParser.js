@@ -6883,6 +6883,10 @@ function parse(input){
             terminal.printError(Text.TARGET_MODEL_INSTANCE_NOT_IN_ACTIVE_SCENE);
             return true;
           }
+          if (splitted[1] == splitted[2]){
+            terminal.printError(Text.SOURCE_AND_TARGET_OBJECTS_ARE_THE_SAME);
+            return true;
+          }
           modelInstance1.syncOrientation(modelInstance2);
           refreshRaycaster(Text.ORIENTATION_SYNCED);
           if (physicsDebugMode){
