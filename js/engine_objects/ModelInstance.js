@@ -826,4 +826,17 @@ ModelInstance.prototype.syncOrientation = function(targetModelInstance){
   }
 
   this.physicsBody = boxPhysicsBody;
+
+  if (this.animationGroup1){
+    this.animationGroup1.group.scale.copy(this.mesh.scale);
+    this.animationGroup1.group.position.copy(this.mesh.position);
+    this.animationGroup1.group.quaternion.copy(this.mesh.quaternion);
+    this.animationGroup1.group.updateMatrixWorld(true);
+  }
+  if (this.animationGroup2){
+    this.animationGroup2.group.scale.copy(this.mesh.scale);
+    this.animationGroup2.group.position.copy(this.mesh.position);
+    this.animationGroup2.group.quaternion.copy(this.mesh.quaternion);
+    this.animationGroup2.group.updateMatrixWorld(true);
+  }
 }

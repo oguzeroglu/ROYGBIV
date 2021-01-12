@@ -6860,6 +6860,39 @@ function parse(input){
           }
           return true;
         break;
+        case 286: //syncModelInstanceOrientation
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var modelInstance1 = modelInstances[splitted[1]];
+          var modelInstance2 = modelInstances[splitted[2]];
+          if (!modelInstance1){
+            terminal.printError(Text.SOURCE_MODEL_INSTANCE_NOT_FOUND);
+            return true;
+          }
+          if (!modelInstance2){
+            terminal.printError(Text.TARGET_MODEL_INSTANCE_NOT_FOUND);
+            return true;
+          }
+          if (modelInstance1.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.SOURCE_MODEL_INSTANCE_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          if (modelInstance2.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.TARGET_MODEL_INSTANCE_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          modelInstance1.syncOrientation(modelInstance2);
+          refreshRaycaster(Text.ORIENTATION_SYNCED);
+          if (physicsDebugMode){
+            terminal.skip = true;
+            parseCommand("switchPhysicsDebugMode");
+            parseCommand("switchPhysicsDebugMode");
+            terminal.skip = false;
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

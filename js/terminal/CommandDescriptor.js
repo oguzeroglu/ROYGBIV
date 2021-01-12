@@ -286,7 +286,8 @@ var CommandDescriptor = function(){
       1, //selectModelInstance
       1, //destroyModelInstance
       0, //printModels
-      0 //printModelInstances
+      0, //printModelInstances
+      2 //syncModelInstanceOrientation
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -575,7 +576,8 @@ var CommandDescriptor = function(){
     "selectModelInstance instanceName",
     "destroyModelInstance instanceName",
     "printModels",
-    "printModelInstances"
+    "printModelInstances",
+    "syncModelInstanceOrientation sourceModelInstance targetModelInstance"
   ];
 
   this.commands = [
@@ -864,7 +866,8 @@ var CommandDescriptor = function(){
     "selectModelInstance",
     "destroyModelInstance",
     "printModels",
-    "printModelInstances"
+    "printModelInstances",
+    "syncModelInstanceOrientation"
   ];
 
   this.commandInfo = [
@@ -1153,7 +1156,8 @@ var CommandDescriptor = function(){
     "selectModelInstance: Selects a model instance.",
     "destroyModelInstance: Destroys a model instance.",
     "printModels: Prints a list of created models.",
-    "printModelInstances: Prints model instances."
+    "printModelInstances: Prints model instances.",
+    "syncModelInstanceOrientation: Syncs the world matrix of sourceModelInstance with targetModelInstance."
   ];
 
   this.keyboardInfo = [
@@ -2094,6 +2098,12 @@ var CommandDescriptor = function(){
   this.destroyModelInstance = new Object();
   this.destroyModelInstance.types = [];
   this.destroyModelInstance.types.push(this.MODEL_INSTANCE_NAME); //instanceName
+
+  // syncModelInstanceOrientation
+  this.syncModelInstanceOrientation = new Object();
+  this.syncModelInstanceOrientation.types = [];
+  this.syncModelInstanceOrientation.types.push(this.MODEL_INSTANCE_NAME); //sourceModelInstance
+  this.syncModelInstanceOrientation.types.push(this.MODEL_INSTANCE_NAME); //targetModelInstance
 };
 
 CommandDescriptor.prototype.test = function(){
