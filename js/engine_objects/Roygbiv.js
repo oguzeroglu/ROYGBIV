@@ -3434,6 +3434,7 @@ Roygbiv.prototype.createFPSControl = function(parameters){
 // requestFullScreen (optional): If true the FullScreen mode is requested if the screen is not on full screen. Orbit Controls
 // API also automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value
 // is false.
+// onUpdate (optional): A function that is executed on each frame (optional).
 Roygbiv.prototype.createOrbitControl = function(parameters){
   if (mode == 0){
     return;
@@ -3452,6 +3453,7 @@ Roygbiv.prototype.createOrbitControl = function(parameters){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.mouseWheelZoomSpeed, parameters.mouseWheelZoomSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.initialPhi, parameters.initialPhi);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.initialTheta, parameters.initialTheta);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.onUpdate, parameters.onUpdate);
   return new OrbitControls(parameters);
 }
 

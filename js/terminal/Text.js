@@ -1310,7 +1310,8 @@ var Text = function(){
                                                   "mouseDragRotationSpeed (optional): The speed of mouse drag rotation. Default value is 20.\n"+
                                                   "fingerSwipeRotationSpeed (optional): The speed of finger touch rotation for mobile devices. Default value is 20.\n"+
                                                   "keyboardRotationSpeed (optional): The speed of rotation using keyboard events. Default value is 10.\n"+
-                                                  "requestFullScreen (optional): If true the FullScreen mode is requested if the screen is not on full screen. Orbit Controls API\nalso automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value is false.";
+                                                  "requestFullScreen (optional): If true the FullScreen mode is requested if the screen is not on full screen. Orbit Controls API\nalso automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value is false.\n" +
+                                                  "onUpdate (optional): A function that is executed on each frame (optional).";
   this.ROYGBIV_SCRIPTING_API_ISORIENTATIONLANDSCAPE = "For mobile devices returns if the orientation is landscape for mobile devices. Returns false for desktop devices";
   this.ROYGBIV_SCRIPTING_API_SETSCREENORIENTATIONCHANGELISTENER = "Sets a listener for orientation change events. For mobile devices, the callbackFunction is executed with isLandscape parameter\nwhen the orientation is changed.";
   this.ROYGBIV_SCRIPTING_API_REMOVESCREENORIENTATIONCHANGELISTENER = "Removes the listener for orientation change events.";

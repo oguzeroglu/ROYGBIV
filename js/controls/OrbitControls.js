@@ -14,6 +14,8 @@ var OrbitControls = function(params){
   this.initialPhi = (!(typeof params.initialPhi == UNDEFINED))? params.initialPhi: Math.PI/4;
   this.initialTheta = (!(typeof params.initialTheta == UNDEFINED))? params.initialTheta: Math.PI/4;
 
+  this.onUpdateCallback = params.onUpdate;
+
   if (this.initialRadius > this.maxRadius){
     this.initialRadius = this.maxRadius;
   }
@@ -192,4 +194,8 @@ OrbitControls.prototype.update = function(){
   camera.position.add(this.lookPosition);
   camera.lookAt(this.lookPosition.x, this.lookPosition.y, this.lookPosition.z);
   this.resetStatus();
+
+  if (this.onUpdateCallback){
+    this.onUpdateCallback();
+  }
 }
