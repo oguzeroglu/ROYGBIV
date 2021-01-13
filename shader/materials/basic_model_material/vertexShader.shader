@@ -22,6 +22,10 @@ varying vec3 vLightSpecular;
 
 #define INSERTION
 
+#ifdef HAS_PHONG_LIGHTING
+  varying float vMaterialIndex;
+#endif
+
 #ifdef HAS_ANIMATION
   uniform mat4 animMatrix1;
   uniform mat4 animMatrix2;
@@ -87,6 +91,13 @@ varying vec3 vLightSpecular;
 #endif
 
 #ifdef AFFECTED_BY_LIGHT
+
+  int isSpecularityDisabledForMaterial(){
+    int mi = int(materialIndex);
+    //LIGHT_DISABLE_SPECULARITY_CODE
+    return 0;
+  }
+
   vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
     vec3 pointLightPosition = vec3(pX, pY, pZ);
     vec3 toLight = normalize(pointLightPosition - worldPosition);
@@ -858,7 +869,17 @@ void main(){
   vLightSpecular = lightSpecular;
   vColor = color;
 
+  #ifdef AFFECTED_BY_LIGHT
+    if (isSpecularityDisabledForMaterial() == 1){
+      vLightSpecular = vec3(0.0, 0.0, 0.0);
+    }
+  #endif
+
   vMetalness = metalnessRoughness[0];
+
+  #ifdef HAS_PHONG_LIGHTING
+    vMaterialIndex = materialIndex;
+  #endif
 
   #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
     vRoughness = metalnessRoughness[1];

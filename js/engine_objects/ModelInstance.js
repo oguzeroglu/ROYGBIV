@@ -37,6 +37,9 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
   this.blending = NORMAL_BLENDING;
   this.specularColor = {r: 1, g: 1, b: 1};
 
+  this.disabledSpecularityIndices = {};
+  this.refreshDisabledSpecularities();
+
   webglCallbackHandler.registerEngineObject(this);
 }
 
@@ -124,6 +127,8 @@ ModelInstance.prototype.export = function(){
   for (var animationName in this.animations){
     exportObj.animations[animationName] = this.animations[animationName].export();
   }
+
+  exportObj.disabledSpecularityIndices = this.disabledSpecularityIndices;
 
   return exportObj;
 }
@@ -848,4 +853,30 @@ ModelInstance.prototype.syncOrientation = function(targetModelInstance){
     this.animationGroup2.group.quaternion.copy(this.mesh.quaternion);
     this.animationGroup2.group.updateMatrixWorld(true);
   }
+}
+
+ModelInstance.prototype.refreshDisabledSpecularities = function(){
+  if (this.disableLightSpecularityCode){
+    macroHandler.replaceText("//LIGHT_DISABLE_SPECULARITY_CODE\n" + this.disableLightSpecularityCode, "//LIGHT_DISABLE_SPECULARITY_CODE\n", this.mesh.material, true, true);
+  }
+
+  var indices = Object.keys(this.disabledSpecularityIndices);
+  if (indices.length == 0){
+    return;
+  }
+
+  var text = "if(@@1){ return 1; }\n";
+  var insideText = "";
+
+  for (var i = 0; i < indices.length; i ++){
+    if (i != indices.length -1){
+      insideText += "mi == " + indices[i] + " || ";
+    }else{
+      insideText += "mi == " + indices[i];
+    }
+  }
+
+  text = text.replace("@@1", insideText);
+  macroHandler.replaceText("//LIGHT_DISABLE_SPECULARITY_CODE\n", "//LIGHT_DISABLE_SPECULARITY_CODE\n" + text, this.mesh.material, true, true);
+  this.disableLightSpecularityCode = text;
 }

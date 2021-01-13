@@ -2345,6 +2345,7 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     var mrParams = {
       "Metalness": childInfo.metalness,
       "Roughness": childInfo.roughness,
+      "Specularity disabled": !!modelInstance.disabledSpecularityIndices[i],
       "Sync all": function(){
         var metalness = allMRParams[this.index]["Metalness"];
         var roughness = allMRParams[this.index]["Roughness"];
@@ -2365,6 +2366,14 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     }.bind({index: i}));
     childFolder.add(mrParams, "Roughness").min(0).max(1).step(0.01).onChange(function(val){
       modelInstance.model.setMetalnessRoughness(false, val, this.index);
+    }.bind({index: i}));
+    childFolder.add(mrParams, "Specularity disabled").onChange(function(val){
+      if (val){
+        modelInstance.disabledSpecularityIndices[this.index] = true;
+      }else{
+        delete modelInstance.disabledSpecularityIndices[this.index];
+      }
+      modelInstance.refreshDisabledSpecularities();
     }.bind({index: i}));
     childFolder.add(mrParams, "Sync all");
 

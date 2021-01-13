@@ -19,6 +19,10 @@ varying float vMetalness;
 
 #define INSERTION
 
+#ifdef HAS_PHONG_LIGHTING
+  varying float vMaterialIndex;
+#endif
+
 vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
 
 #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
@@ -734,6 +738,12 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     return (ambient + diffuse);
   }
 
+  int isSpecularityDisabledForMaterial(){
+    int mi = int(vMaterialIndex);
+    //LIGHT_DISABLE_SPECULARITY_CODE
+    return 0;
+  }
+
   void handleLighting(vec3 worldPositionComputed){
 
     #ifdef HAS_NORMAL_MAP
@@ -962,6 +972,12 @@ void main(){
       #else
         textureColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w)).rgb;
       #endif
+    }
+  #endif
+
+  #ifdef HAS_PHONG_LIGHTING
+    if (isSpecularityDisabledForMaterial() == 1){
+      specularTotal = vec3(0.0, 0.0, 0.0);
     }
   #endif
 

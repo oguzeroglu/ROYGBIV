@@ -96,6 +96,11 @@ ImportHandler.prototype.importModelInstances = function(obj){
     if (curModelInstanceExport.specularColor){
       modelInstance.setSpecularColor(curModelInstanceExport.specularColor.r, curModelInstanceExport.specularColor.g, curModelInstanceExport.specularColor.b);
     }
+
+    if (curModelInstanceExport.disabledSpecularityIndices){
+      modelInstance.disabledSpecularityIndices = curModelInstanceExport.disabledSpecularityIndices;
+      modelInstance.refreshDisabledSpecularities();
+    }
   }
 }
 
