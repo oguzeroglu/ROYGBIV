@@ -317,6 +317,10 @@ var Preconditions = function(){
   this.opacity = "opacity";
   this.domElement = "domElement";
   this.arModelName = "arModelName";
+  this.childName = "childName";
+  this.colorR = "colorR";
+  this.colorG = "colorG";
+  this.colorB = "colorB";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -325,6 +329,18 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfModelInstanceHasChild = function(callerFunc, modelInstance, childName){
+  if (childName == null){
+    return;
+  }
+  for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
+    if (modelInstance.model.info.childInfos[i].name == childName){
+      return;
+    }
+  }
+  this.throw(callerFunc, "Model instance does not have such child.");
 }
 
 Preconditions.prototype.checkIfARSupported = function(callerFunc){
@@ -860,6 +876,12 @@ Preconditions.prototype.checkIfTrueOnlyIfYAndZExists = function(callerFunc, erro
 
 Preconditions.prototype.checkIfDefined = function(callerFunc, parameterName, obj){
   if (typeof obj == UNDEFINED || obj == null){
+    this.throw(callerFunc, parameterName+" is not defined.");
+  }
+}
+
+Preconditions.prototype.checkIfDefinedNotNull = function(callerFunc, parameterName, obj){
+  if (typeof obj == UNDEFINED){
     this.throw(callerFunc, parameterName+" is not defined.");
   }
 }

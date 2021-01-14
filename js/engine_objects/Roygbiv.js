@@ -366,7 +366,8 @@ var Roygbiv = function(){
     "onDOMElementClick",
     "removeDOMElementClickListener",
     "isARSupported",
-    "startAugmentedReality"
+    "startAugmentedReality",
+    "setModelInstanceColor"
   ];
 
   this.globals = new Object();
@@ -3180,6 +3181,32 @@ Roygbiv.prototype.mapTexturesToModelInstance = function(modelInstance, texturesO
   preConditions.checkIfValidModelTextureSObj(ROYGBIV.mapTexturesToModelInstance, modelInstance, texturesObj);
   preConditions.checkIfModelInstanceInActiveScene(ROYGBIV.mapTexturesToModelInstance, modelInstance);
   modelInstance.mapCustomTextures(texturesObj);
+}
+
+// Changes the material color of give child of a model instance. The color of all
+// children are set if the childName parameter is set to null. Color values need
+// to be in [0, 1] range.
+Roygbiv.prototype.setModelInstanceColor = function(modelInstance, childName, colorR, colorG, colorB){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceColor, preConditions.modelInstance, modelInstance);
+  preConditions.checkIfDefinedNotNull(ROYGBIV.setModelInstanceColor, preConditions.childName, childName);
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceColor, preConditions.colorR, colorR);
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceColor, preConditions.colorG, colorG);
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceColor, preConditions.colorB, colorB);
+  preConditions.checkIfNumber(ROYGBIV.setModelInstanceColor, preConditions.colorR, colorR);
+  preConditions.checkIfNumber(ROYGBIV.setModelInstanceColor, preConditions.colorG, colorG);
+  preConditions.checkIfNumber(ROYGBIV.setModelInstanceColor, preConditions.colorB, colorB);
+  preConditions.checkIfModelInstanceHasChild(ROYGBIV.setModelInstanceColor, modelInstance, childName);
+  preConditions.checkIfModelInstanceInActiveScene(ROYGBIV.setModelInstanceColor, modelInstance);
+
+  var childIndex = null;
+  if (childName != null){
+    childIndex = modelInstance.getIndexByChildName(childName);
+  }
+  modelInstance.setColor(colorR, colorG, colorB, childIndex, true);
 }
 
 // CONTROL FUNCTIONS ***********************************************************

@@ -5,6 +5,11 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
 
   this.indexedMaterialIndices = indexedMaterialIndices || [];
 
+  this.indicesByChildName = {};
+  for (var i = 0; i < modelInfo.childInfos.length; i ++){
+    this.indicesByChildName[modelInfo.childInfos[i].name] = i;
+  }
+
   var hasNormalMap = modelInfo.hasNormalMap;
 
   if (!indices){

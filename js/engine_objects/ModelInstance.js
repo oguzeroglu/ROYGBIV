@@ -904,3 +904,7 @@ ModelInstance.prototype.setColor = function(r, g, b, childIndex, fromScript){
   this.mesh.geometry.attributes.color.updateRange.set(0, colorAry.length);
   this.mesh.geometry.attributes.color.needsUpdate = true;
 }
+
+ModelInstance.prototype.getIndexByChildName = function(childName){
+  return this.model.indicesByChildName[childName];
+}

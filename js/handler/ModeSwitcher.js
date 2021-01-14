@@ -649,6 +649,11 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       animationHandler.forceFinish(modelInstance.animations[animationName]);
       modelInstance.animations[animationName].finishCallbackFunction = 0;
     }
+
+    for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
+      var childInfo = modelInstance.model.info.childInfos[i];
+      modelInstance.setColor(childInfo.colorR, childInfo.colorG, childInfo.colorB, i, false);
+    }
   }
 
   for (var sceneName in sceneHandler.scenes){
