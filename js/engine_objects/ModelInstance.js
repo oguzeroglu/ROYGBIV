@@ -880,3 +880,27 @@ ModelInstance.prototype.refreshDisabledSpecularities = function(){
   macroHandler.replaceText("//LIGHT_DISABLE_SPECULARITY_CODE\n", "//LIGHT_DISABLE_SPECULARITY_CODE\n" + text, this.mesh.material, true, true);
   this.disableLightSpecularityCode = text;
 }
+
+ModelInstance.prototype.setColor = function(r, g, b, childIndex, fromScript){
+  var colorAry = this.mesh.geometry.attributes.color.array;
+
+  var i2 = 0;
+  for (var i = 0; i < colorAry.length; i += 3){
+    var index = this.model.indexedMaterialIndices[i2];
+    if (childIndex == null || index == childIndex){
+      colorAry[i] = r;
+      colorAry[i + 1] = g;
+      colorAry[i + 2] = b;
+    }
+    i2 ++;
+  }
+
+  if (!fromScript){
+    this.model.info.childInfos[childIndex].colorR = r;
+    this.model.info.childInfos[childIndex].colorG = g;
+    this.model.info.childInfos[childIndex].colorB = b;
+  }
+
+  this.mesh.geometry.attributes.color.updateRange.set(0, colorAry.length);
+  this.mesh.geometry.attributes.color.needsUpdate = true;
+}

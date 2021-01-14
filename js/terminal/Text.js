@@ -121,6 +121,7 @@ var Text = function(){
   this.SHADOW_INTENSITY_UPDATED = "Shadow intensity updated.";
   this.CONFIGURATION_CREATED = "Configuration created.";
   this.MATERIAL_CREATED = "Material created.";
+  this.COLOR_SET = "Color set.";
   this.BASIC_MATERIAL_INFO_TREE = "|____BASIC MATERIAL: @@1 -> color: @@2";
   this.MATERIALS = "Materials";
   this.NO_CREATED_MATERIALS = "There are no created materials.";

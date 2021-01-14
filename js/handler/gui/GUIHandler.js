@@ -2377,6 +2377,28 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     }.bind({index: i}));
     childFolder.add(mrParams, "Sync all");
 
+
+    childFolder.add({
+      "Color": childInfo.colorR + "," + childInfo.colorG + "," + childInfo.colorB
+    }, "Color").onFinishChange(function(val){
+      var splitted = val.split(",");
+      terminal.clear();
+      if (splitted.length != 3){
+        terminal.printError(Text.INVALID_VECTOR_VALUE);
+        return;
+      }
+      var colorR = parseFloat(splitted[0]);
+      var colorG = parseFloat(splitted[1]);
+      var colorB = parseFloat(splitted[2]);
+      if (isNaN(colorR) || isNaN(colorG) || isNaN(colorB)){
+        terminal.printError(Text.INVALID_VECTOR_VALUE);
+        return;
+      }
+
+      modelInstance.setColor(colorR, colorG, colorB, this.index, false);
+      terminal.printInfo(Text.COLOR_SET);
+    }.bind({index: i}));
+
     var vp = {
       "Visible": modelInstance.isChildVisible(i),
       "Isolate": function(){
