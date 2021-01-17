@@ -38,6 +38,7 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
   this.specularColor = {r: 1, g: 1, b: 1};
 
   this.disabledSpecularityIndices = {};
+  this.disabledEnvMappingIndices = {};
   this.refreshDisabledSpecularities();
 
   webglCallbackHandler.registerEngineObject(this);
@@ -129,6 +130,7 @@ ModelInstance.prototype.export = function(){
   }
 
   exportObj.disabledSpecularityIndices = this.disabledSpecularityIndices;
+  exportObj.disabledEnvMappingIndices = this.disabledEnvMappingIndices;
 
   return exportObj;
 }
@@ -879,6 +881,32 @@ ModelInstance.prototype.refreshDisabledSpecularities = function(){
   text = text.replace("@@1", insideText);
   macroHandler.replaceText("//LIGHT_DISABLE_SPECULARITY_CODE\n", "//LIGHT_DISABLE_SPECULARITY_CODE\n" + text, this.mesh.material, true, true);
   this.disableLightSpecularityCode = text;
+}
+
+ModelInstance.prototype.refreshDisabledEnvMapping = function(){
+  if (this.disabledEnvMappingCode){
+    macroHandler.replaceText("//DISABLE_ENV_MAPPING_CODE\n" + this.disabledEnvMappingCode, "//DISABLE_ENV_MAPPING_CODE\n", this.mesh.material, true, false);
+  }
+
+  var indices = Object.keys(this.disabledEnvMappingIndices);
+  if (indices.length == 0){
+    return;
+  }
+
+  var text = "if(@@1){ return 1; }\n";
+  var insideText = "";
+
+  for (var i = 0; i < indices.length; i ++){
+    if (i != indices.length -1){
+      insideText += "mi == " + indices[i] + " || ";
+    }else{
+      insideText += "mi == " + indices[i];
+    }
+  }
+
+  text = text.replace("@@1", insideText);
+  macroHandler.replaceText("//DISABLE_ENV_MAPPING_CODE\n", "//DISABLE_ENV_MAPPING_CODE\n" + text, this.mesh.material, true, false);
+  this.disabledEnvMappingCode = text;
 }
 
 ModelInstance.prototype.setColor = function(r, g, b, childIndex, fromScript){

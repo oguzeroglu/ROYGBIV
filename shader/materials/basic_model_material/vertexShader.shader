@@ -37,6 +37,7 @@ varying vec3 vLightSpecular;
 
 #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
   varying float vRoughness;
+  varying float vEnvMapDisabled;
 #endif
 
 #ifdef CHILDREN_HIDEABLE
@@ -89,6 +90,12 @@ varying vec3 vLightSpecular;
     varying float vNormalTextureIndex;
   #endif
 #endif
+
+int isEnvMappingDisabledForMaterial(){
+  int mi = int(materialIndex);
+  //DISABLE_ENV_MAPPING_CODE
+  return 0;
+}
 
 #ifdef AFFECTED_BY_LIGHT
 
@@ -883,6 +890,14 @@ void main(){
 
   #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
     vRoughness = metalnessRoughness[1];
+  #endif
+
+  #ifdef HAS_ENVIRONMENT_MAP
+    if (isEnvMappingDisabledForMaterial() == 1){
+      vEnvMapDisabled = 100.0;
+    }else{
+      vEnvMapDisabled = -100.0;
+    }
   #endif
 
   gl_Position = projectionMatrix * selectedMVMatrix * vec4(position, 1.0);

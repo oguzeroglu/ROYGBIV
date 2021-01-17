@@ -2346,6 +2346,7 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       "Metalness": childInfo.metalness,
       "Roughness": childInfo.roughness,
       "Specularity disabled": !!modelInstance.disabledSpecularityIndices[i],
+      "Env mapping disabled": !!modelInstance.disabledEnvMappingIndices[i],
       "Sync all": function(){
         var metalness = allMRParams[this.index]["Metalness"];
         var roughness = allMRParams[this.index]["Roughness"];
@@ -2375,8 +2376,15 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       }
       modelInstance.refreshDisabledSpecularities();
     }.bind({index: i}));
+    childFolder.add(mrParams, "Env mapping disabled").onChange(function(val){
+      if (val){
+        modelInstance.disabledEnvMappingIndices[this.index] = true;
+      }else{
+        delete modelInstance.disabledEnvMappingIndices[this.index];
+      }
+      modelInstance.refreshDisabledEnvMapping();
+    }.bind({index: i}));
     childFolder.add(mrParams, "Sync all");
-
 
     childFolder.add({
       "Color": childInfo.colorR + "," + childInfo.colorG + "," + childInfo.colorB

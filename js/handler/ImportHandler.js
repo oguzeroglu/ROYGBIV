@@ -101,6 +101,11 @@ ImportHandler.prototype.importModelInstances = function(obj){
       modelInstance.disabledSpecularityIndices = curModelInstanceExport.disabledSpecularityIndices;
       modelInstance.refreshDisabledSpecularities();
     }
+
+    if (curModelInstanceExport.disabledEnvMappingIndices){
+      modelInstance.disabledEnvMappingIndices = curModelInstanceExport.disabledEnvMappingIndices;
+      modelInstance.refreshDisabledEnvMapping();
+    }
   }
 }
 
