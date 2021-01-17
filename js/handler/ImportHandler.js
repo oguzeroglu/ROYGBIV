@@ -106,6 +106,11 @@ ImportHandler.prototype.importModelInstances = function(obj){
       modelInstance.disabledEnvMappingIndices = curModelInstanceExport.disabledEnvMappingIndices;
       modelInstance.refreshDisabledEnvMapping();
     }
+
+    if (curModelInstanceExport.envMapModeIndices){
+      modelInstance.envMapModeIndices = curModelInstanceExport.envMapModeIndices;
+      modelInstance.refreshEnvMapMode();
+    }
   }
 }
 

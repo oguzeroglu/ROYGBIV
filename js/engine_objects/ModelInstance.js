@@ -39,7 +39,10 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
 
   this.disabledSpecularityIndices = {};
   this.disabledEnvMappingIndices = {};
+  this.envMapModeIndices = {};
   this.refreshDisabledSpecularities();
+  this.refreshDisabledEnvMapping();
+  this.refreshEnvMapMode();
 
   webglCallbackHandler.registerEngineObject(this);
 }
@@ -131,6 +134,7 @@ ModelInstance.prototype.export = function(){
 
   exportObj.disabledSpecularityIndices = this.disabledSpecularityIndices;
   exportObj.disabledEnvMappingIndices = this.disabledEnvMappingIndices;
+  exportObj.envMapModeIndices = this.envMapModeIndices;
 
   return exportObj;
 }
@@ -907,6 +911,32 @@ ModelInstance.prototype.refreshDisabledEnvMapping = function(){
   text = text.replace("@@1", insideText);
   macroHandler.replaceText("//DISABLE_ENV_MAPPING_CODE\n", "//DISABLE_ENV_MAPPING_CODE\n" + text, this.mesh.material, true, false);
   this.disabledEnvMappingCode = text;
+}
+
+ModelInstance.prototype.refreshEnvMapMode = function(){
+  if (this.envMapModeCode){
+    macroHandler.replaceText("//ENV_MODE_GETTER_CODE\n" + this.envMapModeCode, "//ENV_MODE_GETTER_CODE\n", this.mesh.material, true, false);
+  }
+
+  var indices = Object.keys(this.envMapModeIndices);
+  if (indices.length == 0){
+    return;
+  }
+
+  var text = "if(@@1){ return 1; }\n";
+  var insideText = "";
+
+  for (var i = 0; i < indices.length; i ++){
+    if (i != indices.length -1){
+      insideText += "mi == " + indices[i] + " || ";
+    }else{
+      insideText += "mi == " + indices[i];
+    }
+  }
+
+  text = text.replace("@@1", insideText);
+  macroHandler.replaceText("//ENV_MODE_GETTER_CODE\n", "//ENV_MODE_GETTER_CODE\n" + text, this.mesh.material, true, false);
+  this.envMapModeCode = text;
 }
 
 ModelInstance.prototype.setColor = function(r, g, b, childIndex, fromScript){

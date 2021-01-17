@@ -38,6 +38,7 @@ varying vec3 vLightSpecular;
 #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
   varying float vRoughness;
   varying float vEnvMapDisabled;
+  varying float vEnvMapModeRefraction;
 #endif
 
 #ifdef CHILDREN_HIDEABLE
@@ -94,6 +95,12 @@ varying vec3 vLightSpecular;
 int isEnvMappingDisabledForMaterial(){
   int mi = int(materialIndex);
   //DISABLE_ENV_MAPPING_CODE
+  return 0;
+}
+
+int isEnvModeRefractive(){
+  int mi = int(materialIndex);
+  //ENV_MODE_GETTER_CODE
   return 0;
 }
 
@@ -897,6 +904,12 @@ void main(){
       vEnvMapDisabled = 100.0;
     }else{
       vEnvMapDisabled = -100.0;
+    }
+
+    if (isEnvModeRefractive() == 1){
+      vEnvMapModeRefraction = 100.0;
+    }else{
+      vEnvMapModeRefraction = -100.0;
     }
   #endif
 

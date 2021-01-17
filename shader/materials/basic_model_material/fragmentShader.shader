@@ -31,6 +31,7 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
 
 #ifdef HAS_ENVIRONMENT_MAP
   varying float vEnvMapDisabled;
+  varying float vEnvMapModeRefraction;
 #endif
 
 #ifdef CHILDREN_HIDEABLE
@@ -921,7 +922,12 @@ void main(){
       vec3 envVec;
 
 
-      envVec = reflect(eyeToSurfaceDir, worldNormal);
+      if (vEnvMapModeRefraction < 0.0){
+        envVec = reflect(eyeToSurfaceDir, worldNormal);
+      }else{
+        envVec = refract(eyeToSurfaceDir, worldNormal, 1.0);
+        envVec = vec3(envVec.z, envVec.y, envVec.x);
+      }
 
       float exponent = pow(2.0, (1.0 - vRoughness) * 18.0 + 2.0);
       float maxMIPLevel = log2(float(ENVIRONMENT_MAP_SIZE));
