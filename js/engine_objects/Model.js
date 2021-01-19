@@ -422,10 +422,12 @@ Model.prototype.supportsCustomTextures = function(){
 Model.prototype.enableCustomTextures = function(){
   var diffuseTextureIndexByTextureID = {};
   var normalTextureIndexByTextureID = {};
+  var specularTextureIndexByTextureID = {};
   var curTextureIndex = 0;
 
   var diffuseTextureIndices = new Float32Array(this.indexedMaterialIndices.length);
-  var normalTextureIndices = this.info.hasNormalMap? new Float32Array(this.indexedMaterialIndices.length): null
+  var normalTextureIndices = this.info.hasNormalMap? new Float32Array(this.indexedMaterialIndices.length): null;
+  var specularTextureIndices = this.info.hasSpecularMap? new Float32Array(this.indexedMaterialIndices.length): null;
 
   for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
     var materialIndex = this.indexedMaterialIndices[i];
@@ -451,6 +453,18 @@ Model.prototype.enableCustomTextures = function(){
         normalTextureIndices[i] = -100;
       }
     }
+
+    if (this.info.hasSpecularMap){
+      if (material.specularTextureID){
+        if (typeof specularTextureIndexByTextureID[material.specularTextureID] == UNDEFINED){
+          specularTextureIndexByTextureID[material.specularTextureID] = curTextureIndex ++;
+        }
+
+        specularTextureIndices[i] = specularTextureIndexByTextureID[material.specularTextureID];
+      }else{
+        specularTextureIndices[i] = -100;
+      }
+    }
   }
 
   var diffuseTextureIndexBufferAttribute = new THREE.BufferAttribute(diffuseTextureIndices, 1);
@@ -460,23 +474,35 @@ Model.prototype.enableCustomTextures = function(){
   this.info.customTexturesEnabled = true;
   this.diffuseTextureIndexByTextureID = diffuseTextureIndexByTextureID;
   this.normalTextureIndexByTextureID = normalTextureIndexByTextureID;
+  this.specularTextureIndexByTextureID = specularTextureIndexByTextureID;
 
   if (this.info.hasNormalMap){
     var normalTextureIndexBufferAttribute = new THREE.BufferAttribute(normalTextureIndices, 1);
     normalTextureIndexBufferAttribute.setDynamic(false);
     this.geometry.addAttribute("normalTextureIndex", normalTextureIndexBufferAttribute);
   }
+
+  if (this.info.hasSpecularMap){
+    var specularTextureIndexBufferAttribute = new THREE.BufferAttribute(specularTextureIndices, 1);
+    specularTextureIndexBufferAttribute.setDynamic(false);
+    this.geometry.addAttribute("specularTextureIndex", specularTextureIndexBufferAttribute);
+  }
 }
 
 Model.prototype.disableCustomTextures = function(){
   delete this.diffuseTextureIndexByTextureID;
   delete this.normalTextureIndexByTextureID;
+  delete this.specularTextureIndexByTextureID;
 
   this.geometry.removeAttribute("diffuseTextureIndex");
   this.info.customTexturesEnabled = false;
 
   if (this.info.hasNormalMap){
     this.geometry.removeAttribute("normalTextureIndex");
+  }
+
+  if (this.info.hasSpecularMap){
+    this.geometry.removeAttribute("specularTextureIndex");
   }
 }
 

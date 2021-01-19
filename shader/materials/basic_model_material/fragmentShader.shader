@@ -921,7 +921,36 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
 
 #ifdef HAS_SPECULAR_MAP
   float getSpecularStrength(){
-    return texture2D(texture, uvAffineTransformation(vUV, vSpecularUV.x, vSpecularUV.y, vSpecularUV.z, vSpecularUV.w)).r;
+    #ifdef HAS_CUSTOM_TEXTURE
+      int specularTextureIndexInt = int(vSpecularTextureIndex);
+      #ifdef CUSTOM_SPECULAR_TEXTURE_0
+        if (specularTextureIndexInt == 0){
+          return texture2D(customSpecularTexture0, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_SPECULAR_TEXTURE_1
+        if (specularTextureIndexInt == 1){
+          return texture2D(customSpecularTexture1, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_SPECULAR_TEXTURE_2
+        if (specularTextureIndexInt == 2){
+          return texture2D(customSpecularTexture2, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_SPECULAR_TEXTURE_3
+        if (specularTextureIndexInt == 3){
+          return texture2D(customSpecularTexture3, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_SPECULAR_TEXTURE_4
+        if (specularTextureIndexInt == 4){
+          return texture2D(customSpecularTexture4, vUV).r;
+        }
+      #endif
+    #else
+      return texture2D(texture, uvAffineTransformation(vUV, vSpecularUV.x, vSpecularUV.y, vSpecularUV.z, vSpecularUV.w)).r;
+    #endif
   }
 #endif
 
