@@ -357,6 +357,9 @@ ModelInstance.prototype.setAffectedByLight = function(isAffectedByLight){
         macroHandler.removeMacro("HAS_NORMAL_MAP", this.mesh.material, true, true);
         delete this.mesh.material.uniforms.normalScale;
       }
+      if (this.model.info.hasSpecularMap){
+        macroHandler.removeMacro("HAS_SPECULAR_MAP", this.mesh.material, true, true);
+      }
     }
     delete this.lightingType;
 
@@ -381,6 +384,10 @@ ModelInstance.prototype.setPhongLight = function(){
     macroHandler.injectMacro("HAS_NORMAL_MAP", this.mesh.material, true, true);
     this.mesh.material.uniforms.normalScale = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
+
+  if (this.model.info.hasSpecularMap){
+    macroHandler.injectMacro("HAS_SPECULAR_MAP", this.mesh.material, true, true);
+  }
 }
 
 ModelInstance.prototype.unsetPhongLight = function(){
@@ -390,6 +397,10 @@ ModelInstance.prototype.unsetPhongLight = function(){
   if (this.model.info.hasNormalMap){
     macroHandler.removeMacro("HAS_NORMAL_MAP", this.mesh.material, true, true);
     delete this.mesh.material.uniforms.normalScale;
+  }
+
+  if (this.model.info.hasSpecularMap){
+    macroHandler.removeMacro("HAS_SPECULAR_MAP", this.mesh.material, true, true);
   }
 }
 

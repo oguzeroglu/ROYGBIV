@@ -73,6 +73,11 @@ varying vec3 vLightSpecular;
     varying vec3 vBitangent;
     varying vec4 vNormalUV;
   #endif
+
+  #ifdef HAS_SPECULAR_MAP
+    attribute vec4 specularUV;
+    varying vec4 vSpecularUV;
+  #endif
 #endif
 
 #ifdef AFFECTED_BY_LIGHT
@@ -89,6 +94,10 @@ varying vec3 vLightSpecular;
   #ifdef HAS_NORMAL_MAP
     attribute float normalTextureIndex;
     varying float vNormalTextureIndex;
+  #endif
+  #ifdef HAS_SPECULAR_MAP
+    attribute float specularTextureIndex;
+    varying float vSpecularTextureIndex;
   #endif
 #endif
 
@@ -865,6 +874,10 @@ void main(){
       vTangent = (selectedMVMatrix * vec4(tangent.xyz, 0.0)).xyz;
       vBitangent = normalize(cross(vNormal, vTangent) * tangent.w);
     #endif
+
+    #ifdef HAS_SPECULAR_MAP
+      vSpecularUV = specularUV;
+    #endif
   #endif
 
   #ifdef HAS_TEXTURE
@@ -876,6 +889,9 @@ void main(){
     vDiffuseTextureIndex = diffuseTextureIndex;
     #ifdef HAS_NORMAL_MAP
       vNormalTextureIndex = normalTextureIndex;
+    #endif
+    #ifdef HAS_SPECULAR_MAP
+      vSpecularTextureIndex = specularTextureIndex;
     #endif
   #endif
 
