@@ -136,8 +136,14 @@ ImportHandler.prototype.importModels = function(obj, callback){
       var colors = new Float32Array(indexedMaterialIndices.length * 3);
       var diffuseUVs = new Float32Array(indexedMaterialIndices.length * 4);
       var normalUVs;
+      var specularUVs;
+
       if (this.curModelExport.hasNormalMap){
         normalUVs = new Float32Array(indexedMaterialIndices.length * 4);
+      }
+
+      if (this.curModelExport.hasSpecularMap){
+        specularUVs = new Float32Array(indexedMaterialIndices.length * 4);
       }
 
       var x = 0, y = 0, z = 0;
@@ -158,13 +164,20 @@ ImportHandler.prototype.importModels = function(obj, callback){
           normalUVs[z ++] = -100;
           normalUVs[z ++] = -100;
         }
+
+        if (this.curModelExport.hasSpecularMap){
+          specularUVs[z ++] = -100;
+          specularUVs[z ++] = -100;
+          specularUVs[z ++] = -100;
+          specularUVs[z ++] = -100;
+        }
       }
 
       if (isDeployment){
         loadTime.modelGenerationTimes[this.curModelExport.name] = performance.now();
       }
 
-      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, normalUVs, null, indices, indexedMaterialIndices);
+      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, null, indices, indexedMaterialIndices);
 
       if (this.curModelExport.customTexturesEnabled){
         model.enableCustomTextures();

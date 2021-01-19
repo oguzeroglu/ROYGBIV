@@ -1,4 +1,4 @@
-var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, materialIndices, indices, indexedMaterialIndices){
+var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, materialIndices, indices, indexedMaterialIndices){
   this.name = modelInfo.name;
 
   this.geometry = new THREE.BufferGeometry();
@@ -11,6 +11,7 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
   }
 
   var hasNormalMap = modelInfo.hasNormalMap;
+  var hasSpecularMap = modelInfo.hasSpecularMap;
 
   if (!indices){
     var indexInfos = {};
@@ -41,6 +42,10 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var curNormalUVY = hasNormalMap? normalUVs[i4 + 1]: 0;
       var curNormalUVZ = hasNormalMap? normalUVs[i4 + 2]: 0;
       var curNormalUVW = hasNormalMap? normalUVs[i4 + 3]: 0;
+      var curSpecularUVX = hasSpecularMap? specularUVs[i4]: 0;
+      var curSpecularUVY = hasSpecularMap? specularUVs[i4 + 1]: 0;
+      var curSpecularUVZ = hasSpecularMap? specularUVs[i4 + 2]: 0;
+      var curSpecularUVW = hasSpecularMap? specularUVs[i4 + 3]: 0;
       var curMaterialIndex = materialIndices[i3];
       var key = curPosX + PIPE + curPosY + PIPE + curPosZ;
       key += PIPE + curNormalX + PIPE + curNormalY + PIPE + curNormalZ;
@@ -48,6 +53,7 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       key += PIPE + curDiffuseUVX + PIPE + curDiffuseUVY + PIPE + curDiffuseUVZ + PIPE + curDiffuseUVW;
       key += PIPE + curColorR + PIPE + curColorG + PIPE + curColorB;
       key += PIPE + curNormalUVX + PIPE + curNormalUVY + PIPE + curNormalUVZ + PIPE + curNormalUVW;
+      key += PIPE + curSpecularUVX + PIPE + curSpecularUVY + PIPE + curSpecularUVZ + PIPE + curSpecularUVW;
       if (indexInfos[key]){
         indexHitCount ++;
         indices.push(indexInfos[key]);
@@ -71,8 +77,9 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
     var allColors = new Float32Array(curIndex * 3);
 
     var allNormalUVs = hasNormalMap? new Float32Array(curIndex * 4): null;
+    var allSpecularUVs = hasSpecularMap? new Float32Array(curIndex * 4): null;
 
-    var x = 0, y = 0, z = 0, w = 0, t = 0, s = 0;
+    var x = 0, y = 0, z = 0, w = 0, t = 0, s = 0, a = 0;
     for (var i = 0; i < curIndex; i ++){
       var key = indexInfosInverse[i];
       var splitted = key.split(PIPE);
@@ -95,6 +102,10 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var curNormalUVY = parseFloat(splitted[16]);
       var curNormalUVZ = parseFloat(splitted[17]);
       var curNormalUVW = parseFloat(splitted[18]);
+      var curSpecularUVX = parseFloat(splitted[19]);
+      var surSpecularUVY = parseFloat(splitted[20]);
+      var curSpecularUVZ = parseFloat(splitted[21]);
+      var curSpecularUVW = parseFloat(splitted[22]);
 
       allPositions[x ++] = curPosX;
       allPositions[x ++] = curPosY;
@@ -117,6 +128,13 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
         allNormalUVs[s ++] = curNormalUVY;
         allNormalUVs[s ++] = curNormalUVZ;
         allNormalUVs[s ++] = curNormalUVW;
+      }
+
+      if (hasSpecularMap){
+        allSpecularUVs[a ++] = curSpecularUVX;
+        allSpecularUVs[a ++] = curSpecularUVY;
+        allSpecularUVs[a ++] = curSpecularUVZ;
+        allSpecularUVs[a ++] = curSpecularUVW;
       }
     }
 
@@ -145,6 +163,12 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       normalUVsBufferAttribute.setDynamic(false);
       this.geometry.addAttribute("normalUV", normalUVsBufferAttribute);
     }
+
+    if (hasSpecularMap){
+      var specularUVsBufferAttribute = new THREE.BufferAttribute(allSpecularUVs, 4);
+      specularUVsBufferAttribute.setDynamic(false);
+      this.geometry.addAttribute("specularUV", specularUVsBufferAttribute);
+    }
   }else{
     var positionsBufferAttribute = new THREE.BufferAttribute(positions, 3);
     var colorsBufferAttribute = new THREE.BufferAttribute(colors, 3);
@@ -170,6 +194,12 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var normalUVsBufferAttribute = new THREE.BufferAttribute(normalUVs, 4);
       normalUVsBufferAttribute.setDynamic(false);
       this.geometry.addAttribute("normalUV", normalUVsBufferAttribute);
+    }
+
+    if (hasSpecularMap){
+      var specularUVsBufferAttribute = new THREE.BufferAttribute(specularUVs, 4);
+      specularUVsBufferAttribute.setDynamic(false);
+      this.geometry.addAttribute("specularUV", specularUVsBufferAttribute);
     }
   }
 
@@ -252,6 +282,9 @@ Model.prototype.getUsedTextures = function(){
       if (this.info.childInfos[i].normalTextureURL == textureURL){
         textureID = this.info.childInfos[i].normalTextureID;
       }
+      if (this.info.childInfos[i].specularTextureURL == textureURL){
+        textureID = this.info.childInfos[i].specularTextureID;
+      }
     }
     usedTextures.push({
       id: textureID,
@@ -267,7 +300,8 @@ Model.prototype.getUsedTextures = function(){
 Model.prototype.onTextureAtlasRefreshed = function(){
   var diffuseUVAry = this.geometry.attributes.diffuseUV.array;
   var normalUVAry = this.info.hasNormalMap? this.geometry.attributes.normalUV.array: null;
-  var diffuseUVIndex = 0, normalUVIndex = 0;
+  var specularUVAry = this.info.hasSpecularMap? this.geometry.attributes.specularUV.array: null;
+  var diffuseUVIndex = 0, normalUVIndex = 0, specularUVIndex = 0;
   var ranges = textureAtlasHandler.textureMerger.ranges;
   for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
     var materialIndex = this.indexedMaterialIndices[i];
@@ -293,6 +327,18 @@ Model.prototype.onTextureAtlasRefreshed = function(){
         normalUVIndex += 4;
       }
     }
+
+    if (specularUVAry){
+      if (childInfo.specularTextureID){
+        var range = ranges[childInfo.specularTextureID];
+        specularUVAry[specularUVIndex ++] = range.startU;
+        specularUVAry[specularUVIndex ++] = range.startV;
+        specularUVAry[specularUVIndex ++] = range.endU;
+        specularUVAry[specularUVIndex ++] = range.endV;
+      }else{
+        specularUVIndex += 4;
+      }
+    }
   }
 
   this.geometry.attributes.diffuseUV.updateRange.set(0, diffuseUVAry.length);
@@ -302,6 +348,11 @@ Model.prototype.onTextureAtlasRefreshed = function(){
     this.geometry.attributes.normalUV.updateRange.set(0, normalUVAry.length);
     this.geometry.attributes.normalUV.needsUpdate = true;
   }
+
+  if (specularUVAry){
+    this.geometry.attributes.specularUV.updateRange.set(0, specularUVAry.length);
+    this.geometry.attributes.specularUV.needsUpdate = true;
+  }
 }
 
 Model.prototype.loadTextures = function(callback){
@@ -310,13 +361,18 @@ Model.prototype.loadTextures = function(callback){
   for (var i = 0; i < this.info.childInfos.length; i ++){
     var diffuseTextureURL = this.info.childInfos[i].diffuseTextureURL;
     var normalTextureURL = this.info.childInfos[i].normalTextureURL;
+    var specularTextureURL = this.info.childInfos[i].specularTextureURL;
     var diffuseTextureID = this.info.childInfos[i].diffuseTextureID;
     var normalTextureID = this.info.childInfos[i].normalTextureID;
+    var specularTextureID = this.info.childInfos[i].specularTextureID;
     if (diffuseTextureURL){
       texturesToLoad[diffuseTextureURL] = diffuseTextureID;
     }
     if (normalTextureURL){
       texturesToLoad[normalTextureURL] = normalTextureID;
+    }
+    if (specularTextureURL){
+      texturesToLoad[specularTextureURL] = specularTextureID;
     }
   }
 

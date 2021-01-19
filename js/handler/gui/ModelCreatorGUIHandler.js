@@ -176,6 +176,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   var boundingBox = new THREE.Box3();
 
   var hasNormalMap = false;
+  var hasSpecularMap = false;
 
   var flatInfo = [];
   for (var i = 0; i < model.children.length; i ++){
@@ -280,6 +281,28 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       }
     }
 
+    if (childMat.specularMap){
+      hasSpecularMap = true;
+      var tmpCanvas = document.createElement("canvas");
+      tmpCanvas.width = childMat.specularMap.image.width;
+      tmpCanvas.height = childMat.specularMap.image.height;
+      tmpCanvas.getContext("2d").drawImage(childMat.specularMap.image, 0, 0);
+      texturesObj[childMat.specularMap.image.src] = new THREE.CanvasTexture(tmpCanvas);
+      childInfo.specularTextureURL = childMat.specularMap.image.src;
+      var specularTextureID = null;
+      for (var i2 = 0; i2 < childInfos.length; i2 ++){
+        if (childInfos[i2].specularTextureURL == childMat.specularMap.image.src){
+          specularTextureID = childInfos[i2].specularTextureID;
+          break;
+        }
+      }
+      if (!specularTextureID){
+        childInfo.specularTextureID = generateUUID();
+      }else{
+        childInfo.specularTextureID = specularTextureID;
+      }
+    }
+
     childInfos.push(childInfo);
   }
 
@@ -297,6 +320,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   var uvs = [];
   var diffuseUVs = [];
   var normalUVs = [];
+  var specularUVs = [];
 
   var materialIndices = [];
 
@@ -360,6 +384,13 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     }else if (hasNormalMap){
       this.quadruplePush(normalUVs, -100, -100, -100, -100, "number");
     }
+
+    if (curFlatInfo.material.specularMap){
+      var uvInfo = textureMerger.ranges[curFlatInfo.material.specularMap.image.src];
+      this.quadruplePush(specularUVs, uvInfo.startU, uvInfo.startV, uvInfo.endU, uvInfo.endV, "number");
+    }else if (hasSpecularMap){
+      this.quadruplePush(specularUVs, -100, -100, -100, -100, "number");
+    }
   }
 
   modelCreatorGUIHandler.model = new Model({
@@ -368,8 +399,9 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     childInfos: childInfos,
     originalBoundingBox: boundingBox,
     hasNormalMap: hasNormalMap,
+    hasSpecularMap: hasSpecularMap,
     centerGeometry: centerGeometry
-  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, materialIndices);
+  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, materialIndices);
 
   modelCreatorGUIHandler.model.setARModelNames(arModelNames);
 
