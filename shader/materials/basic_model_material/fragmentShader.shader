@@ -62,12 +62,19 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
     varying vec4 vNormalUV;
     uniform vec2 normalScale;
   #endif
+
+  #ifdef HAS_SPECULAR_MAP
+    varying vec4 vSpecularUV;
+  #endif
 #endif
 
 #ifdef HAS_CUSTOM_TEXTURE
   varying float vDiffuseTextureIndex;
   #ifdef HAS_NORMAL_MAP
     varying float vNormalTextureIndex;
+  #endif
+  #ifdef HAS_SPECULAR_MAP
+    varying float vSpecularTextureIndex;
   #endif
   #ifdef CUSTOM_TEXTURE_0
     uniform sampler2D customDiffuseTexture0;
@@ -98,6 +105,21 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #endif
   #ifdef CUSTOM_NORMAL_TEXTURE_4
     uniform sampler2D customNormalTexture4;
+  #endif
+  #ifdef CUSTOM_SPECULAR_TEXTURE_0
+    uniform sampler2D customSpecularTexture0;
+  #endif
+  #ifdef CUSTOM_SPECULAR_TEXTURE_1
+    uniform sampler2D customSpecularTexture1;
+  #endif
+  #ifdef CUSTOM_SPECULAR_TEXTURE_2
+    uniform sampler2D customSpecularTexture2;
+  #endif
+  #ifdef CUSTOM_SPECULAR_TEXTURE_3
+    uniform sampler2D customSpecularTexture3;
+  #endif
+  #ifdef CUSTOM_SPECULAR_TEXTURE_4
+    uniform sampler2D customSpecularTexture4;
   #endif
 #else
   uniform sampler2D texture;
@@ -897,6 +919,41 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
   }
 #endif
 
+#ifdef HAS_SPECULAR_MAP
+  float getSpecularStrength(){
+    #ifdef HAS_CUSTOM_TEXTURE
+      int specularTextureIndexInt = int(vSpecularTextureIndex);
+      #ifdef CUSTOM_SPECULAR_TEXTURE_0
+        if (specularTextureIndexInt == 0){
+          return texture2D(customSpecularTexture0, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_SPECULAR_TEXTURE_1
+        if (specularTextureIndexInt == 1){
+          return texture2D(customSpecularTexture1, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_SPECULAR_TEXTURE_2
+        if (specularTextureIndexInt == 2){
+          return texture2D(customSpecularTexture2, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_SPECULAR_TEXTURE_3
+        if (specularTextureIndexInt == 3){
+          return texture2D(customSpecularTexture3, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_SPECULAR_TEXTURE_4
+        if (specularTextureIndexInt == 4){
+          return texture2D(customSpecularTexture4, vUV).r;
+        }
+      #endif
+    #else
+      return texture2D(texture, uvAffineTransformation(vUV, vSpecularUV.x, vSpecularUV.y, vSpecularUV.z, vSpecularUV.w)).r;
+    #endif
+  }
+#endif
+
 void main(){
 
   #ifdef CHILDREN_HIDEABLE
@@ -990,6 +1047,10 @@ void main(){
   #ifdef HAS_PHONG_LIGHTING
     if (isSpecularityDisabledForMaterial() == 1){
       specularTotal = vec3(0.0, 0.0, 0.0);
+    }else{
+      #ifdef HAS_SPECULAR_MAP
+        specularTotal *= getSpecularStrength();
+      #endif
     }
   #endif
 
