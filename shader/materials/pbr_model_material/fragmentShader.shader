@@ -154,7 +154,7 @@ vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, vec3 wo
   vec3 L = normalize(sub);
   vec3 H = normalize(V + L);
   float distance = length(sub);
-  float attenuation = 100000.0 / (distance * distance);
+  float attenuation = 500000.0 / (distance * distance);
   vec3 radiance = vec3(r, g, b) * attenuation;
 
   float NDF = DistributionGGX(normal, H, vRoughness);
@@ -370,10 +370,6 @@ void main(){
   #endif
 
   vec3 color = ambient + Lo;
-
-  color = color / (color + vec3(1.0, 1.0, 1.0));
-  float coef = 1.0/2.2;
-  color = pow(color, vec3(coef, coef, coef));
 
   gl_FragColor = vec4(color, float(ALPHA));
 }

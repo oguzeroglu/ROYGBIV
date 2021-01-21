@@ -1018,6 +1018,12 @@ ModelInstance.prototype.makePBR = function(){
   macroHandler.injectMat4("worldInverseTranspose", worldInverseTranspose, this.mesh.material, true, false);
 
   macroHandler.injectMacro("CHILDREN_HIDEABLE", this.mesh.material, true, true);
+
+  if (this.hasEnvironmentMap()){
+    var skybox = skyBoxes[this.environmentMapInfo.skyboxName];
+    this.unmapEnvironment();
+    this.mapEnvironment(skybox);
+  }
 }
 
 ModelInstance.prototype.unmakePBR = function(){
@@ -1039,4 +1045,10 @@ ModelInstance.prototype.unmakePBR = function(){
   macroHandler.injectMat4("worldInverseTranspose", worldInverseTranspose, this.mesh.material, true, false);
 
   macroHandler.injectMacro("CHILDREN_HIDEABLE", this.mesh.material, true, true);
+
+  if (this.hasEnvironmentMap()){
+    var skybox = skyBoxes[this.environmentMapInfo.skyboxName];
+    this.unmapEnvironment();
+    this.mapEnvironment(skybox);
+  }
 }
