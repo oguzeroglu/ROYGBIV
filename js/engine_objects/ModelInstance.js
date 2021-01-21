@@ -998,3 +998,45 @@ ModelInstance.prototype.setColor = function(r, g, b, childIndex, fromScript){
 ModelInstance.prototype.getIndexByChildName = function(childName){
   return this.model.indicesByChildName[childName];
 }
+
+ModelInstance.prototype.makePBR = function(){
+  this.mesh.material.vertexShader = "" + ShaderContent.pbrModelMaterialVertexShader;
+  this.mesh.material.fragmentShader = "" + ShaderContent.pbrModelMaterialFragmentShader;
+  this.setAffectedByLight(true);
+  this.setPhongLight();
+
+  this.envMapModeCode = null;
+  this.disabledEnvMappingCode = null;
+
+  this.refreshDisabledEnvMapping();
+  this.refreshEnvMapMode();
+
+  this.mesh.updateMatrixWorld(true);
+  var worldInverseTranspose = new THREE.Matrix4().getInverse(this.mesh.matrixWorld).transpose();
+
+  macroHandler.injectMat4("worldMatrix", this.mesh.matrixWorld, this.mesh.material, true, false);
+  macroHandler.injectMat4("worldInverseTranspose", worldInverseTranspose, this.mesh.material, true, false);
+
+  macroHandler.injectMacro("CHILDREN_HIDEABLE", this.mesh.material, true, true);
+}
+
+ModelInstance.prototype.unmakePBR = function(){
+  this.mesh.material.vertexShader = "" + ShaderContent.basicModelMaterialVertexShader;
+  this.mesh.material.fragmentShader = "" + ShaderContent.basicModelMaterialFragmentShader;
+  this.unsetPhongLight();
+  this.setAffectedByLight(false);
+
+  this.envMapModeCode = null;
+  this.disabledEnvMappingCode = null;
+
+  this.refreshDisabledEnvMapping();
+  this.refreshEnvMapMode();
+
+  this.mesh.updateMatrixWorld(true);
+  var worldInverseTranspose = new THREE.Matrix4().getInverse(this.mesh.matrixWorld).transpose();
+
+  macroHandler.injectMat4("worldMatrix", this.mesh.matrixWorld, this.mesh.material, true, false);
+  macroHandler.injectMat4("worldInverseTranspose", worldInverseTranspose, this.mesh.material, true, false);
+
+  macroHandler.injectMacro("CHILDREN_HIDEABLE", this.mesh.material, true, true);
+}
