@@ -1,0 +1,148 @@
+precision lowp float;
+precision lowp int;
+
+attribute vec3 color;
+attribute vec3 position;
+attribute vec3 normal;
+attribute vec4 diffuseUV;
+attribute vec2 metalnessRoughness;
+attribute float materialIndex;
+
+varying float vMetalness;
+varying float vRoughness;
+varying vec3 vColor;
+varying vec3 vWorldPosition;
+varying float vMaterialIndex;
+varying vec3 vNormal;
+
+uniform mat4 projectionMatrix;
+uniform mat4 modelViewMatrix;
+uniform vec3 cameraPosition;
+
+#define INSERTION
+
+#ifdef HAS_ANIMATION
+  uniform mat4 animMatrix1;
+  uniform mat4 animMatrix2;
+  uniform mat4 animWorldInverseTransposeMatrix1;
+  uniform mat4 animWorldInverseTransposeMatrix2;
+  uniform mat4 animModelViewMatrix1;
+  uniform mat4 animModelViewMatrix2;
+#endif
+
+#ifdef HAS_ENVIRONMENT_MAP
+  varying float vEnvMapDisabled;
+  varying float vEnvMapModeRefraction;
+#endif
+
+#ifdef CHILDREN_HIDEABLE
+  attribute float hiddenFlag;
+  varying float vHiddenFlag;
+#endif
+
+#ifdef HAS_TEXTURE
+  attribute vec2 uv;
+  varying vec2 vUV;
+  varying vec4 vDiffuseUV;
+#endif
+
+#ifdef HAS_ENVIRONMENT_MAP
+  varying vec3 vWorldNormal;
+#endif
+
+#ifdef HAS_NORMAL_MAP
+  attribute vec4 normalUV;
+  attribute vec4 tangent;
+  varying vec3 vTangent;
+  varying vec3 vBitangent;
+  varying vec4 vNormalUV;
+#endif
+
+#ifdef HAS_CUSTOM_TEXTURE
+  attribute float diffuseTextureIndex;
+  varying float vDiffuseTextureIndex;
+  #ifdef HAS_NORMAL_MAP
+    attribute float normalTextureIndex;
+    varying float vNormalTextureIndex;
+  #endif
+#endif
+
+int isEnvMappingDisabledForMaterial(){
+  int mi = int(materialIndex);
+  //DISABLE_ENV_MAPPING_CODE
+  return 0;
+}
+
+int isEnvModeRefractive(){
+  int mi = int(materialIndex);
+  //ENV_MODE_GETTER_CODE
+  return 0;
+}
+
+void main(){
+  #ifdef HAS_ANIMATION
+    int mi = int(materialIndex);
+    mat4 selectedMVMatrix;
+    mat4 selectedWorldMatrix;
+    mat4 selectedWorldInverseTranspose;
+    #ANIMATION_MATRIX_CODE
+  #else
+    mat4 selectedWorldMatrix = worldMatrix;
+    mat4 selectedWorldInverseTranspose = worldInverseTranspose;
+    mat4 selectedMVMatrix = modelViewMatrix;
+  #endif
+
+  #ifdef CHILDREN_HIDEABLE
+    vHiddenFlag = hiddenFlag;
+    if (hiddenFlag > 0.0){
+      return;
+    }
+  #endif
+
+  vec3 worldPositionComputed = (selectedWorldMatrix * vec4(position, 1.0)).xyz;
+  vWorldPosition = worldPositionComputed;
+
+  #ifdef HAS_ENVIRONMENT_MAP
+    vWorldNormal = mat3(selectedWorldMatrix) * normal;
+  #endif
+
+  vNormal = normalize(mat3(selectedWorldInverseTranspose) * normal);
+  #ifdef HAS_NORMAL_MAP
+    vNormalUV = normalUV;
+    vTangent = (selectedMVMatrix * vec4(tangent.xyz, 0.0)).xyz;
+    vBitangent = normalize(cross(vNormal, vTangent) * tangent.w);
+  #endif
+
+  #ifdef HAS_TEXTURE
+    vUV = uv;
+    vDiffuseUV = diffuseUV;
+  #endif
+
+  #ifdef HAS_CUSTOM_TEXTURE
+    vDiffuseTextureIndex = diffuseTextureIndex;
+    #ifdef HAS_NORMAL_MAP
+      vNormalTextureIndex = normalTextureIndex;
+    #endif
+  #endif
+
+  vColor = color;
+  vMetalness = metalnessRoughness[0];
+  vMaterialIndex = materialIndex;
+  vRoughness = metalnessRoughness[1];
+
+  #ifdef HAS_ENVIRONMENT_MAP
+    if (isEnvMappingDisabledForMaterial() == 1){
+      vEnvMapDisabled = 100.0;
+    }else{
+      vEnvMapDisabled = -100.0;
+    }
+
+    if (isEnvModeRefractive() == 1){
+      vEnvMapModeRefraction = 100.0;
+    }else{
+      vEnvMapModeRefraction = -100.0;
+    }
+  #endif
+
+  gl_Position = projectionMatrix * selectedMVMatrix * vec4(position, 1.0);
+}
