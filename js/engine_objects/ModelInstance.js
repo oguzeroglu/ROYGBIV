@@ -826,6 +826,23 @@ ModelInstance.prototype.removeAnimation = function(animation){
   delete this.animations[animation.name];
 }
 
+ModelInstance.prototype.refreshAnimationGroups = function(){
+  var ag1 = this.animationGroup1;
+  var ag2 = this.animationGroup2;
+  if (ag1){
+    this.removeAnimationGroup(ag1);
+  }
+  if (ag2){
+    this.removeAnimationGroup(ag2);
+  }
+  if (ag1){
+    this.addAnimationGroup(ag1);
+  }
+  if (ag2){
+    this.addAnimationGroup(ag2);
+  }
+}
+
 ModelInstance.prototype.setAlpha = function(alpha){
   macroHandler.replaceText("#define ALPHA " + this.alpha, "#define ALPHA " + alpha, this.mesh.material, false, true);
   this.alpha = alpha;
@@ -1032,6 +1049,8 @@ ModelInstance.prototype.makePBR = function(){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
   }
 
+  this.refreshAnimationGroups();
+
   this.pbrLightAttenuationCoef = 500000;
   this.hasPBR = true;
 }
@@ -1065,6 +1084,8 @@ ModelInstance.prototype.unmakePBR = function(){
   if (this.mesh.material.uniforms.texture){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
   }
+
+  this.refreshAnimationGroups();
 
   delete this.pbrLightAttenuationCoef;
   this.hasPBR = false;
