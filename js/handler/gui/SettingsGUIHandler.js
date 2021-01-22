@@ -433,7 +433,8 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
     "Text": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.TEXT),
     "Lightning": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.LIGHTNING),
     "Sprite": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SPRITE),
-    "Model": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.MODEL)
+    "Model": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.MODEL),
+    "PBR Model": shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.PBR_MODEL)
   };
 
   var precisionAry = ["low", "medium", "high"];
@@ -490,6 +491,11 @@ SettingsGUIHandler.prototype.initializeGraphicsFolder = function(parentFolder){
   }).listen();
   shaderPrecisionFolder.add(shaderPrecisionParameters, "Model", precisionAry).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.MODEL, settingsGUIHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  shaderPrecisionFolder.add(shaderPrecisionParameters, "PBR Model", precisionAry).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.PBR_MODEL, settingsGUIHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
   }).listen();
