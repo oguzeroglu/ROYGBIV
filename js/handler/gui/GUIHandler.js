@@ -161,7 +161,8 @@ var GUIHandler = function(){
     "Alpha": "1",
     "Depth write": true,
     "Blending": "Normal",
-    "Specular color": "1,1,1"
+    "Specular color": "1,1,1",
+    "PBR Light Attenuation Coef.": "0"
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -452,6 +453,11 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     }else{
       guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
     }
+
+    if (curSelection.hasPBR){
+      guiHandler.modelInstanceManipulationParameters["PBR Light Attenuation Coef."] = "" + curSelection.pbrLightAttenuationCoef;
+    }
+
   }else{
     guiHandler.hide(guiHandler.guiTypes.MODEL_INSTANCE);
   }
@@ -2162,6 +2168,8 @@ GUIHandler.prototype.initializeVirtualKeyboardGUI = function(){
 }
 
 GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
+  var modelInstance = selectionHandler.getSelectedObject();
+
   guiHandler.datGuiModelInstance = new dat.GUI({hideable: false, width: 420});
   guiHandler.datGuiModelInstance.domElement.addEventListener("mousedown", function(e){
     mimGUIFocused = true;
@@ -2231,65 +2239,79 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Blending", ["NO_BLENDING", "NORMAL_BLENDING", "ADDITIVE_BLENDING", "SUBTRACTIVE_BLENDING", "MULTIPLY_BLENDING"]).onChange(function(val){
     selectionHandler.getSelectedObject().setBlending(window[val]);
   }).listen();
-  graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Affected by light").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    terminal.clear();
-    obj.setAffectedByLight(val);
-    if (val){
-      guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
-      guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
-      guiHandler.enableController(guiHandler.modelInstanceHasSpecularityController);
-      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
-    }else{
-      guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
-      guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
-      guiHandler.disableController(guiHandler.modelInstanceHasSpecularityController);
-      guiHandler.modelInstanceManipulationParameters["Normal map scale"] = "1,1";
-      guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
-      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
-    }
-  }).listen();
-  graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Specular color").onFinishChange(function(val){
-    terminal.clear();
-    var splitted = val.split(",");
-    var rVal = parseFloat(splitted[0]);
-    var gVal = parseFloat(splitted[1]);
-    var bVal = parseFloat(splitted[2]);
-    if (isNaN(rVal) || isNaN(gVal) || isNaN(bVal)){
-      terminal.printError(Text.INVALID_VECTOR_VALUE);
-      return;
-    }
-    if (rVal < 0 || rVal > 1 || gVal < 0 || gVal > 1 || bVal < 0 || bVal > 1){
-      terminal.printError(Text.VALUES_MUST_BE_BETWEEN_0_1);
-      return;
-    }
-    selectionHandler.getSelectedObject().setSpecularColor(rVal, gVal, bVal);
-    terminal.printInfo(Text.SPECULAR_COLOR_SET);
-  }).listen();
-  guiHandler.modelInstanceHasSpecularityController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Has specularity").onChange(function(val){
-    var modelInstance = selectionHandler.getSelectedObject();
-    if (!modelInstance.affectedByLight){
-      guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
-      return;
-    }
-    if (val){
-      modelInstance.enableSpecularity();
-    }else{
-      modelInstance.disableSpecularity();
-    }
-  }).listen();
-  guiHandler.modelInstanceManupulationLightingTypeController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Lighting type", Object.keys(lightHandler.lightTypes)).onChange(function(val){
-    if (val == lightHandler.lightTypes.PHONG){
-      selectionHandler.getSelectedObject().setPhongLight();
-      if (selectionHandler.getSelectedObject().model.info.hasNormalMap){
-        guiHandler.enableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+  if (!modelInstance.hasPBR){
+    graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Affected by light").onChange(function(val){
+      var obj = selectionHandler.getSelectedObject();
+      terminal.clear();
+      obj.setAffectedByLight(val);
+      if (val){
+        guiHandler.modelInstanceManipulationParameters["Lighting type"] = lightHandler.lightTypes.GOURAUD;
+        guiHandler.enableController(guiHandler.modelInstanceManupulationLightingTypeController);
+        guiHandler.enableController(guiHandler.modelInstanceHasSpecularityController);
+        terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
+      }else{
+        guiHandler.disableController(guiHandler.modelInstanceManupulationLightingTypeController);
+        guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+        guiHandler.disableController(guiHandler.modelInstanceHasSpecularityController);
+        guiHandler.modelInstanceManipulationParameters["Normal map scale"] = "1,1";
+        guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
+        terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
       }
-    }else{
-      guiHandler.modelInstanceManipulationParameters["Normal map scale"] = "1,1";
-      selectionHandler.getSelectedObject().unsetPhongLight();
-      guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
-    }
-  }).listen();
+    }).listen();
+    graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Specular color").onFinishChange(function(val){
+      terminal.clear();
+      var splitted = val.split(",");
+      var rVal = parseFloat(splitted[0]);
+      var gVal = parseFloat(splitted[1]);
+      var bVal = parseFloat(splitted[2]);
+      if (isNaN(rVal) || isNaN(gVal) || isNaN(bVal)){
+        terminal.printError(Text.INVALID_VECTOR_VALUE);
+        return;
+      }
+      if (rVal < 0 || rVal > 1 || gVal < 0 || gVal > 1 || bVal < 0 || bVal > 1){
+        terminal.printError(Text.VALUES_MUST_BE_BETWEEN_0_1);
+        return;
+      }
+      selectionHandler.getSelectedObject().setSpecularColor(rVal, gVal, bVal);
+      terminal.printInfo(Text.SPECULAR_COLOR_SET);
+    }).listen();
+    guiHandler.modelInstanceHasSpecularityController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Has specularity").onChange(function(val){
+      var modelInstance = selectionHandler.getSelectedObject();
+      if (!modelInstance.affectedByLight){
+        guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
+        return;
+      }
+      if (val){
+        modelInstance.enableSpecularity();
+      }else{
+        modelInstance.disableSpecularity();
+      }
+    }).listen();
+    guiHandler.modelInstanceManupulationLightingTypeController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Lighting type", Object.keys(lightHandler.lightTypes)).onChange(function(val){
+      if (val == lightHandler.lightTypes.PHONG){
+        selectionHandler.getSelectedObject().setPhongLight();
+        if (selectionHandler.getSelectedObject().model.info.hasNormalMap){
+          guiHandler.enableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+        }
+      }else{
+        guiHandler.modelInstanceManipulationParameters["Normal map scale"] = "1,1";
+        selectionHandler.getSelectedObject().unsetPhongLight();
+        guiHandler.disableController(guiHandler.modelInstanceManipulationNormalMapScaleController);
+      }
+    }).listen();
+  }else{
+    graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "PBR Light Attenuation Coef.").onFinishChange(function(val){
+      var parsed = parseFloat(val);
+      terminal.clear();
+      if (isNaN(parsed)){
+        terminal.printError(Text.INVALID_NUMERICAL_VALUE);
+        return;
+      }
+
+      modelInstance.setPBRLightAttenuationCoef(parsed);
+      terminal.printInfo(Text.LIGHT_ATTENUATION_COEFFICIENT_SET)
+    }).listen();
+  }
   guiHandler.modelInstanceManipulationNormalMapScaleController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Normal map scale").onFinishChange(function(val){
     terminal.clear();
     var splitted = val.split(",");
@@ -2307,8 +2329,6 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     terminal.printInfo(Text.NORMAL_MAP_SCALE_SET);
   }).listen();
 
-  var modelInstance = selectionHandler.getSelectedObject();
-
   var allVisibilityParams = [];
 
   var visibilityConf = {
@@ -2325,6 +2345,24 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       }
     }
   }
+
+  var pbrConf = modelInstance.hasPBR? {
+    "Disable PBR": function(){
+      terminal.clear();
+      modelInstance.unmakePBR();
+      selectionHandler.resetCurrentSelection();
+      terminal.printInfo(Text.PBR_DISABLED_FOR_MODEL_INSTANCE);
+    }
+  }: {
+    "Enable PBR": function(){
+      terminal.clear();
+      modelInstance.makePBR();
+      selectionHandler.resetCurrentSelection();
+      terminal.printInfo(Text.PBR_ENABLED_FOR_MODEL_INSTANCE);
+    }
+  };
+
+  graphicsFolder.add(pbrConf, Object.keys(pbrConf)[0]);
 
   graphicsFolder.add(visibilityConf, "Show All");
   graphicsFolder.add(visibilityConf, "Hide All");
@@ -2369,14 +2407,16 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     childFolder.add(mrParams, "Roughness").min(0).max(1).step(0.01).onChange(function(val){
       modelInstance.model.setMetalnessRoughness(false, val, this.index);
     }.bind({index: i}));
-    childFolder.add(mrParams, "Specularity disabled").onChange(function(val){
-      if (val){
-        modelInstance.disabledSpecularityIndices[this.index] = true;
-      }else{
-        delete modelInstance.disabledSpecularityIndices[this.index];
-      }
-      modelInstance.refreshDisabledSpecularities();
-    }.bind({index: i}));
+    if (!modelInstance.hasPBR){
+      childFolder.add(mrParams, "Specularity disabled").onChange(function(val){
+        if (val){
+          modelInstance.disabledSpecularityIndices[this.index] = true;
+        }else{
+          delete modelInstance.disabledSpecularityIndices[this.index];
+        }
+        modelInstance.refreshDisabledSpecularities();
+      }.bind({index: i}));
+    }
     childFolder.add(mrParams, "Env mapping disabled").onChange(function(val){
       if (val){
         modelInstance.disabledEnvMappingIndices[this.index] = true;

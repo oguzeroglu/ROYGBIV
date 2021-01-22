@@ -1026,6 +1026,7 @@ ModelInstance.prototype.makePBR = function(){
   }
 
   this.pbrLightAttenuationCoef = 500000;
+  this.hasPBR = true;
 }
 
 ModelInstance.prototype.unmakePBR = function(){
@@ -1055,6 +1056,7 @@ ModelInstance.prototype.unmakePBR = function(){
   }
 
   delete this.pbrLightAttenuationCoef;
+  this.hasPBR = false;
 }
 
 ModelInstance.prototype.setPBRLightAttenuationCoef = function(lightAttenuationCoef){
