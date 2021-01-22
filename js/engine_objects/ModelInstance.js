@@ -136,6 +136,9 @@ ModelInstance.prototype.export = function(){
   exportObj.disabledEnvMappingIndices = this.disabledEnvMappingIndices;
   exportObj.envMapModeIndices = this.envMapModeIndices;
 
+  exportObj.hasPBR = this.hasPBR;
+  exportObj.pbrLightAttenuationCoef = this.pbrLightAttenuationCoef;
+
   return exportObj;
 }
 
@@ -385,7 +388,7 @@ ModelInstance.prototype.setPhongLight = function(){
     this.mesh.material.uniforms.normalScale = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
 
-  if (this.model.info.hasSpecularMap){
+  if (this.model.info.hasSpecularMap && !this.hasPBR){
     macroHandler.injectMacro("HAS_SPECULAR_MAP", this.mesh.material, true, true);
   }
 }
@@ -823,6 +826,23 @@ ModelInstance.prototype.removeAnimation = function(animation){
   delete this.animations[animation.name];
 }
 
+ModelInstance.prototype.refreshAnimationGroups = function(){
+  var ag1 = this.animationGroup1;
+  var ag2 = this.animationGroup2;
+  if (ag1){
+    this.removeAnimationGroup(ag1);
+  }
+  if (ag2){
+    this.removeAnimationGroup(ag2);
+  }
+  if (ag1){
+    this.addAnimationGroup(ag1);
+  }
+  if (ag2){
+    this.addAnimationGroup(ag2);
+  }
+}
+
 ModelInstance.prototype.setAlpha = function(alpha){
   macroHandler.replaceText("#define ALPHA " + this.alpha, "#define ALPHA " + alpha, this.mesh.material, false, true);
   this.alpha = alpha;
@@ -997,4 +1017,82 @@ ModelInstance.prototype.setColor = function(r, g, b, childIndex, fromScript){
 
 ModelInstance.prototype.getIndexByChildName = function(childName){
   return this.model.indicesByChildName[childName];
+}
+
+ModelInstance.prototype.makePBR = function(){
+  this.mesh.material.vertexShader = "" + ShaderContent.pbrModelMaterialVertexShader;
+  this.mesh.material.fragmentShader = "" + ShaderContent.pbrModelMaterialFragmentShader;
+  this.setAffectedByLight(true);
+  this.setPhongLight();
+
+  this.envMapModeCode = null;
+  this.disabledEnvMappingCode = null;
+
+  this.refreshDisabledEnvMapping();
+  this.refreshEnvMapMode();
+
+  this.mesh.updateMatrixWorld(true);
+  var worldInverseTranspose = new THREE.Matrix4().getInverse(this.mesh.matrixWorld).transpose();
+
+  macroHandler.injectMat4("worldMatrix", this.mesh.matrixWorld, this.mesh.material, true, false);
+  macroHandler.injectMat4("worldInverseTranspose", worldInverseTranspose, this.mesh.material, true, false);
+
+  macroHandler.injectMacro("CHILDREN_HIDEABLE", this.mesh.material, true, true);
+
+  if (this.hasEnvironmentMap()){
+    var skybox = skyBoxes[this.environmentMapInfo.skyboxName];
+    this.unmapEnvironment();
+    this.mapEnvironment(skybox);
+  }
+
+  if (this.mesh.material.uniforms.texture){
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
+  }
+
+  this.refreshAnimationGroups();
+
+  this.pbrLightAttenuationCoef = 500000;
+  this.hasPBR = true;
+}
+
+ModelInstance.prototype.unmakePBR = function(){
+  this.mesh.material.vertexShader = "" + ShaderContent.basicModelMaterialVertexShader;
+  this.mesh.material.fragmentShader = "" + ShaderContent.basicModelMaterialFragmentShader;
+  this.unsetPhongLight();
+  this.setAffectedByLight(false);
+
+  this.envMapModeCode = null;
+  this.disabledEnvMappingCode = null;
+
+  this.refreshDisabledEnvMapping();
+  this.refreshEnvMapMode();
+
+  this.mesh.updateMatrixWorld(true);
+  var worldInverseTranspose = new THREE.Matrix4().getInverse(this.mesh.matrixWorld).transpose();
+
+  macroHandler.injectMat4("worldMatrix", this.mesh.matrixWorld, this.mesh.material, true, false);
+  macroHandler.injectMat4("worldInverseTranspose", worldInverseTranspose, this.mesh.material, true, false);
+
+  macroHandler.injectMacro("CHILDREN_HIDEABLE", this.mesh.material, true, true);
+
+  if (this.hasEnvironmentMap()){
+    var skybox = skyBoxes[this.environmentMapInfo.skyboxName];
+    this.unmapEnvironment();
+    this.mapEnvironment(skybox);
+  }
+
+  if (this.mesh.material.uniforms.texture){
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
+  }
+
+  this.refreshAnimationGroups();
+
+  delete this.pbrLightAttenuationCoef;
+  this.hasPBR = false;
+}
+
+ModelInstance.prototype.setPBRLightAttenuationCoef = function(lightAttenuationCoef){
+  macroHandler.removeMacro("LIGHT_ATTENUATION_COEF " + this.pbrLightAttenuationCoef, this.mesh.material, false, true);
+  macroHandler.injectMacro("LIGHT_ATTENUATION_COEF " + lightAttenuationCoef, this.mesh.material, false, true);
+  this.pbrLightAttenuationCoef = lightAttenuationCoef;
 }

@@ -893,6 +893,7 @@ function readEngineScripts(projectName, author, enableAntialias, modules, bootsc
           scriptContent = scriptContent.replace("var DISABLE_MODEL_SHADERS = false;", "var DISABLE_MODEL_SHADERS = true;");
         }else{
           totalShaderContent += generateRSFChunk("materials/basic_model_material");
+          totalShaderContent += generateRSFChunk("materials/pbr_model_material");
         }
 
         writeRSFFile(projectName, totalShaderContent);

@@ -111,6 +111,11 @@ ImportHandler.prototype.importModelInstances = function(obj){
       modelInstance.envMapModeIndices = curModelInstanceExport.envMapModeIndices;
       modelInstance.refreshEnvMapMode();
     }
+
+    if (curModelInstanceExport.hasPBR){
+      modelInstance.makePBR();
+      modelInstance.setPBRLightAttenuationCoef(curModelInstanceExport.pbrLightAttenuationCoef);
+    }
   }
 }
 

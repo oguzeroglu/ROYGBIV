@@ -29,7 +29,9 @@ var ShaderContent = function(){
     {name: "spriteVertexShader", isVertexShader: true, dir: "sprite"},
     {name: "spriteFragmentShader", isVertexShader: false, dir: "sprite"},
     {name: "basicModelMaterialVertexShader", isVertexShader: true, dir: "materials/basic_model_material"},
-    {name: "basicModelMaterialFragmentShader", isVertexShader: false, dir: "materials/basic_model_material"}
+    {name: "basicModelMaterialFragmentShader", isVertexShader: false, dir: "materials/basic_model_material"},
+    {name: "pbrModelMaterialVertexShader", isVertexShader: true, dir: "materials/pbr_model_material"},
+    {name: "pbrModelMaterialFragmentShader", isVertexShader: false, dir: "materials/pbr_model_material"}
   ];
   this.currentLoadCount = 0;
   this.allShadersReadyCallback = function(){
@@ -117,6 +119,8 @@ var ShaderContent = function(){
     if (DISABLE_MODEL_SHADERS){
       this.shaders[28].disabled = true;
       this.shaders[29].disabled = true;
+      this.shaders[30].disabled = true;
+      this.shaders[31].disabled = true;
       totalLen -= 2;
     }
   }

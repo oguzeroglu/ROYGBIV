@@ -13,7 +13,8 @@ var ShaderPrecisionHandler = function(){
     TEXT: 7,
     LIGHTNING: 8,
     SPRITE: 9,
-    MODEL: 10
+    MODEL: 10,
+    PBR_MODEL: 11
   }
   this.reset();
 }
@@ -330,6 +331,24 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
       fragmentShaderName = "basicModelMaterialFragmentShader";
       for (var modelInstanceName in modelInstances){
         var modelInstance = modelInstances[modelInstanceName];
+        if (modelInstance.hasPBR){
+          continue;
+        }
+        modelInstance.mesh.material.vertexShader = this.replace(modelInstance.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
+        modelInstance.mesh.material.fragmentShader = this.replace(modelInstance.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
+        modelInstance.mesh.material.needsUpdate = true;
+      }
+    break;
+    case this.types.PBR_MODEL:
+      vertexShader = ShaderContent.pbrModelMaterialVertexShader;
+      fragmentShader = ShaderContent.pbrModelMaterialFragmentShader;
+      vertexShaderName = "pbrModelMaterialVertexShader";
+      fragmentShaderName = "pbrModelMaterialFragmentShader";
+      for (var modelInstanceName in modelInstances){
+        var modelInstance = modelInstances[modelInstanceName];
+        if (!modelInstance.hasPBR){
+          continue;
+        }
         modelInstance.mesh.material.vertexShader = this.replace(modelInstance.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
         modelInstance.mesh.material.fragmentShader = this.replace(modelInstance.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
         modelInstance.mesh.material.needsUpdate = true;
