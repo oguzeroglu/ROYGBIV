@@ -119,6 +119,8 @@ var ShaderContent = function(){
     if (DISABLE_MODEL_SHADERS){
       this.shaders[28].disabled = true;
       this.shaders[29].disabled = true;
+      this.shaders[30].disabled = true;
+      this.shaders[31].disabled = true;
       totalLen -= 2;
     }
   }
