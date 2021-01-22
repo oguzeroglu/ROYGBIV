@@ -136,6 +136,9 @@ ModelInstance.prototype.export = function(){
   exportObj.disabledEnvMappingIndices = this.disabledEnvMappingIndices;
   exportObj.envMapModeIndices = this.envMapModeIndices;
 
+  exportObj.hasPBR = this.hasPBR;
+  exportObj.pbrLightAttenuationCoef = this.pbrLightAttenuationCoef;
+
   return exportObj;
 }
 
