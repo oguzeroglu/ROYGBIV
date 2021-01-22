@@ -778,7 +778,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
 
       if (vNormalUV.x >= 0.0){
         #ifdef HAS_CUSTOM_TEXTURE
-          int normalTextureIndexInt = int(vNormalTextureIndex);
+          int normalTextureIndexInt = int(vNormalTextureIndex + 0.5);
           vec3 normalTextureColor;
 
           #ifdef CUSTOM_NORMAL_TEXTURE_0
@@ -922,7 +922,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
 #ifdef HAS_SPECULAR_MAP
   float getSpecularStrength(){
     #ifdef HAS_CUSTOM_TEXTURE
-      int specularTextureIndexInt = int(vSpecularTextureIndex);
+      int specularTextureIndexInt = int(vSpecularTextureIndex + 0.5);
       #ifdef CUSTOM_SPECULAR_TEXTURE_0
         if (specularTextureIndexInt == 0){
           return texture2D(customSpecularTexture0, vUV).r;
@@ -1012,7 +1012,7 @@ void main(){
   #ifdef HAS_TEXTURE
     if (vDiffuseUV.x >= 0.0) {
       #ifdef HAS_CUSTOM_TEXTURE
-        int diffuseTextureIndexInt = int(vDiffuseTextureIndex);
+        int diffuseTextureIndexInt = int(vDiffuseTextureIndex + 0.5);
         #ifdef CUSTOM_TEXTURE_0
           if (diffuseTextureIndexInt == 0){
             textureColor = texture2D(customDiffuseTexture0, vUV).rgb;
