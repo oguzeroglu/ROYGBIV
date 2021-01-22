@@ -2,7 +2,6 @@
 #extension GL_OES_standard_derivatives : enable
 
 #define PI 3.1415926
-
 #define ALPHA 1
 
 precision lowp float;
@@ -19,6 +18,8 @@ uniform vec3 cameraPosition;
 uniform mat4 dynamicLightsMatrix;
 
 #define INSERTION
+
+#define LIGHT_ATTENUATION_COEF 500000
 
 #ifdef HAS_ENVIRONMENT_MAP
   varying vec3 vWorldNormal;
@@ -154,7 +155,7 @@ vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, vec3 wo
   vec3 L = normalize(sub);
   vec3 H = normalize(V + L);
   float distance = length(sub);
-  float attenuation = 500000.0 / (distance * distance);
+  float attenuation = float(LIGHT_ATTENUATION_COEF) / (distance * distance);
   vec3 radiance = vec3(r, g, b) * attenuation;
 
   float NDF = DistributionGGX(normal, H, vRoughness);

@@ -1024,6 +1024,8 @@ ModelInstance.prototype.makePBR = function(){
     this.unmapEnvironment();
     this.mapEnvironment(skybox);
   }
+
+  this.pbrLightAttenuationCoef = 500000;
 }
 
 ModelInstance.prototype.unmakePBR = function(){
@@ -1051,4 +1053,12 @@ ModelInstance.prototype.unmakePBR = function(){
     this.unmapEnvironment();
     this.mapEnvironment(skybox);
   }
+
+  delete this.pbrLightAttenuationCoef;
+}
+
+ModelInstance.prototype.setPBRLightAttenuationCoef = function(lightAttenuationCoef){
+  macroHandler.removeMacro("LIGHT_ATTENUATION_COEF " + this.pbrLightAttenuationCoef, this.mesh.material, false, true);
+  macroHandler.injectMacro("LIGHT_ATTENUATION_COEF " + lightAttenuationCoef, this.mesh.material, false, true);
+  this.pbrLightAttenuationCoef = lightAttenuationCoef;
 }
