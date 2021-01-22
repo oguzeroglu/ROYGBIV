@@ -388,7 +388,7 @@ ModelInstance.prototype.setPhongLight = function(){
     this.mesh.material.uniforms.normalScale = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
 
-  if (this.model.info.hasSpecularMap){
+  if (this.model.info.hasSpecularMap && !this.hasPBR){
     macroHandler.injectMacro("HAS_SPECULAR_MAP", this.mesh.material, true, true);
   }
 }
@@ -1028,6 +1028,10 @@ ModelInstance.prototype.makePBR = function(){
     this.mapEnvironment(skybox);
   }
 
+  if (this.mesh.material.uniforms.texture){
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
+  }
+
   this.pbrLightAttenuationCoef = 500000;
   this.hasPBR = true;
 }
@@ -1056,6 +1060,10 @@ ModelInstance.prototype.unmakePBR = function(){
     var skybox = skyBoxes[this.environmentMapInfo.skyboxName];
     this.unmapEnvironment();
     this.mapEnvironment(skybox);
+  }
+
+  if (this.mesh.material.uniforms.texture){
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
   }
 
   delete this.pbrLightAttenuationCoef;
