@@ -181,7 +181,7 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo){
 
     if (vNormalUV.x >= 0.0){
       #ifdef HAS_CUSTOM_TEXTURE
-        int normalTextureIndexInt = int(vNormalTextureIndex);
+        int normalTextureIndexInt = int(vNormalTextureIndex + 0.5);
         vec3 normalTextureColor;
 
         #ifdef CUSTOM_NORMAL_TEXTURE_0
@@ -292,7 +292,7 @@ void main(){
   #ifdef HAS_TEXTURE
     if (vDiffuseUV.x >= 0.0) {
       #ifdef HAS_CUSTOM_TEXTURE
-        int diffuseTextureIndexInt = int(vDiffuseTextureIndex);
+        int diffuseTextureIndexInt = int(vDiffuseTextureIndex + 0.5);
         #ifdef CUSTOM_TEXTURE_0
           if (diffuseTextureIndexInt == 0){
             textureColor = texture2D(customDiffuseTexture0, vUV).rgb;
