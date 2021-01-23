@@ -9,7 +9,6 @@ precision lowp int;
 
 varying vec3 vColor;
 varying float vMetalness;
-varying float vMaterialIndex;
 varying float vRoughness;
 varying vec3 vWorldPosition;
 varying vec3 vNormal;

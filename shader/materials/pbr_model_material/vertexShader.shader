@@ -12,7 +12,6 @@ varying float vMetalness;
 varying float vRoughness;
 varying vec3 vColor;
 varying vec3 vWorldPosition;
-varying float vMaterialIndex;
 varying vec3 vNormal;
 
 uniform mat4 projectionMatrix;
@@ -127,7 +126,6 @@ void main(){
 
   vColor = color;
   vMetalness = metalnessRoughness[0];
-  vMaterialIndex = materialIndex;
   vRoughness = metalnessRoughness[1];
 
   #ifdef HAS_ENVIRONMENT_MAP
