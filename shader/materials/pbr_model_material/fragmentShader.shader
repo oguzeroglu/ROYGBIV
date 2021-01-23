@@ -3,6 +3,7 @@
 
 #define PI 3.1415926
 #define ALPHA 1
+#define ALPHA_TEST 0.5
 
 precision lowp float;
 precision lowp int;
@@ -44,6 +45,10 @@ uniform mat4 dynamicLightsMatrix;
   varying vec3 vBitangent;
   varying vec4 vNormalUV;
   uniform vec2 normalScale;
+#endif
+
+#ifdef HAS_ALPHA_MAP
+  varying vec4 vAlphaUV;
 #endif
 
 #ifdef HAS_CUSTOM_TEXTURE
@@ -286,6 +291,15 @@ void main(){
     }
   #endif
 
+  float alphaCoef = 1.0;
+  #ifdef HAS_ALPHA_MAP
+    alphaCoef = texture2D(texture, uvAffineTransformation(vUV, vAlphaUV.x, vAlphaUV.y, vAlphaUV.z, vAlphaUV.w)).g;
+    if (alphaCoef <= ALPHA_TEST){
+      discard;
+      return;
+    }
+  #endif
+
   vec3 textureColor = vec3(1.0, 1.0, 1.0);
 
   #ifdef HAS_TEXTURE
@@ -375,5 +389,5 @@ void main(){
 
   vec3 color = ambient + Lo;
 
-  gl_FragColor = vec4(color, float(ALPHA));
+  gl_FragColor = vec4(color, float(ALPHA) * alphaCoef);
 }

@@ -1074,6 +1074,9 @@ ModelInstance.prototype.makePBR = function(){
   if (this.mesh.material.uniforms.texture){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
   }
+  if (this.model.info.hasAlphaMap){
+    macroHandler.injectMacro("HAS_ALPHA_MAP", this.mesh.material, true, true);
+  }
 
   this.refreshAnimationGroups();
 
@@ -1109,6 +1112,9 @@ ModelInstance.prototype.unmakePBR = function(){
 
   if (this.mesh.material.uniforms.texture){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
+  }
+  if (this.model.info.hasAlphaMap){
+    macroHandler.injectMacro("HAS_ALPHA_MAP", this.mesh.material, true, true);
   }
 
   this.refreshAnimationGroups();

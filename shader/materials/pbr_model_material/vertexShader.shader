@@ -66,6 +66,11 @@ uniform vec3 cameraPosition;
   #endif
 #endif
 
+#ifdef HAS_ALPHA_MAP
+  attribute vec4 alphaUV;
+  varying vec4 vAlphaUV;
+#endif
+
 int isEnvMappingDisabledForMaterial(){
   int mi = int(materialIndex);
   //DISABLE_ENV_MAPPING_CODE
@@ -96,6 +101,10 @@ void main(){
     if (hiddenFlag > 0.0){
       return;
     }
+  #endif
+
+  #ifdef HAS_ALPHA_MAP
+    vAlphaUV = alphaUV;
   #endif
 
   vec3 worldPositionComputed = (selectedWorldMatrix * vec4(position, 1.0)).xyz;
