@@ -57,7 +57,7 @@ ImportHandler.prototype.importModelInstances = function(obj){
     }
 
     if (curModelInstanceExport.environmentMapInfo){
-      modelInstance.mapEnvironment(skyBoxes[curModelInstanceExport.environmentMapInfo.skyboxName]);
+      modelInstance.mapEnvironment(skyBoxes[curModelInstanceExport.environmentMapInfo.skyboxName], curModelInstanceExport.environmentMapInfo.fallbackDiffuse);
     }
 
     if (curModelInstanceExport.isSpecularityEnabled){

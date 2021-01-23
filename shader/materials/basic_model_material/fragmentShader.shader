@@ -1002,7 +1002,7 @@ void main(){
           if (vRoughness < 0.4){
             fallbackMIPLevel = 0.0;
           }
-          vec3 envDiffuseColor = vec3(1.0, 1.0, 1.0);
+          vec3 envDiffuseColor = vec3(float(ENV_DIFFUSE_FALLBACK_R), float(ENV_DIFFUSE_FALLBACK_G), float(ENV_DIFFUSE_FALLBACK_B));
           vec3 envSpecularColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x), fallbackMIPLevel).rgb * fresnel;
         #endif
 

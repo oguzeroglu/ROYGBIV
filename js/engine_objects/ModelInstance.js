@@ -586,7 +586,29 @@ ModelInstance.prototype.updateEnvironmentMap = function(skybox){
   macroHandler.injectMacro("ENVIRONMENT_MAP_SIZE " + skybox.imageSize, this.mesh.material, false, true);
 }
 
-ModelInstance.prototype.mapEnvironment = function(skybox){
+ModelInstance.prototype.setEnvMapFallbackDiffuseValue = function(fallbackDiffuse){
+  var macroValR = macroHandler.getMacroValue("ENV_DIFFUSE_FALLBACK_R", this.mesh.material, false);
+  var macroValG = macroHandler.getMacroValue("ENV_DIFFUSE_FALLBACK_G", this.mesh.material, false);
+  var macroValB = macroHandler.getMacroValue("ENV_DIFFUSE_FALLBACK_B", this.mesh.material, false);
+
+  if (macroValR != null){
+    macroHandler.removeMacro("ENV_DIFFUSE_FALLBACK_R " + macroValR, this.mesh.material, false, true);
+    macroHandler.removeMacro("ENV_DIFFUSE_FALLBACK_G " + macroValG, this.mesh.material, false, true);
+    macroHandler.removeMacro("ENV_DIFFUSE_FALLBACK_B " + macroValB, this.mesh.material, false, true);
+  }
+
+  if (!fallbackDiffuse){
+    return;
+  }
+
+  macroHandler.injectMacro("ENV_DIFFUSE_FALLBACK_R " + fallbackDiffuse.r, this.mesh.material, false, true);
+  macroHandler.injectMacro("ENV_DIFFUSE_FALLBACK_G " + fallbackDiffuse.g, this.mesh.material, false, true);
+  macroHandler.injectMacro("ENV_DIFFUSE_FALLBACK_B " + fallbackDiffuse.b, this.mesh.material, false, true);
+
+  this.environmentMapInfo.fallbackDiffuse = fallbackDiffuse;
+}
+
+ModelInstance.prototype.mapEnvironment = function(skybox, fallbackDiffuse){
   if (this.hasEnvironmentMap()){
     this.unmapEnvironment();
   }
@@ -607,6 +629,8 @@ ModelInstance.prototype.mapEnvironment = function(skybox){
   this.environmentMapInfo = {
     skyboxName: skybox.name
   };
+
+  this.setEnvMapFallbackDiffuseValue(fallbackDiffuse);
 }
 
 ModelInstance.prototype.unmapEnvironment = function(){
@@ -623,6 +647,8 @@ ModelInstance.prototype.unmapEnvironment = function(){
 
   var macroVal = macroHandler.getMacroValue("ENVIRONMENT_MAP_SIZE", this.mesh.material, false);
   macroHandler.removeMacro("ENVIRONMENT_MAP_SIZE " + macroVal, this.mesh.material, false, true);
+
+  this.setEnvMapFallbackDiffuseValue(null);
 }
 
 ModelInstance.prototype.disableSpecularity = function(){
@@ -1042,7 +1068,7 @@ ModelInstance.prototype.makePBR = function(){
   if (this.hasEnvironmentMap()){
     var skybox = skyBoxes[this.environmentMapInfo.skyboxName];
     this.unmapEnvironment();
-    this.mapEnvironment(skybox);
+    this.mapEnvironment(skybox, this.environmentMapInfo.fallbackDiffuse);
   }
 
   if (this.mesh.material.uniforms.texture){
@@ -1078,7 +1104,7 @@ ModelInstance.prototype.unmakePBR = function(){
   if (this.hasEnvironmentMap()){
     var skybox = skyBoxes[this.environmentMapInfo.skyboxName];
     this.unmapEnvironment();
-    this.mapEnvironment(skybox);
+    this.mapEnvironment(skybox, this.environmentMapInfo.fallbackDiffuse);
   }
 
   if (this.mesh.material.uniforms.texture){

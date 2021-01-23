@@ -2610,10 +2610,20 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   var environmentMapFolder = guiHandler.datGuiModelInstance.addFolder("Environment Map");
   var firstSkyboxName = Object.keys(skyBoxes)[0] || "";
   var childParams = [];
+
+  var fallbackDiffuseText = "1,1,1";
+  if (modelInstance.environmentMapInfo){
+    fallbackDiffuseText = modelInstance.environmentMapInfo.fallbackDiffuse.r + "," + modelInstance.environmentMapInfo.fallbackDiffuse.g + "," + modelInstance.environmentMapInfo.fallbackDiffuse.b;
+  }
+
   var environmentMapParams = {
     "Skybox": modelInstance.hasEnvironmentMap()? modelInstance.environmentMapInfo.skyboxName: firstSkyboxName,
-    "Enable": modelInstance.hasEnvironmentMap()
+    "Enable": modelInstance.hasEnvironmentMap(),
+    "Fallback diffuse color": fallbackDiffuseText
   };
+
+  var envMapFallbackDiffuseController;
+
   environmentMapFolder.add(environmentMapParams, "Skybox", Object.keys(skyBoxes)).onChange(function(val){
     if (modelInstance.hasEnvironmentMap()){
       modelInstance.updateEnvironmentMap(skyBoxes[val]);
@@ -2628,13 +2638,42 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
         return;
       }
 
-      modelInstance.mapEnvironment(skyBoxes[environmentMapParams["Skybox"]]);
+      var fallbackDiffuseSplitted = environmentMapParams["Fallback diffuse color"].split(",");
+      var fallbackDiffuse = {r: parseFloat(fallbackDiffuseSplitted[0]), g: parseFloat(fallbackDiffuseSplitted[1]), b: parseFloat(fallbackDiffuseSplitted[2])};
+
+      if (isNaN(fallbackDiffuse.r) || isNaN(fallbackDiffuse.g) || isNaN(fallbackDiffuse.b)){
+        terminal.printError(Text.INVALID_FALLBACK_DIFFUSE_VECTOR);
+        environmentMapParams["Enable"] = false;
+        return;
+      }
+
+      modelInstance.mapEnvironment(skyBoxes[environmentMapParams["Skybox"]], fallbackDiffuse);
+      guiHandler.enableController(envMapFallbackDiffuseController);
       terminal.printInfo(Text.ENVIRONMENT_MAP_CREATED);
     }else{
       modelInstance.unmapEnvironment();
+      guiHandler.disableController(envMapFallbackDiffuseController);
       terminal.printInfo(Text.ENVIRONMENT_MAP_REMOVED);
     }
   });
+  envMapFallbackDiffuseController = environmentMapFolder.add(environmentMapParams, "Fallback diffuse color").onFinishChange(function(val){
+    terminal.clear();
+    var fallbackDiffuseSplitted = val.split(",");
+    var fallbackDiffuse = {r: parseFloat(fallbackDiffuseSplitted[0]), g: parseFloat(fallbackDiffuseSplitted[1]), b: parseFloat(fallbackDiffuseSplitted[2])};
+
+    if (isNaN(fallbackDiffuse.r) || isNaN(fallbackDiffuse.g) || isNaN(fallbackDiffuse.b)){
+      terminal.printError(Text.INVALID_FALLBACK_DIFFUSE_VECTOR);
+      environmentMapParams["Enable"] = false;
+      return;
+    }
+
+    modelInstance.setEnvMapFallbackDiffuseValue(fallbackDiffuse);
+    terminal.printInfo(Text.FALLBACK_DIFFUSE_VECTOR_SET);
+  });
+
+  if (!modelInstance.hasEnvironmentMap()){
+    guiHandler.disableController(envMapFallbackDiffuseController);
+  }
 }
 
 GUIHandler.prototype.initializeMassManipulationGUI = function(){
