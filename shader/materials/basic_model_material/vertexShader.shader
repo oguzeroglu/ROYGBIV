@@ -104,6 +104,10 @@ varying vec3 vLightSpecular;
     attribute float specularTextureIndex;
     varying float vSpecularTextureIndex;
   #endif
+  #ifdef HAS_ALPHA_MAP
+    attribute float alphaTextureIndex;
+    varying float vAlphaTextureIndex;
+  #endif
 #endif
 
 int isEnvMappingDisabledForMaterial(){
@@ -901,6 +905,9 @@ void main(){
     #endif
     #ifdef HAS_SPECULAR_MAP
       vSpecularTextureIndex = specularTextureIndex;
+    #endif
+    #ifdef HAS_ALPHA_MAP
+      vAlphaTextureIndex = alphaTextureIndex;
     #endif
   #endif
 

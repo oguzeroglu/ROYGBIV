@@ -81,6 +81,9 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #ifdef HAS_SPECULAR_MAP
     varying float vSpecularTextureIndex;
   #endif
+  #ifdef HAS_ALPHA_MAP
+    varying float vAlphaTextureIndex;
+  #endif
   #ifdef CUSTOM_TEXTURE_0
     uniform sampler2D customDiffuseTexture0;
   #endif
@@ -125,6 +128,21 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #endif
   #ifdef CUSTOM_SPECULAR_TEXTURE_4
     uniform sampler2D customSpecularTexture4;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_0
+    uniform sampler2D customAlphaTexture0;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_1
+    uniform sampler2D customAlphaTexture1;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_2
+    uniform sampler2D customAlphaTexture2;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_3
+    uniform sampler2D customAlphaTexture3;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_4
+    uniform sampler2D customAlphaTexture4;
   #endif
 #else
   uniform sampler2D texture;
@@ -959,6 +977,47 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
   }
 #endif
 
+#ifdef HAS_ALPHA_MAP
+  float getAlphaCoef(){
+    if (vAlphaUV.x < 0.0) {
+      return 1.0;
+    }
+    
+    #ifdef HAS_CUSTOM_TEXTURE
+      int alphaTextureIndexInt = int(vAlphaTextureIndex + 0.5);
+      #ifdef CUSTOM_ALPHA_TEXTURE_0
+        if (alphaTextureIndexInt == 0){
+          return texture2D(customAlphaTexture0, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ALPHA_TEXTURE_1
+        if (alphaTextureIndexInt == 1){
+          return texture2D(customAlphaTexture1, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ALPHA_TEXTURE_2
+        if (alphaTextureIndexInt == 2){
+          return texture2D(customAlphaTexture2, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ALPHA_TEXTURE_3
+        if (alphaTextureIndexInt == 3){
+          return texture2D(customAlphaTexture3, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ALPHA_TEXTURE_4
+        if (alphaTextureIndexInt == 4){
+          return texture2D(customAlphaTexture4, vUV).g;
+        }
+      #endif
+    #else
+      return texture2D(texture, uvAffineTransformation(vUV, vAlphaUV.x, vAlphaUV.y, vAlphaUV.z, vAlphaUV.w)).g;
+    #endif
+
+    return 1.0;
+  }
+#endif
+
 void main(){
 
   #ifdef CHILDREN_HIDEABLE
@@ -970,7 +1029,7 @@ void main(){
 
   float alphaCoef = 1.0;
   #ifdef HAS_ALPHA_MAP
-    alphaCoef = texture2D(texture, uvAffineTransformation(vUV, vAlphaUV.x, vAlphaUV.y, vAlphaUV.z, vAlphaUV.w)).g;
+    alphaCoef = getAlphaCoef();
     if (alphaCoef <= ALPHA_TEST){
       discard;
       return;

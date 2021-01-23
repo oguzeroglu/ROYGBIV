@@ -456,12 +456,14 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
   var diffuseTextureIndexByTextureID = model.diffuseTextureIndexByTextureID;
   var normalTextureIndexByTextureID = model.normalTextureIndexByTextureID;
   var specularTextureIndexByTextureID = model.specularTextureIndexByTextureID;
+  var alphaTextureIndexByTextureID = model.alphaTextureIndexByTextureID;
 
   for (var i = 0; i < usedTextures.length; i ++){
     var textureID = usedTextures[i].id;
     var diffuseTextureIndex = diffuseTextureIndexByTextureID[textureID];
     var normalTextureIndex = normalTextureIndexByTextureID[textureID];
     var specularTextureIndex = specularTextureIndexByTextureID[textureID];
+    var alphaTextureIndex = alphaTextureIndexByTextureID[textureID];
 
     if (!(typeof diffuseTextureIndex == UNDEFINED)){
       var texture = texturesObj[textureID].diffuseTexture;
@@ -490,6 +492,15 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
       }else{
         uniforms[key].value = texture;
       }
+    }else if (!(typeof alphaTextureIndex == UNDEFINED)){
+      var texture = texturesObj[textureID].diffuseTexture;
+      var key = "customAlphaTexture" + alphaTextureIndex;
+      if (!uniforms[key]){
+        uniforms[key] = new THREE.Uniform(texture);
+        macroHandler.injectMacro("CUSTOM_ALPHA_TEXTURE_" + alphaTextureIndex, material, false, true);
+      }else{
+        uniforms[key].value = texture;
+      }
     }
   }
 
@@ -507,12 +518,14 @@ ModelInstance.prototype.unmapCustomTextures = function(){
   var diffuseTextureIndexByTextureID = model.diffuseTextureIndexByTextureID;
   var normalTextureIndexByTextureID = model.normalTextureIndexByTextureID;
   var specularTextureIndexByTextureID = model.specularTextureIndexByTextureID;
+  var alphaTextureIndexByTextureID = model.alphaTextureIndexByTextureID;
 
   for (var i = 0; i < usedTextures.length; i ++){
     var textureID = usedTextures[i].id;
     var diffuseTextureIndex = diffuseTextureIndexByTextureID[textureID];
     var normalTextureIndex = normalTextureIndexByTextureID[textureID];
     var specularTextureIndex = specularTextureIndexByTextureID[textureID];
+    var alphaTextureIndex = alphaTextureIndexByTextureID[textureID];
 
     if (!(typeof diffuseTextureIndex == UNDEFINED)){
       var key = "customDiffuseTexture" + diffuseTextureIndex;
@@ -525,6 +538,10 @@ ModelInstance.prototype.unmapCustomTextures = function(){
     }else if (!(typeof specularTextureIndex == UNDEFINED)){
       var key = "customSpecularTexture" + specularTextureIndex;
       macroHandler.removeMacro("CUSTOM_SPECULAR_TEXTURE_" + specularTextureIndex, material, false, true);
+      delete uniforms[key];
+    }else if (!(typeof alphaTextureIndex == UNDEFINED)){
+      var key = "customAlphaTexture" + alphaTextureIndex;
+      macroHandler.removeMacro("CUSTOM_ALPHA_TEXTURE_" + alphaTextureIndex, material, false, true);
       delete uniforms[key];
     }
   }

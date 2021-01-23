@@ -64,6 +64,10 @@ uniform vec3 cameraPosition;
     attribute float normalTextureIndex;
     varying float vNormalTextureIndex;
   #endif
+  #ifdef HAS_ALPHA_MAP
+    attribute float alphaTextureIndex;
+    varying float vAlphaTextureIndex;
+  #endif
 #endif
 
 #ifdef HAS_ALPHA_MAP
@@ -130,6 +134,9 @@ void main(){
     vDiffuseTextureIndex = diffuseTextureIndex;
     #ifdef HAS_NORMAL_MAP
       vNormalTextureIndex = normalTextureIndex;
+    #endif
+    #ifdef HAS_ALPHA_MAP
+      vAlphaTextureIndex = alphaTextureIndex;
     #endif
   #endif
 
