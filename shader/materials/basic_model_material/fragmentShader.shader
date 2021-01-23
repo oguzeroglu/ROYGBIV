@@ -4,6 +4,7 @@
 #define PI 3.1415926
 
 #define ALPHA 1
+#define ALPHA_TEST 0.5
 
 precision lowp float;
 precision lowp int;
@@ -66,6 +67,10 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #ifdef HAS_SPECULAR_MAP
     varying vec4 vSpecularUV;
   #endif
+#endif
+
+#ifdef HAS_ALPHA_MAP
+  varying vec4 vAlphaUV;
 #endif
 
 #ifdef HAS_CUSTOM_TEXTURE
@@ -963,6 +968,15 @@ void main(){
     }
   #endif
 
+  float alphaCoef = 1.0;
+  #ifdef HAS_ALPHA_MAP
+    alphaCoef = texture2D(texture, uvAffineTransformation(vUV, vAlphaUV.x, vAlphaUV.y, vAlphaUV.z, vAlphaUV.w)).g;
+    if (alphaCoef <= ALPHA_TEST){
+      discard;
+      return;
+    }
+  #endif
+
   vec3 color = vColor;
   #ifdef HAS_PHONG_LIGHTING
     lightDiffuse = vec3(0.0, 0.0, 0.0);
@@ -1059,5 +1073,5 @@ void main(){
   #endif
 
   gl_FragColor.rgb = (diffuseTotal * mix(color, vec3(0.0, 0.0, 0.0), vMetalness) * textureColor) + (SPECULAR_COLOR * specularTotal);
-  gl_FragColor.a = float(ALPHA);
+  gl_FragColor.a = float(ALPHA) * alphaCoef;
 }

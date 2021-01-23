@@ -843,6 +843,7 @@ void main(){
       gl_FragColor.a *= val;
       if (val <= ALPHA_TEST){
         discard;
+        return;
       }
     }
   #endif

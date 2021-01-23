@@ -88,6 +88,11 @@ varying vec3 vLightSpecular;
   attribute vec3 bakedColor;
 #endif
 
+#ifdef HAS_ALPHA_MAP
+  attribute vec4 alphaUV;
+  varying vec4 vAlphaUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   attribute float diffuseTextureIndex;
   varying float vDiffuseTextureIndex;
@@ -878,6 +883,10 @@ void main(){
     #ifdef HAS_SPECULAR_MAP
       vSpecularUV = specularUV;
     #endif
+  #endif
+
+  #ifdef HAS_ALPHA_MAP
+    vAlphaUV = alphaUV;
   #endif
 
   #ifdef HAS_TEXTURE

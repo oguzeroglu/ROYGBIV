@@ -32,6 +32,10 @@ MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
     this.geometry.removeAttribute("uv");
   }
 
+  if (model.info.hasAlphaMap){
+    macroHandler.injectMacro("HAS_ALPHA_MAP", material, true, true);
+  }
+
   if (!isDeployment){
     macroHandler.injectMacro("CHILDREN_HIDEABLE", material, true, true);
   }
