@@ -140,8 +140,9 @@ ImportHandler.prototype.importModels = function(obj, callback){
 
       var colors = new Float32Array(indexedMaterialIndices.length * 3);
       var diffuseUVs = new Float32Array(indexedMaterialIndices.length * 4);
-      var normalUVs;
-      var specularUVs;
+      var normalUVs = null;
+      var specularUVs = null;
+      var alphaUVs = null;
 
       if (this.curModelExport.hasNormalMap){
         normalUVs = new Float32Array(indexedMaterialIndices.length * 4);
@@ -151,7 +152,11 @@ ImportHandler.prototype.importModels = function(obj, callback){
         specularUVs = new Float32Array(indexedMaterialIndices.length * 4);
       }
 
-      var x = 0, y = 0, z = 0;
+      if (this.curModelExport.hasAlphaMap){
+        alphaUVs = new Float32Array(indexedMaterialIndices.length * 4);
+      }
+
+      var x = 0, y = 0, z = 0, w = 0;
       for (var i = 0; i < indexedMaterialIndices.length; i ++){
         var materialIndex = indexedMaterialIndices[i];
         var curMaterial = this.curModelExport.childInfos[materialIndex];
@@ -176,13 +181,20 @@ ImportHandler.prototype.importModels = function(obj, callback){
           specularUVs[z ++] = -100;
           specularUVs[z ++] = -100;
         }
+
+        if (this.curModelExport.hasAlphaMap){
+          alphaUVs[w ++] = -100;
+          alphaUVs[w ++] = -100;
+          alphaUVs[w ++] = -100;
+          alphaUVs[w ++] = -100;
+        }
       }
 
       if (isDeployment){
         loadTime.modelGenerationTimes[this.curModelExport.name] = performance.now();
       }
 
-      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, null, indices, indexedMaterialIndices);
+      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, null, indices, indexedMaterialIndices);
 
       if (this.curModelExport.customTexturesEnabled){
         model.enableCustomTextures();
