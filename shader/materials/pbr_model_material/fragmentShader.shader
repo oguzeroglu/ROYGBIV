@@ -357,7 +357,7 @@ void main(){
         vec3 envSpecularColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
       #else
         vec3 envDiffuseColor = textureCube(environmentMap, N2, maxMIPLevel).rgb;
-        vec3 envSpecularColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x)).rgb;
+        vec3 envSpecularColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb;
       #endif
 
       vec3 kD = 1.0 - fresnel;
