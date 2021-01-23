@@ -997,10 +997,14 @@ void main(){
       #ifdef GL_EXT_shader_texture_lod
         vec3 envDiffuseColor = textureCubeLodEXT(environmentMap, N2, maxMIPLevel).rgb;
         vec3 envSpecularColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
-      #else
-        vec3 envDiffuseColor = textureCube(environmentMap, N2, maxMIPLevel).rgb;
-        vec3 envSpecularColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb;
-      #endif
+        #else
+          float fallbackMIPLevel = maxMIPLevel;
+          if (vRoughness < 0.4){
+            fallbackMIPLevel = 0.0;
+          }
+          vec3 envDiffuseColor = vec3(1.0, 1.0, 1.0);
+          vec3 envSpecularColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x), fallbackMIPLevel).rgb * fresnel;
+        #endif
 
       specularTotal += envSpecularColor;
       diffuseTotal += envDiffuseColor * (1.0 / PI);
