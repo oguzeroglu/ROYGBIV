@@ -21,7 +21,7 @@ RMFHandler.prototype.generate = function(positions, normals, uvs, indexedMateria
     var key = curPosX + PIPE + curPosY + PIPE + curPosZ;
     key += PIPE + curNormalX + PIPE + curNormalY + PIPE + curNormalZ;
     key += PIPE + curUVX + PIPE + curUVY;
-    if (indexInfos[key]){
+    if (!(typeof indexInfos[key] == UNDEFINED)){
       indices.push(indexInfos[key]);
     }else{
       indexInfos[key] = curIndex;
