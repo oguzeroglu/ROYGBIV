@@ -74,6 +74,9 @@ uniform mat4 dynamicLightsMatrix;
   #ifdef CUSTOM_TEXTURE_4
     uniform sampler2D customDiffuseTexture4;
   #endif
+  #ifdef CUSTOM_TEXTURE_5
+    uniform sampler2D customDiffuseTexture5;
+  #endif
   #ifdef CUSTOM_NORMAL_TEXTURE_0
     uniform sampler2D customNormalTexture0;
   #endif
@@ -89,6 +92,9 @@ uniform mat4 dynamicLightsMatrix;
   #ifdef CUSTOM_NORMAL_TEXTURE_4
     uniform sampler2D customNormalTexture4;
   #endif
+  #ifdef CUSTOM_NORMAL_TEXTURE_5
+    uniform sampler2D customNormalTexture5;
+  #endif
   #ifdef CUSTOM_ALPHA_TEXTURE_0
     uniform sampler2D customAlphaTexture0;
   #endif
@@ -103,6 +109,9 @@ uniform mat4 dynamicLightsMatrix;
   #endif
   #ifdef CUSTOM_ALPHA_TEXTURE_4
     uniform sampler2D customAlphaTexture4;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_5
+    uniform sampler2D customAlphaTexture5;
   #endif
 #else
   uniform sampler2D texture;
@@ -231,6 +240,11 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo){
             normalTextureColor = texture2D(customNormalTexture4, vUV).rgb;
           }
         #endif
+        #ifdef CUSTOM_NORMAL_TEXTURE_5
+          if (normalTextureIndexInt == 5){
+            normalTextureColor = texture2D(customNormalTexture5, vUV).rgb;
+          }
+        #endif
       #else
         vec3 normalTextureColor = texture2D(texture, uvAffineTransformation(vUV, vNormalUV.x, vNormalUV.y, vNormalUV.z, vNormalUV.w)).rgb;
       #endif
@@ -334,6 +348,11 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo){
           return texture2D(customAlphaTexture4, vUV).g;
         }
       #endif
+      #ifdef CUSTOM_ALPHA_TEXTURE_5
+        if (alphaTextureIndexInt == 5){
+          return texture2D(customAlphaTexture5, vUV).g;
+        }
+      #endif
     #else
       return texture2D(texture, uvAffineTransformation(vUV, vAlphaUV.x, vAlphaUV.y, vAlphaUV.z, vAlphaUV.w)).g;
     #endif
@@ -388,6 +407,11 @@ void main(){
         #ifdef CUSTOM_TEXTURE_4
           if (diffuseTextureIndexInt == 4){
             textureColor = texture2D(customDiffuseTexture4, vUV).rgb;
+            }
+        #endif
+        #ifdef CUSTOM_TEXTURE_5
+          if (diffuseTextureIndexInt == 5){
+            textureColor = texture2D(customDiffuseTexture5, vUV).rgb;
             }
         #endif
       #else

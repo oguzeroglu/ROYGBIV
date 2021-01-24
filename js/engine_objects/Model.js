@@ -477,7 +477,7 @@ Model.prototype.destroy = function(){
 Model.prototype.supportsCustomTextures = function(){
   var usedTextures = this.getUsedTextures();
 
-  return !(usedTextures.length == 0 || usedTextures.length > 5);
+  return !(usedTextures.length == 0 || usedTextures.length > 6);
 }
 
 Model.prototype.enableCustomTextures = function(){
