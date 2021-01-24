@@ -2,35 +2,12 @@ var RMFHandler = function(){
 
 }
 
-RMFHandler.prototype.generate = function(positions, normals, uvs, indexedMaterialIndices){
-  var indexInfos = {};
-  var indexInfosInverse = {};
-  var curIndex = 0;
-
-  var i2 = 0;
-  var indices = [];
-  for (var i = 0; i < positions.length; i += 3){
-    var curPosX = positions[i];
-    var curPosY = positions[i + 1];
-    var curPosZ = positions[i + 2];
-    var curNormalX = normals[i];
-    var curNormalY = normals[i + 1];
-    var curNormalZ = normals[i + 2];
-    var curUVX = uvs[i2];
-    var curUVY = uvs[i2 + 1];
-    var key = curPosX + PIPE + curPosY + PIPE + curPosZ;
-    key += PIPE + curNormalX + PIPE + curNormalY + PIPE + curNormalZ;
-    key += PIPE + curUVX + PIPE + curUVY;
-    if (!(typeof indexInfos[key] == UNDEFINED)){
-      indices.push(indexInfos[key]);
-    }else{
-      indexInfos[key] = curIndex;
-      indexInfosInverse[curIndex] = key;
-      indices.push(curIndex);
-      curIndex ++;
-    }
-    i2 += 2;
-  }
+RMFHandler.prototype.generate = function(model){
+  var indexInfos = model.indexInfos;
+  var indexInfosInverse = model.indexInfosInverse;
+  var curIndex = model.curIndex;
+  var indices = model.indices;
+  var indexedMaterialIndices = model.indexedMaterialIndices;
 
   var info = [curIndex];
 

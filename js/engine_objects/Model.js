@@ -75,6 +75,11 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       i4 += 4;
     }
 
+    this.indexInfos = indexInfos;
+    this.indexInfosInverse = indexInfosInverse;
+    this.indices = indices;
+    this.curIndex = curIndex;
+
     this.indexHitCount = indexHitCount;
     var allPositions = new Float32Array(curIndex * 3);
     var allNormals = new Float32Array(curIndex * 3);

@@ -452,7 +452,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     }
   }
 
-  var generated = rmfHandler.generate(positions, normals, uvs, modelCreatorGUIHandler.model.indexedMaterialIndices);
+  var generated = rmfHandler.generate(modelCreatorGUIHandler.model);
   xhr.send(generated.rmf);
 
   var xhr2 = new XMLHttpRequest();
