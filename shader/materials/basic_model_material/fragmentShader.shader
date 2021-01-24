@@ -982,7 +982,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     if (vAlphaUV.x < 0.0) {
       return 1.0;
     }
-    
+
     #ifdef HAS_CUSTOM_TEXTURE
       int alphaTextureIndexInt = int(vAlphaTextureIndex + 0.5);
       #ifdef CUSTOM_ALPHA_TEXTURE_0
@@ -1131,6 +1131,6 @@ void main(){
     }
   #endif
 
-  gl_FragColor.rgb = (diffuseTotal * mix(color, vec3(0.0, 0.0, 0.0), vMetalness) * textureColor) + (SPECULAR_COLOR * specularTotal);
+  gl_FragColor.rgb = (diffuseTotal * color * textureColor) + (SPECULAR_COLOR * specularTotal);
   gl_FragColor.a = float(ALPHA) * alphaCoef;
 }
