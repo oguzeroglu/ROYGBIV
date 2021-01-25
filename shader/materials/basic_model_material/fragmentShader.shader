@@ -996,6 +996,8 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     #else
       return texture2D(texture, uvAffineTransformation(vUV, vSpecularUV.x, vSpecularUV.y, vSpecularUV.z, vSpecularUV.w)).r;
     #endif
+
+    return 0.0;
   }
 #endif
 
