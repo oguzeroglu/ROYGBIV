@@ -4,6 +4,7 @@
 #define PI 3.1415926
 
 #define ALPHA 1
+#define ALPHA_TEST 0.5
 
 precision lowp float;
 precision lowp int;
@@ -68,6 +69,10 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #endif
 #endif
 
+#ifdef HAS_ALPHA_MAP
+  varying vec4 vAlphaUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   varying float vDiffuseTextureIndex;
   #ifdef HAS_NORMAL_MAP
@@ -75,6 +80,9 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #endif
   #ifdef HAS_SPECULAR_MAP
     varying float vSpecularTextureIndex;
+  #endif
+  #ifdef HAS_ALPHA_MAP
+    varying float vAlphaTextureIndex;
   #endif
   #ifdef CUSTOM_TEXTURE_0
     uniform sampler2D customDiffuseTexture0;
@@ -91,6 +99,9 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #ifdef CUSTOM_TEXTURE_4
     uniform sampler2D customDiffuseTexture4;
   #endif
+  #ifdef CUSTOM_TEXTURE_5
+    uniform sampler2D customDiffuseTexture5;
+  #endif
   #ifdef CUSTOM_NORMAL_TEXTURE_0
     uniform sampler2D customNormalTexture0;
   #endif
@@ -106,6 +117,9 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #ifdef CUSTOM_NORMAL_TEXTURE_4
     uniform sampler2D customNormalTexture4;
   #endif
+  #ifdef CUSTOM_NORMAL_TEXTURE_5
+    uniform sampler2D customNormalTexture5;
+  #endif
   #ifdef CUSTOM_SPECULAR_TEXTURE_0
     uniform sampler2D customSpecularTexture0;
   #endif
@@ -120,6 +134,27 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #endif
   #ifdef CUSTOM_SPECULAR_TEXTURE_4
     uniform sampler2D customSpecularTexture4;
+  #endif
+  #ifdef CUSTOM_SPECULAR_TEXTURE_5
+    uniform sampler2D customSpecularTexture5;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_0
+    uniform sampler2D customAlphaTexture0;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_1
+    uniform sampler2D customAlphaTexture1;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_2
+    uniform sampler2D customAlphaTexture2;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_3
+    uniform sampler2D customAlphaTexture3;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_4
+    uniform sampler2D customAlphaTexture4;
+  #endif
+  #ifdef CUSTOM_ALPHA_TEXTURE_5
+    uniform sampler2D customAlphaTexture5;
   #endif
 #else
   uniform sampler2D texture;
@@ -806,6 +841,11 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
               normalTextureColor = texture2D(customNormalTexture4, vUV).rgb;
             }
           #endif
+          #ifdef CUSTOM_NORMAL_TEXTURE_5
+            if (normalTextureIndexInt == 5){
+              normalTextureColor = texture2D(customNormalTexture5, vUV).rgb;
+            }
+          #endif
         #else
           vec3 normalTextureColor = texture2D(texture, uvAffineTransformation(vUV, vNormalUV.x, vNormalUV.y, vNormalUV.z, vNormalUV.w)).rgb;
         #endif
@@ -948,9 +988,62 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
           return texture2D(customSpecularTexture4, vUV).r;
         }
       #endif
+      #ifdef CUSTOM_SPECULAR_TEXTURE_5
+        if (specularTextureIndexInt == 5){
+          return texture2D(customSpecularTexture5, vUV).r;
+        }
+      #endif
     #else
       return texture2D(texture, uvAffineTransformation(vUV, vSpecularUV.x, vSpecularUV.y, vSpecularUV.z, vSpecularUV.w)).r;
     #endif
+
+    return 0.0;
+  }
+#endif
+
+#ifdef HAS_ALPHA_MAP
+  float getAlphaCoef(){
+    if (vAlphaUV.x < 0.0) {
+      return 1.0;
+    }
+
+    #ifdef HAS_CUSTOM_TEXTURE
+      int alphaTextureIndexInt = int(vAlphaTextureIndex + 0.5);
+      #ifdef CUSTOM_ALPHA_TEXTURE_0
+        if (alphaTextureIndexInt == 0){
+          return texture2D(customAlphaTexture0, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ALPHA_TEXTURE_1
+        if (alphaTextureIndexInt == 1){
+          return texture2D(customAlphaTexture1, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ALPHA_TEXTURE_2
+        if (alphaTextureIndexInt == 2){
+          return texture2D(customAlphaTexture2, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ALPHA_TEXTURE_3
+        if (alphaTextureIndexInt == 3){
+          return texture2D(customAlphaTexture3, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ALPHA_TEXTURE_4
+        if (alphaTextureIndexInt == 4){
+          return texture2D(customAlphaTexture4, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ALPHA_TEXTURE_5
+        if (alphaTextureIndexInt == 5){
+          return texture2D(customAlphaTexture5, vUV).g;
+        }
+      #endif
+    #else
+      return texture2D(texture, uvAffineTransformation(vUV, vAlphaUV.x, vAlphaUV.y, vAlphaUV.z, vAlphaUV.w)).g;
+    #endif
+
+    return 1.0;
   }
 #endif
 
@@ -958,6 +1051,15 @@ void main(){
 
   #ifdef CHILDREN_HIDEABLE
     if (vHiddenFlag > 0.0){
+      discard;
+      return;
+    }
+  #endif
+
+  float alphaCoef = 1.0;
+  #ifdef HAS_ALPHA_MAP
+    alphaCoef = getAlphaCoef();
+    if (alphaCoef <= ALPHA_TEST){
       discard;
       return;
     }
@@ -1040,7 +1142,12 @@ void main(){
         #ifdef CUSTOM_TEXTURE_4
           if (diffuseTextureIndexInt == 4){
             textureColor = texture2D(customDiffuseTexture4, vUV).rgb;
-            }
+          }
+        #endif
+        #ifdef CUSTOM_TEXTURE_5
+          if (diffuseTextureIndexInt == 5){
+            textureColor = texture2D(customDiffuseTexture5, vUV).rgb;
+          }
         #endif
       #else
         textureColor = texture2D(texture, uvAffineTransformation(vUV, vDiffuseUV.x, vDiffuseUV.y, vDiffuseUV.z, vDiffuseUV.w)).rgb;
@@ -1058,6 +1165,6 @@ void main(){
     }
   #endif
 
-  gl_FragColor.rgb = (diffuseTotal * mix(color, vec3(0.0, 0.0, 0.0), vMetalness) * textureColor) + (SPECULAR_COLOR * specularTotal);
-  gl_FragColor.a = float(ALPHA);
+  gl_FragColor.rgb = (diffuseTotal * color * textureColor) + (SPECULAR_COLOR * specularTotal);
+  gl_FragColor.a = float(ALPHA) * alphaCoef;
 }

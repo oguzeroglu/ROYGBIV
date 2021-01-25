@@ -64,6 +64,15 @@ uniform vec3 cameraPosition;
     attribute float normalTextureIndex;
     varying float vNormalTextureIndex;
   #endif
+  #ifdef HAS_ALPHA_MAP
+    attribute float alphaTextureIndex;
+    varying float vAlphaTextureIndex;
+  #endif
+#endif
+
+#ifdef HAS_ALPHA_MAP
+  attribute vec4 alphaUV;
+  varying vec4 vAlphaUV;
 #endif
 
 int isEnvMappingDisabledForMaterial(){
@@ -98,6 +107,10 @@ void main(){
     }
   #endif
 
+  #ifdef HAS_ALPHA_MAP
+    vAlphaUV = alphaUV;
+  #endif
+
   vec3 worldPositionComputed = (selectedWorldMatrix * vec4(position, 1.0)).xyz;
   vWorldPosition = worldPositionComputed;
 
@@ -121,6 +134,9 @@ void main(){
     vDiffuseTextureIndex = diffuseTextureIndex;
     #ifdef HAS_NORMAL_MAP
       vNormalTextureIndex = normalTextureIndex;
+    #endif
+    #ifdef HAS_ALPHA_MAP
+      vAlphaTextureIndex = alphaTextureIndex;
     #endif
   #endif
 

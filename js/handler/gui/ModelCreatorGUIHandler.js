@@ -177,6 +177,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
 
   var hasNormalMap = false;
   var hasSpecularMap = false;
+  var hasAlphaMap = false;
 
   var flatInfo = [];
   for (var i = 0; i < model.children.length; i ++){
@@ -303,6 +304,28 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       }
     }
 
+    if (childMat.alphaMap){
+      hasAlphaMap = true;
+      var tmpCanvas = document.createElement("canvas");
+      tmpCanvas.width = childMat.alphaMap.image.width;
+      tmpCanvas.height = childMat.alphaMap.image.height;
+      tmpCanvas.getContext("2d").drawImage(childMat.alphaMap.image, 0, 0);
+      texturesObj[childMat.alphaMap.image.src] = new THREE.CanvasTexture(tmpCanvas);
+      childInfo.alphaTextureURL = childMat.alphaMap.image.src;
+      var alphaTextureID = null;
+      for (var i2 = 0; i2 < childInfos.length; i2 ++){
+        if (childInfos[i2].alphaTextureURL == childMat.alphaMap.image.src){
+          alphaTextureID = childInfos[i2].alphaTextureID;
+          break;
+        }
+      }
+      if (!alphaTextureID){
+        childInfo.alphaTextureID = generateUUID();
+      }else{
+        childInfo.alphaTextureID = alphaTextureID;
+      }
+    }
+
     childInfos.push(childInfo);
   }
 
@@ -321,6 +344,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   var diffuseUVs = [];
   var normalUVs = [];
   var specularUVs = [];
+  var alphaUVs = [];
 
   var materialIndices = [];
 
@@ -391,6 +415,13 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     }else if (hasSpecularMap){
       this.quadruplePush(specularUVs, -100, -100, -100, -100, "number");
     }
+
+    if (curFlatInfo.material.alphaMap){
+      var uvInfo = textureMerger.ranges[curFlatInfo.material.alphaMap.image.src];
+      this.quadruplePush(alphaUVs, uvInfo.startU, uvInfo.startV, uvInfo.endU, uvInfo.endV, "number");
+    }else if (hasAlphaMap){
+      this.quadruplePush(alphaUVs, -100, -100, -100, -100, "number");
+    }
   }
 
   modelCreatorGUIHandler.model = new Model({
@@ -400,8 +431,9 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     originalBoundingBox: boundingBox,
     hasNormalMap: hasNormalMap,
     hasSpecularMap: hasSpecularMap,
+    hasAlphaMap: hasAlphaMap,
     centerGeometry: centerGeometry
-  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, materialIndices);
+  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, materialIndices);
 
   modelCreatorGUIHandler.model.setARModelNames(arModelNames);
 
@@ -420,7 +452,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     }
   }
 
-  var generated = rmfHandler.generate(positions, normals, uvs, modelCreatorGUIHandler.model.indexedMaterialIndices);
+  var generated = rmfHandler.generate(modelCreatorGUIHandler.model);
   xhr.send(generated.rmf);
 
   var xhr2 = new XMLHttpRequest();
