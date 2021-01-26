@@ -178,6 +178,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   var hasNormalMap = false;
   var hasSpecularMap = false;
   var hasAlphaMap = false;
+  var hasRoughnessMap = false;
 
   var flatInfo = [];
   for (var i = 0; i < model.children.length; i ++){
@@ -326,6 +327,28 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       }
     }
 
+    if (childMat.roughnessMap){
+      hasRoughnessMap = true;
+      var tmpCanvas = document.createElement("canvas");
+      tmpCanvas.width = childMat.roughnessMap.image.width;
+      tmpCanvas.height = childMat.roughnessMap.image.height;
+      tmpCanvas.getContext("2d").drawImage(childMat.roughnessMap.image, 0, 0);
+      texturesObj[childMat.roughnessMap.image.src] = new THREE.CanvasTexture(tmpCanvas);
+      childInfo.roughnessTextureURL = childMat.roughnessMap.image.src;
+      var roughnessTextureID = null;
+      for (var i2 = 0; i2 < childInfos.length; i2 ++){
+        if (childInfos[i2].roughnessTextureURL == childMat.roughnessMap.image.src){
+          roughnessTextureID = childInfos[i2].roughnessTextureID;
+          break;
+        }
+      }
+      if (!roughnessTextureID){
+        childInfo.roughnessTextureID = generateUUID();
+      }else{
+        childInfo.roughnessTextureID = roughnessTextureID;
+      }
+    }
+
     childInfos.push(childInfo);
   }
 
@@ -345,6 +368,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   var normalUVs = [];
   var specularUVs = [];
   var alphaUVs = [];
+  var roughnessUVs = [];
 
   var materialIndices = [];
 
@@ -422,6 +446,13 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     }else if (hasAlphaMap){
       this.quadruplePush(alphaUVs, -100, -100, -100, -100, "number");
     }
+
+    if (curFlatInfo.material.roughnessMap){
+      var uvInfo = textureMerger.ranges[curFlatInfo.material.roughnessMap.image.src];
+      this.quadruplePush(roughnessUVs, uvInfo.startU, uvInfo.startV, uvInfo.endU, uvInfo.endV, "number");
+    }else if (hasRoughnessMap){
+      this.quadruplePush(roughnessUVs, -100, -100, -100, -100, "number");
+    }
   }
 
   modelCreatorGUIHandler.model = new Model({
@@ -432,8 +463,9 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     hasNormalMap: hasNormalMap,
     hasSpecularMap: hasSpecularMap,
     hasAlphaMap: hasAlphaMap,
+    hasRoughnessMap: hasRoughnessMap,
     centerGeometry: centerGeometry
-  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, materialIndices);
+  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, roughnessUVs, materialIndices);
 
   modelCreatorGUIHandler.model.setARModelNames(arModelNames);
 

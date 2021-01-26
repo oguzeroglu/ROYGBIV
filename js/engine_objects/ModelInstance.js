@@ -457,6 +457,7 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
   var normalTextureIndexByTextureID = model.normalTextureIndexByTextureID;
   var specularTextureIndexByTextureID = model.specularTextureIndexByTextureID;
   var alphaTextureIndexByTextureID = model.alphaTextureIndexByTextureID;
+  var roughnessTextureIndexByTextureID = model.roughnessTextureIndexByTextureID;
 
   for (var i = 0; i < usedTextures.length; i ++){
     var textureID = usedTextures[i].id;
@@ -464,6 +465,7 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
     var normalTextureIndex = normalTextureIndexByTextureID[textureID];
     var specularTextureIndex = specularTextureIndexByTextureID[textureID];
     var alphaTextureIndex = alphaTextureIndexByTextureID[textureID];
+    var roughnessTextureIndex = roughnessTextureIndexByTextureID[textureID];
 
     if (!(typeof diffuseTextureIndex == UNDEFINED)){
       var texture = texturesObj[textureID].diffuseTexture;
@@ -501,6 +503,15 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
       }else{
         uniforms[key].value = texture;
       }
+    }else if (!(typeof roughnessTextureIndex == UNDEFINED)){
+      var texture = texturesObj[textureID].diffuseTexture;
+      var key = "customRoughnessTexture" + roughnessTextureIndex;
+      if (!uniforms[key]){
+        uniforms[key] = new THREE.Uniform(texture);
+        macroHandler.injectMacro("CUSTOM_ROUGHNESS_TEXTURE_" + roughnessTextureIndex, material, false, true);
+      }else{
+        uniforms[key].value = texture;
+      }
     }
   }
 
@@ -519,6 +530,7 @@ ModelInstance.prototype.unmapCustomTextures = function(){
   var normalTextureIndexByTextureID = model.normalTextureIndexByTextureID;
   var specularTextureIndexByTextureID = model.specularTextureIndexByTextureID;
   var alphaTextureIndexByTextureID = model.alphaTextureIndexByTextureID;
+  var roughnessTextureIndexByTextureID = model.roughnessTextureIndexByTextureID;
 
   for (var i = 0; i < usedTextures.length; i ++){
     var textureID = usedTextures[i].id;
@@ -526,6 +538,7 @@ ModelInstance.prototype.unmapCustomTextures = function(){
     var normalTextureIndex = normalTextureIndexByTextureID[textureID];
     var specularTextureIndex = specularTextureIndexByTextureID[textureID];
     var alphaTextureIndex = alphaTextureIndexByTextureID[textureID];
+    var roughnessTextureIndex = roughnessTextureIndexByTextureID[textureID];
 
     if (!(typeof diffuseTextureIndex == UNDEFINED)){
       var key = "customDiffuseTexture" + diffuseTextureIndex;
@@ -542,6 +555,10 @@ ModelInstance.prototype.unmapCustomTextures = function(){
     }else if (!(typeof alphaTextureIndex == UNDEFINED)){
       var key = "customAlphaTexture" + alphaTextureIndex;
       macroHandler.removeMacro("CUSTOM_ALPHA_TEXTURE_" + alphaTextureIndex, material, false, true);
+      delete uniforms[key];
+    }else if (!(typeof roughnessTextureIndex == UNDEFINED)){
+      var key = "customRoughnessTexture" + roughnessTextureIndex;
+      macroHandler.removeMacro("CUSTOM_ROUGHNESS_TEXTURE_" + roughnessTextureIndex, material, false, true);
       delete uniforms[key];
     }
   }
@@ -1094,6 +1111,9 @@ ModelInstance.prototype.makePBR = function(){
   if (this.model.info.hasAlphaMap){
     macroHandler.injectMacro("HAS_ALPHA_MAP", this.mesh.material, true, true);
   }
+  if (this.model.info.hasRoughnessMap){
+    macroHandler.injectMacro("HAS_ROUGHNESS_MAP", this.mesh.material, true, true);
+  }
 
   this.refreshAnimationGroups();
 
@@ -1132,6 +1152,9 @@ ModelInstance.prototype.unmakePBR = function(){
   }
   if (this.model.info.hasAlphaMap){
     macroHandler.injectMacro("HAS_ALPHA_MAP", this.mesh.material, true, true);
+  }
+  if (this.model.info.hasRoughnessMap){
+    macroHandler.injectMacro("HAS_ROUGHNESS_MAP", this.mesh.material, true, true);
   }
 
   this.refreshAnimationGroups();
