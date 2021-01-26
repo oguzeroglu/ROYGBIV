@@ -51,6 +51,10 @@ uniform mat4 dynamicLightsMatrix;
   varying vec4 vAlphaUV;
 #endif
 
+#ifdef HAS_ROUGHNESS_MAP
+  varying vec4 vRoughnessUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   varying float vDiffuseTextureIndex;
   #ifdef HAS_NORMAL_MAP
@@ -58,6 +62,9 @@ uniform mat4 dynamicLightsMatrix;
   #endif
   #ifdef HAS_ALPHA_MAP
     varying float vAlphaTextureIndex;
+  #endif
+  #ifdef HAS_ROUGHNESS_MAP
+    varying float vRoughnessTextureIndex;
   #endif
   #ifdef CUSTOM_TEXTURE_0
     uniform sampler2D customDiffuseTexture0;
@@ -112,6 +119,24 @@ uniform mat4 dynamicLightsMatrix;
   #endif
   #ifdef CUSTOM_ALPHA_TEXTURE_5
     uniform sampler2D customAlphaTexture5;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_0
+    uniform sampler2D customRoughnessTexture0;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_1
+    uniform sampler2D customRoughnessTexture1;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_2
+    uniform sampler2D customRoughnessTexture2;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_3
+    uniform sampler2D customRoughnessTexture3;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_4
+    uniform sampler2D customRoughnessTexture4;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_5
+    uniform sampler2D customRoughnessTexture5;
   #endif
 #else
   uniform sampler2D texture;
@@ -180,7 +205,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0){
   return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
 
-vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, vec3 worldPosition, vec3 normal, vec3 V, vec3 F0, vec3 albedo){
+vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, vec3 worldPosition, vec3 normal, vec3 V, vec3 F0, vec3 albedo, float selectedRoughness){
   vec3 lightPosition = vec3(pX, pY, pZ);
   vec3 sub = lightPosition - worldPosition;
   vec3 L = normalize(sub);
@@ -189,8 +214,8 @@ vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, vec3 wo
   float attenuation = float(LIGHT_ATTENUATION_COEF) / (distance * distance);
   vec3 radiance = vec3(r, g, b) * attenuation;
 
-  float NDF = DistributionGGX(normal, H, vRoughness);
-  float G = GeometrySmith(normal, V, L, vRoughness);
+  float NDF = DistributionGGX(normal, H, selectedRoughness);
+  float G = GeometrySmith(normal, V, L, selectedRoughness);
   vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
   vec3 nominator = NDF * G * F;
@@ -205,7 +230,7 @@ vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, vec3 wo
   return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
-vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo){
+vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, float selectedRoughness){
 
   #ifdef HAS_NORMAL_MAP
     vec3 computedNormal;
@@ -266,35 +291,35 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo){
     Lo += pointLight(
       float(STATIC_POINT_LIGHT_1_X), float(STATIC_POINT_LIGHT_1_Y), float(STATIC_POINT_LIGHT_1_Z),
       float(STATIC_POINT_LIGHT_1_R), float(STATIC_POINT_LIGHT_1_G), float(STATIC_POINT_LIGHT_1_B),
-      worldPositionComputed, computedNormal, V, F0, albedo
+      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness
     );
   #endif
   #ifdef HAS_STATIC_POINT_LIGHT_2
     Lo += pointLight(
       float(STATIC_POINT_LIGHT_2_X), float(STATIC_POINT_LIGHT_2_Y), float(STATIC_POINT_LIGHT_2_Z),
       float(STATIC_POINT_LIGHT_2_R), float(STATIC_POINT_LIGHT_2_G), float(STATIC_POINT_LIGHT_2_B),
-      worldPositionComputed, computedNormal, V, F0, albedo
+      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness
     );
   #endif
   #ifdef HAS_STATIC_POINT_LIGHT_3
     Lo += pointLight(
       float(STATIC_POINT_LIGHT_3_X), float(STATIC_POINT_LIGHT_3_Y), float(STATIC_POINT_LIGHT_3_Z),
       float(STATIC_POINT_LIGHT_3_R), float(STATIC_POINT_LIGHT_3_G), float(STATIC_POINT_LIGHT_3_B),
-      worldPositionComputed, computedNormal, V, F0, albedo
+      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness
     );
   #endif
   #ifdef HAS_STATIC_POINT_LIGHT_4
     Lo += pointLight(
       float(STATIC_POINT_LIGHT_4_X), float(STATIC_POINT_LIGHT_4_Y), float(STATIC_POINT_LIGHT_4_Z),
       float(STATIC_POINT_LIGHT_4_R), float(STATIC_POINT_LIGHT_4_G), float(STATIC_POINT_LIGHT_4_B),
-      worldPositionComputed, computedNormal, V, F0, albedo
+      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness
     );
   #endif
   #ifdef HAS_STATIC_POINT_LIGHT_5
     Lo += pointLight(
       float(STATIC_POINT_LIGHT_5_X), float(STATIC_POINT_LIGHT_5_Y), float(STATIC_POINT_LIGHT_5_Z),
       float(STATIC_POINT_LIGHT_5_R), float(STATIC_POINT_LIGHT_5_G), float(STATIC_POINT_LIGHT_5_B),
-      worldPositionComputed, computedNormal, V, F0, albedo
+      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness
     );
   #endif
 
@@ -361,6 +386,52 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo){
   }
 #endif
 
+#ifdef HAS_ROUGHNESS_MAP
+  float getRoughnessCoef(){
+    if (vRoughnessUV.x < 0.0) {
+      return 1.0;
+    }
+
+    #ifdef HAS_CUSTOM_TEXTURE
+      int roughnessTextureIndexInt = int(vRoughnessTextureIndex + 0.5);
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_0
+        if (roughnessTextureIndexInt == 0){
+          return texture2D(customRoughnessTexture0, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_1
+        if (roughnessTextureIndexInt == 1){
+          return texture2D(customRoughnessTexture1, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_2
+        if (roughnessTextureIndexInt == 2){
+          return texture2D(customRoughnessTexture2, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_3
+        if (roughnessTextureIndexInt == 3){
+          return texture2D(customRoughnessTexture3, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_4
+        if (roughnessTextureIndexInt == 4){
+          return texture2D(customRoughnessTexture4, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_5
+        if (roughnessTextureIndexInt == 5){
+          return texture2D(customRoughnessTexture5, vUV).g;
+        }
+      #endif
+    #else
+      return texture2D(texture, uvAffineTransformation(vUV, vRoughnessUV.x, vRoughnessUV.y, vRoughnessUV.z, vRoughnessUV.w)).g;
+    #endif
+
+    return 1.0;
+  }
+#endif
+
 void main(){
   #ifdef CHILDREN_HIDEABLE
     if (vHiddenFlag > 0.0){
@@ -376,6 +447,11 @@ void main(){
       discard;
       return;
     }
+  #endif
+
+  float selectedRoughness = vRoughness;
+  #ifdef HAS_ROUGHNESS_MAP
+    selectedRoughness = vRoughness * getRoughnessCoef();
   #endif
 
   vec3 textureColor = vec3(1.0, 1.0, 1.0);
@@ -425,7 +501,7 @@ void main(){
   vec3 V = normalize(cameraPosition - vWorldPosition);
   vec3 F0 = vec3(0.04, 0.04, 0.04);
   F0 = mix(F0, albedo, vMetalness);
-  vec3 Lo = handleLighting(vWorldPosition, V, F0, albedo);
+  vec3 Lo = handleLighting(vWorldPosition, V, F0, albedo, selectedRoughness);
 
   #ifdef HAS_ENVIRONMENT_MAP
     vec3 ambient;
@@ -440,8 +516,8 @@ void main(){
         envVec = refract(eyeToSurfaceDir, worldNormal, 1.0);
         envVec = vec3(envVec.z, envVec.y, envVec.x);
       }
-
-      float exponent = pow(2.0, (1.0 - vRoughness) * 18.0 + 2.0);
+      
+      float exponent = pow(2.0, (1.0 - selectedRoughness) * 18.0 + 2.0);
       float maxMIPLevel = log2(float(ENVIRONMENT_MAP_SIZE));
       float minMIPLevel = mipMapLevel(vec2(envVec.z, envVec.x) * float(ENVIRONMENT_MAP_SIZE));
       float MIPLevel = max(minMIPLevel, log2(float(ENVIRONMENT_MAP_SIZE) * sqrt(3.0)) - 0.5 * log2(exponent + 1.0));
@@ -453,7 +529,7 @@ void main(){
         vec3 envSpecularColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
       #else
         float fallbackMIPLevel = maxMIPLevel;
-        if (vRoughness < 0.4){
+        if (selectedRoughness < 0.4){
           fallbackMIPLevel = 0.0;
         }
         vec3 envDiffuseColor = vec3(float(ENV_DIFFUSE_FALLBACK_R), float(ENV_DIFFUSE_FALLBACK_G), float(ENV_DIFFUSE_FALLBACK_B));

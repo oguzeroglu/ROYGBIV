@@ -93,6 +93,11 @@ varying vec3 vLightSpecular;
   varying vec4 vAlphaUV;
 #endif
 
+#ifdef HAS_ROUGHNESS_MAP
+  attribute vec4 roughnessUV;
+  varying vec4 vRoughnessUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   attribute float diffuseTextureIndex;
   varying float vDiffuseTextureIndex;
@@ -107,6 +112,10 @@ varying vec3 vLightSpecular;
   #ifdef HAS_ALPHA_MAP
     attribute float alphaTextureIndex;
     varying float vAlphaTextureIndex;
+  #endif
+  #ifdef HAS_ROUGHNESS_MAP
+    attribute float roughnessTextureIndex;
+    varying float vRoughnessTextureIndex;
   #endif
 #endif
 
@@ -893,6 +902,10 @@ void main(){
     vAlphaUV = alphaUV;
   #endif
 
+  #ifdef HAS_ROUGHNESS_MAP
+    vRoughnessUV = roughnessUV;
+  #endif
+
   #ifdef HAS_TEXTURE
     vUV = uv;
     vDiffuseUV = diffuseUV;
@@ -908,6 +921,9 @@ void main(){
     #endif
     #ifdef HAS_ALPHA_MAP
       vAlphaTextureIndex = alphaTextureIndex;
+    #endif
+    #ifdef HAS_ROUGHNESS_MAP
+      vRoughnessTextureIndex = roughnessTextureIndex;
     #endif
   #endif
 
