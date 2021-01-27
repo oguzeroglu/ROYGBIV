@@ -14,9 +14,14 @@ varying vec3 vColor;
 vec3 lightDiffuse = vec3(0.0, 0.0, 0.0);
 vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
 varying vec3 vLightDiffuse;
-varying vec3 vLightSpecular;
 
 #define INSERTION
+
+#ifdef ENABLE_SPECULARITY
+  varying vec3 vLightSpecular;
+#else
+  vec3 vLightSpecular = vec3(0.0, 0.0, 0.0);
+#endif
 
 #ifdef HAS_ENVIRONMENT_MAP
   varying float vMetalness;

@@ -16,9 +16,12 @@ varying vec3 vColor;
 vec3 lightDiffuse = vec3(1.0, 1.0, 1.0);
 vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
 varying vec3 vLightDiffuse;
-varying vec3 vLightSpecular;
 
 #define INSERTION
+
+#ifdef ENABLE_SPECULARITY
+  varying vec3 vLightSpecular;
+#endif
 
 #ifdef HAS_ENVIRONMENT_MAP
   varying float vMetalness;
@@ -135,11 +138,13 @@ int isEnvModeRefractive(){
 
 #ifdef AFFECTED_BY_LIGHT
 
-  int isSpecularityDisabledForMaterial(){
-    int mi = int(materialIndex);
-    //LIGHT_DISABLE_SPECULARITY_CODE
-    return 0;
-  }
+  #ifdef ENABLE_SPECULARITY
+    int isSpecularityDisabledForMaterial(){
+      int mi = int(materialIndex);
+      //LIGHT_DISABLE_SPECULARITY_CODE
+      return 0;
+    }
+  #endif
 
   vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
     vec3 pointLightPosition = vec3(pX, pY, pZ);
@@ -930,10 +935,13 @@ void main(){
   #endif
 
   vLightDiffuse = lightDiffuse;
-  vLightSpecular = lightSpecular;
+
+  #ifdef ENABLE_SPECULARITY
+    vLightSpecular = lightSpecular;
+  #endif
   vColor = color;
 
-  #ifdef AFFECTED_BY_LIGHT
+  #if defined(AFFECTED_BY_LIGHT) && defined(ENABLE_SPECULARITY)
     if (isSpecularityDisabledForMaterial() == 1){
       vLightSpecular = vec3(0.0, 0.0, 0.0);
     }
