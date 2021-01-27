@@ -22,7 +22,7 @@ varying vec3 vLightSpecular;
 
 #define INSERTION
 
-#ifdef HAS_PHONG_LIGHTING
+#if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
   varying float vMaterialIndex;
 #endif
 
@@ -939,7 +939,7 @@ void main(){
 
   vMetalness = metalnessRoughness[0];
 
-  #ifdef HAS_PHONG_LIGHTING
+  #if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
     vMaterialIndex = materialIndex;
   #endif
 

@@ -20,7 +20,7 @@ varying float vMetalness;
 
 #define INSERTION
 
-#ifdef HAS_PHONG_LIGHTING
+#if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
   varying float vMaterialIndex;
 #endif
 
@@ -825,11 +825,13 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     return (ambient + diffuse);
   }
 
-  int isSpecularityDisabledForMaterial(){
-    int mi = int(vMaterialIndex);
-    //LIGHT_DISABLE_SPECULARITY_CODE
-    return 0;
-  }
+  #if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
+    int isSpecularityDisabledForMaterial(){
+      int mi = int(vMaterialIndex);
+      //LIGHT_DISABLE_SPECULARITY_CODE
+      return 0;
+    }
+  #endif
 
   void handleLighting(vec3 worldPositionComputed, float selectedRoughness){
 
@@ -1236,7 +1238,7 @@ void main(){
     }
   #endif
 
-  #ifdef HAS_PHONG_LIGHTING
+  #if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
     if (isSpecularityDisabledForMaterial() == 1){
       specularTotal = vec3(0.0, 0.0, 0.0);
     }else{
