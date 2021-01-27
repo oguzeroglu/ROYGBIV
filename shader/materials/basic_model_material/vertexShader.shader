@@ -8,8 +8,6 @@ attribute vec4 diffuseUV;
 attribute vec2 metalnessRoughness;
 attribute float materialIndex;
 
-varying float vMetalness;
-
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 
@@ -21,6 +19,10 @@ varying vec3 vLightDiffuse;
 varying vec3 vLightSpecular;
 
 #define INSERTION
+
+#ifdef HAS_ENVIRONMENT_MAP
+  varying float vMetalness;
+#endif
 
 #if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
   varying float vMaterialIndex;
@@ -937,7 +939,9 @@ void main(){
     }
   #endif
 
-  vMetalness = metalnessRoughness[0];
+  #ifdef HAS_ENVIRONMENT_MAP
+    vMetalness = metalnessRoughness[0];
+  #endif
 
   #if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
     vMaterialIndex = materialIndex;
