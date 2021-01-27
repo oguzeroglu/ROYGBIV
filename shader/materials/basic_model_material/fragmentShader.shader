@@ -595,7 +595,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     return 0.0;
   }
 
-  void handleDynamicLight(inout vec3 ambient, inout vec3 diffuse, inout int currentIndex, int lightType, int lightIndex, vec3 computedNormal, vec3 worldPositionComputed){
+  void handleDynamicLight(inout vec3 ambient, inout vec3 diffuse, inout int currentIndex, int lightType, int lightIndex, vec3 computedNormal, vec3 worldPositionComputed, float selectedRoughness){
 
     if (lightType == 0){ // ambient-color
       vec3 ambientRGB = getVec3FromLightMatrix(currentIndex);
@@ -764,7 +764,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     }
   }
 
-  vec3 handleDynamicLights(vec3 computedNormal, vec3 worldPositionComputed){
+  vec3 handleDynamicLights(vec3 computedNormal, vec3 worldPositionComputed, float selectedRoughness){
 
     int currentIndex = 0;
 
@@ -774,37 +774,37 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     // I know this looks horrible, but this is actually a pretty smart way to
     // handle dynamic lighting.
     #ifdef DYNAMIC_LIGHT_1_TYPE
-      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_1_TYPE, 1, computedNormal, worldPositionComputed);
+      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_1_TYPE, 1, computedNormal, worldPositionComputed, selectedRoughness);
       #ifdef DYNAMIC_LIGHT_2_TYPE
-        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_2_TYPE, 2, computedNormal, worldPositionComputed);
+        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_2_TYPE, 2, computedNormal, worldPositionComputed, selectedRoughness);
         #ifdef DYNAMIC_LIGHT_3_TYPE
-          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_3_TYPE, 3, computedNormal, worldPositionComputed);
+          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_3_TYPE, 3, computedNormal, worldPositionComputed, selectedRoughness);
           #ifdef DYNAMIC_LIGHT_4_TYPE
-            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_4_TYPE, 4, computedNormal, worldPositionComputed);
+            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_4_TYPE, 4, computedNormal, worldPositionComputed, selectedRoughness);
             #ifdef DYNAMIC_LIGHT_5_TYPE
-              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_5_TYPE, 5, computedNormal, worldPositionComputed);
+              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_5_TYPE, 5, computedNormal, worldPositionComputed, selectedRoughness);
               #ifdef DYNAMIC_LIGHT_6_TYPE
-                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_6_TYPE, 6, computedNormal, worldPositionComputed);
+                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_6_TYPE, 6, computedNormal, worldPositionComputed, selectedRoughness);
                 #ifdef DYNAMIC_LIGHT_7_TYPE
-                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_7_TYPE, 7, computedNormal, worldPositionComputed);
+                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_7_TYPE, 7, computedNormal, worldPositionComputed, selectedRoughness);
                   #ifdef DYNAMIC_LIGHT_8_TYPE
-                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_8_TYPE, 8, computedNormal, worldPositionComputed);
+                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_8_TYPE, 8, computedNormal, worldPositionComputed, selectedRoughness);
                     #ifdef DYNAMIC_LIGHT_9_TYPE
-                      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_9_TYPE, 9, computedNormal, worldPositionComputed);
+                      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_9_TYPE, 9, computedNormal, worldPositionComputed, selectedRoughness);
                       #ifdef DYNAMIC_LIGHT_10_TYPE
-                        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_10_TYPE, 10, computedNormal, worldPositionComputed);
+                        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_10_TYPE, 10, computedNormal, worldPositionComputed, selectedRoughness);
                         #ifdef DYNAMIC_LIGHT_11_TYPE
-                          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_11_TYPE, 11, computedNormal, worldPositionComputed);
+                          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_11_TYPE, 11, computedNormal, worldPositionComputed, selectedRoughness);
                           #ifdef DYNAMIC_LIGHT_12_TYPE
-                            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_12_TYPE, 12, computedNormal, worldPositionComputed);
+                            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_12_TYPE, 12, computedNormal, worldPositionComputed, selectedRoughness);
                             #ifdef DYNAMIC_LIGHT_13_TYPE
-                              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_13_TYPE, 13, computedNormal, worldPositionComputed);
+                              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_13_TYPE, 13, computedNormal, worldPositionComputed, selectedRoughness);
                               #ifdef DYNAMIC_LIGHT_14_TYPE
-                                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_14_TYPE, 14, computedNormal, worldPositionComputed);
+                                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_14_TYPE, 14, computedNormal, worldPositionComputed, selectedRoughness);
                                 #ifdef DYNAMIC_LIGHT_15_TYPE
-                                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_15_TYPE, 15, computedNormal, worldPositionComputed);
+                                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_15_TYPE, 15, computedNormal, worldPositionComputed, selectedRoughness);
                                   #ifdef DYNAMIC_LIGHT_16_TYPE
-                                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_16_TYPE, 16, computedNormal, worldPositionComputed);
+                                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_16_TYPE, 16, computedNormal, worldPositionComputed, selectedRoughness);
                                   #endif
                                 #endif
                               #endif
@@ -966,7 +966,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
       );
     #endif
 
-    lightDiffuse = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed));
+    lightDiffuse = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed, selectedRoughness));
   }
 #endif
 
