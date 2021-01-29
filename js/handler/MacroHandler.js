@@ -224,9 +224,13 @@ MacroHandler.prototype.compressAttributes = function(mesh, compressableAttribute
     }
   }
 
+  var result = [];
   for (var i = 0; i < compressionAttributes.length; i ++){
     this.compressAttribute(mesh.material, compressionAttributes[i]);
+    result.push(compressionAttributes[i].name);
   }
+
+  return result;
 }
 
 MacroHandler.prototype.compressAttribute = function(material, compressionInfo){

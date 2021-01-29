@@ -44,6 +44,10 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
   this.refreshDisabledEnvMapping();
   this.refreshEnvMapMode();
 
+  if (isDeployment){
+    this.compressGeometry();
+  }
+
   webglCallbackHandler.registerEngineObject(this);
 }
 
@@ -1167,4 +1171,15 @@ ModelInstance.prototype.setPBRLightAttenuationCoef = function(lightAttenuationCo
   macroHandler.removeMacro("LIGHT_ATTENUATION_COEF " + this.pbrLightAttenuationCoef, this.mesh.material, false, true);
   macroHandler.injectMacro("LIGHT_ATTENUATION_COEF " + lightAttenuationCoef, this.mesh.material, false, true);
   this.pbrLightAttenuationCoef = lightAttenuationCoef;
+}
+
+ModelInstance.prototype.compressGeometry = function(){
+  var compressableAttributes = [
+    "diffuseUV", "metalnessRoughness", "materialIndex", "normalUV",
+    "specularUV", "alphaUV", "roughnessUV", "diffuseTextureIndex",
+    "normalTextureIndex", "specularTextureIndex", "alphaTextureIndex",
+    "roughnessTextureIndex", "color"
+  ];
+
+  this.compressedAttributes = macroHandler.compressAttributes(this.mesh, compressableAttributes);
 }
