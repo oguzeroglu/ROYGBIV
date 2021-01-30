@@ -2282,6 +2282,13 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
         return;
       }
       if (val){
+        if (modelInstance.lightingType == lightHandler.lightTypes.GOURAUD && modelInstance.model.info.hasRoughnessMap){
+          terminal.clear();
+          terminal.printError(Text.MODEL_INSTANCE_HAS_ROUGHNESS_MAP_GOURAUD_MODE_SPECULARITY);
+          guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
+          return;
+        }
+
         modelInstance.enableSpecularity();
       }else{
         modelInstance.disableSpecularity();

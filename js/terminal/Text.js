@@ -252,6 +252,7 @@ var Text = function(){
   this.NO_GRAPHS_FOUND = "No graphs found.";
   this.ASTAR_CREATED = "AStar created.";
   this.ASTAR_DESTROYED = "AStar destroyed.";
+  this.MODEL_INSTANCE_HAS_ROUGHNESS_MAP_GOURAUD_MODE_SPECULARITY = "Model instance has roughness map. Cannot enable specularity in Gouraud lighting mode.";
   this.NO_SUCH_ASTAR_IN_CURRENT_SCENE = "No such AStar in current scene";
   this.NO_ASTARS_IN_THIS_SCENE = "No AStars in this scene.";
   this.COMMAND_EXECUTED_FOR_X_GRAPHS = "Command executed for @@1 graphs.";
