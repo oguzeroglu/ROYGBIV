@@ -1174,6 +1174,54 @@ ModelInstance.prototype.setPBRLightAttenuationCoef = function(lightAttenuationCo
 }
 
 ModelInstance.prototype.compressGeometry = function(){
+  var diffuseUV = null, normalUV = null, specularUV = null, alphaUV = null, roughnessUV = null;
+  var diffuseTextureIndex = null, normalTextureIndex = null, specularTextureIndex = null, alphaTextureIndex = null, roughnessTextureIndex = null;
+
+  if (this.mesh.geometry.attributes.diffuseUV){
+    var ary = this.mesh.geometry.attributes.diffuseUV.array;
+    diffuseUV = new THREE.Vector4(ary[0], ary[1], ary[2], ary[3]);
+  }
+
+  if (this.mesh.geometry.attributes.normalUV){
+    var ary = this.mesh.geometry.attributes.normalUV.array;
+    normalUV = new THREE.Vector4(ary[0], ary[1], ary[2], ary[3]);
+  }
+
+  if (this.mesh.geometry.attributes.specularUV){
+    var ary = this.mesh.geometry.attributes.specularUV.array;
+    specularUV = new THREE.Vector4(ary[0], ary[1], ary[2], ary[3]);
+  }
+
+  if (this.mesh.geometry.attributes.alphaUV){
+    var ary = this.mesh.geometry.attributes.alphaUV.array;
+    alphaUV = new THREE.Vector4(ary[0], ary[1], ary[2], ary[3]);
+  }
+
+  if (this.mesh.geometry.attributes.roughnessUV){
+    var ary = this.mesh.geometry.attributes.roughnessUV.array;
+    roughnessUV = new THREE.Vector4(ary[0], ary[1], ary[2], ary[3]);
+  }
+
+  if (this.mesh.geometry.attributes.diffuseTextureIndex){
+    diffuseTextureIndex = this.mesh.geometry.attributes.diffuseTextureIndex.array[0];
+  }
+
+  if (this.mesh.geometry.attributes.normalTextureIndex){
+    normalTextureIndex = this.mesh.geometry.attributes.normalTextureIndex.array[0];
+  }
+
+  if (this.mesh.geometry.attributes.specularTextureIndex){
+    specularTextureIndex = this.mesh.geometry.attributes.specularTextureIndex.array[0];
+  }
+
+  if (this.mesh.geometry.attributes.alphaTextureIndex){
+    alphaTextureIndex = this.mesh.geometry.attributes.alphaTextureIndex.array[0];
+  }
+
+  if (this.mesh.geometry.attributes.roughnessTextureIndex){
+    roughnessTextureIndex = this.mesh.geometry.attributes.roughnessTextureIndex.array[0];
+  }
+
   var compressableAttributes = [
     "diffuseUV", "metalnessRoughness", "materialIndex", "normalUV",
     "specularUV", "alphaUV", "roughnessUV", "diffuseTextureIndex",
@@ -1182,4 +1230,81 @@ ModelInstance.prototype.compressGeometry = function(){
   ];
 
   this.compressedAttributes = macroHandler.compressAttributes(this.mesh, compressableAttributes);
+
+  if (this.compressedAttributes.indexOf("color") >= 0){
+    var colorR = this.model.info.childInfos[0].colorR;
+    var colorG = this.model.info.childInfos[0].colorG;
+    var colorB = this.model.info.childInfos[0].colorB;
+    macroHandler.compressVaryingVec3(this.mesh.material, "vColor", colorR, colorG, colorB);
+  }
+
+  if (this.compressedAttributes.indexOf("metalnessRoughness") >= 0){
+    var metalness = this.model.info.childInfos[0].metalness;
+    var roughness = this.model.info.childInfos[0].roughness;
+    macroHandler.compressVaryingFloat(this.mesh.material, "vMetalness", metalness);
+    macroHandler.compressVaryingFloat(this.mesh.material, "vRoughness", roughness);
+  }
+
+  if (this.compressedAttributes.indexOf("diffuseUV") >= 0){
+    macroHandler.compressVaryingVec4(this.mesh.material, "vDiffuseUV", diffuseUV.x, diffuseUV.y, diffuseUV.z, diffuseUV.w);
+  }
+
+  if (this.compressedAttributes.indexOf("normalUV") >= 0){
+    macroHandler.compressVaryingVec4(this.mesh.material, "vNormalUV", normalUV.x, normalUV.y, normalUV.z, normalUV.w);
+  }
+
+  if (this.compressedAttributes.indexOf("specularUV") >= 0){
+    macroHandler.compressVaryingVec4(this.mesh.material, "vSpecularUV", specularUV.x, specularUV.y, specularUV.z, specularUV.w);
+  }
+
+  if (this.compressedAttributes.indexOf("alphaUV") >= 0){
+    macroHandler.compressVaryingVec4(this.mesh.material, "vAlphaUV", alphaUV.x, alphaUV.y, alphaUV.z, alphaUV.w);
+  }
+
+  if (this.compressedAttributes.indexOf("roughnessUV") >= 0){
+    macroHandler.compressVaryingVec4(this.mesh.material, "vRoughnessUV", roughnessUV.x, roughnessUV.y, roughnessUV.z, roughnessUV.w);
+  }
+
+  if (this.compressedAttributes.indexOf("diffuseTextureIndex") >= 0){
+    macroHandler.compressVaryingFloat(this.mesh.material, "vDiffuseTextureIndex", diffuseTextureIndex);
+  }
+
+  if (this.compressedAttributes.indexOf("normalTextureIndex") >= 0){
+    macroHandler.compressVaryingFloat(this.mesh.material, "vNormalTextureIndex", normalTextureIndex);
+  }
+
+  if (this.compressedAttributes.indexOf("specularTextureIndex") >= 0){
+    macroHandler.compressVaryingFloat(this.mesh.material, "vSpecularTextureIndex", specularTextureIndex);
+  }
+
+  if (this.compressedAttributes.indexOf("alphaTextureIndex") >= 0){
+    macroHandler.compressVaryingFloat(this.mesh.material, "vAlphaTextureIndex", alphaTextureIndex);
+  }
+
+  if (this.compressedAttributes.indexOf("roughnessTextureIndex") >= 0){
+    macroHandler.compressVaryingFloat(this.mesh.material, "vRoughnessTextureIndex", roughnessTextureIndex);
+  }
+
+  var allTrue = true, allFalse = true;
+  var allRefract = true, allReflect = true;
+  for (var index = 0; index < this.model.info.childInfos.length; index ++){
+    if (this.disabledEnvMappingIndices[index]){
+      allFalse = false;
+    }else{
+      allTrue = false;
+    }
+    if (this.envMapModeIndices[index]){
+      allReflect = false;
+    }else{
+      allRefract = false;
+    }
+  }
+
+  if (allTrue || allFalse){
+    macroHandler.compressVaryingFloat(this.mesh.material, "vEnvMapDisabled", allTrue? 100: -100);
+  }
+
+  if (allRefract || allReflect){
+    macroHandler.compressVaryingFloat(this.mesh.material, "vEnvMapModeRefraction", allRefract? 100: -100);
+  }
 }
