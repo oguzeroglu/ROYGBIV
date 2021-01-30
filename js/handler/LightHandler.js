@@ -260,8 +260,13 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
     var pos = REUSABLE_VECTOR_2.set(positionAttrAry[i], positionAttrAry[i + 1], positionAttrAry[i + 2]);
 
     if (obj.isObjectGroup || obj.isModelInstance){
-      var colorAry = obj.mesh.geometry.attributes.color.array;
-      color = REUSABLE_VECTOR_3.set(colorAry[i], colorAry[i + 1], colorAry[i + 2]);
+      if (obj.isModelInstance && ! obj.mesh.geometry.attributes.color){
+        var childInfo = obj.model.info.childInfos[0];
+        color = REUSABLE_VECTOR_3.set(childInfo.colorR, childInfo.colorG, childInfo.colorB);
+      }else{
+        var colorAry = obj.mesh.geometry.attributes.color.array;
+        color = REUSABLE_VECTOR_3.set(colorAry[i], colorAry[i + 1], colorAry[i + 2]);
+      }
     }
 
     normal.applyMatrix3(mat3).normalize();
