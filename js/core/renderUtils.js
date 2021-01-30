@@ -37,6 +37,7 @@ function render(){
     cpuOperationsHandler.handleActiveVirtualKeyboard();
     cpuOperationsHandler.handleInputText();
     cpuOperationsHandler.updateLightHandler();
+    cpuOperationsHandler.updateDOMElementPositionAlignments();
     delayedExecutionHandler.tick();
   }else{
     if (!isDeployment){
@@ -284,6 +285,13 @@ function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemA
 
 function handleSkybox(){
   skyboxHandler.update();
+}
+
+function updateDOMElementPositionAlignments(){
+  for (var domElementName in domElements3DAligned){
+    var pos = domElements3DAligned[domElementName];
+    domElements[domElementName].align3DPosition(pos.x, pos.y, pos.z);
+  }
 }
 
 function deploymentScripts(){

@@ -83,6 +83,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
     render();
   }
   fpsHandler.reset();
+  domElements3DAligned = {};
 }
 
 ModeSwitcher.prototype.switchFromDesignToPreview = function(){

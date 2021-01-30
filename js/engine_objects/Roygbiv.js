@@ -367,7 +367,9 @@ var Roygbiv = function(){
     "removeDOMElementClickListener",
     "isARSupported",
     "startAugmentedReality",
-    "setModelInstanceColor"
+    "setModelInstanceColor",
+    "align3DPosition",
+    "unalign3DPosition"
   ];
 
   this.globals = new Object();
@@ -4312,6 +4314,35 @@ Roygbiv.prototype.setDOMElementSize = function(domElement, width, height){
   preConditions.checkIfNumber(ROYGBIV.setDOMElementSize, preConditions.width, width);
   preConditions.checkIfNumber(ROYGBIV.setDOMElementSize, preConditions.height, height);
   domElement.setSize(width, height);
+}
+
+// Aligns the position of a DOM element to given 3D position on each frame.
+Roygbiv.prototype.align3DPosition = function(domElement, x, y, z){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.align3DPosition, preConditions.domElement, domElement);
+  preConditions.checkIfDefined(ROYGBIV.align3DPosition, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.align3DPosition, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.align3DPosition, preConditions.z, z);
+  preConditions.checkIfDOMElement(ROYGBIV.align3DPosition, domElement);
+  preConditions.checkIfNumber(ROYGBIV.align3DPosition, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.align3DPosition, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.align3DPosition, preConditions.z, z);
+
+  domElements3DAligned[domElement.name] = {x: x, y: y, z: z};
+}
+
+// Stops aligning the position of a DOM element. This may be used after align3DPosition API.
+Roygbiv.prototype.unalign3DPosition = function(domElement){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.unalign3DPosition, preConditions.domElement, domElement);
+  preConditions.checkIfDOMElement(ROYGBIV.unalign3DPosition, domElement);
+
+  delete domElements3DAligned[domElement.name];
 }
 
 // AR FUNCTIONS ****************************************************************

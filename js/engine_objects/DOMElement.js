@@ -29,7 +29,8 @@ var DOMElement = function(type, properties){
   this.element = element;
 
   document.body.appendChild(element);
-  domElements[generateUUID()] = this;
+  this.name = generateUUID();
+  domElements[this.name] = this;
 
   element.addEventListener("mouseover", function(){
     if (this.mouseoverCallback){
@@ -68,4 +69,12 @@ DOMElement.prototype.setSize = function(width, height){
 
 DOMElement.prototype.onModeSwitch = function(){
   document.body.removeChild(this.element);
+}
+
+DOMElement.prototype.align3DPosition = function(x, y, z){
+  REUSABLE_VECTOR.set(x, y, z);
+  REUSABLE_VECTOR.project(camera);
+  const projectedX = (REUSABLE_VECTOR.x * 0.5 + 0.5) * canvas.clientWidth;
+  const projectedY = (REUSABLE_VECTOR.y * -0.5 + 0.5) * canvas.clientHeight;
+  this.element.style.transform = "translate(-50%, -50%) translate(" + projectedX + "px," + projectedY + "px)";
 }

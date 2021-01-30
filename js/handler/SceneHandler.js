@@ -273,6 +273,9 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     this.readyCallback = readyCallback;
     this.scenes[this.getActiveSceneName()].onBeforeExit();
   }
+
+  domElements3DAligned = {};
+
   this.ready = false;
   this.physicsReady = false;
   this.raycasterReady = false;
