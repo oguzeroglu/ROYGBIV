@@ -296,9 +296,15 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
       }
     }
 
-    result[x ++] = (color.x * (ambient.x + diffuse.x));
-    result[x ++] = (color.y * (ambient.y + diffuse.y));
-    result[x ++] = (color.z * (ambient.z + diffuse.z));
+    var coefX = 1, coefY = 1, coefZ = 1;
+    if (!obj.isModelInstance){
+      coefX = color.x;
+      coefY = color.y;
+      coefZ = color.z;
+    }
+    result[x ++] = (coefX * (ambient.x + diffuse.x));
+    result[x ++] = (coefY * (ambient.y + diffuse.y));
+    result[x ++] = (coefZ * (ambient.z + diffuse.z));
   }
 
   if (!isDesignMode){
