@@ -44,10 +44,6 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
   this.refreshDisabledEnvMapping();
   this.refreshEnvMapMode();
 
-  if (isDeployment){
-    this.compressGeometry();
-  }
-
   webglCallbackHandler.registerEngineObject(this);
 }
 

@@ -116,6 +116,10 @@ ImportHandler.prototype.importModelInstances = function(obj){
       modelInstance.makePBR();
       modelInstance.setPBRLightAttenuationCoef(curModelInstanceExport.pbrLightAttenuationCoef);
     }
+
+    if (isDeployment){
+      modelInstance.compressGeometry();
+    }
   }
 }
 
