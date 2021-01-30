@@ -224,9 +224,13 @@ MacroHandler.prototype.compressAttributes = function(mesh, compressableAttribute
     }
   }
 
+  var result = [];
   for (var i = 0; i < compressionAttributes.length; i ++){
     this.compressAttribute(mesh.material, compressionAttributes[i]);
+    result.push(compressionAttributes[i].name);
   }
+
+  return result;
 }
 
 MacroHandler.prototype.compressAttribute = function(material, compressionInfo){
@@ -307,5 +311,43 @@ MacroHandler.prototype.replaceText = function(oldText, newText, material, insert
   if (insertFragmentShader){
     material.fragmentShader = material.fragmentShader.replace(oldText, newText);
   }
+  material.needsUpdate = true;
+}
+
+MacroHandler.prototype.compressVaryingVec3 = function(material, varyingName, vecX, vecY, vecZ){
+  var newValueString = "vec3 " + varyingName + " = vec3(@@1);";
+  var innerStr = "";
+  innerStr += "float(" + vecX + "),";
+  innerStr += "float(" + vecY + "),";
+  innerStr += "float(" + vecZ + ")";
+  newValueString = newValueString.replace("@@1", innerStr);
+
+  material.vertexShader = material.vertexShader.replace("varying vec3 " + varyingName + ";", newValueString);
+  material.fragmentShader = material.fragmentShader.replace("varying vec3 " + varyingName + ";", newValueString);
+
+  material.needsUpdate = true;
+}
+
+MacroHandler.prototype.compressVaryingVec4 = function(material, varyingName, vecX, vecY, vecZ, vecW){
+  var newValueString = "vec4 " + varyingName + " = vec4(@@1);";
+  var innerStr = "";
+  innerStr += "float(" + vecX + "),";
+  innerStr += "float(" + vecY + "),";
+  innerStr += "float(" + vecZ + "),";
+  innerStr += "float(" + vecW + ")";
+  newValueString = newValueString.replace("@@1", innerStr);
+
+  material.vertexShader = material.vertexShader.replace("varying vec4 " + varyingName + ";", newValueString);
+  material.fragmentShader = material.fragmentShader.replace("varying vec4 " + varyingName + ";", newValueString);
+
+  material.needsUpdate = true;
+}
+
+MacroHandler.prototype.compressVaryingFloat = function(material, varyingName, val){
+  var newValueString = "float " + varyingName + " = float(@@1);".replace("@@1", val);
+
+  material.vertexShader = material.vertexShader.replace("varying float " + varyingName + ";", newValueString);
+  material.fragmentShader = material.fragmentShader.replace("varying float " + varyingName + ";", newValueString);
+
   material.needsUpdate = true;
 }

@@ -68,11 +68,20 @@ uniform vec3 cameraPosition;
     attribute float alphaTextureIndex;
     varying float vAlphaTextureIndex;
   #endif
+  #ifdef HAS_ROUGHNESS_MAP
+    attribute float roughnessTextureIndex;
+    varying float vRoughnessTextureIndex;
+  #endif
 #endif
 
 #ifdef HAS_ALPHA_MAP
   attribute vec4 alphaUV;
   varying vec4 vAlphaUV;
+#endif
+
+#ifdef HAS_ROUGHNESS_MAP
+  attribute vec4 roughnessUV;
+  varying vec4 vRoughnessUV;
 #endif
 
 int isEnvMappingDisabledForMaterial(){
@@ -111,6 +120,10 @@ void main(){
     vAlphaUV = alphaUV;
   #endif
 
+  #ifdef HAS_ROUGHNESS_MAP
+    vRoughnessUV = roughnessUV;
+  #endif
+
   vec3 worldPositionComputed = (selectedWorldMatrix * vec4(position, 1.0)).xyz;
   vWorldPosition = worldPositionComputed;
 
@@ -137,6 +150,9 @@ void main(){
     #endif
     #ifdef HAS_ALPHA_MAP
       vAlphaTextureIndex = alphaTextureIndex;
+    #endif
+    #ifdef HAS_ROUGHNESS_MAP
+      vRoughnessTextureIndex = roughnessTextureIndex;
     #endif
   #endif
 

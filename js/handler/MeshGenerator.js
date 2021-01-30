@@ -36,6 +36,11 @@ MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
     macroHandler.injectMacro("HAS_ALPHA_MAP", material, true, true);
   }
 
+  if (model.info.hasRoughnessMap){
+    macroHandler.injectMacro("HAS_ROUGHNESS_MAP", material, true, true);
+  }
+
+
   if (!isDeployment){
     macroHandler.injectMacro("CHILDREN_HIDEABLE", material, true, true);
   }

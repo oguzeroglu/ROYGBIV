@@ -8,8 +8,6 @@ attribute vec4 diffuseUV;
 attribute vec2 metalnessRoughness;
 attribute float materialIndex;
 
-varying float vMetalness;
-
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 
@@ -18,11 +16,18 @@ varying vec3 vColor;
 vec3 lightDiffuse = vec3(1.0, 1.0, 1.0);
 vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
 varying vec3 vLightDiffuse;
-varying vec3 vLightSpecular;
 
 #define INSERTION
 
-#ifdef HAS_PHONG_LIGHTING
+#ifdef ENABLE_SPECULARITY
+  varying vec3 vLightSpecular;
+#endif
+
+#ifdef HAS_ENVIRONMENT_MAP
+  varying float vMetalness;
+#endif
+
+#if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
   varying float vMaterialIndex;
 #endif
 
@@ -93,6 +98,11 @@ varying vec3 vLightSpecular;
   varying vec4 vAlphaUV;
 #endif
 
+#ifdef HAS_ROUGHNESS_MAP
+  attribute vec4 roughnessUV;
+  varying vec4 vRoughnessUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   attribute float diffuseTextureIndex;
   varying float vDiffuseTextureIndex;
@@ -107,6 +117,10 @@ varying vec3 vLightSpecular;
   #ifdef HAS_ALPHA_MAP
     attribute float alphaTextureIndex;
     varying float vAlphaTextureIndex;
+  #endif
+  #ifdef HAS_ROUGHNESS_MAP
+    attribute float roughnessTextureIndex;
+    varying float vRoughnessTextureIndex;
   #endif
 #endif
 
@@ -124,11 +138,13 @@ int isEnvModeRefractive(){
 
 #ifdef AFFECTED_BY_LIGHT
 
-  int isSpecularityDisabledForMaterial(){
-    int mi = int(materialIndex);
-    //LIGHT_DISABLE_SPECULARITY_CODE
-    return 0;
-  }
+  #ifdef ENABLE_SPECULARITY
+    int isSpecularityDisabledForMaterial(){
+      int mi = int(materialIndex);
+      //LIGHT_DISABLE_SPECULARITY_CODE
+      return 0;
+    }
+  #endif
 
   vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
     vec3 pointLightPosition = vec3(pX, pY, pZ);
@@ -893,6 +909,10 @@ void main(){
     vAlphaUV = alphaUV;
   #endif
 
+  #ifdef HAS_ROUGHNESS_MAP
+    vRoughnessUV = roughnessUV;
+  #endif
+
   #ifdef HAS_TEXTURE
     vUV = uv;
     vDiffuseUV = diffuseUV;
@@ -909,21 +929,29 @@ void main(){
     #ifdef HAS_ALPHA_MAP
       vAlphaTextureIndex = alphaTextureIndex;
     #endif
+    #ifdef HAS_ROUGHNESS_MAP
+      vRoughnessTextureIndex = roughnessTextureIndex;
+    #endif
   #endif
 
   vLightDiffuse = lightDiffuse;
-  vLightSpecular = lightSpecular;
+
+  #ifdef ENABLE_SPECULARITY
+    vLightSpecular = lightSpecular;
+  #endif
   vColor = color;
 
-  #ifdef AFFECTED_BY_LIGHT
+  #if defined(AFFECTED_BY_LIGHT) && defined(ENABLE_SPECULARITY)
     if (isSpecularityDisabledForMaterial() == 1){
       vLightSpecular = vec3(0.0, 0.0, 0.0);
     }
   #endif
 
-  vMetalness = metalnessRoughness[0];
+  #ifdef HAS_ENVIRONMENT_MAP
+    vMetalness = metalnessRoughness[0];
+  #endif
 
-  #ifdef HAS_PHONG_LIGHTING
+  #if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
     vMaterialIndex = materialIndex;
   #endif
 

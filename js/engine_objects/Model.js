@@ -1,4 +1,4 @@
-var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, materialIndices, indices, indexedMaterialIndices){
+var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, roughnessUVs, materialIndices, indices, indexedMaterialIndices){
   this.name = modelInfo.name;
 
   this.geometry = new THREE.BufferGeometry();
@@ -13,6 +13,7 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
   var hasNormalMap = modelInfo.hasNormalMap;
   var hasSpecularMap = modelInfo.hasSpecularMap;
   var hasAlphaMap = modelInfo.hasAlphaMap;
+  var hasRoughnessMap = modelInfo.hasRoughnessMap;
 
   if (!indices){
     var indexInfos = {};
@@ -51,6 +52,10 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var curAlphaUVY = hasAlphaMap? alphaUVs[i4 + 1]: 0;
       var curAlphaUVZ = hasAlphaMap? alphaUVs[i4 + 2]: 0;
       var curAlphaUVW = hasAlphaMap? alphaUVs[i4 + 3]: 0;
+      var curRoughnessUVX = hasRoughnessMap? roughnessUVs[i4]: 0;
+      var curRoughnessUVY = hasRoughnessMap? roughnessUVs[i4 + 1]: 0;
+      var curRoughnessUVZ = hasRoughnessMap? roughnessUVs[i4 + 2]: 0;
+      var curRoughnessUVW = hasRoughnessMap? roughnessUVs[i4 + 3]: 0;
       var curMaterialIndex = materialIndices[i3];
       var key = curPosX + PIPE + curPosY + PIPE + curPosZ;
       key += PIPE + curNormalX + PIPE + curNormalY + PIPE + curNormalZ;
@@ -60,6 +65,7 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       key += PIPE + curNormalUVX + PIPE + curNormalUVY + PIPE + curNormalUVZ + PIPE + curNormalUVW;
       key += PIPE + curSpecularUVX + PIPE + curSpecularUVY + PIPE + curSpecularUVZ + PIPE + curSpecularUVW;
       key += PIPE + curAlphaUVX + PIPE + curAlphaUVY + PIPE + curAlphaUVZ + PIPE + curAlphaUVW;
+      key += PIPE + curRoughnessUVX + PIPE + curRoughnessUVY + PIPE + curRoughnessUVZ + PIPE + curRoughnessUVW;
       if (!(typeof indexInfos[key] == UNDEFINED)){
         indexHitCount ++;
         indices.push(indexInfos[key]);
@@ -90,6 +96,7 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
     var allNormalUVs = hasNormalMap? new Float32Array(curIndex * 4): null;
     var allSpecularUVs = hasSpecularMap? new Float32Array(curIndex * 4): null;
     var allAlphaUVs = hasAlphaMap? new Float32Array(curIndex * 4): null;
+    var allRoughnessUVs = hasRoughnessMap? new Float32Array(curIndex * 4): null;
 
     var x = 0, y = 0, z = 0, w = 0, t = 0, s = 0, a = 0, b = 0;
     for (var i = 0; i < curIndex; i ++){
@@ -122,6 +129,10 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var curAlphaUVY = parseFloat(splitted[24]);
       var curAlphaUVZ = parseFloat(splitted[25]);
       var curAlphaUVW = parseFloat(splitted[26]);
+      var curRoughnessUVX = parseFloat(splitted[27]);
+      var curRoughnessUVY = parseFloat(splitted[28]);
+      var curRoughnessUVZ = parseFloat(splitted[29]);
+      var curRoughnessUVW = parseFloat(splitted[30]);
 
       allPositions[x ++] = curPosX;
       allPositions[x ++] = curPosY;
@@ -158,6 +169,13 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
         allAlphaUVs[b ++] = curAlphaUVY;
         allAlphaUVs[b ++] = curAlphaUVZ;
         allAlphaUVs[b ++] = curAlphaUVW;
+      }
+
+      if (hasRoughnessMap){
+        allRoughnessUVs[b ++] = curRoughnessUVX;
+        allRoughnessUVs[b ++] = curRoughnessUVY;
+        allRoughnessUVs[b ++] = curRoughnessUVZ;
+        allRoughnessUVs[b ++] = curRoughnessUVW;
       }
     }
 
@@ -198,6 +216,12 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       alphaUVsBufferAttribute.setDynamic(false);
       this.geometry.addAttribute("alphaUV", alphaUVsBufferAttribute);
     }
+
+    if (hasRoughnessMap){
+      var roughnessUVsBufferAttribute = new THREE.BufferAttribute(allRoughnessUVs, 4);
+      roughnessUVsBufferAttribute.setDynamic(false);
+      this.geometry.addAttribute("roughnessUV", roughnessUVsBufferAttribute);
+    }
   }else{
     var positionsBufferAttribute = new THREE.BufferAttribute(positions, 3);
     var colorsBufferAttribute = new THREE.BufferAttribute(colors, 3);
@@ -235,6 +259,12 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var alphaUVsBufferAttribute = new THREE.BufferAttribute(alphaUVs, 4);
       alphaUVsBufferAttribute.setDynamic(false);
       this.geometry.addAttribute("alphaUV", alphaUVsBufferAttribute);
+    }
+
+    if (hasRoughnessMap){
+      var roughnessUVsBufferAttribute = new THREE.BufferAttribute(roughnessUVs, 4);
+      roughnessUVsBufferAttribute.setDynamic(false);
+      this.geometry.addAttribute("roughnessUV", roughnessUVsBufferAttribute);
     }
   }
 
@@ -323,6 +353,9 @@ Model.prototype.getUsedTextures = function(){
       if (this.info.childInfos[i].alphaTextureURL == textureURL){
         textureID = this.info.childInfos[i].alphaTextureID;
       }
+      if (this.info.childInfos[i].roughnessTextureURL == textureURL){
+        textureID = this.info.childInfos[i].roughnessTextureID;
+      }
     }
     usedTextures.push({
       id: textureID,
@@ -340,7 +373,8 @@ Model.prototype.onTextureAtlasRefreshed = function(){
   var normalUVAry = this.info.hasNormalMap? this.geometry.attributes.normalUV.array: null;
   var specularUVAry = this.info.hasSpecularMap? this.geometry.attributes.specularUV.array: null;
   var alphaUVAry = this.info.hasAlphaMap? this.geometry.attributes.alphaUV.array: null;
-  var diffuseUVIndex = 0, normalUVIndex = 0, specularUVIndex = 0, alphaUVIndex = 0;
+  var roughnessUVAry = this.info.hasRoughnessMap? this.geometry.attributes.roughnessUV.array: null;
+  var diffuseUVIndex = 0, normalUVIndex = 0, specularUVIndex = 0, alphaUVIndex = 0, roughnessUVIndex = 0;
   var ranges = textureAtlasHandler.textureMerger.ranges;
   for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
     var materialIndex = this.indexedMaterialIndices[i];
@@ -390,6 +424,18 @@ Model.prototype.onTextureAtlasRefreshed = function(){
         alphaUVIndex += 4;
       }
     }
+
+    if (roughnessUVAry){
+      if (childInfo.roughnessTextureID){
+        var range = ranges[childInfo.roughnessTextureID];
+        roughnessUVAry[roughnessUVIndex ++] = range.startU;
+        roughnessUVAry[roughnessUVIndex ++] = range.startV;
+        roughnessUVAry[roughnessUVIndex ++] = range.endU;
+        roughnessUVAry[roughnessUVIndex ++] = range.endV;
+      }else{
+        roughnessUVIndex += 4;
+      }
+    }
   }
 
   this.geometry.attributes.diffuseUV.updateRange.set(0, diffuseUVAry.length);
@@ -409,6 +455,11 @@ Model.prototype.onTextureAtlasRefreshed = function(){
     this.geometry.attributes.alphaUV.updateRange.set(0, alphaUVAry.length);
     this.geometry.attributes.alphaUV.needsUpdate = true;
   }
+
+  if (roughnessUVAry){
+    this.geometry.attributes.roughnessUV.updateRange.set(0, roughnessUVAry.length);
+    this.geometry.attributes.roughnessUV.needsUpdate = true;
+  }
 }
 
 Model.prototype.loadTextures = function(callback){
@@ -419,10 +470,12 @@ Model.prototype.loadTextures = function(callback){
     var normalTextureURL = this.info.childInfos[i].normalTextureURL;
     var specularTextureURL = this.info.childInfos[i].specularTextureURL;
     var alphaTextureURL = this.info.childInfos[i].alphaTextureURL;
+    var roughnessTextureURL = this.info.childInfos[i].roughnessTextureURL;
     var diffuseTextureID = this.info.childInfos[i].diffuseTextureID;
     var normalTextureID = this.info.childInfos[i].normalTextureID;
     var specularTextureID = this.info.childInfos[i].specularTextureID;
     var alphaTextureID = this.info.childInfos[i].alphaTextureID;
+    var roughnessTextureID = this.info.childInfos[i].roughnessTextureID;
     if (diffuseTextureURL){
       texturesToLoad[diffuseTextureURL] = diffuseTextureID;
     }
@@ -434,6 +487,9 @@ Model.prototype.loadTextures = function(callback){
     }
     if (alphaTextureURL){
       texturesToLoad[alphaTextureURL] = alphaTextureID;
+    }
+    if (roughnessTextureURL){
+      texturesToLoad[roughnessTextureURL] = roughnessTextureID;
     }
   }
 
@@ -485,12 +541,14 @@ Model.prototype.enableCustomTextures = function(){
   var normalTextureIndexByTextureID = {};
   var specularTextureIndexByTextureID = {};
   var alphaTextureIndexByTextureID = {};
+  var roughnessTextureIndexByTextureID = {};
   var curTextureIndex = 0;
 
   var diffuseTextureIndices = new Float32Array(this.indexedMaterialIndices.length);
   var normalTextureIndices = this.info.hasNormalMap? new Float32Array(this.indexedMaterialIndices.length): null;
   var specularTextureIndices = this.info.hasSpecularMap? new Float32Array(this.indexedMaterialIndices.length): null;
   var alphaTextureIndices = this.info.hasAlphaMap? new Float32Array(this.indexedMaterialIndices.length): null;
+  var roughnessTextureIndices = this.info.hasRoughnessMap? new Float32Array(this.indexedMaterialIndices.length): null;
 
   for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
     var materialIndex = this.indexedMaterialIndices[i];
@@ -540,6 +598,18 @@ Model.prototype.enableCustomTextures = function(){
         alphaTextureIndices[i] = -100;
       }
     }
+
+    if (this.info.hasRoughnessMap){
+      if (material.roughnessTextureID){
+        if (typeof roughnessTextureIndexByTextureID[material.roughnessTextureID] == UNDEFINED){
+          roughnessTextureIndexByTextureID[material.roughnessTextureID] = curTextureIndex ++;
+        }
+
+        roughnessTextureIndices[i] = roughnessTextureIndexByTextureID[material.roughnessTextureID];
+      }else{
+        roughnessTextureIndices[i] = -100;
+      }
+    }
   }
 
   var diffuseTextureIndexBufferAttribute = new THREE.BufferAttribute(diffuseTextureIndices, 1);
@@ -551,6 +621,7 @@ Model.prototype.enableCustomTextures = function(){
   this.normalTextureIndexByTextureID = normalTextureIndexByTextureID;
   this.specularTextureIndexByTextureID = specularTextureIndexByTextureID;
   this.alphaTextureIndexByTextureID = alphaTextureIndexByTextureID;
+  this.roughnessTextureIndexByTextureID = roughnessTextureIndexByTextureID;
 
   if (this.info.hasNormalMap){
     var normalTextureIndexBufferAttribute = new THREE.BufferAttribute(normalTextureIndices, 1);
@@ -569,6 +640,12 @@ Model.prototype.enableCustomTextures = function(){
     alphaTextureIndexBufferAttribute.setDynamic(false);
     this.geometry.addAttribute("alphaTextureIndex", alphaTextureIndexBufferAttribute);
   }
+
+  if (this.info.hasRoughnessMap){
+    var roughnessTextureIndexBufferAttribute = new THREE.BufferAttribute(roughnessTextureIndices, 1);
+    roughnessTextureIndexBufferAttribute.setDynamic(false);
+    this.geometry.addAttribute("roughnessTextureIndex", roughnessTextureIndexBufferAttribute);
+  }
 }
 
 Model.prototype.disableCustomTextures = function(){
@@ -576,6 +653,7 @@ Model.prototype.disableCustomTextures = function(){
   delete this.normalTextureIndexByTextureID;
   delete this.specularTextureIndexByTextureID;
   delete this.alphaTextureIndexByTextureID;
+  delete this.roughnessTextureIndexByTextureID;
 
   this.geometry.removeAttribute("diffuseTextureIndex");
   this.info.customTexturesEnabled = false;
@@ -590,6 +668,10 @@ Model.prototype.disableCustomTextures = function(){
 
   if (this.info.hasAlpha){
     this.geometry.removeAttribute("alphaTextureIndex");
+  }
+
+  if (this.info.hasRoughness){
+    this.geometry.removeAttribute("roughnessTextureIndex");
   }
 }
 

@@ -14,13 +14,20 @@ varying vec3 vColor;
 vec3 lightDiffuse = vec3(0.0, 0.0, 0.0);
 vec3 lightSpecular = vec3(0.0, 0.0, 0.0);
 varying vec3 vLightDiffuse;
-varying vec3 vLightSpecular;
-
-varying float vMetalness;
 
 #define INSERTION
 
-#ifdef HAS_PHONG_LIGHTING
+#ifdef ENABLE_SPECULARITY
+  varying vec3 vLightSpecular;
+#else
+  vec3 vLightSpecular = vec3(0.0, 0.0, 0.0);
+#endif
+
+#ifdef HAS_ENVIRONMENT_MAP
+  varying float vMetalness;
+#endif
+
+#if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
   varying float vMaterialIndex;
 #endif
 
@@ -73,6 +80,10 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   varying vec4 vAlphaUV;
 #endif
 
+#ifdef HAS_ROUGHNESS_MAP
+  varying vec4 vRoughnessUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   varying float vDiffuseTextureIndex;
   #ifdef HAS_NORMAL_MAP
@@ -83,6 +94,9 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #endif
   #ifdef HAS_ALPHA_MAP
     varying float vAlphaTextureIndex;
+  #endif
+  #ifdef HAS_ROUGHNESS_MAP
+    varying float vRoughnessTextureIndex;
   #endif
   #ifdef CUSTOM_TEXTURE_0
     uniform sampler2D customDiffuseTexture0;
@@ -156,6 +170,24 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #ifdef CUSTOM_ALPHA_TEXTURE_5
     uniform sampler2D customAlphaTexture5;
   #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_0
+    uniform sampler2D customRoughnessTexture0;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_1
+    uniform sampler2D customRoughnessTexture1;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_2
+    uniform sampler2D customRoughnessTexture2;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_3
+    uniform sampler2D customRoughnessTexture3;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_4
+    uniform sampler2D customRoughnessTexture4;
+  #endif
+  #ifdef CUSTOM_ROUGHNESS_TEXTURE_5
+    uniform sampler2D customRoughnessTexture5;
+  #endif
 #else
   uniform sampler2D texture;
 #endif
@@ -188,7 +220,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
 }
 
 #ifdef HAS_PHONG_LIGHTING
-  vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
+  vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal, float selectedRoughness){
     vec3 pointLightPosition = vec3(pX, pY, pZ);
     vec3 toLight = normalize(pointLightPosition - worldPosition);
     float diffuseFactor = dot(normal, toLight);
@@ -199,7 +231,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
       #ifdef ENABLE_SPECULARITY
         vec3 toCamera = normalize(cameraPosition - worldPosition);
         vec3 halfVector = normalize(toLight + toCamera);
-        float shininess = 4.0 / pow(vRoughness, 4.0) - 2.0;
+        float shininess = 4.0 / pow(selectedRoughness, 4.0) - 2.0;
         float specular = pow(dot(normal, halfVector), shininess);
         lightSpecular.rgb += specular;
       #endif
@@ -570,7 +602,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     return 0.0;
   }
 
-  void handleDynamicLight(inout vec3 ambient, inout vec3 diffuse, inout int currentIndex, int lightType, int lightIndex, vec3 computedNormal, vec3 worldPositionComputed){
+  void handleDynamicLight(inout vec3 ambient, inout vec3 diffuse, inout int currentIndex, int lightType, int lightIndex, vec3 computedNormal, vec3 worldPositionComputed, float selectedRoughness){
 
     if (lightType == 0){ // ambient-color
       vec3 ambientRGB = getVec3FromLightMatrix(currentIndex);
@@ -617,7 +649,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
       diffuse += pointLight(
         pointPosition.x, pointPosition.y, pointPosition.z,
         staticPointColor.x, staticPointColor.y, staticPointColor.z,
-        staticPointStrength, worldPositionComputed, computedNormal
+        staticPointStrength, worldPositionComputed, computedNormal, selectedRoughness
       );
       currentIndex += 3;
     }else if (lightType == 6){ // point-color
@@ -627,7 +659,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
       diffuse += pointLight(
         staticPointPosition.x, staticPointPosition.y, staticPointPosition.z,
         pointColor.x, pointColor.y, pointColor.z,
-        staticPointStrength, worldPositionComputed, computedNormal
+        staticPointStrength, worldPositionComputed, computedNormal, selectedRoughness
       );
       currentIndex += 3;
     }else if (lightType == 7){ // point-strength
@@ -637,7 +669,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
       diffuse += pointLight(
         staticPointPosition.x, staticPointPosition.y, staticPointPosition.z,
         staticPointColor.x, staticPointColor.y, staticPointColor.z,
-        pointStrength, worldPositionComputed, computedNormal
+        pointStrength, worldPositionComputed, computedNormal, selectedRoughness
       );
       currentIndex ++;
     }else if (lightType == 8){ // diffuse-dir-color
@@ -682,7 +714,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
       diffuse += pointLight(
         pointPosition.x, pointPosition.y, pointPosition.z,
         pointColor.x, pointColor.y, pointColor.z,
-        staticPointStrength, worldPositionComputed, computedNormal
+        staticPointStrength, worldPositionComputed, computedNormal, selectedRoughness
       );
     }else if (lightType == 12){ // point-position-strength
       vec3 staticPointColor = getStaticColor(lightIndex);
@@ -693,7 +725,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
       diffuse += pointLight(
         pointPosition.x, pointPosition.y, pointPosition.z,
         staticPointColor.x, staticPointColor.y, staticPointColor.z,
-        pointStrength, worldPositionComputed, computedNormal
+        pointStrength, worldPositionComputed, computedNormal, selectedRoughness
       );
     }else if (lightType == 13){ // point-color-strength
       vec3 pointColor = getVec3FromLightMatrix(currentIndex);
@@ -704,7 +736,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
       diffuse += pointLight(
         staticPointPosition.x, staticPointPosition.y, staticPointPosition.z,
         pointColor.x, pointColor.y, pointColor.z,
-        pointStrength, worldPositionComputed, computedNormal
+        pointStrength, worldPositionComputed, computedNormal, selectedRoughness
       );
     }else if (lightType == 14){ // diffuse-dir-color-strength
       vec3 diffuseColor = getVec3FromLightMatrix(currentIndex);
@@ -728,7 +760,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
       diffuse += pointLight(
         pointPosition.x, pointPosition.y, pointPosition.z,
         pointColor.x, pointColor.y, pointColor.z,
-        pointStrength, worldPositionComputed, computedNormal
+        pointStrength, worldPositionComputed, computedNormal, selectedRoughness
       );
     }else if (lightType == 16){ // ambient-color-strength
       vec3 ambientRGB = getVec3FromLightMatrix(currentIndex);
@@ -739,7 +771,7 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     }
   }
 
-  vec3 handleDynamicLights(vec3 computedNormal, vec3 worldPositionComputed){
+  vec3 handleDynamicLights(vec3 computedNormal, vec3 worldPositionComputed, float selectedRoughness){
 
     int currentIndex = 0;
 
@@ -749,37 +781,37 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     // I know this looks horrible, but this is actually a pretty smart way to
     // handle dynamic lighting.
     #ifdef DYNAMIC_LIGHT_1_TYPE
-      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_1_TYPE, 1, computedNormal, worldPositionComputed);
+      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_1_TYPE, 1, computedNormal, worldPositionComputed, selectedRoughness);
       #ifdef DYNAMIC_LIGHT_2_TYPE
-        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_2_TYPE, 2, computedNormal, worldPositionComputed);
+        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_2_TYPE, 2, computedNormal, worldPositionComputed, selectedRoughness);
         #ifdef DYNAMIC_LIGHT_3_TYPE
-          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_3_TYPE, 3, computedNormal, worldPositionComputed);
+          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_3_TYPE, 3, computedNormal, worldPositionComputed, selectedRoughness);
           #ifdef DYNAMIC_LIGHT_4_TYPE
-            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_4_TYPE, 4, computedNormal, worldPositionComputed);
+            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_4_TYPE, 4, computedNormal, worldPositionComputed, selectedRoughness);
             #ifdef DYNAMIC_LIGHT_5_TYPE
-              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_5_TYPE, 5, computedNormal, worldPositionComputed);
+              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_5_TYPE, 5, computedNormal, worldPositionComputed, selectedRoughness);
               #ifdef DYNAMIC_LIGHT_6_TYPE
-                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_6_TYPE, 6, computedNormal, worldPositionComputed);
+                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_6_TYPE, 6, computedNormal, worldPositionComputed, selectedRoughness);
                 #ifdef DYNAMIC_LIGHT_7_TYPE
-                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_7_TYPE, 7, computedNormal, worldPositionComputed);
+                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_7_TYPE, 7, computedNormal, worldPositionComputed, selectedRoughness);
                   #ifdef DYNAMIC_LIGHT_8_TYPE
-                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_8_TYPE, 8, computedNormal, worldPositionComputed);
+                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_8_TYPE, 8, computedNormal, worldPositionComputed, selectedRoughness);
                     #ifdef DYNAMIC_LIGHT_9_TYPE
-                      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_9_TYPE, 9, computedNormal, worldPositionComputed);
+                      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_9_TYPE, 9, computedNormal, worldPositionComputed, selectedRoughness);
                       #ifdef DYNAMIC_LIGHT_10_TYPE
-                        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_10_TYPE, 10, computedNormal, worldPositionComputed);
+                        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_10_TYPE, 10, computedNormal, worldPositionComputed, selectedRoughness);
                         #ifdef DYNAMIC_LIGHT_11_TYPE
-                          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_11_TYPE, 11, computedNormal, worldPositionComputed);
+                          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_11_TYPE, 11, computedNormal, worldPositionComputed, selectedRoughness);
                           #ifdef DYNAMIC_LIGHT_12_TYPE
-                            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_12_TYPE, 12, computedNormal, worldPositionComputed);
+                            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_12_TYPE, 12, computedNormal, worldPositionComputed, selectedRoughness);
                             #ifdef DYNAMIC_LIGHT_13_TYPE
-                              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_13_TYPE, 13, computedNormal, worldPositionComputed);
+                              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_13_TYPE, 13, computedNormal, worldPositionComputed, selectedRoughness);
                               #ifdef DYNAMIC_LIGHT_14_TYPE
-                                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_14_TYPE, 14, computedNormal, worldPositionComputed);
+                                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_14_TYPE, 14, computedNormal, worldPositionComputed, selectedRoughness);
                                 #ifdef DYNAMIC_LIGHT_15_TYPE
-                                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_15_TYPE, 15, computedNormal, worldPositionComputed);
+                                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_15_TYPE, 15, computedNormal, worldPositionComputed, selectedRoughness);
                                   #ifdef DYNAMIC_LIGHT_16_TYPE
-                                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_16_TYPE, 16, computedNormal, worldPositionComputed);
+                                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_16_TYPE, 16, computedNormal, worldPositionComputed, selectedRoughness);
                                   #endif
                                 #endif
                               #endif
@@ -800,13 +832,15 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
     return (ambient + diffuse);
   }
 
-  int isSpecularityDisabledForMaterial(){
-    int mi = int(vMaterialIndex);
-    //LIGHT_DISABLE_SPECULARITY_CODE
-    return 0;
-  }
+  #if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
+    int isSpecularityDisabledForMaterial(){
+      int mi = int(vMaterialIndex);
+      //LIGHT_DISABLE_SPECULARITY_CODE
+      return 0;
+    }
+  #endif
 
-  void handleLighting(vec3 worldPositionComputed){
+  void handleLighting(vec3 worldPositionComputed, float selectedRoughness){
 
     #ifdef HAS_NORMAL_MAP
       vec3 computedNormal;
@@ -909,39 +943,39 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
       diffuse += pointLight(
         float(STATIC_POINT_LIGHT_1_X), float(STATIC_POINT_LIGHT_1_Y), float(STATIC_POINT_LIGHT_1_Z),
         float(STATIC_POINT_LIGHT_1_R), float(STATIC_POINT_LIGHT_1_G), float(STATIC_POINT_LIGHT_1_B),
-        float(STATIC_POINT_LIGHT_1_STRENGTH), worldPositionComputed, computedNormal
+        float(STATIC_POINT_LIGHT_1_STRENGTH), worldPositionComputed, computedNormal, selectedRoughness
       );
     #endif
     #ifdef HAS_STATIC_POINT_LIGHT_2
       diffuse += pointLight(
         float(STATIC_POINT_LIGHT_2_X), float(STATIC_POINT_LIGHT_2_Y), float(STATIC_POINT_LIGHT_2_Z),
         float(STATIC_POINT_LIGHT_2_R), float(STATIC_POINT_LIGHT_2_G), float(STATIC_POINT_LIGHT_2_B),
-        float(STATIC_POINT_LIGHT_2_STRENGTH), worldPositionComputed, computedNormal
+        float(STATIC_POINT_LIGHT_2_STRENGTH), worldPositionComputed, computedNormal, selectedRoughness
       );
     #endif
     #ifdef HAS_STATIC_POINT_LIGHT_3
       diffuse += pointLight(
         float(STATIC_POINT_LIGHT_3_X), float(STATIC_POINT_LIGHT_3_Y), float(STATIC_POINT_LIGHT_3_Z),
         float(STATIC_POINT_LIGHT_3_R), float(STATIC_POINT_LIGHT_3_G), float(STATIC_POINT_LIGHT_3_B),
-        float(STATIC_POINT_LIGHT_3_STRENGTH), worldPositionComputed, computedNormal
+        float(STATIC_POINT_LIGHT_3_STRENGTH), worldPositionComputed, computedNormal, selectedRoughness
       );
     #endif
     #ifdef HAS_STATIC_POINT_LIGHT_4
       diffuse += pointLight(
         float(STATIC_POINT_LIGHT_4_X), float(STATIC_POINT_LIGHT_4_Y), float(STATIC_POINT_LIGHT_4_Z),
         float(STATIC_POINT_LIGHT_4_R), float(STATIC_POINT_LIGHT_4_G), float(STATIC_POINT_LIGHT_4_B),
-        float(STATIC_POINT_LIGHT_4_STRENGTH), worldPositionComputed, computedNormal
+        float(STATIC_POINT_LIGHT_4_STRENGTH), worldPositionComputed, computedNormal, selectedRoughness
       );
     #endif
     #ifdef HAS_STATIC_POINT_LIGHT_5
       diffuse += pointLight(
         float(STATIC_POINT_LIGHT_5_X), float(STATIC_POINT_LIGHT_5_Y), float(STATIC_POINT_LIGHT_5_Z),
         float(STATIC_POINT_LIGHT_5_R), float(STATIC_POINT_LIGHT_5_G), float(STATIC_POINT_LIGHT_5_B),
-        float(STATIC_POINT_LIGHT_5_STRENGTH), worldPositionComputed, computedNormal
+        float(STATIC_POINT_LIGHT_5_STRENGTH), worldPositionComputed, computedNormal, selectedRoughness
       );
     #endif
 
-    lightDiffuse = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed));
+    lightDiffuse = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed, selectedRoughness));
   }
 #endif
 
@@ -1047,6 +1081,52 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
   }
 #endif
 
+#ifdef HAS_ROUGHNESS_MAP
+  float getRoughnessCoef(){
+    if (vRoughnessUV.x < 0.0) {
+      return 1.0;
+    }
+
+    #ifdef HAS_CUSTOM_TEXTURE
+      int roughnessTextureIndexInt = int(vRoughnessTextureIndex + 0.5);
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_0
+        if (roughnessTextureIndexInt == 0){
+          return texture2D(customRoughnessTexture0, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_1
+        if (roughnessTextureIndexInt == 1){
+          return texture2D(customRoughnessTexture1, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_2
+        if (roughnessTextureIndexInt == 2){
+          return texture2D(customRoughnessTexture2, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_3
+        if (roughnessTextureIndexInt == 3){
+          return texture2D(customRoughnessTexture3, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_4
+        if (roughnessTextureIndexInt == 4){
+          return texture2D(customRoughnessTexture4, vUV).g;
+        }
+      #endif
+      #ifdef CUSTOM_ROUGHNESS_TEXTURE_5
+        if (roughnessTextureIndexInt == 5){
+          return texture2D(customRoughnessTexture5, vUV).g;
+        }
+      #endif
+    #else
+      return texture2D(texture, uvAffineTransformation(vUV, vRoughnessUV.x, vRoughnessUV.y, vRoughnessUV.z, vRoughnessUV.w)).g;
+    #endif
+
+    return 1.0;
+  }
+#endif
+
 void main(){
 
   #ifdef CHILDREN_HIDEABLE
@@ -1065,10 +1145,20 @@ void main(){
     }
   #endif
 
+  float roughnessCoef = 1.0;
+  #ifdef HAS_ROUGHNESS_MAP
+    roughnessCoef = getRoughnessCoef();
+  #endif
+
+  float selectedRoughness = 1.0;
+  #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
+    selectedRoughness = vRoughness * roughnessCoef;
+  #endif
+
   vec3 color = vColor;
   #ifdef HAS_PHONG_LIGHTING
     lightDiffuse = vec3(0.0, 0.0, 0.0);
-    handleLighting(vWorldPosition);
+    handleLighting(vWorldPosition, selectedRoughness);
   #endif
 
   vec3 diffuseTotal = vLightDiffuse + lightDiffuse;
@@ -1088,7 +1178,7 @@ void main(){
         envVec = vec3(envVec.z, envVec.y, envVec.x);
       }
 
-      float exponent = pow(2.0, (1.0 - vRoughness) * 18.0 + 2.0);
+      float exponent = pow(2.0, (1.0 - selectedRoughness) * 18.0 + 2.0);
       float maxMIPLevel = log2(float(ENVIRONMENT_MAP_SIZE));
       float minMIPLevel = mipMapLevel(vec2(envVec.z, envVec.x) * float(ENVIRONMENT_MAP_SIZE));
       float MIPLevel = max(minMIPLevel, log2(float(ENVIRONMENT_MAP_SIZE) * sqrt(3.0)) - 0.5 * log2(exponent + 1.0));
@@ -1101,7 +1191,7 @@ void main(){
         vec3 envSpecularColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
         #else
           float fallbackMIPLevel = maxMIPLevel;
-          if (vRoughness < 0.4){
+          if (selectedRoughness < 0.4){
             fallbackMIPLevel = 0.0;
           }
           vec3 envDiffuseColor = vec3(float(ENV_DIFFUSE_FALLBACK_R), float(ENV_DIFFUSE_FALLBACK_G), float(ENV_DIFFUSE_FALLBACK_B));
@@ -1155,7 +1245,7 @@ void main(){
     }
   #endif
 
-  #ifdef HAS_PHONG_LIGHTING
+  #if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
     if (isSpecularityDisabledForMaterial() == 1){
       specularTotal = vec3(0.0, 0.0, 0.0);
     }else{

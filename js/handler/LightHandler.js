@@ -260,8 +260,13 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
     var pos = REUSABLE_VECTOR_2.set(positionAttrAry[i], positionAttrAry[i + 1], positionAttrAry[i + 2]);
 
     if (obj.isObjectGroup || obj.isModelInstance){
-      var colorAry = obj.mesh.geometry.attributes.color.array;
-      color = REUSABLE_VECTOR_3.set(colorAry[i], colorAry[i + 1], colorAry[i + 2]);
+      if (obj.isModelInstance && ! obj.mesh.geometry.attributes.color){
+        var childInfo = obj.model.info.childInfos[0];
+        color = REUSABLE_VECTOR_3.set(childInfo.colorR, childInfo.colorG, childInfo.colorB);
+      }else{
+        var colorAry = obj.mesh.geometry.attributes.color.array;
+        color = REUSABLE_VECTOR_3.set(colorAry[i], colorAry[i + 1], colorAry[i + 2]);
+      }
     }
 
     normal.applyMatrix3(mat3).normalize();
@@ -296,9 +301,15 @@ LightHandler.prototype.bakeObjectLight = function(obj, isDesignMode){
       }
     }
 
-    result[x ++] = (color.x * (ambient.x + diffuse.x));
-    result[x ++] = (color.y * (ambient.y + diffuse.y));
-    result[x ++] = (color.z * (ambient.z + diffuse.z));
+    var coefX = 1, coefY = 1, coefZ = 1;
+    if (!obj.isModelInstance){
+      coefX = color.x;
+      coefY = color.y;
+      coefZ = color.z;
+    }
+    result[x ++] = (coefX * (ambient.x + diffuse.x));
+    result[x ++] = (coefY * (ambient.y + diffuse.y));
+    result[x ++] = (coefZ * (ambient.z + diffuse.z));
   }
 
   if (!isDesignMode){
