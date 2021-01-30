@@ -151,6 +151,9 @@ void main(){
     #ifdef HAS_ALPHA_MAP
       vAlphaTextureIndex = alphaTextureIndex;
     #endif
+    #ifdef HAS_ROUGHNESS_MAP
+      vRoughnessTextureIndex = roughnessTextureIndex;
+    #endif
   #endif
 
   vColor = color;
