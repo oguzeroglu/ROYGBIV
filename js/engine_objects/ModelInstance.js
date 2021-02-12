@@ -618,6 +618,14 @@ ModelInstance.prototype.updateEnvironmentMap = function(skybox){
 
   macroHandler.removeMacro("ENVIRONMENT_MAP_SIZE " + macroVal, this.mesh.material, false, true);
   macroHandler.injectMacro("ENVIRONMENT_MAP_SIZE " + skybox.imageSize, this.mesh.material, false, true);
+
+  if (this.isHDR && !skybox.isHDR){
+    macroHandler.removeMacro("IS_HDR", this.mesh.material, false, true);
+    this.isHDR = false;
+  }else if (!this.isHDR && skybox.isHDR){
+    macroHandler.injectMacro("IS_HDR", this.mesh.material, false, true);
+    this.isHDR = true;
+  }
 }
 
 ModelInstance.prototype.setEnvMapFallbackDiffuseValue = function(fallbackDiffuse){
@@ -665,6 +673,11 @@ ModelInstance.prototype.mapEnvironment = function(skybox, fallbackDiffuse){
   };
 
   this.setEnvMapFallbackDiffuseValue(fallbackDiffuse);
+
+  if (skybox.isHDR){
+    macroHandler.injectMacro("IS_HDR", this.mesh.material, false, true);
+    this.isHDR = true;
+  }
 }
 
 ModelInstance.prototype.unmapEnvironment = function(){
@@ -683,6 +696,11 @@ ModelInstance.prototype.unmapEnvironment = function(){
   macroHandler.removeMacro("ENVIRONMENT_MAP_SIZE " + macroVal, this.mesh.material, false, true);
 
   this.setEnvMapFallbackDiffuseValue(null);
+
+  if (this.isHDR){
+    macroHandler.removeMacro("IS_HDR", this.mesh.material, false, true);
+    this.isHDR = false;
+  }
 }
 
 ModelInstance.prototype.disableSpecularity = function(){

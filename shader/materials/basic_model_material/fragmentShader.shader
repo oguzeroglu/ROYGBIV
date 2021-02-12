@@ -1127,6 +1127,10 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
   }
 #endif
 
+vec4 RGBEToLinear(vec4 value){
+	return vec4(value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0);
+}
+
 void main(){
 
   #ifdef CHILDREN_HIDEABLE
@@ -1187,15 +1191,26 @@ void main(){
       vec3 fresnel = f0 + (vec3(1.0, 1.0, 1.0) + f0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0);
 
       #ifdef GL_EXT_shader_texture_lod
-        vec3 envDiffuseColor = textureCubeLodEXT(environmentMap, N2, maxMIPLevel).rgb;
-        vec3 envSpecularColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
+        #ifdef IS_HDR
+          vec3 envDiffuseColor = RGBEToLinear(textureCubeLodEXT(environmentMap, N2, maxMIPLevel)).rgb;
+          vec3 envSpecularColor = RGBEToLinear(textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel)).rgb * fresnel;
+        #else
+          vec3 envDiffuseColor = textureCubeLodEXT(environmentMap, N2, maxMIPLevel).rgb;
+          vec3 envSpecularColor = textureCubeLodEXT(environmentMap, vec3(envVec.z, envVec.y, envVec.x), MIPLevel).rgb * fresnel;
+        #endif
         #else
           float fallbackMIPLevel = maxMIPLevel;
           if (selectedRoughness < 0.4){
             fallbackMIPLevel = 0.0;
           }
-          vec3 envDiffuseColor = vec3(float(ENV_DIFFUSE_FALLBACK_R), float(ENV_DIFFUSE_FALLBACK_G), float(ENV_DIFFUSE_FALLBACK_B));
-          vec3 envSpecularColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x), fallbackMIPLevel).rgb * fresnel;
+
+          #ifdef IS_HDR
+            vec3 envDiffuseColor = vec3(float(ENV_DIFFUSE_FALLBACK_R), float(ENV_DIFFUSE_FALLBACK_G), float(ENV_DIFFUSE_FALLBACK_B));
+            vec3 envSpecularColor = RGBEToLinear(textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x), fallbackMIPLevel)).rgb * fresnel;
+          #else
+            vec3 envDiffuseColor = vec3(float(ENV_DIFFUSE_FALLBACK_R), float(ENV_DIFFUSE_FALLBACK_G), float(ENV_DIFFUSE_FALLBACK_B));
+            vec3 envSpecularColor = textureCube(environmentMap, vec3(envVec.z, envVec.y, envVec.x), fallbackMIPLevel).rgb * fresnel;
+          #endif
         #endif
 
       specularTotal += envSpecularColor;

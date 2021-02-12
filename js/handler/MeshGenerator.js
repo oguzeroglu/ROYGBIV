@@ -283,6 +283,11 @@ MeshGenerator.prototype.generateSkybox = function(skybox, isMock){
   mesh.onBeforeRender = function(){
     webglCallbackHandler.onBeforeRender(skybox);
   }
+
+  if (skybox.isHDR){
+    macroHandler.injectMacro("IS_HDR", material, false, true);
+  }
+
   return mesh;
 }
 

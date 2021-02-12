@@ -85,7 +85,7 @@ SkyBox.prototype.loadHDR = function(callback){
   var that = this;
   var prefix = skyBoxRootDirectory + this.directoryName + "/";
   var paths = [prefix + "right.hdr", prefix + "left.hdr", prefix + "up.hdr", prefix + "down.hdr", prefix + "front.hdr", prefix + "back.hdr"];
-  new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, paths, function(hdrCubeMap){
+  new THREE.HDRCubeTextureLoader().load(THREE.UnsignedByteType, paths, function(hdrCubeMap){
     that.cubeTexture = hdrCubeMap;
     that.cubeTexture.needsUpdate = true;
     that.imageSize = hdrCubeMap.image[0].image.width;
