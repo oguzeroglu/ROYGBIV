@@ -1,7 +1,10 @@
-var SkyBox = function(name, directoryName, color){
+var SkyBox = function(name, directoryName, color, isHDR){
   this.name = name;
   this.directoryName = directoryName;
   this.color = color;
+
+  this.isHDR = isHDR;
+
   this.hasBack = false;
   this.hasDown = false;
   this.hasFront = false;
@@ -21,10 +24,13 @@ SkyBox.prototype.getUniform = function(){
 }
 
 SkyBox.prototype.clone = function(){
-  return new SkyBox(this.name, this.directoryName, this.color);
+  return new SkyBox(this.name, this.directoryName, this.color, this.isHDR);
 }
 
 SkyBox.prototype.dispose = function(){
+  if (this.isHDR){
+    return;
+  }
   this.backTexture.dispose();
   this.downTexture.dispose();
   this.frontTexture.dispose();
@@ -39,13 +45,18 @@ SkyBox.prototype.export = function(isBuildingForDeploymentMode){
   exportObject.name = this.name;
   exportObject.directoryName = this.directoryName;
   exportObject.color = this.color;
+  exportObject.isHDR = this.isHDR;
 
   if (isBuildingForDeploymentMode){
-    for (var instanceName in modelInstances){
-      var modelInstance = modelInstances[instanceName];
-      if (modelInstance.environmentMapInfo && modelInstance.environmentMapInfo.skyboxName == this.name){
-        exportObject.noCompress = true;
-        break;
+    if (this.isHDR){
+      exportObject.noCompress = true;
+    }else{
+      for (var instanceName in modelInstances){
+        var modelInstance = modelInstances[instanceName];
+        if (modelInstance.environmentMapInfo && modelInstance.environmentMapInfo.skyboxName == this.name){
+          exportObject.noCompress = true;
+          break;
+        }
       }
     }
   }
@@ -70,7 +81,24 @@ SkyBox.prototype.loadTexture = function(textureName, textureObjectName, textureA
   });
 }
 
+SkyBox.prototype.loadHDR = function(callback){
+  var that = this;
+  var prefix = skyBoxRootDirectory + this.directoryName + "/";
+  var paths = [prefix + "right.hdr", prefix + "left.hdr", prefix + "up.hdr", prefix + "down.hdr", prefix + "front.hdr", prefix + "back.hdr"];
+  new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, paths, function(hdrCubeMap){
+    that.cubeTexture = hdrCubeMap;
+    that.cubeTexture.needsUpdate = true;
+    that.imageSize = hdrCubeMap.image[0].image.width;
+    callback();
+  }, noop, noop);
+}
+
 SkyBox.prototype.loadTextures = function(callback){
+  if (this.isHDR){
+    this.loadHDR(callback);
+    return;
+  }
+
   var textureInfos = [
     ["back", "backTexture", "hasBack"],
     ["down", "downTexture", "hasDown"],

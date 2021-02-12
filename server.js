@@ -95,6 +95,7 @@ app.post("/getSkyboxFolders", function(req, res){
   console.log("[*] Getting skybox folders.");
   res.setHeader("Content-Type", "application/json");
   var textureNames = ["back.png", "down.png", "front.png", "left.png", "right.png", "up.png"];
+  var hdrTextureNames = ["back.hdr", "down.hdr", "front.hdr", "left.hdr", "right.hdr", "back.hdr"];
   var folders = [];
   var dirs = fs.readdirSync("skybox").filter(f => {
     var joined = path.join("./skybox/", f);
@@ -106,13 +107,27 @@ app.post("/getSkyboxFolders", function(req, res){
     var skyboxFolder = path.join("./skybox/", dirs[i]);
     var files = fs.readdirSync(skyboxFolder);
     var put = true;
+    var isHDR = false;
     for (var i2 = 0; i2<textureNames.length; i2++){
       if (files.indexOf(textureNames[i2]) <= -1){
         put = false;
       }
     }
+
+    if (!put){
+      put = true;
+      for (var i2 = 0; i2<hdrTextureNames.length; i2++){
+        if (files.indexOf(hdrTextureNames[i2]) <= -1){
+          put = false;
+        }
+      }
+
+      if (put){
+        isHDR = true;
+      }
+    }
     if (put){
-      folders.push(dirs[i]);
+      folders.push({dirName: dirs[i], isHDR: isHDR});
     }
   }
   console.log("[*] Found "+folders.length+" skyboxes.");

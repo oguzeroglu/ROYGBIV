@@ -1,6 +1,6 @@
 This folder holds the Skybox textures, do not delete this folder.
 
-Each Skybox texture MUST contain the following images:
+Each Skybox texture must contain the following images (for HDR skyboxes .hdr instead of .png):
 
 back.png -> the back face of the cube
 down.png -> the down face of the cube
