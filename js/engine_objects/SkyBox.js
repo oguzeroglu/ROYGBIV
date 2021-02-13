@@ -15,6 +15,25 @@ var SkyBox = function(name, directoryName, color, isHDR){
   this.uniformCache = null;
 }
 
+SkyBox.prototype.debugPMREM = function(){
+  var hdrCubeMap = this.cubeTexture;
+  var pmremGenerator = new THREE.PMREMGenerator(hdrCubeMap);
+  pmremGenerator.update(renderer.webglRenderer);
+
+  var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker(pmremGenerator.cubeLods);
+  pmremCubeUVPacker.update(renderer.webglRenderer);
+
+  var hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+  pmremGenerator.dispose();
+  pmremCubeUVPacker.dispose();
+
+  var testMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(200, 200), new THREE.MeshBasicMaterial({color: "white"}));
+  scene.add(testMesh);
+
+  testMesh.material.map = hdrCubeRenderTarget.texture;
+}
+
 SkyBox.prototype.getUniform = function(){
   if (!this.uniformCache){
     this.uniformCache = new THREE.Uniform(this.cubeTexture);
