@@ -1137,6 +1137,13 @@ ModelInstance.prototype.makePBR = function(){
 
   this.pbrLightAttenuationCoef = 500000;
   this.hasPBR = true;
+
+  if (this.toneMappingInfo){
+    var exposure = this.toneMappingInfo.exposure;
+    this.disableToneMapping();
+    this.enableToneMapping();
+    this.replaceToneMappingExposure(exposure);
+  }
 }
 
 ModelInstance.prototype.unmakePBR = function(){
@@ -1179,6 +1186,13 @@ ModelInstance.prototype.unmakePBR = function(){
 
   delete this.pbrLightAttenuationCoef;
   this.hasPBR = false;
+
+  if (this.toneMappingInfo){
+    var exposure = this.toneMappingInfo.exposure;
+    this.disableToneMapping();
+    this.enableToneMapping();
+    this.replaceToneMappingExposure(exposure);
+  }
 }
 
 ModelInstance.prototype.setPBRLightAttenuationCoef = function(lightAttenuationCoef){
@@ -1321,4 +1335,33 @@ ModelInstance.prototype.compressGeometry = function(){
   if (allRefract || allReflect){
     macroHandler.compressVaryingFloat(this.mesh.material, "vEnvMapModeRefraction", allRefract? 100: -100);
   }
+}
+
+ModelInstance.prototype.enableToneMapping = function(){
+  if (!this.isHDR || this.toneMappingInfo){
+    return;
+  }
+
+  macroHandler.injectMacro("TONE_MAPPING_ENABLED", this.mesh.material, false, true);
+  macroHandler.injectMacro("TONE_MAPPING_EXPOSURE 1", this.mesh.material, false, true);
+
+  this.toneMappingInfo = {exposure: 1};
+}
+
+ModelInstance.prototype.disableToneMapping = function(){
+  if (!this.isHDR || !this.toneMappingInfo){
+    return;
+  }
+
+  macroHandler.removeMacro("TONE_MAPPING_ENABLED", this.mesh.material, false, true);
+  macroHandler.removeMacro("TONE_MAPPING_EXPOSURE " + this.toneMappingInfo.exposure, this.mesh.material, false, true);
+
+  delete this.toneMappingInfo;
+}
+
+ModelInstance.prototype.replaceToneMappingExposure = function(newExposure){
+  macroHandler.removeMacro("TONE_MAPPING_EXPOSURE " + this.toneMappingInfo.exposure, this.mesh.material, false, true);
+  macroHandler.injectMacro("TONE_MAPPING_EXPOSURE " + newExposure, this.mesh.material, false, true);
+
+  this.toneMappingInfo.exposure = newExposure;
 }

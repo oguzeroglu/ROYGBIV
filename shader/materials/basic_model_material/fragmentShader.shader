@@ -1269,6 +1269,15 @@ vec4 RGBMToLinear( in vec4 value, in float maxRange ) {
 
   	return vec4(result.rgb, 1.0);
   }
+
+#endif
+
+#ifdef TONE_MAPPING_ENABLED
+  vec3 OptimizedCineonToneMapping( vec3 color ) {
+    color *= float(TONE_MAPPING_EXPOSURE);
+    color = max( vec3( 0.0 ), color - 0.004 );
+    return pow( ( color * ( 6.2 * color + 0.5 ) ) / ( color * ( 6.2 * color + 1.7 ) + 0.06 ), vec3( 2.2 ) );
+  }
 #endif
 
 void main(){
@@ -1406,4 +1415,8 @@ void main(){
 
   gl_FragColor.rgb = (diffuseTotal * color * textureColor) + (SPECULAR_COLOR * specularTotal);
   gl_FragColor.a = float(ALPHA) * alphaCoef;
+
+  #if defined(IS_HDR) && defined(TONE_MAPPING_ENABLED)
+    gl_FragColor.rgb = OptimizedCineonToneMapping(gl_FragColor.rgb);
+  #endif
 }
