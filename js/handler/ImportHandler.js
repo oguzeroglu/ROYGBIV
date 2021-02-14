@@ -116,6 +116,11 @@ ImportHandler.prototype.importModelInstances = function(obj){
       modelInstance.makePBR();
       modelInstance.setPBRLightAttenuationCoef(curModelInstanceExport.pbrLightAttenuationCoef);
     }
+
+    if (curModelInstanceExport.toneMappingInfo){
+      modelInstance.enableToneMapping();
+      modelInstance.replaceToneMappingExposure(curModelInstanceExport.toneMappingInfo.exposure);
+    }
   }
 
   if (isDeployment){

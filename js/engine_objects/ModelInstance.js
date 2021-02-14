@@ -138,6 +138,7 @@ ModelInstance.prototype.export = function(){
 
   exportObj.hasPBR = this.hasPBR;
   exportObj.pbrLightAttenuationCoef = this.pbrLightAttenuationCoef;
+  exportObj.toneMappingInfo = this.toneMappingInfo;
 
   return exportObj;
 }
