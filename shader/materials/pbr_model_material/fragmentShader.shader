@@ -686,7 +686,7 @@ void main(){
 
       vec3 kD = 1.0 - fresnel;
       kD *= 1.0 - vMetalness;
-      ambient = (kD * (envDiffuseColor * (1.0 / PI)) + envSpecularColor);
+      ambient = (kD * albedo * (envDiffuseColor * (1.0 / PI)) + envSpecularColor);
     }else{
       ambient = vec3(0.03, 0.03, 0.03) * albedo;
     }
