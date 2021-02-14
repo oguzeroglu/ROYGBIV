@@ -436,14 +436,6 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, fl
   }
 #endif
 
-vec4 RGBEToLinear(vec4 value){
-	return vec4(value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0);
-}
-
-vec4 RGBMToLinear( in vec4 value, in float maxRange ) {
-	return vec4( value.xyz * value.w * maxRange, 1.0 );
-}
-
 #ifdef IS_HDR
   #define cubeUV_textureSize (1024.0)
   #define cubeUV_maxLods1  (log2(cubeUV_textureSize*0.25) - 1.0)
@@ -451,10 +443,9 @@ vec4 RGBMToLinear( in vec4 value, in float maxRange ) {
   #define cubeUV_maxLods2 (log2(cubeUV_textureSize*0.25) - 2.0)
   #define cubeUV_rcpTextureSize (1.0 / cubeUV_textureSize)
   #define cubeUV_maxLods3 (log2(cubeUV_textureSize*0.25) - 3.0)
-  #define GAMMA_FACTOR 2
 
-  vec4 GammaToLinear( in vec4 value, in float gammaFactor ) {
-    return vec4( pow( value.xyz, vec3( gammaFactor ) ), value.w );
+  vec4 RGBMToLinear( in vec4 value, in float maxRange ) {
+  	return vec4( value.xyz * value.w * maxRange, 1.0 );
   }
 
   vec4 envMapTexelToLinear( vec4 value ) { return RGBMToLinear( value, 16.0 ); }
