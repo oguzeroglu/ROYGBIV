@@ -162,7 +162,8 @@ var GUIHandler = function(){
     "Depth write": true,
     "Blending": "Normal",
     "Specular color": "1,1,1",
-    "PBR Light Attenuation Coef.": "0"
+    "PBR Light Attenuation Coef.": "0",
+    "Side": "BOTH"
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -423,6 +424,9 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Alpha"] = "" + curSelection.alpha;
     guiHandler.modelInstanceManipulationParameters["Depth write"] = !!curSelection.depthWrite;
     guiHandler.modelInstanceManipulationParameters["Specular color"] = curSelection.specularColor.r + "," + curSelection.specularColor.g + "," + curSelection.specularColor.b;
+    guiHandler.modelInstanceManipulationParameters["Side"] = curSelection.mesh.material.side == THREE.DoubleSide? "BOTH": (
+      curSelection.mesh.material.side == THREE.FrontSide? "FRONT": "BACK"
+    );
 
     var blendingText = "NO_BLENDING";
     if (curSelection.blending == NORMAL_BLENDING){
@@ -2238,6 +2242,15 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   }).listen();
   graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Blending", ["NO_BLENDING", "NORMAL_BLENDING", "ADDITIVE_BLENDING", "SUBTRACTIVE_BLENDING", "MULTIPLY_BLENDING"]).onChange(function(val){
     selectionHandler.getSelectedObject().setBlending(window[val]);
+  }).listen();
+  graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Side", ["FRONT", "BACK", "BOTH"]).onChange(function(val){
+    if (val == "FRONT"){
+      selectionHandler.getSelectedObject().setRenderSide(THREE.FrontSide);
+    }else if (val == "BACK"){
+      selectionHandler.getSelectedObject().setRenderSide(THREE.BackSide);
+    }else{
+      selectionHandler.getSelectedObject().setRenderSide(THREE.DoubleSide);
+    }
   }).listen();
   if (!modelInstance.hasPBR){
     graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Affected by light").onChange(function(val){

@@ -121,6 +121,10 @@ ImportHandler.prototype.importModelInstances = function(obj){
       modelInstance.enableToneMapping();
       modelInstance.replaceToneMappingExposure(curModelInstanceExport.toneMappingInfo.exposure);
     }
+
+    if (!(typeof curModelInstanceExport.renderSide == UNDEFINED)){
+      modelInstance.setRenderSide(curModelInstanceExport.renderSide);
+    }
   }
 
   if (isDeployment){

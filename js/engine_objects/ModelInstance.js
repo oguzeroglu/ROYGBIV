@@ -140,6 +140,8 @@ ModelInstance.prototype.export = function(){
   exportObj.pbrLightAttenuationCoef = this.pbrLightAttenuationCoef;
   exportObj.toneMappingInfo = this.toneMappingInfo;
 
+  exportObj.renderSide = this.mesh.material.side;
+
   return exportObj;
 }
 
@@ -1365,4 +1367,8 @@ ModelInstance.prototype.replaceToneMappingExposure = function(newExposure){
   macroHandler.injectMacro("TONE_MAPPING_EXPOSURE " + newExposure, this.mesh.material, false, true);
 
   this.toneMappingInfo.exposure = newExposure;
+}
+
+ModelInstance.prototype.setRenderSide = function(side){
+  this.mesh.material.side = side;
 }
