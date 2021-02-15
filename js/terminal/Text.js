@@ -913,6 +913,7 @@ var Text = function(){
   this.CANNOT_SET_MASS_FOR_SIMPLIFIED_OBJECTS = "Cannot set mass for objects with simplified physics.";
   this.ALREADY_FOR_MOBILE = "Application is already @@1 for mobile devices.";
   this.ENABLED = "enabled";
+  this.EXPOSURE_SET = "Exposure set. Note that tone mapping only works for HDR skyboxes.";
   this.TRANSITION_CREATED = "Transition created.";
   this.TRANSITION_DESTROYED = "Transition destroyed.";
   this.TRANSITION_REMOVED_FROM_SM = "Transition removed from state machine.";

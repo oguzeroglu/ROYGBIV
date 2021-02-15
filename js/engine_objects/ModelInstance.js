@@ -1363,6 +1363,9 @@ ModelInstance.prototype.disableToneMapping = function(){
 }
 
 ModelInstance.prototype.replaceToneMappingExposure = function(newExposure){
+  if (!this.toneMappingInfo){
+    return;
+  }
   macroHandler.removeMacro("TONE_MAPPING_EXPOSURE " + this.toneMappingInfo.exposure, this.mesh.material, false, true);
   macroHandler.injectMacro("TONE_MAPPING_EXPOSURE " + newExposure, this.mesh.material, false, true);
 

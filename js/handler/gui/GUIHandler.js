@@ -2639,7 +2639,8 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   var environmentMapParams = {
     "Skybox": modelInstance.hasEnvironmentMap()? modelInstance.environmentMapInfo.skyboxName: firstSkyboxName,
     "Enable": modelInstance.hasEnvironmentMap(),
-    "Fallback diffuse color": fallbackDiffuseText
+    "Fallback diffuse color": fallbackDiffuseText,
+    "Exposure": modelInstance.toneMappingInfo? ("" + modelInstance.toneMappingInfo.exposure): "1"
   };
 
   var envMapFallbackDiffuseController;
@@ -2667,6 +2668,11 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
         return;
       }
 
+      if (!isNaN(parseFloat(environmentMapParams["Exposure"]))){
+        modelInstance.enableToneMapping();
+        modelInstance.replaceToneMappingExposure(parseFloat(environmentMapParams["Exposure"]));
+      }
+
       modelInstance.mapEnvironment(skyBoxes[environmentMapParams["Skybox"]], fallbackDiffuse);
       guiHandler.enableController(envMapFallbackDiffuseController);
       terminal.printInfo(Text.ENVIRONMENT_MAP_CREATED);
@@ -2689,6 +2695,17 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
 
     modelInstance.setEnvMapFallbackDiffuseValue(fallbackDiffuse);
     terminal.printInfo(Text.FALLBACK_DIFFUSE_VECTOR_SET);
+  });
+  environmentMapFolder.add(environmentMapParams, "Exposure").onFinishChange(function(val){
+    terminal.clear();
+    var parsed = parseFloat(val);
+    if (isNaN(parsed)){
+      terminal.printError(Text.INVALID_NUMERICAL_VALUE);
+      return;
+    }
+    modelInstance.enableToneMapping();
+    modelInstance.replaceToneMappingExposure(parsed);
+    terminal.printInfo(Text.EXPOSURE_SET);
   });
 
   if (!modelInstance.hasEnvironmentMap()){
