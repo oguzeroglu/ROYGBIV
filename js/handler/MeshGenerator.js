@@ -263,7 +263,7 @@ MeshGenerator.prototype.generateSkybox = function(skybox, isMock){
     GLOBAL_CUBE_TEXTURE_UNIFORM = skybox.getUniform();
     cubeTextureUniform = GLOBAL_CUBE_TEXTURE_UNIFORM;
   }else{
-    cubeTextureUniform = new THREE.Uniform(skybox.cubeTexture);
+    cubeTextureUniform = skybox.getUniform();
   }
   var material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.skyboxVertexShader,
