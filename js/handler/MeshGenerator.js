@@ -286,6 +286,9 @@ MeshGenerator.prototype.generateSkybox = function(skybox, isMock){
 
   if (skybox.isHDR){
     macroHandler.injectMacro("IS_HDR", material, false, true);
+
+    macroHandler.injectMacro("TONE_MAPPING_ENABLED", mesh.material, false, true);
+    macroHandler.injectMacro("TONE_MAPPING_EXPOSURE " + skybox.toneMappingInfo.exposure, mesh.material, false, true);
   }
 
   return mesh;

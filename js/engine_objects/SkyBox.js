@@ -13,6 +13,10 @@ var SkyBox = function(name, directoryName, color, isHDR){
   this.hasUp = false;
 
   this.uniformCache = null;
+
+  if (isHDR){
+    this.toneMappingInfo = {exposure: 1};
+  }
 }
 
 SkyBox.prototype.debugPMREM = function(){
@@ -51,7 +55,13 @@ SkyBox.prototype.getUniform = function(){
 }
 
 SkyBox.prototype.clone = function(){
-  return new SkyBox(this.name, this.directoryName, this.color, this.isHDR);
+  var skybox = new SkyBox(this.name, this.directoryName, this.color, this.isHDR);
+
+  if (this.toneMappingInfo){
+    skybox.toneMappingInfo = JSON.parse(JSON.stringify(this.toneMappingInfo));
+  }
+
+  return skybox;
 }
 
 SkyBox.prototype.dispose = function(){
@@ -73,6 +83,10 @@ SkyBox.prototype.export = function(isBuildingForDeploymentMode){
   exportObject.directoryName = this.directoryName;
   exportObject.color = this.color;
   exportObject.isHDR = this.isHDR;
+
+  if (this.isHDR){
+    exportObject.toneMappingInfo = JSON.parse(JSON.stringify(this.toneMappingInfo));
+  }
 
   if (isBuildingForDeploymentMode){
     if (this.isHDR){

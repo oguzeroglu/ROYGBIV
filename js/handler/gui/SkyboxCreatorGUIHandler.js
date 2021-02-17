@@ -16,6 +16,7 @@ SkyboxCreatorGUIHandler.prototype.init = function(skyboxName, isEdit){
   this.configurations = {
     "Skybox": "",
     "Color": "#ffffff",
+    "Exposure": !isEdit? "1": (skyBoxes[skyboxName].isHDR? "" + skyBoxes[skyboxName].toneMappingInfo.exposure: "1") ,
     "Cancel": function(){
       if (skyboxCreatorGUIHandler.isLoading){
         return;
@@ -31,6 +32,7 @@ SkyboxCreatorGUIHandler.prototype.init = function(skyboxName, isEdit){
       terminal.printInfo(Text.LOADING);
       guiHandler.disableController(skyboxCreatorGUIHandler.skyboxController);
       guiHandler.disableController(skyboxCreatorGUIHandler.colorController);
+      guiHandler.disableController(skyboxCreatorGUIHandler.exposureController);
       skyboxCreatorGUIHandler.isLoading = true;
       skyBoxes[skyboxName] = skyboxCreatorGUIHandler.skybox.clone();
       skyBoxes[skyboxName].loadTextures(function(){
@@ -38,6 +40,7 @@ SkyboxCreatorGUIHandler.prototype.init = function(skyboxName, isEdit){
         terminal.clear();
         guiHandler.enableController(skyboxCreatorGUIHandler.skyboxController);
         guiHandler.enableController(skyboxCreatorGUIHandler.colorController);
+        guiHandler.enableController(skyboxCreatorGUIHandler.exposureController);
         skyboxCreatorGUIHandler.isLoading = false;
         if (!isEdit){
           skyboxCreatorGUIHandler.close(Text.SKYBOX_CREATED, false);
@@ -94,6 +97,7 @@ SkyboxCreatorGUIHandler.prototype.loadSkybox = function(skyboxName, dirName){
 
   guiHandler.disableController(this.skyboxController);
   guiHandler.disableController(this.colorController);
+  guiHandler.disableController(this.exposureController);
 
   this.isLoading = true;
   if (this.testMesh){
@@ -102,7 +106,10 @@ SkyboxCreatorGUIHandler.prototype.loadSkybox = function(skyboxName, dirName){
   this.dispose();
   var isHDR = this.hdrStatusByDirName[dirName];
 
+  skyboxCreatorGUIHandler.configurations["Exposure"] = "1";
+
   if (!isHDR){
+
     terminal.printInfo(Text.COMPRESSING_TEXTURE);
 
     var xhr = new XMLHttpRequest();
@@ -119,6 +126,7 @@ SkyboxCreatorGUIHandler.prototype.loadSkybox = function(skyboxName, dirName){
         terminal.printInfo(Text.TEXTURES_COMPRESSED);
         terminal.printInfo(Text.LOADING);
         skyboxCreatorGUIHandler.skybox = new SkyBox(skyboxName, dirName, skyboxCreatorGUIHandler.configurations["Color"]);
+        guiHandler.disableController(skyboxCreatorGUIHandler.exposureController);
         skyboxCreatorGUIHandler.skybox.loadTextures(function(){
           skyboxCreatorGUIHandler.testMesh = skyboxCreatorGUIHandler.generateSkyboxMesh(skyboxCreatorGUIHandler.skybox);
           scene.add(skyboxCreatorGUIHandler.testMesh);
@@ -146,6 +154,7 @@ SkyboxCreatorGUIHandler.prototype.loadSkybox = function(skyboxName, dirName){
       terminal.printInfo(Text.AFTER_SKYBOX_CREATION);
       guiHandler.enableController(skyboxCreatorGUIHandler.skyboxController);
       guiHandler.enableController(skyboxCreatorGUIHandler.colorController);
+      guiHandler.enableController(skyboxCreatorGUIHandler.exposureController);
       skyboxCreatorGUIHandler.isLoading = false;
     });
   }
@@ -175,6 +184,21 @@ SkyboxCreatorGUIHandler.prototype.createGUI = function(skyboxName, folders){
   this.colorController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Color").onFinishChange(function(val){
     skyboxCreatorGUIHandler.testMesh.material.uniforms.color.value.set(val);
     skyboxCreatorGUIHandler.skybox.color = val;
+  }).listen();
+  this.exposureController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Exposure").onFinishChange(function(val){
+    terminal.clear();
+    var parsed = parseFloat(val);
+
+    if (isNaN(parsed)){
+      terminal.printError(Text.INVALID_NUMERICAL_VALUE);
+      return;
+    }
+
+    macroHandler.removeMacro("TONE_MAPPING_EXPOSURE " + skyboxCreatorGUIHandler.skybox.toneMappingInfo.exposure, skyboxCreatorGUIHandler.testMesh.material, false, true);
+    macroHandler.injectMacro("TONE_MAPPING_EXPOSURE " + parsed, skyboxCreatorGUIHandler.testMesh.material, false, true);
+    skyboxCreatorGUIHandler.skybox.toneMappingInfo.exposure = parsed;
+
+    terminal.printInfo(Text.EXPOSURE_SET);
   }).listen();
   this.cancelController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Cancel");
   this.doneController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Done");
@@ -210,5 +234,6 @@ SkyboxCreatorGUIHandler.prototype.edit = function(skybox, folders){
   this.createGUI(skybox.name, folders);
   this.configurations["Skybox"] = skybox.directoryName;
   this.configurations["Color"] = skybox.color;
+
   this.loadSkybox(skybox.name, skybox.directoryName);
 }

@@ -1264,6 +1264,9 @@ ImportHandler.prototype.importSkyboxes = function(obj, callback){
     var skyboxExport = skyboxExports[skyboxName];
     var skybox = new SkyBox(skyboxExport.name, skyboxExport.directoryName, skyboxExport.color, skyboxExport.isHDR);
     skybox.noCompress = !!skyboxExport.noCompress;
+    if (skyboxExport.toneMappingInfo){
+      skybox.toneMappingInfo = skyboxExport.toneMappingInfo;
+    }
     skyBoxes[skyboxExport.name] = skybox;
     skybox.loadTextures(callback);
   }
