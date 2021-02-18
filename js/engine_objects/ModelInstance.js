@@ -1257,7 +1257,7 @@ ModelInstance.prototype.compressGeometry = function(){
     "diffuseUV", "metalnessRoughness", "materialIndex", "normalUV",
     "specularUV", "alphaUV", "roughnessUV", "diffuseTextureIndex",
     "normalTextureIndex", "specularTextureIndex", "alphaTextureIndex",
-    "roughnessTextureIndex", "color"
+    "roughnessTextureIndex"
   ];
 
   this.compressedAttributes = macroHandler.compressAttributes(this.mesh, compressableAttributes);
