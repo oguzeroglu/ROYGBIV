@@ -1328,7 +1328,8 @@ void main(){
       float MIPLevel = max(minMIPLevel, log2(float(ENVIRONMENT_MAP_SIZE) * sqrt(3.0)) - 0.5 * log2(exponent + 1.0));
       vec3 N2 = vec3(vWorldNormal.z, vWorldNormal.y, vWorldNormal.x);
       vec3 f0 = mix(vec3(0.04, 0.04, 0.04), color, vMetalness);
-      vec3 fresnel = f0 + (vec3(1.0, 1.0, 1.0) + f0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0);
+      vec3 fresnelCoef = vec3(float(FRESNEL_COEF_R), float(FRESNEL_COEF_G), float(FRESNEL_COEF_B));
+      vec3 fresnel = f0 + (vec3(1.0, 1.0, 1.0) + f0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0) * fresnelCoef;
 
       #ifdef IS_HDR
         vec3 envDiffuseColor = textureCubeUV(N2, 1.0).rgb;

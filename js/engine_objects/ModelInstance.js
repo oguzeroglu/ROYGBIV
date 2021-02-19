@@ -142,6 +142,10 @@ ModelInstance.prototype.export = function(){
 
   exportObj.renderSide = this.mesh.material.side;
 
+  if (this.fresnelFactor){
+    exportObj.fresnelFactor = JSON.parse(JSON.stringify(this.fresnelFactor));
+  }
+
   return exportObj;
 }
 
@@ -671,6 +675,11 @@ ModelInstance.prototype.mapEnvironment = function(skybox, fallbackDiffuse){
   macroHandler.injectMacro("HAS_ENVIRONMENT_MAP", this.mesh.material, true, true);
   macroHandler.injectMacro("ENVIRONMENT_MAP_SIZE " + skybox.imageSize, this.mesh.material, false, true);
 
+  this.fresnelFactor = {r: 1, g: 1, b: 1};
+  macroHandler.injectMacro("FRESNEL_COEF_R 1", this.mesh.material, false, true);
+  macroHandler.injectMacro("FRESNEL_COEF_G 1", this.mesh.material, false, true);
+  macroHandler.injectMacro("FRESNEL_COEF_B 1", this.mesh.material, false, true);
+
   this.environmentMapInfo = {
     skyboxName: skybox.name
   };
@@ -700,10 +709,33 @@ ModelInstance.prototype.unmapEnvironment = function(){
 
   this.setEnvMapFallbackDiffuseValue(null);
 
+  macroHandler.removeMacro("FRESNEL_COEF_R " + this.fresnelFactor.r, this.mesh.material, false, true);
+  macroHandler.removeMacro("FRESNEL_COEF_G " + this.fresnelFactor.g, this.mesh.material, false, true);
+  macroHandler.removeMacro("FRESNEL_COEF_B " + this.fresnelFactor.b, this.mesh.material, false, true);
+  delete this.fresnelFactor;
+
   if (this.isHDR){
     macroHandler.removeMacro("IS_HDR", this.mesh.material, false, true);
     this.isHDR = false;
   }
+}
+
+ModelInstance.prototype.modifyFresnelFactor = function(r, g, b){
+  if (!this.fresnelFactor){
+    return;
+  }
+
+  macroHandler.removeMacro("FRESNEL_COEF_R " + this.fresnelFactor.r, this.mesh.material, false, true);
+  macroHandler.removeMacro("FRESNEL_COEF_G " + this.fresnelFactor.g, this.mesh.material, false, true);
+  macroHandler.removeMacro("FRESNEL_COEF_B " + this.fresnelFactor.b, this.mesh.material, false, true);
+
+  this.fresnelFactor.r = r;
+  this.fresnelFactor.g = g;
+  this.fresnelFactor.b = b;
+
+  macroHandler.injectMacro("FRESNEL_COEF_R " + this.fresnelFactor.r, this.mesh.material, false, true);
+  macroHandler.injectMacro("FRESNEL_COEF_G " + this.fresnelFactor.g, this.mesh.material, false, true);
+  macroHandler.injectMacro("FRESNEL_COEF_B " + this.fresnelFactor.b, this.mesh.material, false, true);
 }
 
 ModelInstance.prototype.disableSpecularity = function(){

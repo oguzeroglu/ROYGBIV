@@ -125,6 +125,10 @@ ImportHandler.prototype.importModelInstances = function(obj){
     if (!(typeof curModelInstanceExport.renderSide == UNDEFINED)){
       modelInstance.setRenderSide(curModelInstanceExport.renderSide);
     }
+
+    if (curModelInstanceExport.fresnelFactor){
+      modelInstance.modifyFresnelFactor(curModelInstanceExport.fresnelFactor.r, curModelInstanceExport.fresnelFactor.g, curModelInstanceExport.fresnelFactor.b);
+    }
   }
 
   if (isDeployment){
