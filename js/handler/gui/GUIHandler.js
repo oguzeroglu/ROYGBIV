@@ -2640,10 +2640,12 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     "Skybox": modelInstance.hasEnvironmentMap()? modelInstance.environmentMapInfo.skyboxName: firstSkyboxName,
     "Enable": modelInstance.hasEnvironmentMap(),
     "Fallback diffuse color": fallbackDiffuseText,
-    "Exposure": modelInstance.toneMappingInfo? ("" + modelInstance.toneMappingInfo.exposure): "1"
+    "Exposure": modelInstance.toneMappingInfo? ("" + modelInstance.toneMappingInfo.exposure): "1",
+    "Fresnel factor": !modelInstance.fresnelFactor? "1,1,1": modelInstance.fresnelFactor.r + "," + modelInstance.fresnelFactor.g + "," + modelInstance.fresnelFactor.b
   };
 
   var envMapFallbackDiffuseController;
+  var envMapFresnelFactorController;
 
   environmentMapFolder.add(environmentMapParams, "Skybox", Object.keys(skyBoxes)).onChange(function(val){
     if (modelInstance.hasEnvironmentMap()){
@@ -2652,6 +2654,9 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   });
   environmentMapFolder.add(environmentMapParams, "Enable").onChange(function(val){
     terminal.clear();
+
+    environmentMapParams["Fresnel factor"] = "1,1,1";
+
     if (val){
       if (!environmentMapParams["Skybox"]){
         terminal.printError(Text.SKYBOX_NAME_CANNOT_BE_EMPTY);
@@ -2675,10 +2680,12 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
 
       modelInstance.mapEnvironment(skyBoxes[environmentMapParams["Skybox"]], fallbackDiffuse);
       guiHandler.enableController(envMapFallbackDiffuseController);
+      guiHandler.enableController(envMapFresnelFactorController);
       terminal.printInfo(Text.ENVIRONMENT_MAP_CREATED);
     }else{
       modelInstance.unmapEnvironment();
       guiHandler.disableController(envMapFallbackDiffuseController);
+      guiHandler.disableController(envMapFresnelFactorController);
       terminal.printInfo(Text.ENVIRONMENT_MAP_REMOVED);
     }
   });
@@ -2707,9 +2714,25 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     modelInstance.replaceToneMappingExposure(parsed);
     terminal.printInfo(Text.EXPOSURE_SET);
   });
+  envMapFresnelFactorController = environmentMapFolder.add(environmentMapParams, "Fresnel factor").onFinishChange(function(val){
+    terminal.clear();
+    var splitted = val.split(",");
+    var val1 = parseFloat(splitted[0]);
+    var val2 = parseFloat(splitted[1]);
+    var val3 = parseFloat(splitted[2]);
+
+    if (isNaN(val1) || isNaN(val2) || isNaN(val3)){
+      terminal.printError(Text.INVALID_VECTOR_VALUE);
+      return;
+    }
+
+    modelInstance.modifyFresnelFactor(val1, val2, val3);
+    terminal.printInfo(Text.FRESNEL_FACTOR_SET);
+  }).listen();
 
   if (!modelInstance.hasEnvironmentMap()){
     guiHandler.disableController(envMapFallbackDiffuseController);
+    guiHandler.disableController(envMapFresnelFactorController);
   }
 }
 

@@ -394,6 +394,7 @@ var Text = function(){
   this.THERE_ARE_NO_PHYSICS_TESTS = "There are no physics tests.";
   this.PHYSICS_DEBUG_MODE_ON = "Physics debug mode: ON";
   this.PHYSICS_DEBUG_MODE_OFF = "Physics debug mode: OFF";
+  this.FRESNEL_FACTOR_SET = "Fresnel factor set.";
   this.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS = "Error happened compressing texture atlas.";
   this.AXIS_MUST_BE_ONE_OF_X_Y_Z = "Axis must be one of x, y, or z.";
   this.HEIGHT_MUST_BE_A_NUMBER = "Height must be a number.";
