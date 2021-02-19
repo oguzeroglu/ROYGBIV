@@ -2686,6 +2686,7 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       modelInstance.unmapEnvironment();
       guiHandler.disableController(envMapFallbackDiffuseController);
       guiHandler.disableController(envMapFresnelFactorController);
+      delete modelInstance.environmentMapInfo;
       terminal.printInfo(Text.ENVIRONMENT_MAP_REMOVED);
     }
   });
