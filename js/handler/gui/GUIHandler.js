@@ -2415,6 +2415,8 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
           }
           modelInstance.model.setMetalnessRoughness(true, metalness, i2);
           modelInstance.model.setMetalnessRoughness(false, roughness, i2);
+          allMRParams[i2]["Metalness"] = metalness;
+          allMRParams[i2]["Roughness"] = roughness;
         }
       }.bind({index: i})
     };
@@ -2423,10 +2425,10 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
 
     childFolder.add(mrParams, "Metalness").min(0).max(1).step(0.01).onChange(function(val){
       modelInstance.model.setMetalnessRoughness(true, val, this.index);
-    }.bind({index: i}));
+    }.bind({index: i})).listen();
     childFolder.add(mrParams, "Roughness").min(0).max(1).step(0.01).onChange(function(val){
       modelInstance.model.setMetalnessRoughness(false, val, this.index);
-    }.bind({index: i}));
+    }.bind({index: i})).listen();
     if (!modelInstance.hasPBR){
       childFolder.add(mrParams, "Specularity disabled").onChange(function(val){
         if (val){
