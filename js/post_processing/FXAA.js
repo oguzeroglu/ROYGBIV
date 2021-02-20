@@ -3,6 +3,8 @@ var FXAA = function(){
 
   this.generateDirectPass();
   this.generateFXAAPass();
+
+  this.selectedDevicePixelRatio = window.devicePixelRatio > 2? window.devicePixelRatio: 2;
 }
 
 FXAA.prototype.showConfigurations = function(){
@@ -18,7 +20,7 @@ FXAA.prototype.load = noop;
 FXAA.prototype.reset = noop;
 
 FXAA.prototype.generateDirectPass = function(){
-  this.sceneTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
+  this.sceneTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z * this.selectedDevicePixelRatio, renderer.getCurrentViewport().w * this.selectedDevicePixelRatio, this.rtParameters);
   this.sceneTarget.texture.generateMipmaps = false;
 }
 
@@ -33,7 +35,7 @@ FXAA.prototype.generateFXAAPass = function(){
 }
 
 FXAA.prototype.setSize = function(width, height){
-  this.sceneTarget.setSize(width, height);
+  this.sceneTarget.setSize(width * this.selectedDevicePixelRatio, height * this.selectedDevicePixelRatio);
   this.fxaaMaterial.uniforms.resolution.value.x = 1 / this.sceneTarget.width;
   this.fxaaMaterial.uniforms.resolution.value.y = 1 / this.sceneTarget.height;
 }
