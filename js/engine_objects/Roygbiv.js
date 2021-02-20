@@ -3183,6 +3183,7 @@ Roygbiv.prototype.mapTexturesToModelInstance = function(modelInstance, texturesO
   preConditions.checkIfValidModelTextureSObj(ROYGBIV.mapTexturesToModelInstance, modelInstance, texturesObj);
   preConditions.checkIfModelInstanceInActiveScene(ROYGBIV.mapTexturesToModelInstance, modelInstance);
   modelInstance.mapCustomTextures(texturesObj);
+  smartRenderingHandler.invalidate();
 }
 
 // Changes the material color of give child of a model instance. The color of all
@@ -3209,6 +3210,7 @@ Roygbiv.prototype.setModelInstanceColor = function(modelInstance, childName, col
     childIndex = modelInstance.getIndexByChildName(childName);
   }
   modelInstance.setColor(colorR, colorG, colorB, childIndex, true);
+  smartRenderingHandler.invalidate();
 }
 
 // CONTROL FUNCTIONS ***********************************************************

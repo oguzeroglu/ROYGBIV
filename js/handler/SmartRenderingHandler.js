@@ -1,5 +1,7 @@
 var SmartRenderingHandler = function(){
   this.isEnabled = false;
+  this.cameraPositionCache = new THREE.Vector3();
+  this.cameraQuaternionCache = new THREE.Quaternion();
 }
 
 SmartRenderingHandler.prototype.onSwitchToPreviewMode = function(){
@@ -86,6 +88,12 @@ SmartRenderingHandler.prototype.onSwitchToPreviewMode = function(){
   }
 
   this.isEnabled = true;
+  this.invalidated = false;
+  this.firstRenderCount = 0;
+}
+
+SmartRenderingHandler.prototype.invalidate = function(){
+  this.invalidated = true;
 }
 
 SmartRenderingHandler.prototype.shouldSkipRender = function(){
@@ -93,5 +101,27 @@ SmartRenderingHandler.prototype.shouldSkipRender = function(){
     return false;
   }
 
-  return true;
+  if (this.firstRenderCount < 3){
+    this.firstRenderCount ++;
+    return false;
+  }
+
+  var result = this.cameraPositionCache.equals(camera.position) && this.cameraQuaternionCache.equals(camera.quaternion);
+  this.cameraPositionCache.copy(camera.position);
+  this.cameraQuaternionCache.copy(camera.quaternion);
+
+  if (this.invalidated){
+    result = false;
+    this.invalidated = false;
+  }
+
+  if (this.debug){
+    if (this.lastResult != result){
+      console.log(result? "Sleeping.": "Waking up.");
+    }
+
+    this.lastResult = result;
+  }
+
+  return result;
 }

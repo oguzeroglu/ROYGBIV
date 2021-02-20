@@ -81,10 +81,7 @@ function renderScene(){
   }
 
   if (smartRenderingHandler.shouldSkipRender()){
-    console.log("skip");
     return;
-  }else{
-    console.log("NO");
   }
 
   threejsRenderMonitoringHandler.currentRenderCallCountPerFrame = 0;
