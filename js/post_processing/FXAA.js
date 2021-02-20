@@ -62,7 +62,7 @@ FXAA.prototype.directPass = function(){
 
 FXAA.prototype.fxaaPass = function(){
   this.fxaaMaterial.uniforms.tDiffuse.value = this.sceneTarget.texture;
-  for (var i = 0; i < this.fxaaCount; i ++){
+  for (var i = 0; i < smartRenderingHandler.buffer - 1; i ++){
     var fxaaTarget = this.fxaaTargets[i];
     renderer.webglRenderer.render(this.fxaaScene, orthographicCamera, fxaaTarget);
     this.fxaaMaterial.uniforms.tDiffuse.value = fxaaTarget.texture;

@@ -2,6 +2,8 @@ var SmartRenderingHandler = function(){
   this.isEnabled = false;
   this.cameraPositionCache = new THREE.Vector3();
   this.cameraQuaternionCache = new THREE.Quaternion();
+
+  this.buffer = 0;
 }
 
 SmartRenderingHandler.prototype.onSwitchToPreviewMode = function(){
@@ -119,13 +121,18 @@ SmartRenderingHandler.prototype.shouldSkipRender = function(){
     if (this.debug){
       console.log(result? "Sleeping.": "Waking up.");
     }
-
-    if (result){
-      this.antialias = true;
-    }
   }
 
   this.lastResult = result;
+
+  if (result){
+    if (this.buffer < 6){
+      this.buffer ++;
+      this.antialias = true;
+    }
+  }else{
+    this.buffer = 0;
+  }
 
   return result;
 }
