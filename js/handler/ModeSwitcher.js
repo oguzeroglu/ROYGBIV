@@ -91,6 +91,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     loadTime.modeSwitchTime = performance.now();
   }
   steeringHandler.onModeSwitch();
+  smartRenderingHandler.onSwitchToPreviewMode();
   TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;

@@ -280,6 +280,7 @@ var areaConfigurationsVisible = false;
 var areaConfigurationsHandler;
 var textureAtlasHandler;
 var augmentedRealityHandler;
+var smartRenderingHandler;
 var shadowBaker;
 var markedPointsVisible = true;
 var frustum = new THREE.Frustum();
