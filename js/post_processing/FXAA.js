@@ -1,5 +1,6 @@
 var FXAA = function(){
   this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
+  this.fxaaCount = 5;
 
   this.generateDirectPass();
   this.generateFXAAPass();
@@ -26,16 +27,23 @@ FXAA.prototype.generateDirectPass = function(){
 
 FXAA.prototype.generateFXAAPass = function(){
   this.fxaaMaterial = new THREE.ShaderMaterial(THREE.FXAAShader);
-  this.fxaaMaterial.uniforms.tDiffuse.value = this.sceneTarget.texture;
   this.fxaaMaterial.uniforms.resolution.value.x = 1 / this.sceneTarget.width;
   this.fxaaMaterial.uniforms.resolution.value.y = 1 / this.sceneTarget.height;
   this.fxaaQuad = new THREE.Mesh(REUSABLE_QUAD_GEOMETRY, this.fxaaMaterial);
   this.fxaaScene = new THREE.Scene();
   this.fxaaScene.add(this.fxaaQuad);
+
+  this.fxaaTargets = [];
+  for (var i = 0; i < this.fxaaCount; i ++){
+    this.fxaaTargets.push(new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z * this.selectedDevicePixelRatio, renderer.getCurrentViewport().w * this.selectedDevicePixelRatio, this.rtParameters));
+  }
 }
 
 FXAA.prototype.setSize = function(width, height){
   this.sceneTarget.setSize(width * this.selectedDevicePixelRatio, height * this.selectedDevicePixelRatio);
+  for (var i = 0; i < this.fxaaCount; i ++){
+    this.fxaaTargets[i].setSize(width * this.selectedDevicePixelRatio, height * this.selectedDevicePixelRatio);
+  }
   this.fxaaMaterial.uniforms.resolution.value.x = 1 / this.sceneTarget.width;
   this.fxaaMaterial.uniforms.resolution.value.y = 1 / this.sceneTarget.height;
 }
@@ -53,6 +61,12 @@ FXAA.prototype.directPass = function(){
 }
 
 FXAA.prototype.fxaaPass = function(){
+  this.fxaaMaterial.uniforms.tDiffuse.value = this.sceneTarget.texture;
+  for (var i = 0; i < this.fxaaCount; i ++){
+    var fxaaTarget = this.fxaaTargets[i];
+    renderer.webglRenderer.render(this.fxaaScene, orthographicCamera, fxaaTarget);
+    this.fxaaMaterial.uniforms.tDiffuse.value = fxaaTarget.texture;
+  }
   renderer.webglRenderer.render(this.fxaaScene, orthographicCamera);
 }
 
