@@ -115,13 +115,17 @@ SmartRenderingHandler.prototype.shouldSkipRender = function(){
     this.invalidated = false;
   }
 
-  if (this.debug){
-    if (this.lastResult != result){
+  if (this.lastResult != result){
+    if (this.debug){
       console.log(result? "Sleeping.": "Waking up.");
     }
 
-    this.lastResult = result;
+    if (result){
+      this.antialias = true;
+    }
   }
+
+  this.lastResult = result;
 
   return result;
 }

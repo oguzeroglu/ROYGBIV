@@ -11,7 +11,7 @@ var Renderer = function(){
 }
 
 Renderer.prototype.initEffects = function(){
-  this.effects = {bloom: new Bloom()};
+  this.effects = {bloom: new Bloom(), fxaa: new FXAA()};
   bloom = this.effects.bloom;
   this.mandatoryEffectMethods = ["setSize", "setViewport", "setPixelRatio", "render", "showConfigurations", "hideConfigurations", "export", "load", "reset"];
   for (var effectName in this.effects){
@@ -29,6 +29,10 @@ Renderer.prototype.render = function(scene, camera){
     return;
   }
   this.webglRenderer.render(scene, camera);
+}
+
+Renderer.prototype.renderAntiAlias = function(scene, camera){
+  this.effects.fxaa.render(scene, camera);
 }
 
 Renderer.prototype.setViewport = function(x, y, z, w){

@@ -1528,7 +1528,11 @@ function parse(input){
               terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
               return true;
             }
-            renderer.effects[effectName].showConfigurations();
+            var result = renderer.effects[effectName].showConfigurations();
+            if (result == null){
+              terminal.printError(Text.THIS_EFFECT_IS_NOT_CONFIGURABLE);
+              return true;
+            }
             postProcessiongConfigurationsVisibility[effectName] = true;
             terminal.printInfo(Text.GUI_OPENED);
             return true;
@@ -1537,7 +1541,11 @@ function parse(input){
               terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
               return true;
             }
-            renderer.effects[effectName].hideConfigurations();
+            var result = renderer.effects[effectName].hideConfigurations();
+            if (result == null){
+              terminal.printError(Text.THIS_EFFECT_IS_NOT_CONFIGURABLE);
+              return true;
+            }
             postProcessiongConfigurationsVisibility[effectName] = false;
             terminal.printInfo(Text.GUI_CLOSED);
             return true;

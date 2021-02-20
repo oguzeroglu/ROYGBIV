@@ -81,6 +81,10 @@ function renderScene(){
   }
 
   if (smartRenderingHandler.shouldSkipRender()){
+    if (smartRenderingHandler.antialias){
+      renderer.renderAntiAlias(scene, camera);
+      smartRenderingHandler.antialias = false;
+    }
     return;
   }
 
