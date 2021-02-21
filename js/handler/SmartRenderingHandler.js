@@ -115,6 +115,12 @@ SmartRenderingHandler.prototype.shouldSkipRender = function(){
     return false;
   }
 
+  if (isMobile){
+    if (touchEventHandler.isTouching()){
+      this.invalidate();
+    }
+  }
+
   var result = this.cameraPositionCache.equals(camera.position) && this.cameraQuaternionCache.equals(camera.quaternion);
   this.cameraPositionCache.copy(camera.position);
   this.cameraQuaternionCache.copy(camera.quaternion);
@@ -133,7 +139,7 @@ SmartRenderingHandler.prototype.shouldSkipRender = function(){
   this.lastResult = result;
 
   if (result){
-    if (this.buffer < 6){
+    if (this.buffer < 3){
       this.buffer ++;
       this.antialias = true;
     }

@@ -1,6 +1,6 @@
 var FXAA = function(){
   this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
-  this.fxaaCount = 5;
+  this.fxaaCount = 3;
 
   this.generateDirectPass();
   this.generateFXAAPass();

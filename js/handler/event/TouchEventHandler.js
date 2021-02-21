@@ -145,3 +145,7 @@ TouchEventHandler.prototype.onTouchEnd = function(event){
     draggingSprite.onDragStopped();
   }
 }
+
+TouchEventHandler.prototype.isTouching = function(){
+  return this.touchTrack.size > 0;
+}
