@@ -1517,6 +1517,10 @@ function parse(input){
           // DEPRECATED
         break;
         case 66: //postProcessing
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
           var effectName = splitted[1].toLowerCase();
           var guiVisibilityAction = splitted[2].toLowerCase();
           if (!renderer.effects[effectName]){

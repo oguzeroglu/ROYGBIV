@@ -6,8 +6,14 @@ var SmartRenderingHandler = function(){
   this.buffer = 0;
 }
 
-SmartRenderingHandler.prototype.onSwitchToPreviewMode = function(){
-  for (var objName in addedObjects){
+SmartRenderingHandler.prototype.onSceneChange = function(){
+  this.invalidate();
+  if (Object.keys(lightHandler.dynamicLights).length > 0 || renderer.bloomOn){
+    this.isEnabled = false;
+    return;
+  }
+
+  for (var objName in sceneHandler.getAddedObjects()){
     var addedObject = addedObjects[objName];
     if (addedObject.isChangeable){
       this.isEnabled = false;
@@ -27,7 +33,7 @@ SmartRenderingHandler.prototype.onSwitchToPreviewMode = function(){
     }
   }
 
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     var objectGroup = objectGroups[objName];
     if (objectGroup.isChangeable){
       this.isEnabled = false;
@@ -47,7 +53,7 @@ SmartRenderingHandler.prototype.onSwitchToPreviewMode = function(){
     }
   }
 
-  for (var modelInstanceName in modelInstances){
+  for (var modelInstanceName in sceneHandler.getModelInstances()){
     var modelInstance = modelInstances[modelInstanceName];
 
     if (Object.keys(modelInstance.animations).length > 0){
@@ -56,35 +62,35 @@ SmartRenderingHandler.prototype.onSwitchToPreviewMode = function(){
     }
   }
 
-  if (Object.keys(addedTexts).length > 0){
+  if (Object.keys(sceneHandler.getAddedTexts()).length > 0){
     this.isEnabled = false;
     return;
   }
-  if (Object.keys(containers).length > 0){
+  if (Object.keys(sceneHandler.getContainers()).length > 0){
     this.isEnabled = false;
     return;
   }
-  if (Object.keys(crosshairs).length > 0){
+  if (Object.keys(sceneHandler.getCrosshairs()).length > 0){
     this.isEnabled = false;
     return;
   }
-  if (Object.keys(lightnings).length > 0){
+  if (Object.keys(sceneHandler.getLightnings()).length > 0){
     this.isEnabled = false;
     return;
   }
-  if (Object.keys(muzzleFlashes).length > 0){
+  if (Object.keys(sceneHandler.getMuzzleFlashes()).length > 0){
     this.isEnabled = false;
     return;
   }
-  if (Object.keys(preConfiguredParticleSystems).length > 0){
+  if (Object.keys(sceneHandler.getParticleSystems()).length > 0){
     this.isEnabled = false;
     return;
   }
-  if (Object.keys(sprites).length > 0){
+  if (Object.keys(sceneHandler.getSprites()).length > 0){
     this.isEnabled = false;
     return;
   }
-  if (Object.keys(virtualKeyboards).length > 0){
+  if (Object.keys(sceneHandler.getVirtualKeyboards()).length > 0){
     this.isEnabled = false;
     return;
   }
@@ -92,6 +98,7 @@ SmartRenderingHandler.prototype.onSwitchToPreviewMode = function(){
   this.isEnabled = true;
   this.invalidated = false;
   this.firstRenderCount = 0;
+  this.buffer = 0;
 }
 
 SmartRenderingHandler.prototype.invalidate = function(){

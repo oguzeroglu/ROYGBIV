@@ -12,6 +12,8 @@ SceneHandler.prototype.onReady = function(){
     }else{
       removeCLIDom();
     }
+
+    smartRenderingHandler.onSceneChange();
   }
   if (this.readyCallback){
     this.readyCallback();
