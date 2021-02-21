@@ -1234,6 +1234,8 @@ Roygbiv.prototype.opacity = function(object, delta){
       object.updateOpacity(1);
     }
   }
+
+  smartRenderingHandler.invalidate();
 }
 
 //  Sets the velocity of an object or a glued object. The object must be a dynamic object
@@ -5599,4 +5601,5 @@ Roygbiv.prototype.setPixelRatio = function(pixelRatio){
 
   previewModeScreenResolution = pixelRatio;
   renderer.setPixelRatio(previewModeScreenResolution);
+  smartRenderingHandler.invalidate();
 }

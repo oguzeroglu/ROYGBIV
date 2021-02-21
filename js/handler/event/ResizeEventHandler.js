@@ -70,4 +70,5 @@ ResizeEventHandler.prototype.onResize = function(){
   renderer.setPixelRatio(screenResolution);
   resizeEventHandler.refresh2DNeeded = true;
   activeControl.onResize();
+  smartRenderingHandler.invalidate();
 }
