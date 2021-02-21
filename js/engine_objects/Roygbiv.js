@@ -1234,6 +1234,8 @@ Roygbiv.prototype.opacity = function(object, delta){
       object.updateOpacity(1);
     }
   }
+
+  smartRenderingHandler.invalidate();
 }
 
 //  Sets the velocity of an object or a glued object. The object must be a dynamic object
@@ -3183,6 +3185,7 @@ Roygbiv.prototype.mapTexturesToModelInstance = function(modelInstance, texturesO
   preConditions.checkIfValidModelTextureSObj(ROYGBIV.mapTexturesToModelInstance, modelInstance, texturesObj);
   preConditions.checkIfModelInstanceInActiveScene(ROYGBIV.mapTexturesToModelInstance, modelInstance);
   modelInstance.mapCustomTextures(texturesObj);
+  smartRenderingHandler.invalidate();
 }
 
 // Changes the material color of give child of a model instance. The color of all
@@ -3209,6 +3212,7 @@ Roygbiv.prototype.setModelInstanceColor = function(modelInstance, childName, col
     childIndex = modelInstance.getIndexByChildName(childName);
   }
   modelInstance.setColor(colorR, colorG, colorB, childIndex, true);
+  smartRenderingHandler.invalidate();
 }
 
 // CONTROL FUNCTIONS ***********************************************************
@@ -5597,4 +5601,5 @@ Roygbiv.prototype.setPixelRatio = function(pixelRatio){
 
   previewModeScreenResolution = pixelRatio;
   renderer.setPixelRatio(previewModeScreenResolution);
+  smartRenderingHandler.invalidate();
 }

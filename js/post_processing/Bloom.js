@@ -98,11 +98,13 @@ Bloom.prototype.showConfigurations = function(){
     guiHandler.disableController(guiHandler["blurPassTapController"+(i+1)]);
   }
   this.configurationsOpen = true;
+  return true;
 }
 
 Bloom.prototype.hideConfigurations = function(){
   guiHandler.hide(guiHandler.guiTypes.BLOOM);
   this.configurationsOpen = false;
+  return true;
 }
 
 Bloom.prototype.setBloomTintColor = function(levelIndex, r, g, b){

@@ -47,6 +47,8 @@ window.onload = function() {
   analyticsHandler = new AnalyticsHandler();
   // AUGMENTED REALITY HANDLER
   augmentedRealityHandler = new AugmentedRealityHandler();
+  // SMART RENDERING HANDLER
+  smartRenderingHandler = new SmartRenderingHandler();
 
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");

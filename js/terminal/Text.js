@@ -438,6 +438,7 @@ var Text = function(){
   this.OBJECT_IS_ALREADY_SLIPPERY = "Object is already slippery.";
   this.SLIPPERINESS_ADJUSTED = "Slipperiness adjusted.";
   this.TEXT_ALLOCATED = "Text allocated.";
+  this.THIS_EFFECT_IS_NOT_CONFIGURABLE = "This effect is not configurable.";
   this.OBJECT_WILL_BE_USED_AS_FPS_WEAPON = "Object will be used as FPS weapon. Use fpsWeaponAlignment CLI command to configure the weapon alignment.";
   this.OBJECT_IS_NOT_MARKED_AS_FPS_WEAPON = "Object is not marked as an FPS weapon.";
   this.TEXTS = "Texts";
