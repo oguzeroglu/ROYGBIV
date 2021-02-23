@@ -2302,6 +2302,13 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
           return;
         }
 
+        if (modelInstance.lightingType == lightHandler.lightTypes.GOURAUD && modelInstance.model.info.hasMetalnessMap){
+          terminal.clear();
+          terminal.printError(Text.MODEL_INSTANCE_HAS_METALNESS_MAP_GOURAUD_MODE_SPECULARITY);
+          guiHandler.modelInstanceManipulationParameters["Has specularity"] = false;
+          return;
+        }
+
         modelInstance.enableSpecularity();
       }else{
         modelInstance.disableSpecularity();

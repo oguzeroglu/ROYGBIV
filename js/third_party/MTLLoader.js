@@ -463,6 +463,15 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
+				case 'map_metalness':
+				case 'metalness':
+
+					// Supported by ROYGBIV only
+
+					setMapForType("metalnessMap", value);
+
+					break;
+
 				case 'ns':
 
 					// The specular exponent (defines the focus of the specular highlight)

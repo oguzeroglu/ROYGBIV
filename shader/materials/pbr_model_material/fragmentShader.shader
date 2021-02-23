@@ -59,6 +59,10 @@ uniform mat4 dynamicLightsMatrix;
   varying vec4 vRoughnessUV;
 #endif
 
+#ifdef HAS_METALNESS_MAP
+  varying vec4 vMetalnessUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   varying float vDiffuseTextureIndex;
   #ifdef HAS_NORMAL_MAP
@@ -69,6 +73,9 @@ uniform mat4 dynamicLightsMatrix;
   #endif
   #ifdef HAS_ROUGHNESS_MAP
     varying float vRoughnessTextureIndex;
+  #endif
+  #ifdef HAS_METALNESS_MAP
+    varying float vMetalnessTextureIndex;
   #endif
   #ifdef CUSTOM_TEXTURE_0
     uniform sampler2D customDiffuseTexture0;
@@ -142,6 +149,24 @@ uniform mat4 dynamicLightsMatrix;
   #ifdef CUSTOM_ROUGHNESS_TEXTURE_5
     uniform sampler2D customRoughnessTexture5;
   #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_0
+    uniform sampler2D customMetalnessTexture0;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_1
+    uniform sampler2D customMetalnessTexture1;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_2
+    uniform sampler2D customMetalnessTexture2;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_3
+    uniform sampler2D customMetalnessTexture3;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_4
+    uniform sampler2D customMetalnessTexture4;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_5
+    uniform sampler2D customMetalnessTexture5;
+  #endif
 #else
   uniform sampler2D texture;
 #endif
@@ -209,7 +234,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0){
   return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
 
-vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, vec3 worldPosition, vec3 normal, vec3 V, vec3 F0, vec3 albedo, float selectedRoughness){
+vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, vec3 worldPosition, vec3 normal, vec3 V, vec3 F0, vec3 albedo, float selectedRoughness, float selectedMetalness){
   vec3 lightPosition = vec3(pX, pY, pZ);
   vec3 sub = lightPosition - worldPosition;
   vec3 L = normalize(sub);
@@ -228,13 +253,13 @@ vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, vec3 wo
 
   vec3 kS = F;
   vec3 kD = vec3(1.0, 1.0, 1.0) - kS;
-  kD *= 1.0 - vMetalness;
+  kD *= 1.0 - selectedMetalness;
   float NdotL = max(dot(normal, L), 0.0);
 
   return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
-vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, float selectedRoughness){
+vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, float selectedRoughness, float selectedMetalness){
 
   #ifdef HAS_NORMAL_MAP
     vec3 computedNormal;
@@ -295,35 +320,35 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, fl
     Lo += pointLight(
       float(STATIC_POINT_LIGHT_1_X), float(STATIC_POINT_LIGHT_1_Y), float(STATIC_POINT_LIGHT_1_Z),
       float(STATIC_POINT_LIGHT_1_R), float(STATIC_POINT_LIGHT_1_G), float(STATIC_POINT_LIGHT_1_B),
-      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness
+      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness, selectedMetalness
     );
   #endif
   #ifdef HAS_STATIC_POINT_LIGHT_2
     Lo += pointLight(
       float(STATIC_POINT_LIGHT_2_X), float(STATIC_POINT_LIGHT_2_Y), float(STATIC_POINT_LIGHT_2_Z),
       float(STATIC_POINT_LIGHT_2_R), float(STATIC_POINT_LIGHT_2_G), float(STATIC_POINT_LIGHT_2_B),
-      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness
+      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness, selectedMetalness
     );
   #endif
   #ifdef HAS_STATIC_POINT_LIGHT_3
     Lo += pointLight(
       float(STATIC_POINT_LIGHT_3_X), float(STATIC_POINT_LIGHT_3_Y), float(STATIC_POINT_LIGHT_3_Z),
       float(STATIC_POINT_LIGHT_3_R), float(STATIC_POINT_LIGHT_3_G), float(STATIC_POINT_LIGHT_3_B),
-      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness
+      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness, selectedMetalness
     );
   #endif
   #ifdef HAS_STATIC_POINT_LIGHT_4
     Lo += pointLight(
       float(STATIC_POINT_LIGHT_4_X), float(STATIC_POINT_LIGHT_4_Y), float(STATIC_POINT_LIGHT_4_Z),
       float(STATIC_POINT_LIGHT_4_R), float(STATIC_POINT_LIGHT_4_G), float(STATIC_POINT_LIGHT_4_B),
-      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness
+      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness, selectedMetalness
     );
   #endif
   #ifdef HAS_STATIC_POINT_LIGHT_5
     Lo += pointLight(
       float(STATIC_POINT_LIGHT_5_X), float(STATIC_POINT_LIGHT_5_Y), float(STATIC_POINT_LIGHT_5_Z),
       float(STATIC_POINT_LIGHT_5_R), float(STATIC_POINT_LIGHT_5_G), float(STATIC_POINT_LIGHT_5_B),
-      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness
+      worldPositionComputed, computedNormal, V, F0, albedo, selectedRoughness, selectedMetalness
     );
   #endif
 
@@ -430,6 +455,52 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, fl
       #endif
     #else
       return texture2D(texture, uvAffineTransformation(vUV, vRoughnessUV.x, vRoughnessUV.y, vRoughnessUV.z, vRoughnessUV.w)).g;
+    #endif
+
+    return 1.0;
+  }
+#endif
+
+#ifdef HAS_METALNESS_MAP
+  float getMetalnessCoef(){
+    if (vMetalnessUV.x < 0.0) {
+      return 1.0;
+    }
+
+    #ifdef HAS_CUSTOM_TEXTURE
+      int metalnessTextureIndexInt = int(vMetalnessTextureIndex + 0.5);
+      #ifdef CUSTOM_METALNESS_TEXTURE_0
+        if (metalnessTextureIndexInt == 0){
+          return texture2D(customMetalnessTexture0, vUV).b;
+        }
+      #endif
+      #ifdef CUSTOM_METALNESS_TEXTURE_1
+        if (metalnessTextureIndexInt == 1){
+          return texture2D(customMetalnessTexture1, vUV).b;
+        }
+      #endif
+      #ifdef CUSTOM_METALNESS_TEXTURE_2
+        if (metalnessTextureIndexInt == 2){
+          return texture2D(customMetalnessTexture2, vUV).b;
+        }
+      #endif
+      #ifdef CUSTOM_METALNESS_TEXTURE_3
+        if (metalnessTextureIndexInt == 3){
+          return texture2D(customMetalnessTexture3, vUV).b;
+        }
+      #endif
+      #ifdef CUSTOM_METALNESS_TEXTURE_4
+        if (metalnessTextureIndexInt == 4){
+          return texture2D(customMetalnessTexture4, vUV).b;
+        }
+      #endif
+      #ifdef CUSTOM_METALNESS_TEXTURE_5
+        if (metalnessTextureIndexInt == 5){
+          return texture2D(customMetalnessTexture5, vUV).b;
+        }
+      #endif
+    #else
+      return texture2D(texture, uvAffineTransformation(vUV, vMetalnessUV.x, vMetalnessUV.y, vMetalnessUV.z, vMetalnessUV.w)).b;
     #endif
 
     return 1.0;
@@ -597,6 +668,11 @@ void main(){
     selectedRoughness = vRoughness * getRoughnessCoef();
   #endif
 
+  float selectedMetalness = vMetalness;
+  #ifdef HAS_METALNESS_MAP
+    selectedMetalness = vMetalness * getMetalnessCoef();
+  #endif
+
   vec3 textureColor = vec3(1.0, 1.0, 1.0);
 
   #ifdef HAS_TEXTURE
@@ -643,8 +719,8 @@ void main(){
 
   vec3 V = normalize(cameraPosition - vWorldPosition);
   vec3 F0 = vec3(0.04, 0.04, 0.04);
-  F0 = mix(F0, albedo, vMetalness);
-  vec3 Lo = handleLighting(vWorldPosition, V, F0, albedo, selectedRoughness);
+  F0 = mix(F0, albedo, selectedMetalness);
+  vec3 Lo = handleLighting(vWorldPosition, V, F0, albedo, selectedRoughness, selectedMetalness);
 
   #ifdef HAS_ENVIRONMENT_MAP
     vec3 ambient;
@@ -686,7 +762,7 @@ void main(){
       #endif
 
       vec3 kD = 1.0 - fresnel;
-      kD *= 1.0 - vMetalness;
+      kD *= 1.0 - selectedMetalness;
       ambient = (kD * albedo * (envDiffuseColor * (1.0 / PI)) + envSpecularColor);
     }else{
       ambient = vec3(0.03, 0.03, 0.03) * albedo;
