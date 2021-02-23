@@ -88,6 +88,10 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   varying vec4 vRoughnessUV;
 #endif
 
+#ifdef HAS_METALNESS_MAP
+  varying vec4 vMetalnessUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   varying float vDiffuseTextureIndex;
   #ifdef HAS_NORMAL_MAP
@@ -101,6 +105,9 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #endif
   #ifdef HAS_ROUGHNESS_MAP
     varying float vRoughnessTextureIndex;
+  #endif
+  #ifdef HAS_METALNESS_MAP
+    varying float vMetalnessTextureIndex;
   #endif
   #ifdef CUSTOM_TEXTURE_0
     uniform sampler2D customDiffuseTexture0;
@@ -191,6 +198,24 @@ vec3 SPECULAR_COLOR = vec3(float(1), float(1), float(1));
   #endif
   #ifdef CUSTOM_ROUGHNESS_TEXTURE_5
     uniform sampler2D customRoughnessTexture5;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_0
+    uniform sampler2D customMetalnessTexture0;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_1
+    uniform sampler2D customMetalnessTexture1;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_2
+    uniform sampler2D customMetalnessTexture2;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_3
+    uniform sampler2D customMetalnessTexture3;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_4
+    uniform sampler2D customMetalnessTexture4;
+  #endif
+  #ifdef CUSTOM_METALNESS_TEXTURE_5
+    uniform sampler2D customMetalnessTexture5;
   #endif
 #else
   uniform sampler2D texture;
@@ -1131,6 +1156,52 @@ vec2 uvAffineTransformation(vec2 original, float startU, float startV, float end
   }
 #endif
 
+#ifdef HAS_METALNESS_MAP
+  float getMetalnessCoef(){
+    if (vMetalnessUV.x < 0.0) {
+      return 1.0;
+    }
+
+    #ifdef HAS_CUSTOM_TEXTURE
+      int metalnessTextureIndexInt = int(vMetalnessTextureIndex + 0.5);
+      #ifdef CUSTOM_METALNESS_TEXTURE_0
+        if (metalnessTextureIndexInt == 0){
+          return texture2D(customMetalnessTexture0, vUV).b;
+        }
+      #endif
+      #ifdef CUSTOM_METALNESS_TEXTURE_1
+        if (metalnessTextureIndexInt == 1){
+          return texture2D(customMetalnessTexture1, vUV).b;
+        }
+      #endif
+      #ifdef CUSTOM_METALNESS_TEXTURE_2
+        if (metalnessTextureIndexInt == 2){
+          return texture2D(customMetalnessTexture2, vUV).b;
+        }
+      #endif
+      #ifdef CUSTOM_METALNESS_TEXTURE_3
+        if (metalnessTextureIndexInt == 3){
+          return texture2D(customMetalnessTexture3, vUV).b;
+        }
+      #endif
+      #ifdef CUSTOM_METALNESS_TEXTURE_4
+        if (metalnessTextureIndexInt == 4){
+          return texture2D(customMetalnessTexture4, vUV).b;
+        }
+      #endif
+      #ifdef CUSTOM_METALNESS_TEXTURE_5
+        if (metalnessTextureIndexInt == 5){
+          return texture2D(customMetalnessTexture5, vUV).b;
+        }
+      #endif
+    #else
+      return texture2D(texture, uvAffineTransformation(vUV, vMetalnessUV.x, vMetalnessUV.y, vMetalnessUV.z, vMetalnessUV.w)).b;
+    #endif
+
+    return 1.0;
+  }
+#endif
+
 #ifdef IS_HDR
   #define cubeUV_textureSize (1024.0)
   #define cubeUV_maxLods1  (log2(cubeUV_textureSize*0.25) - 1.0)
@@ -1294,6 +1365,13 @@ void main(){
     roughnessCoef = getRoughnessCoef();
   #endif
 
+  #ifdef HAS_ENVIRONMENT_MAP
+    float selectedMetalness = vMetalness;
+    #ifdef HAS_METALNESS_MAP
+      selectedMetalness = vMetalness * getMetalnessCoef();
+    #endif
+  #endif
+
   float selectedRoughness = 1.0;
   #if defined(HAS_ENVIRONMENT_MAP) || (defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY))
     selectedRoughness = vRoughness * roughnessCoef;
@@ -1327,7 +1405,7 @@ void main(){
       float minMIPLevel = mipMapLevel(vec2(envVec.z, envVec.x) * float(ENVIRONMENT_MAP_SIZE));
       float MIPLevel = max(minMIPLevel, log2(float(ENVIRONMENT_MAP_SIZE) * sqrt(3.0)) - 0.5 * log2(exponent + 1.0));
       vec3 N2 = vec3(vWorldNormal.z, vWorldNormal.y, vWorldNormal.x);
-      vec3 f0 = mix(vec3(0.04, 0.04, 0.04), color, vMetalness);
+      vec3 f0 = mix(vec3(0.04, 0.04, 0.04), color, selectedMetalness);
       vec3 fresnelCoef = vec3(float(FRESNEL_COEF_R), float(FRESNEL_COEF_G), float(FRESNEL_COEF_B));
       vec3 fresnel = f0 + (vec3(1.0, 1.0, 1.0) + f0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0) * fresnelCoef;
 

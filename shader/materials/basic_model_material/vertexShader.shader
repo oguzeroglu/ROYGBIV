@@ -103,6 +103,11 @@ varying vec3 vLightDiffuse;
   varying vec4 vRoughnessUV;
 #endif
 
+#ifdef HAS_METALNESS_MAP
+  attribute vec4 metalnessUV;
+  varying vec4 vMetalnessUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   attribute float diffuseTextureIndex;
   varying float vDiffuseTextureIndex;
@@ -121,6 +126,10 @@ varying vec3 vLightDiffuse;
   #ifdef HAS_ROUGHNESS_MAP
     attribute float roughnessTextureIndex;
     varying float vRoughnessTextureIndex;
+  #endif
+  #ifdef HAS_METALNESS_MAP
+    attribute float metalnessTextureIndex;
+    varying float vMetalnessTextureIndex;
   #endif
 #endif
 
@@ -913,6 +922,10 @@ void main(){
     vRoughnessUV = roughnessUV;
   #endif
 
+  #ifdef HAS_METALNESS_MAP
+    vMetalnessUV = metalnessUV;
+  #endif
+
   #ifdef HAS_TEXTURE
     vUV = uv;
     vDiffuseUV = diffuseUV;
@@ -931,6 +944,9 @@ void main(){
     #endif
     #ifdef HAS_ROUGHNESS_MAP
       vRoughnessTextureIndex = roughnessTextureIndex;
+    #endif
+    #ifdef HAS_METALNESS_MAP
+      vMetalnessTextureIndex = metalnessTextureIndex;
     #endif
   #endif
 
