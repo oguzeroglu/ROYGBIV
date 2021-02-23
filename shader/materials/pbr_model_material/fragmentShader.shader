@@ -22,7 +22,11 @@ uniform mat4 dynamicLightsMatrix;
 #define LIGHT_ATTENUATION_COEF 500000
 
 #ifdef HAS_ENVIRONMENT_MAP
-  varying vec3 vWorldNormal;
+  #if !defined(HAS_NORMAL_MAP)
+    varying vec3 vWorldNormal;
+  #else
+    varying mat4 vSelectedWorldMatrix;
+  #endif
   #ifdef IS_HDR
     uniform sampler2D environmentMap;
   #else
@@ -259,11 +263,11 @@ vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, vec3 wo
   return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
+vec3 computedNormal;
+
 vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, float selectedRoughness, float selectedMetalness){
 
   #ifdef HAS_NORMAL_MAP
-    vec3 computedNormal;
-
     if (vNormalUV.x >= 0.0){
       #ifdef HAS_CUSTOM_TEXTURE
         int normalTextureIndexInt = int(vNormalTextureIndex + 0.5);
@@ -723,9 +727,17 @@ void main(){
   vec3 Lo = handleLighting(vWorldPosition, V, F0, albedo, selectedRoughness, selectedMetalness);
 
   #ifdef HAS_ENVIRONMENT_MAP
+    #ifdef HAS_NORMAL_MAP
+      vec3 selectedWorldNormal = mat3(vSelectedWorldMatrix) * computedNormal;
+    #else
+      vec3 selectedWorldNormal = vWorldNormal;
+    #endif
+  #endif
+
+  #ifdef HAS_ENVIRONMENT_MAP
     vec3 ambient;
     if (vEnvMapDisabled < 0.0){
-      vec3 worldNormal = normalize(vWorldNormal);
+      vec3 worldNormal = normalize(selectedWorldNormal);
       vec3 eyeToSurfaceDir = normalize(vWorldPosition - cameraPosition);
       vec3 envVec;
 
@@ -740,7 +752,7 @@ void main(){
       float maxMIPLevel = log2(float(ENVIRONMENT_MAP_SIZE));
       float minMIPLevel = mipMapLevel(vec2(envVec.z, envVec.x) * float(ENVIRONMENT_MAP_SIZE));
       float MIPLevel = max(minMIPLevel, log2(float(ENVIRONMENT_MAP_SIZE) * sqrt(3.0)) - 0.5 * log2(exponent + 1.0));
-      vec3 N2 = vec3(vWorldNormal.z, vWorldNormal.y, vWorldNormal.x);
+      vec3 N2 = vec3(selectedWorldNormal.z, selectedWorldNormal.y, selectedWorldNormal.x);
       vec3 fresnelCoef = vec3(float(FRESNEL_COEF_R), float(FRESNEL_COEF_G), float(FRESNEL_COEF_B));
       vec3 fresnel = F0 + (vec3(1.0, 1.0, 1.0) + F0) * pow(1.0 - dot(worldNormal, -eyeToSurfaceDir), 5.0) * fresnelCoef;
 

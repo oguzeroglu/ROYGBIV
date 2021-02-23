@@ -45,16 +45,19 @@ uniform vec3 cameraPosition;
   varying vec4 vDiffuseUV;
 #endif
 
-#ifdef HAS_ENVIRONMENT_MAP
-  varying vec3 vWorldNormal;
-#endif
-
 #ifdef HAS_NORMAL_MAP
   attribute vec4 normalUV;
   attribute vec4 tangent;
   varying vec3 vTangent;
   varying vec3 vBitangent;
   varying vec4 vNormalUV;
+  #ifdef HAS_ENVIRONMENT_MAP
+    varying mat4 vSelectedWorldMatrix;
+  #endif
+#else
+  #ifdef HAS_ENVIRONMENT_MAP
+    varying vec3 vWorldNormal;
+  #endif
 #endif
 
 #ifdef HAS_CUSTOM_TEXTURE
@@ -140,8 +143,12 @@ void main(){
   vec3 worldPositionComputed = (selectedWorldMatrix * vec4(position, 1.0)).xyz;
   vWorldPosition = worldPositionComputed;
 
-  #ifdef HAS_ENVIRONMENT_MAP
+  #if !defined(HAS_NORMAL_MAP) && defined(HAS_ENVIRONMENT_MAP)
     vWorldNormal = mat3(selectedWorldMatrix) * normal;
+  #endif
+
+  #if defined(HAS_NORMAL_MAP) && defined(HAS_ENVIRONMENT_MAP)
+    vSelectedWorldMatrix = selectedWorldMatrix;
   #endif
 
   vNormal = normalize(mat3(selectedWorldInverseTranspose) * normal);

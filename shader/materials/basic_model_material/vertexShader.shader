@@ -66,7 +66,11 @@ varying vec3 vLightDiffuse;
 #endif
 
 #ifdef HAS_ENVIRONMENT_MAP
-  varying vec3 vWorldNormal;
+  #ifdef HAS_NORMAL_MAP
+    varying mat4 vSelectedWorldMatrix;
+  #else
+    varying vec3 vWorldNormal;
+  #endif
 #endif
 
 #ifdef HAS_PHONG_LIGHTING
@@ -890,7 +894,11 @@ void main(){
   #endif
 
   #ifdef HAS_ENVIRONMENT_MAP
-    vWorldNormal = mat3(selectedWorldMatrix) * normal;
+    #ifdef HAS_NORMAL_MAP
+      vSelectedWorldMatrix = selectedWorldMatrix;
+    #else
+      vWorldNormal = mat3(selectedWorldMatrix) * normal;
+    #endif
   #endif
 
   #ifdef AFFECTED_BY_LIGHT
