@@ -465,6 +465,7 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
   var specularTextureIndexByTextureID = model.specularTextureIndexByTextureID;
   var alphaTextureIndexByTextureID = model.alphaTextureIndexByTextureID;
   var roughnessTextureIndexByTextureID = model.roughnessTextureIndexByTextureID;
+  var metalnessTextureIndexByTextureID = model.metalnessTextureIndexByTextureID;
 
   for (var i = 0; i < usedTextures.length; i ++){
     var textureID = usedTextures[i].id;
@@ -473,6 +474,7 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
     var specularTextureIndex = specularTextureIndexByTextureID[textureID];
     var alphaTextureIndex = alphaTextureIndexByTextureID[textureID];
     var roughnessTextureIndex = roughnessTextureIndexByTextureID[textureID];
+    var metalnessTextureIndex = metalnessTextureIndexByTextureID[textureID];
 
     if (!(typeof diffuseTextureIndex == UNDEFINED)){
       var texture = texturesObj[textureID].diffuseTexture;
@@ -519,6 +521,15 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
       }else{
         uniforms[key].value = texture;
       }
+    }else if (!(typeof metalnessTextureIndex == UNDEFINED)){
+      var texture = texturesObj[textureID].diffuseTexture;
+      var key = "customMetalnessTexture" + metalnessTextureIndex;
+      if (!uniforms[key]){
+        uniforms[key] = new THREE.Uniform(texture);
+        macroHandler.injectMacro("CUSTOM_METALNESS_TEXTURE_" + metalnessTextureIndex, material, false, true);
+      }else{
+        uniforms[key].value = texture;
+      }
     }
   }
 
@@ -538,6 +549,7 @@ ModelInstance.prototype.unmapCustomTextures = function(){
   var specularTextureIndexByTextureID = model.specularTextureIndexByTextureID;
   var alphaTextureIndexByTextureID = model.alphaTextureIndexByTextureID;
   var roughnessTextureIndexByTextureID = model.roughnessTextureIndexByTextureID;
+  var metalnessTextureIndexByTextureID = model.metalnessTextureIndexByTextureID;
 
   for (var i = 0; i < usedTextures.length; i ++){
     var textureID = usedTextures[i].id;
@@ -546,6 +558,7 @@ ModelInstance.prototype.unmapCustomTextures = function(){
     var specularTextureIndex = specularTextureIndexByTextureID[textureID];
     var alphaTextureIndex = alphaTextureIndexByTextureID[textureID];
     var roughnessTextureIndex = roughnessTextureIndexByTextureID[textureID];
+    var metalnessTextureIndex = metalnessTextureIndexByTextureID[textureID];
 
     if (!(typeof diffuseTextureIndex == UNDEFINED)){
       var key = "customDiffuseTexture" + diffuseTextureIndex;
@@ -566,6 +579,10 @@ ModelInstance.prototype.unmapCustomTextures = function(){
     }else if (!(typeof roughnessTextureIndex == UNDEFINED)){
       var key = "customRoughnessTexture" + roughnessTextureIndex;
       macroHandler.removeMacro("CUSTOM_ROUGHNESS_TEXTURE_" + roughnessTextureIndex, material, false, true);
+      delete uniforms[key];
+    }else if (!(typeof metalnessTextureIndex == UNDEFINED)){
+      var key = "customMetalnessTexture" + metalnessTextureIndex;
+      macroHandler.removeMacro("CUSTOM_METALNESS_TEXTURE_" + metalnessTextureIndex, material, false, true);
       delete uniforms[key];
     }
   }
@@ -1167,6 +1184,9 @@ ModelInstance.prototype.makePBR = function(){
   if (this.model.info.hasRoughnessMap){
     macroHandler.injectMacro("HAS_ROUGHNESS_MAP", this.mesh.material, true, true);
   }
+  if (this.model.info.hasMetalnessMap){
+    macroHandler.injectMacro("HAS_METALNESS_MAP", this.mesh.material, true, true);
+  }
 
   this.refreshAnimationGroups();
 
@@ -1216,6 +1236,9 @@ ModelInstance.prototype.unmakePBR = function(){
   if (this.model.info.hasRoughnessMap){
     macroHandler.injectMacro("HAS_ROUGHNESS_MAP", this.mesh.material, true, true);
   }
+  if (this.model.info.hasMetalnessMap){
+    macroHandler.injectMacro("HAS_METALNESS_MAP", this.mesh.material, true, true);
+  }
 
   this.refreshAnimationGroups();
 
@@ -1237,8 +1260,8 @@ ModelInstance.prototype.setPBRLightAttenuationCoef = function(lightAttenuationCo
 }
 
 ModelInstance.prototype.compressGeometry = function(){
-  var diffuseUV = null, normalUV = null, specularUV = null, alphaUV = null, roughnessUV = null;
-  var diffuseTextureIndex = null, normalTextureIndex = null, specularTextureIndex = null, alphaTextureIndex = null, roughnessTextureIndex = null;
+  var diffuseUV = null, normalUV = null, specularUV = null, alphaUV = null, roughnessUV = null, metalnessUV = null;
+  var diffuseTextureIndex = null, normalTextureIndex = null, specularTextureIndex = null, alphaTextureIndex = null, roughnessTextureIndex = null, metalnessTextureIndex = null;
 
   if (this.mesh.geometry.attributes.diffuseUV){
     var ary = this.mesh.geometry.attributes.diffuseUV.array;
@@ -1265,6 +1288,11 @@ ModelInstance.prototype.compressGeometry = function(){
     roughnessUV = new THREE.Vector4(ary[0], ary[1], ary[2], ary[3]);
   }
 
+  if (this.mesh.geometry.attributes.metalnessUV){
+    var ary = this.mesh.geometry.attributes.metalnessUV.array;
+    metalnessUV = new THREE.Vector4(ary[0], ary[1], ary[2], ary[3]);
+  }
+
   if (this.mesh.geometry.attributes.diffuseTextureIndex){
     diffuseTextureIndex = this.mesh.geometry.attributes.diffuseTextureIndex.array[0];
   }
@@ -1285,11 +1313,15 @@ ModelInstance.prototype.compressGeometry = function(){
     roughnessTextureIndex = this.mesh.geometry.attributes.roughnessTextureIndex.array[0];
   }
 
+  if (this.mesh.geometry.attributes.metalnessTextureIndex){
+    metalnessTextureIndex = this.mesh.geometry.attributes.metalnessTextureIndex.array[0];
+  }
+
   var compressableAttributes = [
     "diffuseUV", "metalnessRoughness", "materialIndex", "normalUV",
     "specularUV", "alphaUV", "roughnessUV", "diffuseTextureIndex",
     "normalTextureIndex", "specularTextureIndex", "alphaTextureIndex",
-    "roughnessTextureIndex"
+    "roughnessTextureIndex", "metalnessUV", "metalnessTextureIndex"
   ];
 
   this.compressedAttributes = macroHandler.compressAttributes(this.mesh, compressableAttributes);
@@ -1328,6 +1360,10 @@ ModelInstance.prototype.compressGeometry = function(){
     macroHandler.compressVaryingVec4(this.mesh.material, "vRoughnessUV", roughnessUV.x, roughnessUV.y, roughnessUV.z, roughnessUV.w);
   }
 
+  if (this.compressedAttributes.indexOf("metalnessUV") >= 0){
+    macroHandler.compressVaryingVec4(this.mesh.material, "vMetalnessUV", metalnessUV.x, metalnessUV.y, metalnessUV.z, metalnessUV.w);
+  }
+
   if (this.compressedAttributes.indexOf("diffuseTextureIndex") >= 0){
     macroHandler.compressVaryingFloat(this.mesh.material, "vDiffuseTextureIndex", diffuseTextureIndex);
   }
@@ -1346,6 +1382,10 @@ ModelInstance.prototype.compressGeometry = function(){
 
   if (this.compressedAttributes.indexOf("roughnessTextureIndex") >= 0){
     macroHandler.compressVaryingFloat(this.mesh.material, "vRoughnessTextureIndex", roughnessTextureIndex);
+  }
+
+  if (this.compressedAttributes.indexOf("metalnessTextureIndex") >= 0){
+    macroHandler.compressVaryingFloat(this.mesh.material, "vMetalnessTextureIndex", metalnessTextureIndex);
   }
 
   var allTrue = true, allFalse = true;

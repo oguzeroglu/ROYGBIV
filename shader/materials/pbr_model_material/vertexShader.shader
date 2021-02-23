@@ -45,16 +45,19 @@ uniform vec3 cameraPosition;
   varying vec4 vDiffuseUV;
 #endif
 
-#ifdef HAS_ENVIRONMENT_MAP
-  varying vec3 vWorldNormal;
-#endif
-
 #ifdef HAS_NORMAL_MAP
   attribute vec4 normalUV;
   attribute vec4 tangent;
   varying vec3 vTangent;
   varying vec3 vBitangent;
   varying vec4 vNormalUV;
+  #ifdef HAS_ENVIRONMENT_MAP
+    varying mat4 vSelectedWorldMatrix;
+  #endif
+#else
+  #ifdef HAS_ENVIRONMENT_MAP
+    varying vec3 vWorldNormal;
+  #endif
 #endif
 
 #ifdef HAS_CUSTOM_TEXTURE
@@ -72,6 +75,10 @@ uniform vec3 cameraPosition;
     attribute float roughnessTextureIndex;
     varying float vRoughnessTextureIndex;
   #endif
+  #ifdef HAS_METALNESS_MAP
+    attribute float metalnessTextureIndex;
+    varying float vMetalnessTextureIndex;
+  #endif
 #endif
 
 #ifdef HAS_ALPHA_MAP
@@ -82,6 +89,11 @@ uniform vec3 cameraPosition;
 #ifdef HAS_ROUGHNESS_MAP
   attribute vec4 roughnessUV;
   varying vec4 vRoughnessUV;
+#endif
+
+#ifdef HAS_METALNESS_MAP
+  attribute vec4 metalnessUV;
+  varying vec4 vMetalnessUV;
 #endif
 
 int isEnvMappingDisabledForMaterial(){
@@ -124,11 +136,19 @@ void main(){
     vRoughnessUV = roughnessUV;
   #endif
 
+  #ifdef HAS_METALNESS_MAP
+    vMetalnessUV = metalnessUV;
+  #endif
+
   vec3 worldPositionComputed = (selectedWorldMatrix * vec4(position, 1.0)).xyz;
   vWorldPosition = worldPositionComputed;
 
-  #ifdef HAS_ENVIRONMENT_MAP
+  #if !defined(HAS_NORMAL_MAP) && defined(HAS_ENVIRONMENT_MAP)
     vWorldNormal = mat3(selectedWorldMatrix) * normal;
+  #endif
+
+  #if defined(HAS_NORMAL_MAP) && defined(HAS_ENVIRONMENT_MAP)
+    vSelectedWorldMatrix = selectedWorldMatrix;
   #endif
 
   vNormal = normalize(mat3(selectedWorldInverseTranspose) * normal);
@@ -153,6 +173,9 @@ void main(){
     #endif
     #ifdef HAS_ROUGHNESS_MAP
       vRoughnessTextureIndex = roughnessTextureIndex;
+    #endif
+    #ifdef HAS_METALNESS_MAP
+      vMetalnessTextureIndex = metalnessTextureIndex;
     #endif
   #endif
 

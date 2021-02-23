@@ -179,6 +179,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   var hasSpecularMap = false;
   var hasAlphaMap = false;
   var hasRoughnessMap = false;
+  var hasMetalnessMap = false;
 
   var flatInfo = [];
   for (var i = 0; i < model.children.length; i ++){
@@ -349,6 +350,28 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       }
     }
 
+    if (childMat.metalnessMap){
+      hasMetalnessMap = true;
+      var tmpCanvas = document.createElement("canvas");
+      tmpCanvas.width = childMat.metalnessMap.image.width;
+      tmpCanvas.height = childMat.metalnessMap.image.height;
+      tmpCanvas.getContext("2d").drawImage(childMat.metalnessMap.image, 0, 0);
+      texturesObj[childMat.metalnessMap.image.src] = new THREE.CanvasTexture(tmpCanvas);
+      childInfo.metalnessTextureURL = childMat.metalnessMap.image.src;
+      var metalnessTextureID = null;
+      for (var i2 = 0; i2 < childInfos.length; i2 ++){
+        if (childInfos[i2].metalnessTextureURL == childMat.metalnessMap.image.src){
+          metalnessTextureID = childInfos[i2].metalnessTextureID;
+          break;
+        }
+      }
+      if (!metalnessTextureID){
+        childInfo.metalnessTextureID = generateUUID();
+      }else{
+        childInfo.metalnessTextureID = metalnessTextureID;
+      }
+    }
+
     childInfos.push(childInfo);
   }
 
@@ -369,6 +392,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   var specularUVs = [];
   var alphaUVs = [];
   var roughnessUVs = [];
+  var metalnessUVs = [];
 
   var materialIndices = [];
 
@@ -453,6 +477,13 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     }else if (hasRoughnessMap){
       this.quadruplePush(roughnessUVs, -100, -100, -100, -100, "number");
     }
+
+    if (curFlatInfo.material.metalnessMap){
+      var uvInfo = textureMerger.ranges[curFlatInfo.material.metalnessMap.image.src];
+      this.quadruplePush(metalnessUVs, uvInfo.startU, uvInfo.startV, uvInfo.endU, uvInfo.endV, "number");
+    }else if (hasMetalnessMap){
+      this.quadruplePush(metalnessUVs, -100, -100, -100, -100, "number");
+    }
   }
 
   modelCreatorGUIHandler.model = new Model({
@@ -464,8 +495,9 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     hasSpecularMap: hasSpecularMap,
     hasAlphaMap: hasAlphaMap,
     hasRoughnessMap: hasRoughnessMap,
+    hasMetalnessMap: hasMetalnessMap,
     centerGeometry: centerGeometry
-  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, roughnessUVs, materialIndices);
+  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, roughnessUVs, metalnessUVs, materialIndices);
 
   modelCreatorGUIHandler.model.setARModelNames(arModelNames);
 
