@@ -175,6 +175,7 @@ ImportHandler.prototype.importModels = function(obj, callback){
       var alphaUVs = null;
       var roughnessUVs = null;
       var metalnessUVs = null;
+      var emissiveUVs = null;
 
       if (this.curModelExport.hasNormalMap){
         normalUVs = new Float32Array(indexedMaterialIndices.length * 4);
@@ -196,7 +197,11 @@ ImportHandler.prototype.importModels = function(obj, callback){
         metalnessUVs = new Float32Array(indexedMaterialIndices.length * 4);
       }
 
-      var x = 0, y = 0, z = 0, w = 0, t = 0, o = 0;
+      if (this.curModelExport.hasEmissiveMap){
+        emissiveUVs = new Float32Array(indexedMaterialIndices.length * 4);
+      }
+
+      var x = 0, y = 0, z = 0, w = 0, t = 0, o = 0, s = 0;
       for (var i = 0; i < indexedMaterialIndices.length; i ++){
         var materialIndex = indexedMaterialIndices[i];
         var curMaterial = this.curModelExport.childInfos[materialIndex];
@@ -242,13 +247,20 @@ ImportHandler.prototype.importModels = function(obj, callback){
           metalnessUVs[o ++] = -100;
           metalnessUVs[o ++] = -100;
         }
+
+        if (this.curModelExport.hasEmissiveMap){
+          emissiveUVs[s ++] = -100;
+          emissiveUVs[s ++] = -100;
+          emissiveUVs[s ++] = -100;
+          emissiveUVs[s ++] = -100;
+        }
       }
 
       if (isDeployment){
         loadTime.modelGenerationTimes[this.curModelExport.name] = performance.now();
       }
 
-      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, roughnessUVs, metalnessUVs, null, indices, indexedMaterialIndices);
+      var model = new Model(this.curModelExport, {}, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, roughnessUVs, metalnessUVs, emissiveUVs, null, indices, indexedMaterialIndices);
 
       if (this.curModelExport.customTexturesEnabled){
         model.enableCustomTextures();

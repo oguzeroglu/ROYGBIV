@@ -79,6 +79,10 @@ uniform vec3 cameraPosition;
     attribute float metalnessTextureIndex;
     varying float vMetalnessTextureIndex;
   #endif
+  #ifdef HAS_EMISSIVE_MAP
+    attribute float emissiveTextureIndex;
+    varying float vEmissiveTextureIndex;
+  #endif
 #endif
 
 #ifdef HAS_ALPHA_MAP
@@ -94,6 +98,11 @@ uniform vec3 cameraPosition;
 #ifdef HAS_METALNESS_MAP
   attribute vec4 metalnessUV;
   varying vec4 vMetalnessUV;
+#endif
+
+#ifdef HAS_EMISSIVE_MAP
+  attribute vec4 emissiveUV;
+  varying vec4 vEmissiveUV;
 #endif
 
 int isEnvMappingDisabledForMaterial(){
@@ -140,6 +149,10 @@ void main(){
     vMetalnessUV = metalnessUV;
   #endif
 
+  #ifdef HAS_EMISSIVE_MAP
+    vEmissiveUV = emissiveUV;
+  #endif
+
   vec3 worldPositionComputed = (selectedWorldMatrix * vec4(position, 1.0)).xyz;
   vWorldPosition = worldPositionComputed;
 
@@ -176,6 +189,9 @@ void main(){
     #endif
     #ifdef HAS_METALNESS_MAP
       vMetalnessTextureIndex = metalnessTextureIndex;
+    #endif
+    #ifdef HAS_EMISSIVE_MAP
+      vEmissiveTextureIndex = emissiveTextureIndex;
     #endif
   #endif
 

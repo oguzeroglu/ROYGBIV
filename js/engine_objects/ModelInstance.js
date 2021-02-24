@@ -466,6 +466,7 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
   var alphaTextureIndexByTextureID = model.alphaTextureIndexByTextureID;
   var roughnessTextureIndexByTextureID = model.roughnessTextureIndexByTextureID;
   var metalnessTextureIndexByTextureID = model.metalnessTextureIndexByTextureID;
+  var emissiveTextureIndexByTextureID = model.emissiveTextureIndexByTextureID;
 
   for (var i = 0; i < usedTextures.length; i ++){
     var textureID = usedTextures[i].id;
@@ -475,6 +476,7 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
     var alphaTextureIndex = alphaTextureIndexByTextureID[textureID];
     var roughnessTextureIndex = roughnessTextureIndexByTextureID[textureID];
     var metalnessTextureIndex = metalnessTextureIndexByTextureID[textureID];
+    var emissiveTextureIndex = emissiveTextureIndexByTextureID[textureID];
 
     if (!(typeof diffuseTextureIndex == UNDEFINED)){
       var texture = texturesObj[textureID].diffuseTexture;
@@ -530,6 +532,15 @@ ModelInstance.prototype.mapCustomTextures = function(texturesObj){
       }else{
         uniforms[key].value = texture;
       }
+    }else if (!(typeof emissiveTextureIndex == UNDEFINED)){
+      var texture = texturesObj[textureID].diffuseTexture;
+      var key = "customEmissiveTexture" + emissiveTextureIndex;
+      if (!uniforms[key]){
+        uniforms[key] = new THREE.Uniform(texture);
+        macroHandler.injectMacro("CUSTOM_EMISSIVE_TEXTURE_" + emissiveTextureIndex, material, false, true);
+      }else{
+        uniforms[key].value = texture;
+      }
     }
   }
 
@@ -550,6 +561,7 @@ ModelInstance.prototype.unmapCustomTextures = function(){
   var alphaTextureIndexByTextureID = model.alphaTextureIndexByTextureID;
   var roughnessTextureIndexByTextureID = model.roughnessTextureIndexByTextureID;
   var metalnessTextureIndexByTextureID = model.metalnessTextureIndexByTextureID;
+  var emissiveTextureIndexByTextureID = model.emissiveTextureIndexByTextureID;
 
   for (var i = 0; i < usedTextures.length; i ++){
     var textureID = usedTextures[i].id;
@@ -559,6 +571,7 @@ ModelInstance.prototype.unmapCustomTextures = function(){
     var alphaTextureIndex = alphaTextureIndexByTextureID[textureID];
     var roughnessTextureIndex = roughnessTextureIndexByTextureID[textureID];
     var metalnessTextureIndex = metalnessTextureIndexByTextureID[textureID];
+    var emissiveTextureIndex = emissiveTextureIndexByTextureID[textureID];
 
     if (!(typeof diffuseTextureIndex == UNDEFINED)){
       var key = "customDiffuseTexture" + diffuseTextureIndex;
@@ -583,6 +596,10 @@ ModelInstance.prototype.unmapCustomTextures = function(){
     }else if (!(typeof metalnessTextureIndex == UNDEFINED)){
       var key = "customMetalnessTexture" + metalnessTextureIndex;
       macroHandler.removeMacro("CUSTOM_METALNESS_TEXTURE_" + metalnessTextureIndex, material, false, true);
+      delete uniforms[key];
+    }else if (!(typeof emissiveTextureIndex == UNDEFINED)){
+      var key = "customEmissiveTexture" + emissiveTextureIndex;
+      macroHandler.removeMacro("CUSTOM_EMISSIVE_TEXTURE_" + emissiveTextureIndex, material, false, true);
       delete uniforms[key];
     }
   }
@@ -1187,6 +1204,9 @@ ModelInstance.prototype.makePBR = function(){
   if (this.model.info.hasMetalnessMap){
     macroHandler.injectMacro("HAS_METALNESS_MAP", this.mesh.material, true, true);
   }
+  if (this.model.info.hasEmissiveMap){
+    macroHandler.injectMacro("HAS_EMISSIVE_MAP", this.mesh.material, true, true);
+  }
 
   this.refreshAnimationGroups();
 
@@ -1239,6 +1259,9 @@ ModelInstance.prototype.unmakePBR = function(){
   if (this.model.info.hasMetalnessMap){
     macroHandler.injectMacro("HAS_METALNESS_MAP", this.mesh.material, true, true);
   }
+  if (this.model.info.hasEmissiveMap){
+    macroHandler.injectMacro("HAS_EMISSIVE_MAP", this.mesh.material, true, true);
+  }
 
   this.refreshAnimationGroups();
 
@@ -1260,8 +1283,8 @@ ModelInstance.prototype.setPBRLightAttenuationCoef = function(lightAttenuationCo
 }
 
 ModelInstance.prototype.compressGeometry = function(){
-  var diffuseUV = null, normalUV = null, specularUV = null, alphaUV = null, roughnessUV = null, metalnessUV = null;
-  var diffuseTextureIndex = null, normalTextureIndex = null, specularTextureIndex = null, alphaTextureIndex = null, roughnessTextureIndex = null, metalnessTextureIndex = null;
+  var diffuseUV = null, normalUV = null, specularUV = null, alphaUV = null, roughnessUV = null, metalnessUV = null, emissiveUV = null;
+  var diffuseTextureIndex = null, normalTextureIndex = null, specularTextureIndex = null, alphaTextureIndex = null, roughnessTextureIndex = null, metalnessTextureIndex = null, emissiveTextureIndex = null;
 
   if (this.mesh.geometry.attributes.diffuseUV){
     var ary = this.mesh.geometry.attributes.diffuseUV.array;
@@ -1293,6 +1316,11 @@ ModelInstance.prototype.compressGeometry = function(){
     metalnessUV = new THREE.Vector4(ary[0], ary[1], ary[2], ary[3]);
   }
 
+  if (this.mesh.geometry.attributes.emissiveUV){
+    var ary = this.mesh.geometry.attributes.emissiveUV.array;
+    emissiveUV = new THREE.Vector4(ary[0], ary[1], ary[2], ary[3]);
+  }
+
   if (this.mesh.geometry.attributes.diffuseTextureIndex){
     diffuseTextureIndex = this.mesh.geometry.attributes.diffuseTextureIndex.array[0];
   }
@@ -1317,11 +1345,16 @@ ModelInstance.prototype.compressGeometry = function(){
     metalnessTextureIndex = this.mesh.geometry.attributes.metalnessTextureIndex.array[0];
   }
 
+  if (this.mesh.geometry.attributes.emissiveTextureIndex){
+    emissiveTextureIndex = this.mesh.geometry.attributes.emissiveTextureIndex.array[0];
+  }
+
   var compressableAttributes = [
     "diffuseUV", "metalnessRoughness", "materialIndex", "normalUV",
     "specularUV", "alphaUV", "roughnessUV", "diffuseTextureIndex",
     "normalTextureIndex", "specularTextureIndex", "alphaTextureIndex",
-    "roughnessTextureIndex", "metalnessUV", "metalnessTextureIndex"
+    "roughnessTextureIndex", "metalnessUV", "metalnessTextureIndex",
+    "emissiveUV", "emissiveTextureIndex"
   ];
 
   this.compressedAttributes = macroHandler.compressAttributes(this.mesh, compressableAttributes);
@@ -1364,6 +1397,10 @@ ModelInstance.prototype.compressGeometry = function(){
     macroHandler.compressVaryingVec4(this.mesh.material, "vMetalnessUV", metalnessUV.x, metalnessUV.y, metalnessUV.z, metalnessUV.w);
   }
 
+  if (this.compressedAttributes.indexOf("emissiveUV") >= 0){
+    macroHandler.compressVaryingVec4(this.mesh.material, "vEmissiveUV", emissiveUV.x, emissiveUV.y, emissiveUV.z, emissiveUV.w);
+  }
+
   if (this.compressedAttributes.indexOf("diffuseTextureIndex") >= 0){
     macroHandler.compressVaryingFloat(this.mesh.material, "vDiffuseTextureIndex", diffuseTextureIndex);
   }
@@ -1386,6 +1423,10 @@ ModelInstance.prototype.compressGeometry = function(){
 
   if (this.compressedAttributes.indexOf("metalnessTextureIndex") >= 0){
     macroHandler.compressVaryingFloat(this.mesh.material, "vMetalnessTextureIndex", metalnessTextureIndex);
+  }
+
+  if (this.compressedAttributes.indexOf("emissiveTextureIndex") >= 0){
+    macroHandler.compressVaryingFloat(this.mesh.material, "vEmissiveTextureIndex", emissiveTextureIndex);
   }
 
   var allTrue = true, allFalse = true;

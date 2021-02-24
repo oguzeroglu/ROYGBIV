@@ -67,6 +67,10 @@ uniform mat4 dynamicLightsMatrix;
   varying vec4 vMetalnessUV;
 #endif
 
+#ifdef HAS_EMISSIVE_MAP
+  varying vec4 vEmissiveUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   varying float vDiffuseTextureIndex;
   #ifdef HAS_NORMAL_MAP
@@ -80,6 +84,9 @@ uniform mat4 dynamicLightsMatrix;
   #endif
   #ifdef HAS_METALNESS_MAP
     varying float vMetalnessTextureIndex;
+  #endif
+  #ifdef HAS_EMISSIVE_MAP
+    varying float vEmissiveTextureIndex;
   #endif
   #ifdef CUSTOM_TEXTURE_0
     uniform sampler2D customDiffuseTexture0;
@@ -170,6 +177,24 @@ uniform mat4 dynamicLightsMatrix;
   #endif
   #ifdef CUSTOM_METALNESS_TEXTURE_5
     uniform sampler2D customMetalnessTexture5;
+  #endif
+  #ifdef CUSTOM_EMISSIVE_TEXTURE_0
+    uniform sampler2D customEmissiveTexture0;
+  #endif
+  #ifdef CUSTOM_EMISSIVE_TEXTURE_1
+    uniform sampler2D customEmissiveTexture1;
+  #endif
+  #ifdef CUSTOM_EMISSIVE_TEXTURE_2
+    uniform sampler2D customEmissiveTexture2;
+  #endif
+  #ifdef CUSTOM_EMISSIVE_TEXTURE_3
+    uniform sampler2D customEmissiveTexture3;
+  #endif
+  #ifdef CUSTOM_EMISSIVE_TEXTURE_4
+    uniform sampler2D customEmissiveTexture4;
+  #endif
+  #ifdef CUSTOM_EMISSIVE_TEXTURE_5
+    uniform sampler2D customEmissiveTexture5;
   #endif
 #else
   uniform sampler2D texture;
@@ -511,6 +536,52 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, fl
   }
 #endif
 
+#ifdef HAS_EMISSIVE_MAP
+  vec3 getEmissiveColor(){
+    if (vEmissiveUV.x < 0.0) {
+      return vec3(0.0, 0.0, 0.0);
+    }
+
+    #ifdef HAS_CUSTOM_TEXTURE
+      int emissiveTextureIndexInt = int(vEmissiveTextureIndex + 0.5);
+      #ifdef CUSTOM_EMISSIVE_TEXTURE_0
+        if (emissiveTextureIndexInt == 0){
+          return texture2D(customEmissiveTexture0, vUV).rgb;
+        }
+      #endif
+      #ifdef CUSTOM_EMISSIVE_TEXTURE_1
+        if (emissiveTextureIndexInt == 1){
+          return texture2D(customEmissiveTexture1, vUV).rgb;
+        }
+      #endif
+      #ifdef CUSTOM_EMISSIVE_TEXTURE_2
+        if (emissiveTextureIndexInt == 2){
+          return texture2D(customEmissiveTexture2, vUV).rgb;
+        }
+      #endif
+      #ifdef CUSTOM_EMISSIVE_TEXTURE_3
+        if (emissiveTextureIndexInt == 3){
+          return texture2D(customEmissiveTexture3, vUV).rgb;
+        }
+      #endif
+      #ifdef CUSTOM_EMISSIVE_TEXTURE_4
+        if (emissiveTextureIndexInt == 4){
+          return texture2D(customEmissiveTexture4, vUV).rgb;
+        }
+      #endif
+      #ifdef CUSTOM_EMISSIVE_TEXTURE_5
+        if (emissiveTextureIndexInt == 5){
+          return texture2D(customEmissiveTexture5, vUV).rgb;
+        }
+      #endif
+    #else
+      return texture2D(texture, uvAffineTransformation(vUV, vEmissiveUV.x, vEmissiveUV.y, vEmissiveUV.z, vEmissiveUV.w)).rgb;
+    #endif
+
+    return vec3(0.0, 0.0, 0.0);
+  }
+#endif
+
 #ifdef IS_HDR
   #define cubeUV_textureSize (1024.0)
   #define cubeUV_maxLods1  (log2(cubeUV_textureSize*0.25) - 1.0)
@@ -786,6 +857,10 @@ void main(){
   vec3 color = ambient + Lo;
 
   gl_FragColor = vec4(color, float(ALPHA) * alphaCoef);
+
+  #ifdef HAS_EMISSIVE_MAP
+    gl_FragColor.rgb += getEmissiveColor();
+  #endif
 
   #if defined(IS_HDR) && defined(TONE_MAPPING_ENABLED)
     gl_FragColor.rgb = OptimizedCineonToneMapping(gl_FragColor.rgb);
