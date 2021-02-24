@@ -472,6 +472,15 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
+				case 'map_emissive':
+				case 'emissive':
+
+					// Supported by ROYGBIV only
+
+					setMapForType("emissiveMap", value);
+
+					break;
+
 				case 'ns':
 
 					// The specular exponent (defines the focus of the specular highlight)

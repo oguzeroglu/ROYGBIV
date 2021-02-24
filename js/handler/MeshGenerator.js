@@ -44,6 +44,10 @@ MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
     macroHandler.injectMacro("HAS_METALNESS_MAP", material, true, true);
   }
 
+  if (model.info.hasEmissiveMap){
+    macroHandler.injectMacro("HAS_EMISSIVE_MAP", material, true, true);
+  }
+
   if (!isDeployment){
     macroHandler.injectMacro("CHILDREN_HIDEABLE", material, true, true);
   }
