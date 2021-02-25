@@ -181,6 +181,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   var hasRoughnessMap = false;
   var hasMetalnessMap = false;
   var hasEmissiveMap = false;
+  var hasAOMap = false;
 
   var flatInfo = [];
   for (var i = 0; i < model.children.length; i ++){
@@ -395,6 +396,28 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       }
     }
 
+    if (childMat.aoMap){
+      hasAOMap = true;
+      var tmpCanvas = document.createElement("canvas");
+      tmpCanvas.width = childMat.aoMap.image.width;
+      tmpCanvas.height = childMat.aoMap.image.height;
+      tmpCanvas.getContext("2d").drawImage(childMat.aoMap.image, 0, 0);
+      texturesObj[childMat.aoMap.image.src] = new THREE.CanvasTexture(tmpCanvas);
+      childInfo.aoTextureURL = childMat.aoMap.image.src;
+      var aoTextureID = null;
+      for (var i2 = 0; i2 < childInfos.length; i2 ++){
+        if (childInfos[i2].aoTextureURL == childMat.aosMap.image.src){
+          aoTextureID = childInfos[i2].aoTextureID;
+          break;
+        }
+      }
+      if (!aoTextureID){
+        childInfo.aoTextureID = generateUUID();
+      }else{
+        childInfo.aoTextureID = aoTextureID;
+      }
+    }
+
     childInfos.push(childInfo);
   }
 
@@ -417,6 +440,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
   var roughnessUVs = [];
   var metalnessUVs = [];
   var emissiveUVs = [];
+  var aoUVs = [];
 
   var materialIndices = [];
 
@@ -515,6 +539,13 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     }else if (hasEmissiveMap){
       this.quadruplePush(emissiveUVs, -100, -100, -100, -100, "number");
     }
+
+    if (curFlatInfo.material.aoMap){
+      var uvInfo = textureMerger.ranges[curFlatInfo.material.aoMap.image.src];
+      this.quadruplePush(aoUVs, uvInfo.startU, uvInfo.startV, uvInfo.endU, uvInfo.endV, "number");
+    }else if (hasAOMap){
+      this.quadruplePush(aoUVs, -100, -100, -100, -100, "number");
+    }
   }
 
   modelCreatorGUIHandler.model = new Model({
@@ -528,8 +559,9 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     hasRoughnessMap: hasRoughnessMap,
     hasMetalnessMap: hasMetalnessMap,
     hasEmissiveMap: hasEmissiveMap,
+    hasAOMap: hasAOMap,
     centerGeometry: centerGeometry
-  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, roughnessUVs, metalnessUVs, emissiveUVs, materialIndices);
+  }, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, roughnessUVs, metalnessUVs, aoUVs, emissiveUVs, materialIndices);
 
   modelCreatorGUIHandler.model.setARModelNames(arModelNames);
 

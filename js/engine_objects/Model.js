@@ -1,4 +1,4 @@
-var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, roughnessUVs, metalnessUVs, emissiveUVs, materialIndices, indices, indexedMaterialIndices){
+var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, diffuseUVs, normalUVs, specularUVs, alphaUVs, roughnessUVs, metalnessUVs, emissiveUVs, aoUVs, materialIndices, indices, indexedMaterialIndices){
   this.name = modelInfo.name;
 
   this.geometry = new THREE.BufferGeometry();
@@ -16,6 +16,7 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
   var hasRoughnessMap = modelInfo.hasRoughnessMap;
   var hasMetalnessMap = modelInfo.hasMetalnessMap;
   var hasEmissiveMap = modelInfo.hasEmissiveMap;
+  var hasAOMap = modelInfo.hasAOMap;
 
   if (!indices){
     var indexInfos = {};
@@ -66,6 +67,10 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var curEmissiveUVY = hasEmissiveMap? emissiveUVs[i4 + 1]: 0;
       var curEmissiveUVZ = hasEmissiveMap? emissiveUVs[i4 + 2]: 0;
       var curEmissiveUVW = hasEmissiveMap? emissiveUVs[i4 + 3]: 0;
+      var curAOUVX = hasAOMap? aoUVs[i4]: 0;
+      var curAOUVY = hasAOMap? aoUVs[i4 + 1]: 0;
+      var curAOUVZ = hasAOMap? aoUVs[i4 + 2]: 0;
+      var curAOUVW = hasAOMap? aoUVs[i4 + 3]: 0;
       var curMaterialIndex = materialIndices[i3];
       var key = curPosX + PIPE + curPosY + PIPE + curPosZ;
       key += PIPE + curNormalX + PIPE + curNormalY + PIPE + curNormalZ;
@@ -78,6 +83,7 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       key += PIPE + curRoughnessUVX + PIPE + curRoughnessUVY + PIPE + curRoughnessUVZ + PIPE + curRoughnessUVW;
       key += PIPE + curMetalnessUVX + PIPE + curMetalnessUVY + PIPE + curMetalnessUVZ + PIPE + curMetalnessUVW;
       key += PIPE + curEmissiveUVX + PIPE + curEmissiveUVY + PIPE + curEmissiveUVZ + PIPE + curEmissiveUVW;
+      key += PIPE + curAOUVX + PIPE + curAOUVY + PIPE + curAOUVZ + PIPE + curAOUVW;
       if (!(typeof indexInfos[key] == UNDEFINED)){
         indexHitCount ++;
         indices.push(indexInfos[key]);
@@ -111,8 +117,9 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
     var allRoughnessUVs = hasRoughnessMap? new Float32Array(curIndex * 4): null;
     var allMetalnessUVs = hasMetalnessMap? new Float32Array(curIndex * 4): null;
     var allEmissiveUVs = hasEmissiveMap? new Float32Array(curIndex * 4): null;
+    var allAOUVs = hasAOMap? new Float32Array(curIndex * 4): null;
 
-    var x = 0, y = 0, z = 0, w = 0, t = 0, s = 0, a = 0, b = 0, c = 0, d = 0, e = 0;
+    var x = 0, y = 0, z = 0, w = 0, t = 0, s = 0, a = 0, b = 0, c = 0, d = 0, e = 0, f = 0;
     for (var i = 0; i < curIndex; i ++){
       var key = indexInfosInverse[i];
       var splitted = key.split(PIPE);
@@ -155,6 +162,10 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var curEmissiveUVY = parseFloat(splitted[36]);
       var curEmissiveUVZ = parseFloat(splitted[37]);
       var curEmissiveUVW = parseFloat(splitted[38]);
+      var curAOUVX = parseFloat(splitted[39]);
+      var curAOUVY = parseFloat(splitted[40]);
+      var curAOUVZ = parseFloat(splitted[41]);
+      var curAOUVW = parseFloat(splitted[42]);
 
       allPositions[x ++] = curPosX;
       allPositions[x ++] = curPosY;
@@ -213,6 +224,13 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
         allEmissiveUVs[e ++] = curEmissiveUVZ;
         allEmissiveUVs[e ++] = curEmissiveUVW;
       }
+
+      if (hasAOMap){
+        allAOUVs[f ++] = curAOUVX;
+        allAOUVs[f ++] = curAOUVY;
+        allAOUVs[f ++] = curAOUVZ;
+        allAOUVs[f ++] = curAOUVW;
+      }
     }
 
     var positionsBufferAttribute = new THREE.BufferAttribute(allPositions, 3);
@@ -270,6 +288,12 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       emissiveUVsBufferAttribute.setDynamic(false);
       this.geometry.addAttribute("emissiveUV", emissiveUVsBufferAttribute);
     }
+
+    if (hasAOMap){
+      var aoUVsBufferAttribute = new THREE.BufferAttribute(allAOUVs, 4);
+      aoUVsBufferAttribute.setDynamic(false);
+      this.geometry.addAttribute("aoUV", aoUVsBufferAttribute);
+    }
   }else{
     var positionsBufferAttribute = new THREE.BufferAttribute(positions, 3);
     var colorsBufferAttribute = new THREE.BufferAttribute(colors, 3);
@@ -325,6 +349,12 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
       var emissiveUVsBufferAttribute = new THREE.BufferAttribute(emissiveUVs, 4);
       emissiveUVsBufferAttribute.setDynamic(false);
       this.geometry.addAttribute("emissiveUV", emissiveUVsBufferAttribute);
+    }
+
+    if (hasAOMap){
+      var aoUVsBufferAttribute = new THREE.BufferAttribute(aoUVs, 4);
+      aoUVsBufferAttribute.setDynamic(false);
+      this.geometry.addAttribute("aoUV", aoUVsBufferAttribute);
     }
   }
 
@@ -422,6 +452,9 @@ Model.prototype.getUsedTextures = function(){
       if (this.info.childInfos[i].emissiveTextureURL == textureURL){
         textureID = this.info.childInfos[i].emissiveTextureID;
       }
+      if (this.info.childInfos[i].aoTextureURL == textureURL){
+        textureID = this.info.childInfos[i].aoTextureID;
+      }
     }
     usedTextures.push({
       id: textureID,
@@ -442,7 +475,8 @@ Model.prototype.onTextureAtlasRefreshed = function(){
   var roughnessUVAry = this.info.hasRoughnessMap? this.geometry.attributes.roughnessUV.array: null;
   var metalnessUVAry = this.info.hasMetalnessMap? this.geometry.attributes.metalnessUV.array: null;
   var emissiveUVAry = this.info.hasEmissiveMap? this.geometry.attributes.emissiveUV.array: null;
-  var diffuseUVIndex = 0, normalUVIndex = 0, specularUVIndex = 0, alphaUVIndex = 0, roughnessUVIndex = 0, metalnessUVIndex = 0, emissiveUVIndex = 0;
+  var aoUVAry = this.info.hasAOMap? this.geometry.attributes.aoUV.array: null;
+  var diffuseUVIndex = 0, normalUVIndex = 0, specularUVIndex = 0, alphaUVIndex = 0, roughnessUVIndex = 0, metalnessUVIndex = 0, emissiveUVIndex = 0, aoUVIndex = 0;
   var ranges = textureAtlasHandler.textureMerger.ranges;
   for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
     var materialIndex = this.indexedMaterialIndices[i];
@@ -528,6 +562,18 @@ Model.prototype.onTextureAtlasRefreshed = function(){
         emissiveUVIndex += 4;
       }
     }
+
+    if (aoUVAry){
+      if (childInfo.aoTextureID){
+        var range = ranges[childInfo.aoTextureID];
+        aoUVAry[aoUVIndex ++] = range.startU;
+        aoUVAry[aoUVIndex ++] = range.startV;
+        aoUVAry[aoUVIndex ++] = range.endU;
+        aoUVAry[aoUVIndex ++] = range.endV;
+      }else{
+        aoUVIndex += 4;
+      }
+    }
   }
 
   this.geometry.attributes.diffuseUV.updateRange.set(0, diffuseUVAry.length);
@@ -562,6 +608,11 @@ Model.prototype.onTextureAtlasRefreshed = function(){
     this.geometry.attributes.emissiveUV.updateRange.set(0, emissiveUVAry.length);
     this.geometry.attributes.emissiveUV.needsUpdate = true;
   }
+
+  if (aoUVAry){
+    this.geometry.attributes.aoUV.updateRange.set(0, aoUVAry.length);
+    this.geometry.attributes.aoUV.needsUpdate = true;
+  }
 }
 
 Model.prototype.loadTextures = function(callback){
@@ -575,6 +626,7 @@ Model.prototype.loadTextures = function(callback){
     var roughnessTextureURL = this.info.childInfos[i].roughnessTextureURL;
     var metalnessTextureURL = this.info.childInfos[i].metalnessTextureURL;
     var emissiveTextureURL = this.info.childInfos[i].emissiveTextureURL;
+    var aoTextureURL = this.info.childInfos[i].aoTextureURL;
     var diffuseTextureID = this.info.childInfos[i].diffuseTextureID;
     var normalTextureID = this.info.childInfos[i].normalTextureID;
     var specularTextureID = this.info.childInfos[i].specularTextureID;
@@ -582,6 +634,7 @@ Model.prototype.loadTextures = function(callback){
     var roughnessTextureID = this.info.childInfos[i].roughnessTextureID;
     var metalnessTextureID = this.info.childInfos[i].metalnessTextureID;
     var emissiveTextureID = this.info.childInfos[i].emissiveTextureID;
+    var aoTextureID = this.info.childInfos[i].aoTextureID;
     if (diffuseTextureURL){
       texturesToLoad[diffuseTextureURL] = diffuseTextureID;
     }
@@ -602,6 +655,9 @@ Model.prototype.loadTextures = function(callback){
     }
     if (emissiveTextureURL){
       texturesToLoad[emissiveTextureURL] = emissiveTextureID;
+    }
+    if (aoTextureURL){
+      texturesToLoad[aoTextureURL] = aoTextureID;
     }
   }
 
@@ -656,6 +712,7 @@ Model.prototype.enableCustomTextures = function(){
   var roughnessTextureIndexByTextureID = {};
   var metalnessTextureIndexByTextureID = {};
   var emissiveTextureIndexByTextureID = {};
+  var aoTextureIndexByTextureID = {};
   var curTextureIndex = 0;
 
   var diffuseTextureIndices = new Float32Array(this.indexedMaterialIndices.length);
@@ -665,6 +722,7 @@ Model.prototype.enableCustomTextures = function(){
   var roughnessTextureIndices = this.info.hasRoughnessMap? new Float32Array(this.indexedMaterialIndices.length): null;
   var metalnessTextureIndices = this.info.hasMetalnessMap? new Float32Array(this.indexedMaterialIndices.length): null;
   var emissiveTextureIndices = this.info.hasEmissiveMap? new Float32Array(this.indexedMaterialIndices.length): null;
+  var aoTextureIndices = this.info.hasAOMap? new Float32Array(this.indexedMaterialIndices.length): null;
 
   for (var i = 0; i < this.indexedMaterialIndices.length; i ++){
     var materialIndex = this.indexedMaterialIndices[i];
@@ -739,6 +797,18 @@ Model.prototype.enableCustomTextures = function(){
       }
     }
 
+    if (this.info.hasAOMap){
+      if (material.aoTextureID){
+        if (typeof aoTextureIndexByTextureID[material.aoTextureID] == UNDEFINED){
+          aoTextureIndexByTextureID[material.aoTextureID] = curTextureIndex ++;
+        }
+
+        aoTextureIndices[i] = aoTextureIndexByTextureID[material.aoTextureID];
+      }else{
+        aoTextureIndices[i] = -100;
+      }
+    }
+
     if (this.info.hasEmissiveMap){
       if (material.emissiveTextureID){
         if (typeof emissiveTextureIndexByTextureID[material.emissiveTextureID] == UNDEFINED){
@@ -764,6 +834,7 @@ Model.prototype.enableCustomTextures = function(){
   this.roughnessTextureIndexByTextureID = roughnessTextureIndexByTextureID;
   this.metalnessTextureIndexByTextureID = metalnessTextureIndexByTextureID;
   this.emissiveTextureIndexByTextureID = emissiveTextureIndexByTextureID;
+  this.aoTextureIndexByTextureID = aoTextureIndexByTextureID;
 
   if (this.info.hasNormalMap){
     var normalTextureIndexBufferAttribute = new THREE.BufferAttribute(normalTextureIndices, 1);
@@ -800,6 +871,12 @@ Model.prototype.enableCustomTextures = function(){
     emissiveTextureIndexBufferAttribute.setDynamic(false);
     this.geometry.addAttribute("emissiveTextureIndex", emissiveTextureIndexBufferAttribute);
   }
+
+  if (this.info.hasAOMap){
+    var aoTextureIndexBufferAttribute = new THREE.BufferAttribute(aoTextureIndices, 1);
+    aoTextureIndexBufferAttribute.setDynamic(false);
+    this.geometry.addAttribute("aoTextureIndex", aoTextureIndexBufferAttribute);
+  }
 }
 
 Model.prototype.disableCustomTextures = function(){
@@ -810,6 +887,7 @@ Model.prototype.disableCustomTextures = function(){
   delete this.roughnessTextureIndexByTextureID;
   delete this.metalnessTextureIndexByTextureID;
   delete this.emissiveTextureIndexByTextureID;
+  delete this.aoTextureIndexByTextureID;
 
   this.geometry.removeAttribute("diffuseTextureIndex");
   this.info.customTexturesEnabled = false;
@@ -836,6 +914,10 @@ Model.prototype.disableCustomTextures = function(){
 
   if (this.info.hasEmissiveMap){
     this.geometry.removeAttribute("emissiveTextureIndex");
+  }
+
+  if (this.info.hasAOMap){
+    this.geometry.removeAttribute("aoTextureIndex");
   }
 }
 

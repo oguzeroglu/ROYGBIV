@@ -71,6 +71,10 @@ uniform mat4 dynamicLightsMatrix;
   varying vec4 vEmissiveUV;
 #endif
 
+#ifdef HAS_AO_MAP
+  varying vec4 vAOUV;
+#endif
+
 #ifdef HAS_CUSTOM_TEXTURE
   varying float vDiffuseTextureIndex;
   #ifdef HAS_NORMAL_MAP
@@ -87,6 +91,9 @@ uniform mat4 dynamicLightsMatrix;
   #endif
   #ifdef HAS_EMISSIVE_MAP
     varying float vEmissiveTextureIndex;
+  #endif
+  #ifdef HAS_AO_MAP
+    varying float vAOTextureIndex;
   #endif
   #ifdef CUSTOM_TEXTURE_0
     uniform sampler2D customDiffuseTexture0;
@@ -195,6 +202,24 @@ uniform mat4 dynamicLightsMatrix;
   #endif
   #ifdef CUSTOM_EMISSIVE_TEXTURE_5
     uniform sampler2D customEmissiveTexture5;
+  #endif
+  #ifdef CUSTOM_AO_TEXTURE_0
+    uniform sampler2D customAOTexture0;
+  #endif
+  #ifdef CUSTOM_AO_TEXTURE_1
+    uniform sampler2D customAOTexture1;
+  #endif
+  #ifdef CUSTOM_AO_TEXTURE_2
+    uniform sampler2D customAOTexture2;
+  #endif
+  #ifdef CUSTOM_AO_TEXTURE_3
+    uniform sampler2D customAOTexture3;
+  #endif
+  #ifdef CUSTOM_AO_TEXTURE_4
+    uniform sampler2D customAOTexture4;
+  #endif
+  #ifdef CUSTOM_AO_TEXTURE_5
+    uniform sampler2D customAOTexture5;
   #endif
 #else
   uniform sampler2D texture;
@@ -582,6 +607,52 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, fl
   }
 #endif
 
+#ifdef HAS_AO_MAP
+  float getAOCoef(){
+    if (vAOUV.x < 0.0) {
+      return 1.0;
+    }
+
+    #ifdef HAS_CUSTOM_TEXTURE
+      int aoTextureIndexInt = int(vAOTextureIndex + 0.5);
+      #ifdef CUSTOM_AO_TEXTURE_0
+        if (aoTextureIndexInt == 0){
+          return texture2D(customAOTexture0, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_AO_TEXTURE_1
+        if (aoTextureIndexInt == 1){
+          return texture2D(customAOTexture1, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_AO_TEXTURE_2
+        if (aoTextureIndexInt == 2){
+          return texture2D(customAOTexture2, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_AO_TEXTURE_3
+        if (aoTextureIndexInt == 3){
+          return texture2D(customAOTexture3, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_AO_TEXTURE_4
+        if (aoTextureIndexInt == 4){
+          return texture2D(customAOTexture4, vUV).r;
+        }
+      #endif
+      #ifdef CUSTOM_AO_TEXTURE_5
+        if (aoTextureIndexInt == 5){
+          return texture2D(customAOTexture5, vUV).r;
+        }
+      #endif
+    #else
+      return texture2D(texture, uvAffineTransformation(vUV, vAOUV.x, vAOUV.y, vAOUV.z, vAOUV.w)).r;
+    #endif
+
+    return 1.0;
+  }
+#endif
+
 #ifdef IS_HDR
   #define cubeUV_textureSize (1024.0)
   #define cubeUV_maxLods1  (log2(cubeUV_textureSize*0.25) - 1.0)
@@ -857,6 +928,10 @@ void main(){
   vec3 color = ambient + Lo;
 
   gl_FragColor = vec4(color, float(ALPHA) * alphaCoef);
+
+  #ifdef HAS_AO_MAP
+    gl_FragColor.rgb *= getAOCoef();
+  #endif
 
   #ifdef HAS_EMISSIVE_MAP
     gl_FragColor.rgb += getEmissiveColor();

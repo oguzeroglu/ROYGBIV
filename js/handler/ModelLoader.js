@@ -34,7 +34,7 @@ ModelLoader.prototype.loadModel = function(directoryName, objFileName, mtlFileNa
 
       for (var i = 0; i < allMaterials.length; i ++){
         var mat = allMaterials[i];
-        if ((mat.map && !mat.map.image) || (mat.normalMap && !mat.normalMap.image) || (mat.specularMap && !mat.specularMap.image) || (mat.alphaMap && !mat.alphaMap.image) || (mat.roughnessMap && !mat.roughnessMap.image) || (mat.metalnessMap && !mat.metalnessMap.image) || (mat.emissiveMap && !mat.emissiveMap.image)){
+        if ((mat.map && !mat.map.image) || (mat.normalMap && !mat.normalMap.image) || (mat.specularMap && !mat.specularMap.image) || (mat.alphaMap && !mat.alphaMap.image) || (mat.roughnessMap && !mat.roughnessMap.image) || (mat.metalnessMap && !mat.metalnessMap.image) || (mat.emissiveMap && !mat.emissiveMap.image) || (mat.aoMap && !mat.aoMap.image)){
           var fn = function(){
             for (var i = 0; i < object.children.length; i ++){
               if ((mat.map && !mat.map.image) || (mat.normalMap && !mat.normalMap.image)){
