@@ -129,6 +129,10 @@ ImportHandler.prototype.importModelInstances = function(obj){
     if (curModelInstanceExport.fresnelFactor){
       modelInstance.modifyFresnelFactor(curModelInstanceExport.fresnelFactor.r, curModelInstanceExport.fresnelFactor.g, curModelInstanceExport.fresnelFactor.b);
     }
+
+    if (!isDeployment && curModelInstanceExport.isCompressed){
+      modelInstance.compressGeometry();
+    }
   }
 
   if (isDeployment){

@@ -146,6 +146,8 @@ ModelInstance.prototype.export = function(){
     exportObj.fresnelFactor = JSON.parse(JSON.stringify(this.fresnelFactor));
   }
 
+  exportObj.isCompressed = this.isCompressed;
+
   return exportObj;
 }
 
