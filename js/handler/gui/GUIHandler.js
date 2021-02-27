@@ -2402,6 +2402,20 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     allAnimationGroupNames.push(modelInstance.animationGroup2.name);
   }
 
+  graphicsFolder.add({"Compress": function(){
+    terminal.clear();
+
+    if (!modelInstance.isCompressable()){
+      terminal.printError(Text.MODEL_INSTSANCE_NOT_COMPRESSABLE);
+      return;
+    }
+
+    modelInstance.compressGeometry();
+    selectionHandler.resetCurrentSelection();
+
+    terminal.printInfo(Text.MODEL_INSTANCE_COMPRESSED);
+  }}, "Compress");
+
   allMRParams = [];
 
   for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
@@ -2743,6 +2757,10 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   if (!modelInstance.hasEnvironmentMap()){
     guiHandler.disableController(envMapFallbackDiffuseController);
     guiHandler.disableController(envMapFresnelFactorController);
+  }
+
+  if (modelInstance.isCompressed){
+    guiHandler.datGuiModelInstance.removeFolder(graphicsFolder);
   }
 }
 

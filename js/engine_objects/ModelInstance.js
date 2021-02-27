@@ -1491,6 +1491,8 @@ ModelInstance.prototype.compressGeometry = function(){
   if (allRefract || allReflect){
     macroHandler.compressVaryingFloat(this.mesh.material, "vEnvMapModeRefraction", allRefract? 100: -100);
   }
+
+  this.isCompressed = true;
 }
 
 ModelInstance.prototype.enableToneMapping = function(){
@@ -1527,4 +1529,17 @@ ModelInstance.prototype.replaceToneMappingExposure = function(newExposure){
 
 ModelInstance.prototype.setRenderSide = function(side){
   this.mesh.material.side = side;
+}
+
+ModelInstance.prototype.isCompressable = function(){
+  for (var miName in modelInstances){
+    if (miName == this.name){
+      continue;
+    }
+    if (this.model.name == modelInstances[miName].model.name){
+      return false;
+    }
+  }
+
+  return true;
 }

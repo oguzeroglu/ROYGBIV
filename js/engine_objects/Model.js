@@ -468,6 +468,22 @@ Model.prototype.getUsedTextures = function(){
 }
 
 Model.prototype.onTextureAtlasRefreshed = function(){
+
+  if (!isDeployment){
+    for (var miName in modelInstances){
+      if (modelInstances[miName].model.name != this.name){
+        continue;
+      }
+
+      if (modelInstances[miName].isCompressed){
+        setTimeout(function(){
+          terminal.printError(Text.MODEL_HAS_COMPRESSED_MODEL_INSTANCE_TEXTURE_REFRESH.replace(Text.PARAM1, this.name));
+        }.bind({name: this.name}), 0);
+        return;
+      }
+    }
+  }
+
   var diffuseUVAry = this.geometry.attributes.diffuseUV.array;
   var normalUVAry = this.info.hasNormalMap? this.geometry.attributes.normalUV.array: null;
   var specularUVAry = this.info.hasSpecularMap? this.geometry.attributes.specularUV.array: null;

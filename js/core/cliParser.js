@@ -6719,6 +6719,17 @@ function parse(input){
             }
           }
 
+          for (var instanceName in modelInstances){
+            var mi = modelInstances[instanceName];
+            if (mi.model.name != modelName){
+              continue;
+            }
+            if (mi.isCompressed){
+              terminal.printError(Text.MODEL_HAS_COMPRESSED_MODEL_INSTANCE);
+              return true;
+            }
+          }
+
           var selections = [];
           if (!jobHandlerWorking){
             for (var gridName in gridSelections){
