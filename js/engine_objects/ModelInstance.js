@@ -148,6 +148,8 @@ ModelInstance.prototype.export = function(){
 
   exportObj.isCompressed = this.isCompressed;
 
+  exportObj.aoIntensity = this.aoIntensity;
+
   return exportObj;
 }
 
@@ -1228,6 +1230,8 @@ ModelInstance.prototype.makePBR = function(){
   }
   if (this.model.info.hasAOMap){
     macroHandler.injectMacro("HAS_AO_MAP", this.mesh.material, true, true);
+    var aoIntensity = (typeof this.aoIntensity === UNDEFINED)? 1: this.aoIntensity;
+    this.setAOIntensity(aoIntensity);
   }
 
   this.refreshAnimationGroups();
@@ -1544,4 +1548,16 @@ ModelInstance.prototype.isCompressable = function(){
   }
 
   return true;
+}
+
+ModelInstance.prototype.setAOIntensity = function(aoIntensity){
+  if (!this.model.info.hasAOMap){
+    return;
+  }
+
+  var oldAO = (typeof this.aoIntensity === UNDEFINED)? 1: this.aoIntensity;
+  macroHandler.removeMacro("AO_INTENSITY " + oldAO, this.mesh.material, false, true);
+  macroHandler.injectMacro("AO_INTENSITY " + aoIntensity, this.mesh.material, false, true);
+
+  this.aoIntensity = aoIntensity;
 }

@@ -617,36 +617,36 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, fl
       int aoTextureIndexInt = int(vAOTextureIndex + 0.5);
       #ifdef CUSTOM_AO_TEXTURE_0
         if (aoTextureIndexInt == 0){
-          return texture2D(customAOTexture0, vUV).r;
+          return (texture2D(customAOTexture0, vUV).r - 1.0) * float(AO_INTENSITY) + 1.0;
         }
       #endif
       #ifdef CUSTOM_AO_TEXTURE_1
         if (aoTextureIndexInt == 1){
-          return texture2D(customAOTexture1, vUV).r;
+          return (texture2D(customAOTexture1, vUV).r - 1.0) * float(AO_INTENSITY) + 1.0;
         }
       #endif
       #ifdef CUSTOM_AO_TEXTURE_2
         if (aoTextureIndexInt == 2){
-          return texture2D(customAOTexture2, vUV).r;
+          return (texture2D(customAOTexture2, vUV).r - 1.0) * float(AO_INTENSITY) + 1.0;
         }
       #endif
       #ifdef CUSTOM_AO_TEXTURE_3
         if (aoTextureIndexInt == 3){
-          return texture2D(customAOTexture3, vUV).r;
+          return (texture2D(customAOTexture3, vUV).r - 1.0) * float(AO_INTENSITY) + 1.0;
         }
       #endif
       #ifdef CUSTOM_AO_TEXTURE_4
         if (aoTextureIndexInt == 4){
-          return texture2D(customAOTexture4, vUV).r;
+          return (texture2D(customAOTexture4, vUV).r - 1.0) * float(AO_INTENSITY) + 1.0;
         }
       #endif
       #ifdef CUSTOM_AO_TEXTURE_5
         if (aoTextureIndexInt == 5){
-          return texture2D(customAOTexture5, vUV).r;
+          return (texture2D(customAOTexture5, vUV).r - 1.0) * float(AO_INTENSITY) + 1.0;
         }
       #endif
     #else
-      return texture2D(texture, uvAffineTransformation(vUV, vAOUV.x, vAOUV.y, vAOUV.z, vAOUV.w)).r;
+      return (texture2D(texture, uvAffineTransformation(vUV, vAOUV.x, vAOUV.y, vAOUV.z, vAOUV.w)).r - 1.0) * float(AO_INTENSITY) + 1.0;
     #endif
 
     return 1.0;

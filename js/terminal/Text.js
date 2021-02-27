@@ -852,6 +852,7 @@ var Text = function(){
   this.PHY_TEST_KEY_NOT_UNIQUE = "Test key not unique. Test cancelled.";
   this.SPHERE_CAN_HAVE_MINIMUM_8_SEGMENTS = "Spheres can have minimum 8 segments.";
   this.SKYBOXINFO_HEADER = "Skybox info";
+  this.AO_INTENSITY_SET = "AO intensity set.";
   this.SKYBOXINFO_NAME = "NAME: @@1";
   this.SKYBOXINFO_DIRNAME = "DIR NAME: @@1";
   this.SKYBOXINFO_FILEEXTENSION = "FILE EXTENSION: @@1";

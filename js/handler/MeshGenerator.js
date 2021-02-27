@@ -50,6 +50,7 @@ MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
 
   if (model.info.hasAOMap){
     macroHandler.injectMacro("HAS_AO_MAP", material, true, true);
+    macroHandler.injectMacro("AO_INTENSITY 1", material, false, true);
   }
 
   if (!isDeployment){

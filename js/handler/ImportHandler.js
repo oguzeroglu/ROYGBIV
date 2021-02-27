@@ -130,6 +130,10 @@ ImportHandler.prototype.importModelInstances = function(obj){
       modelInstance.modifyFresnelFactor(curModelInstanceExport.fresnelFactor.r, curModelInstanceExport.fresnelFactor.g, curModelInstanceExport.fresnelFactor.b);
     }
 
+    if (modelInstance.model.info.hasAOMap){
+      modelInstance.setAOIntensity((typeof curModelInstanceExport.aoIntensity === UNDEFINED)? 1: curModelInstanceExport.aoIntensity);
+    }
+
     if (!isDeployment && curModelInstanceExport.isCompressed){
       modelInstance.compressGeometry();
     }

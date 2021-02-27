@@ -163,7 +163,8 @@ var GUIHandler = function(){
     "Blending": "Normal",
     "Specular color": "1,1,1",
     "PBR Light Attenuation Coef.": "0",
-    "Side": "BOTH"
+    "Side": "BOTH",
+    "AO Intensity": "1"
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -460,6 +461,8 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
 
     if (curSelection.hasPBR){
       guiHandler.modelInstanceManipulationParameters["PBR Light Attenuation Coef."] = "" + curSelection.pbrLightAttenuationCoef;
+
+      guiHandler.modelInstanceManipulationParameters["AO Intensity"] = (typeof curSelection.aoIntensity === UNDEFINED)? "1": "" + curSelection.aoIntensity;
     }
 
   }else{
@@ -2338,6 +2341,24 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
       modelInstance.setPBRLightAttenuationCoef(parsed);
       terminal.printInfo(Text.LIGHT_ATTENUATION_COEFFICIENT_SET)
     }).listen();
+
+    var aoIntensityController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "AO Intensity").onFinishChange(function(val){
+      terminal.clear();
+
+      var parsed = parseFloat(val);
+
+      if (isNaN(parsed)){
+        terminal.printError(Text.INVALID_NUMERICAL_VALUE);
+        return;
+      }
+
+      modelInstance.setAOIntensity(parsed);
+      terminal.printInfo(Text.AO_INTENSITY_SET);
+    }).listen();
+
+    if (!modelInstance.model.info.hasAOMap){
+      guiHandler.disableController(aoIntensityController);
+    }
   }
   guiHandler.modelInstanceManipulationNormalMapScaleController = graphicsFolder.add(guiHandler.modelInstanceManipulationParameters, "Normal map scale").onFinishChange(function(val){
     terminal.clear();
