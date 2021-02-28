@@ -6719,8 +6719,8 @@ function parse(input){
             }
           }
 
-          for (var instanceName in modelInstances){
-            var mi = modelInstances[instanceName];
+          for (var iname in modelInstances){
+            var mi = modelInstances[iname];
             if (mi.model.name != modelName){
               continue;
             }
