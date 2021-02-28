@@ -142,7 +142,7 @@ ImportHandler.prototype.importModelInstances = function(obj){
   if (isDeployment){
     for (var miName in modelInstances){
       if (modelInstances[miName].isCompressable()){
-        modelInstance.compressGeometry();
+        modelInstances[miName].compressGeometry();
       }
     }
   }
