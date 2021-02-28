@@ -1245,6 +1245,10 @@ ModelInstance.prototype.makePBR = function(){
     this.enableToneMapping();
     this.replaceToneMappingExposure(exposure);
   }
+
+  var alpha = this.alpha;
+  this.alpha = 1;
+  this.setAlpha(alpha);
 }
 
 ModelInstance.prototype.unmakePBR = function(){
@@ -1303,6 +1307,10 @@ ModelInstance.prototype.unmakePBR = function(){
     this.enableToneMapping();
     this.replaceToneMappingExposure(exposure);
   }
+
+  var alpha = this.alpha;
+  this.alpha = 1;
+  this.setAlpha(alpha);
 }
 
 ModelInstance.prototype.setPBRLightAttenuationCoef = function(lightAttenuationCoef){
