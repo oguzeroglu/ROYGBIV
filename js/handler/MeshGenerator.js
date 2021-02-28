@@ -48,6 +48,11 @@ MeshGenerator.prototype.generateModelMesh = function(model, overrideTexture){
     macroHandler.injectMacro("HAS_EMISSIVE_MAP", material, true, true);
   }
 
+  if (model.info.hasAOMap){
+    macroHandler.injectMacro("HAS_AO_MAP", material, true, true);
+    macroHandler.injectMacro("AO_INTENSITY 1", material, false, true);
+  }
+
   if (!isDeployment){
     macroHandler.injectMacro("CHILDREN_HIDEABLE", material, true, true);
   }

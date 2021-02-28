@@ -472,6 +472,15 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
+				case 'map_ao':
+				case 'ao':
+
+					// Supported by ROYGBIV only
+
+					setMapForType("aoMap", value);
+
+					break;
+
 				case 'map_emissive':
 				case 'emissive':
 

@@ -83,6 +83,10 @@ uniform vec3 cameraPosition;
     attribute float emissiveTextureIndex;
     varying float vEmissiveTextureIndex;
   #endif
+  #ifdef HAS_AO_MAP
+    attribute float aoTextureIndex;
+    varying float vAOTextureIndex;
+  #endif
 #endif
 
 #ifdef HAS_ALPHA_MAP
@@ -103,6 +107,11 @@ uniform vec3 cameraPosition;
 #ifdef HAS_EMISSIVE_MAP
   attribute vec4 emissiveUV;
   varying vec4 vEmissiveUV;
+#endif
+
+#ifdef HAS_AO_MAP
+  attribute vec4 aoUV;
+  varying vec4 vAOUV;
 #endif
 
 int isEnvMappingDisabledForMaterial(){
@@ -153,6 +162,10 @@ void main(){
     vEmissiveUV = emissiveUV;
   #endif
 
+  #ifdef HAS_AO_MAP
+    vAOUV = aoUV;
+  #endif
+
   vec3 worldPositionComputed = (selectedWorldMatrix * vec4(position, 1.0)).xyz;
   vWorldPosition = worldPositionComputed;
 
@@ -192,6 +205,9 @@ void main(){
     #endif
     #ifdef HAS_EMISSIVE_MAP
       vEmissiveTextureIndex = emissiveTextureIndex;
+    #endif
+    #ifdef HAS_AO_MAP
+      vAOTextureIndex = aoTextureIndex;
     #endif
   #endif
 
