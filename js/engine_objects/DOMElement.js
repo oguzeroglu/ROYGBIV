@@ -68,7 +68,7 @@ DOMElement.prototype.setSize = function(width, height){
 }
 
 DOMElement.prototype.onModeSwitch = function(){
-  document.body.removeChild(this.element);
+  this.element.parentElement.removeChild(this.element);
 }
 
 DOMElement.prototype.align3DPosition = function(x, y, z){
