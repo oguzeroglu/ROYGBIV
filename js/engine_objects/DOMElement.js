@@ -68,6 +68,9 @@ DOMElement.prototype.setSize = function(width, height){
 }
 
 DOMElement.prototype.onModeSwitch = function(){
+  if (!this.element.parentElement){
+    return;
+  }
   this.element.parentElement.removeChild(this.element);
 }
 
