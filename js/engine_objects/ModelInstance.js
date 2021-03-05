@@ -206,6 +206,21 @@ ModelInstance.prototype.exportLightweight = function(){
   return exportObject;
 }
 
+ModelInstance.prototype.correctBoundingBox = function(bb){
+  if (bb.min.x >= bb.max.x){
+    bb.max.x += 0.5;
+    bb.min.x -= 0.5;
+  }
+  if (bb.min.y >= bb.max.y){
+    bb.max.y += 0.5;
+    bb.min.y -= 0.5;
+  }
+  if (bb.min.z >= bb.max.z){
+    bb.max.z += 0.5;
+    bb.min.z -= 0.5;
+  }
+}
+
 ModelInstance.prototype.generateBoundingBoxes = function(){
   this.boundingBoxes = [];
   this.transformedVertices = [];
@@ -249,6 +264,10 @@ ModelInstance.prototype.generateBoundingBoxes = function(){
       this.trianglePlanes.push(plane);
       this.pseudoFaces.push(face);
     }
+  }
+
+  for (var i = 0; i < this.boundingBoxes.length; i ++){
+    this.correctBoundingBox(this.boundingBoxes[i]);
   }
 }
 
