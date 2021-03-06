@@ -152,6 +152,7 @@ var GUIHandler = function(){
   this.modelInstanceManipulationParameters = {
     "Model instance": "",
     "Hidden": false,
+    "Select by child": false,
     "Has mass": false,
     "Intersectable": false,
     "Affected by light": false,
@@ -418,6 +419,7 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.show(guiHandler.guiTypes.MODEL_INSTANCE);
     guiHandler.modelInstanceManipulationParameters["Model instance"] = curSelection.name;
     guiHandler.modelInstanceManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
+    guiHandler.modelInstanceManipulationParameters["Select by child"] = !!curSelection.selectByChild;
     guiHandler.modelInstanceManipulationParameters["Has mass"] = !curSelection.noMass;
     guiHandler.modelInstanceManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
     guiHandler.modelInstanceManipulationParameters["Affected by light"] = !!curSelection.affectedByLight;
@@ -2177,6 +2179,11 @@ GUIHandler.prototype.initializeVirtualKeyboardGUI = function(){
 GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   var modelInstance = selectionHandler.getSelectedObject();
 
+  var selectedChildIndex = null;
+  if (modelInstance.selectByChild){
+    selectedChildIndex = modelInstance.findChildIndexByPoint(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+  }
+
   guiHandler.datGuiModelInstance = new dat.GUI({hideable: false, width: 420});
   guiHandler.datGuiModelInstance.domElement.addEventListener("mousedown", function(e){
     mimGUIFocused = true;
@@ -2189,6 +2196,10 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     }else{
       selectionHandler.getSelectedObject().showInDesignMode();
     }
+  }).listen();
+  guiHandler.datGuiModelInstance.add(guiHandler.modelInstanceManipulationParameters, "Select by child").onChange(function(val){
+    selectionHandler.getSelectedObject().setSelectByChild(val);
+    selectionHandler.resetCurrentSelection();
   }).listen();
 
   var physicsFolder = guiHandler.datGuiModelInstance.addFolder("Physics");
@@ -2440,6 +2451,9 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   allMRParams = [];
 
   for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
+    if (selectedChildIndex != null && i != selectedChildIndex){
+      continue;
+    }
     var childInfo = modelInstance.model.info.childInfos[i];
     var childFolder = graphicsFolder.addFolder(childInfo.name);
     var mrParams = {

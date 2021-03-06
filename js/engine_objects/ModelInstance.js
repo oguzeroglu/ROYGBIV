@@ -90,7 +90,8 @@ ModelInstance.prototype.export = function(){
     alpha: this.alpha,
     depthWrite: this.depthWrite,
     blending: this.blending,
-    specularColor: this.specularColor
+    specularColor: this.specularColor,
+    selectByChild: !!this.selectByChild
   };
 
   var destroyedGridsExport = {};
@@ -1607,4 +1608,8 @@ ModelInstance.prototype.findChildIndexByPoint = function(x, y, z){
   }
 
   return minIndex;
+}
+
+ModelInstance.prototype.setSelectByChild = function(selectByChild){
+  this.selectByChild = selectByChild;
 }
