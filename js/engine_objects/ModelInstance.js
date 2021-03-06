@@ -1588,3 +1588,23 @@ ModelInstance.prototype.setAOIntensity = function(aoIntensity){
 
   this.aoIntensity = aoIntensity;
 }
+
+ModelInstance.prototype.findChildIndexByPoint = function(x, y, z){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+
+  var minDistance = Infinity;
+  var minIndex = null;
+
+  REUSABLE_VECTOR.set(x, y, z);
+  for (var i = 0; i < this.boundingBoxes.length; i ++){
+    var dist = this.boundingBoxes[i].distanceToPoint(REUSABLE_VECTOR);
+    if (dist < minDistance){
+      minDistance = dist;
+      minIndex = i;
+    }
+  }
+
+  return minIndex;
+}
