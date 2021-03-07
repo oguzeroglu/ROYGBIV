@@ -656,6 +656,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       var childInfo = modelInstance.model.info.childInfos[i];
       modelInstance.setColor(childInfo.colorR, childInfo.colorG, childInfo.colorB, i, false);
     }
+
+    modelInstance.resetTextureTransform();
   }
 
   for (var sceneName in sceneHandler.scenes){

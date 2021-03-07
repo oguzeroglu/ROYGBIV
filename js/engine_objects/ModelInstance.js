@@ -44,6 +44,8 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
   this.refreshDisabledEnvMapping();
   this.refreshEnvMapMode();
 
+  this.textureTransformsByMaterialIndex = {};
+
   webglCallbackHandler.registerEngineObject(this);
 }
 
@@ -1612,4 +1614,33 @@ ModelInstance.prototype.findChildIndexByPoint = function(x, y, z){
 
 ModelInstance.prototype.setSelectByChild = function(selectByChild){
   this.selectByChild = selectByChild;
+}
+
+ModelInstance.prototype.setTextureTransformForChild = function(index, offsetX, offsetY, repeatX, repeatY){
+  if (this.textureTransformCode){
+    macroHandler.replaceText("//TEXTURE_TRANSFORM_CODE\n" + this.textureTransformCode, "//TEXTURE_TRANSFORM_CODE\n", this.mesh.material, true, false);
+    this.textureTransformCode = null;
+  }
+
+  this.textureTransformsByMaterialIndex[index] = {offsetX: offsetX, offsetY: offsetY, repeatX: repeatX, repeatY: repeatY};
+
+  var totalText = "";
+  var template = "if(mi == @@1){ return vec4(@@2, @@3, @@4, @@5); };"
+  for (var key in this.textureTransformsByMaterialIndex){
+    var info = this.textureTransformsByMaterialIndex[key];
+    totalText += template.replace("@@1", index).replace("@@2", info.offsetX).replace("@@3", info.offsetY).replace("@@4", info.repeatX).replace("@@5", info.repeatY) + "\n";
+  }
+
+  this.textureTransformCode = totalText;
+
+  macroHandler.replaceText("//TEXTURE_TRANSFORM_CODE\n", "//TEXTURE_TRANSFORM_CODE\n" + totalText, this.mesh.material, true, false);
+}
+
+ModelInstance.prototype.resetTextureTransform = function(){
+  if (this.textureTransformCode){
+    macroHandler.replaceText("//TEXTURE_TRANSFORM_CODE\n" + this.textureTransformCode, "//TEXTURE_TRANSFORM_CODE\n", this.mesh.material, true, false);
+    this.textureTransformCode = null;
+  }
+
+  this.textureTransformsByMaterialIndex = {};
 }
