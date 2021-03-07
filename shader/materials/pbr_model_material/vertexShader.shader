@@ -126,6 +126,12 @@ int isEnvModeRefractive(){
   return 0;
 }
 
+vec4 getTextureTransform() {
+  int mi = int(materialIndex);
+  //TEXTURE_TRANSFORM_CODE
+  return vec4(0.0, 0.0, 1.0, 1.0);
+}
+
 void main(){
   #ifdef HAS_ANIMATION
     int mi = int(materialIndex);
@@ -190,6 +196,16 @@ void main(){
   #endif
 
   #ifdef HAS_CUSTOM_TEXTURE
+    vec4 textureTransformInfo = getTextureTransform(); //offsetX, offsetY, repeatX, repeatY
+
+    vUV = (
+      mat3(
+        textureTransformInfo.z, 0.0, 0.0,
+        0.0, textureTransformInfo.w, 0.0,
+        textureTransformInfo.x, textureTransformInfo.y, 1.0
+      ) * vec3(uv, 1.0)
+    ).xy;
+
     vDiffuseTextureIndex = diffuseTextureIndex;
     #ifdef HAS_NORMAL_MAP
       vNormalTextureIndex = normalTextureIndex;

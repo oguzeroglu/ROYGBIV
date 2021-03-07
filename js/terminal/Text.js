@@ -1546,4 +1546,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETMODELINSTANCECOLOR = "Changes the material color of give child of a model instance. The color of all children are set if\nthe childName parameter is set to null. Color values need to be in [0, 1] range.";
   this.ROYGBIV_SCRIPTING_API_ALIGN3DPOSITION = "Aligns the position of a DOM element to given 3D position on each frame.";
   this.ROYGBIV_SCRIPTING_API_UNALIGN3DPOSITION = "Stops aligning the position of a DOM element. This may be used after align3DPosition API.";
+  this.ROYGBIV_SCRIPTING_API_SETMODELINSTANCETEXTURETRANSFORM = "Sets texture transformation (offsetX, offsetY, repeatX and repeatY) properties for specified child of given model instance.\nNote that these values are used only if the model instance has a custom texture mapped.";
 }

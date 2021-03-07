@@ -369,7 +369,8 @@ var Roygbiv = function(){
     "startAugmentedReality",
     "setModelInstanceColor",
     "align3DPosition",
-    "unalign3DPosition"
+    "unalign3DPosition",
+    "setModelInstanceTextureTransform"
   ];
 
   this.globals = new Object();
@@ -3212,6 +3213,31 @@ Roygbiv.prototype.setModelInstanceColor = function(modelInstance, childName, col
     childIndex = modelInstance.getIndexByChildName(childName);
   }
   modelInstance.setColor(colorR, colorG, colorB, childIndex, true);
+  smartRenderingHandler.invalidate();
+}
+
+// Sets texture transformation (offsetX, offsetY, repeatX and repeatY) properties for specified child
+// of given model instance. Note that these values are used only if the model instance has a custom texture mapped.
+Roygbiv.prototype.setModelInstanceTextureTransform = function(modelInstance, childName, offsetX, offsetY, repeatX, repeatY){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceTextureTransform, preConditions.modelInstance, modelInstance);
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceTextureTransform, preConditions.childName, childName);
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceTextureTransform, preConditions.offsetX, offsetX);
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceTextureTransform, preConditions.offsetY, offsetY);
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceTextureTransform, preConditions.repeatX, repeatX);
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceTextureTransform, preConditions.repeatY, repeatY);
+  preConditions.checkIfModelInstanceHasChild(ROYGBIV.setModelInstanceTextureTransform, modelInstance, childName);
+  preConditions.checkIfModelInstanceInActiveScene(ROYGBIV.setModelInstanceTextureTransform, modelInstance);
+  preConditions.checkIfNumber(ROYGBIV.setModelInstanceTextureTransform, preConditions.offsetX, offsetX);
+  preConditions.checkIfNumber(ROYGBIV.setModelInstanceTextureTransform, preConditions.offsetY, offsetY);
+  preConditions.checkIfNumber(ROYGBIV.setModelInstanceTextureTransform, preConditions.repeatX, repeatX);
+  preConditions.checkIfNumber(ROYGBIV.setModelInstanceTextureTransform, preConditions.repeatY, repeatY);
+
+  var childIndex = modelInstance.getIndexByChildName(childName);
+  modelInstance.setTextureTransformForChild(childIndex, offsetX, offsetY, repeatX, repeatY);
   smartRenderingHandler.invalidate();
 }
 

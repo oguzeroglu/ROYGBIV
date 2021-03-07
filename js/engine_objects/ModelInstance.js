@@ -44,6 +44,8 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
   this.refreshDisabledEnvMapping();
   this.refreshEnvMapMode();
 
+  this.textureTransformsByMaterialIndex = {};
+
   webglCallbackHandler.registerEngineObject(this);
 }
 
@@ -90,7 +92,8 @@ ModelInstance.prototype.export = function(){
     alpha: this.alpha,
     depthWrite: this.depthWrite,
     blending: this.blending,
-    specularColor: this.specularColor
+    specularColor: this.specularColor,
+    selectByChild: !!this.selectByChild
   };
 
   var destroyedGridsExport = {};
@@ -206,6 +209,21 @@ ModelInstance.prototype.exportLightweight = function(){
   return exportObject;
 }
 
+ModelInstance.prototype.correctBoundingBox = function(bb){
+  if (bb.min.x >= bb.max.x){
+    bb.max.x += 0.5;
+    bb.min.x -= 0.5;
+  }
+  if (bb.min.y >= bb.max.y){
+    bb.max.y += 0.5;
+    bb.min.y -= 0.5;
+  }
+  if (bb.min.z >= bb.max.z){
+    bb.max.z += 0.5;
+    bb.min.z -= 0.5;
+  }
+}
+
 ModelInstance.prototype.generateBoundingBoxes = function(){
   this.boundingBoxes = [];
   this.transformedVertices = [];
@@ -249,6 +267,10 @@ ModelInstance.prototype.generateBoundingBoxes = function(){
       this.trianglePlanes.push(plane);
       this.pseudoFaces.push(face);
     }
+  }
+
+  for (var i = 0; i < this.boundingBoxes.length; i ++){
+    this.correctBoundingBox(this.boundingBoxes[i]);
   }
 }
 
@@ -1568,4 +1590,57 @@ ModelInstance.prototype.setAOIntensity = function(aoIntensity){
   macroHandler.injectMacro("AO_INTENSITY " + aoIntensity, this.mesh.material, false, true);
 
   this.aoIntensity = aoIntensity;
+}
+
+ModelInstance.prototype.findChildIndexByPoint = function(x, y, z){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+
+  var minDistance = Infinity;
+  var minIndex = null;
+
+  REUSABLE_VECTOR.set(x, y, z);
+  for (var i = 0; i < this.boundingBoxes.length; i ++){
+    var dist = this.boundingBoxes[i].distanceToPoint(REUSABLE_VECTOR);
+    if (dist < minDistance){
+      minDistance = dist;
+      minIndex = i;
+    }
+  }
+
+  return minIndex;
+}
+
+ModelInstance.prototype.setSelectByChild = function(selectByChild){
+  this.selectByChild = selectByChild;
+}
+
+ModelInstance.prototype.setTextureTransformForChild = function(index, offsetX, offsetY, repeatX, repeatY){
+  if (this.textureTransformCode){
+    macroHandler.replaceText("//TEXTURE_TRANSFORM_CODE\n" + this.textureTransformCode, "//TEXTURE_TRANSFORM_CODE\n", this.mesh.material, true, false);
+    this.textureTransformCode = null;
+  }
+
+  this.textureTransformsByMaterialIndex[index] = {offsetX: offsetX, offsetY: offsetY, repeatX: repeatX, repeatY: repeatY};
+
+  var totalText = "";
+  var template = "if(mi == @@1){ return vec4(@@2, @@3, @@4, @@5); };"
+  for (var key in this.textureTransformsByMaterialIndex){
+    var info = this.textureTransformsByMaterialIndex[key];
+    totalText += template.replace("@@1", index).replace("@@2", info.offsetX).replace("@@3", info.offsetY).replace("@@4", info.repeatX).replace("@@5", info.repeatY) + "\n";
+  }
+
+  this.textureTransformCode = totalText;
+
+  macroHandler.replaceText("//TEXTURE_TRANSFORM_CODE\n", "//TEXTURE_TRANSFORM_CODE\n" + totalText, this.mesh.material, true, false);
+}
+
+ModelInstance.prototype.resetTextureTransform = function(){
+  if (this.textureTransformCode){
+    macroHandler.replaceText("//TEXTURE_TRANSFORM_CODE\n" + this.textureTransformCode, "//TEXTURE_TRANSFORM_CODE\n", this.mesh.material, true, false);
+    this.textureTransformCode = null;
+  }
+
+  this.textureTransformsByMaterialIndex = {};
 }

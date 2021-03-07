@@ -137,6 +137,8 @@ ImportHandler.prototype.importModelInstances = function(obj){
     if (!isDeployment && curModelInstanceExport.isCompressed){
       modelInstance.compressGeometry();
     }
+
+    modelInstance.setSelectByChild(curModelInstanceExport.selectByChild);
   }
 
   if (isDeployment){

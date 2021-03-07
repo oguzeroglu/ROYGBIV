@@ -43,7 +43,8 @@ SelectionHandler.prototype.select = function(object){
     selectedMass = object;
   }
   if (object.isModelInstance){
-    object.visualiseBoundingBoxes();
+    var selectedChildIndex = object.selectByChild? object.findChildIndexByPoint(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z): null;
+    object.visualiseBoundingBoxes((selectedChildIndex != null)? [selectedChildIndex]: null);
     object.mesh.add(axesHelper);
     selectedModelInstance = object;
   }
