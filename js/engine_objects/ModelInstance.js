@@ -1628,7 +1628,7 @@ ModelInstance.prototype.setTextureTransformForChild = function(index, offsetX, o
   var template = "if(mi == @@1){ return vec4(@@2, @@3, @@4, @@5); };"
   for (var key in this.textureTransformsByMaterialIndex){
     var info = this.textureTransformsByMaterialIndex[key];
-    totalText += template.replace("@@1", index).replace("@@2", info.offsetX).replace("@@3", info.offsetY).replace("@@4", info.repeatX).replace("@@5", info.repeatY) + "\n";
+    totalText += template.replace("@@1", key).replace("@@2", info.offsetX).replace("@@3", info.offsetY).replace("@@4", info.repeatX).replace("@@5", info.repeatY) + "\n";
   }
 
   this.textureTransformCode = totalText;
