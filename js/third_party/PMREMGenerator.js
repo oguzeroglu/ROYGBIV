@@ -138,6 +138,11 @@ THREE.PMREMGenerator.prototype = {
 
 	getShader: function () {
 
+    var precisionTextHighp = "precision highp float;\nprecision highp int;\n";
+    var precisionTextMediump = "precision mediump float;\nprecision mediump int;\n";
+
+    var precisionText = HIGH_PRECISION_SUPPORTED? precisionTextHighp: precisionTextMediump;
+
 		var shaderMaterial = new THREE.ShaderMaterial( {
 
 			defines: {
@@ -154,14 +159,18 @@ THREE.PMREMGenerator.prototype = {
 			},
 
 			vertexShader:
-				"varying vec2 vUv;\n\
+        "precision highp float;\n\
+        precision highp int;\n\
+				varying vec2 vUv;\n\
 				void main() {\n\
 					vUv = uv;\n\
 					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\
 				}",
 
 			fragmentShader:
-				"#include <common>\n\
+        "precision highp float;\n\
+        precision highp int;\n\
+				#include <common>\n\
 				varying vec2 vUv;\n\
 				uniform int faceIndex;\n\
 				uniform float roughness;\n\
