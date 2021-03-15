@@ -380,6 +380,7 @@ StateLoader.prototype.resetProject = function(){
   textureAtlasHandler = new TextureAtlasHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
   objectsWithOnClickListeners = new Map();
+  modelInstancesWithClickListeners = new Map();
   objectsWithMouseOverListeners = new Map();
   objectsWithMouseMoveListeners = new Map();
   objectsWithMouseOutListeners = new Map();

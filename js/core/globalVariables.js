@@ -357,6 +357,7 @@ var autoInstancingHandler;
 var autoInstancedObjects = new Object();
 var fpsHandler;
 var objectsWithOnClickListeners = new Map();
+var modelInstancesWithClickListeners = new Map();
 var objectsWithMouseOverListeners = new Map();
 var objectsWithMouseOutListeners = new Map();
 var objectsWithMouseMoveListeners = new Map();

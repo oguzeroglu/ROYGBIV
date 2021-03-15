@@ -66,6 +66,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   maxInactiveTime = 0;
   inactiveCounter = 0;
   objectsWithOnClickListeners = new Map();
+  modelInstancesWithClickListeners = new Map();
   objectsWithMouseOverListeners = new Map();
   objectsWithMouseMoveListeners = new Map();
   objectsWithMouseOutListeners = new Map();

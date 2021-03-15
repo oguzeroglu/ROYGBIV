@@ -263,7 +263,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
     if (!fromTap){
       activeControl.onClick(event);
     }
-    if (mode == 1 && objectsWithOnClickListeners.size == 0 && !activeVirtualKeyboard){
+    if (mode == 1 && objectsWithOnClickListeners.size == 0 && modelInstancesWithClickListeners.size == 0 && !activeVirtualKeyboard){
       return;
     }
     if (!isMobile && mouseEventHandler.lastMouseDownTime){

@@ -370,7 +370,9 @@ var Roygbiv = function(){
     "setModelInstanceColor",
     "align3DPosition",
     "unalign3DPosition",
-    "setModelInstanceTextureTransform"
+    "setModelInstanceTextureTransform",
+    "setModelInstanceClickListener",
+    "removeModelInstanceClickListener"
   ];
 
   this.globals = new Object();
@@ -2998,6 +3000,35 @@ Roygbiv.prototype.removeDOMElementMouseOutListener = function(domElement){
   preConditions.checkIfDOMElement(ROYGBIV.removeDOMElementMouseOutListener, domElement);
 
   domElement.mouseoutCallback = noop;
+}
+
+// Sets a click listener for a model instance. The callbackFunction is executed with x, y, z coordinates
+// of the clicked point. The callbackFunction is bound to object (this = object inside the function).
+Roygbiv.prototype.setModelInstanceClickListener = function(modelInstance, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceClickListener, preConditions.modelInstance, modelInstance);
+  preConditions.checkIfDefined(ROYGBIV.setModelInstanceClickListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfModelInstance(ROYGBIV.setModelInstanceClickListener, modelInstance);
+  preConditions.checkIfTrue(ROYGBIV.setModelInstanceClickListener, "modelInstance marked as unintersectable, cannot be clicked on.", (!modelInstance.isIntersectable));
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setModelInstanceClickListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfModelInstanceInActiveScene(ROYGBIV.setModelInstanceClickListener, modelInstance);
+  modelInstance.clickCallbackFunction = callbackFunction;
+  modelInstancesWithClickListeners.set(modelInstance.name, modelInstance);
+}
+
+// Removes the click listener of a model instance.
+Roygbiv.prototype.removeModelInstanceClickListener = function(modelInstance){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeModelInstanceClickListener, preConditions.modelInstance, modelInstance);
+  preConditions.checkIfModelInstance(ROYGBIV.removeModelInstanceClickListener, modelInstance);
+  preConditions.checkIfTrue(ROYGBIV.removeModelInstanceClickListener, "modelInstance is marked as unintersectable.", (!modelInstance.isIntersectable));
+  preConditions.checkIfModelInstanceInActiveScene(ROYGBIV.removeModelInstanceClickListener, modelInstance);
+  delete modelInstance.clickCallbackFunction;
+  modelInstancesWithClickListeners.delete(modelInstance.name);
 }
 
 // TEXT FUNCTIONS **************************************************************
