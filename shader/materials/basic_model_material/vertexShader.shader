@@ -27,6 +27,10 @@ varying vec3 vLightDiffuse;
   varying float vMetalness;
 #endif
 
+#ifdef HAS_PHONG_LIGHTING
+  varying vec3 vViewPosition;
+#endif
+
 #if defined(HAS_PHONG_LIGHTING) && defined(ENABLE_SPECULARITY)
   varying float vMaterialIndex;
 #endif
@@ -77,9 +81,6 @@ varying vec3 vLightDiffuse;
   varying vec3 vNormal;
   #ifdef HAS_NORMAL_MAP
     attribute vec4 normalUV;
-    attribute vec4 tangent;
-    varying vec3 vTangent;
-    varying vec3 vBitangent;
     varying vec4 vNormalUV;
   #endif
 
@@ -913,8 +914,6 @@ void main(){
     vNormal = normalize(mat3(selectedWorldInverseTranspose) * normal);
     #ifdef HAS_NORMAL_MAP
       vNormalUV = normalUV;
-      vTangent = (selectedMVMatrix * vec4(tangent.xyz, 0.0)).xyz;
-      vBitangent = normalize(cross(vNormal, vTangent) * tangent.w);
     #endif
 
     #ifdef HAS_SPECULAR_MAP
@@ -997,5 +996,10 @@ void main(){
     }
   #endif
 
-  gl_Position = projectionMatrix * selectedMVMatrix * vec4(position, 1.0);
+  vec4 mvPosition = selectedMVMatrix * vec4(position, 1.0);
+  #if defined(HAS_PHONG_LIGHTING)
+    vViewPosition = -mvPosition.xyz;
+  #endif
+
+  gl_Position = projectionMatrix * mvPosition;
 }

@@ -49,10 +49,9 @@ uniform mat4 dynamicLightsMatrix;
 #endif
 
 #ifdef HAS_NORMAL_MAP
-  varying vec3 vTangent;
-  varying vec3 vBitangent;
   varying vec4 vNormalUV;
   uniform vec2 normalScale;
+  varying vec3 vViewPosition;
 #endif
 
 #ifdef HAS_ALPHA_MAP
@@ -225,6 +224,23 @@ uniform mat4 dynamicLightsMatrix;
   uniform sampler2D texture;
 #endif
 
+#if defined(HAS_TEXTURE) && defined(HAS_NORMAL_MAP)
+  vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 mapN, float faceDirection ) {
+    vec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );
+    vec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );
+    vec2 st0 = dFdx( vUV.st );
+    vec2 st1 = dFdy( vUV.st );
+    vec3 N = surf_norm; // normalized
+    vec3 q1perp = cross( q1, N );
+    vec3 q0perp = cross( N, q0 );
+    vec3 T = q1perp * st0.x + q0perp * st1.x;
+    vec3 B = q1perp * st0.y + q0perp * st1.y;
+    float det = max( dot( T, T ), dot( B, B ) );
+    float scale = ( det == 0.0 ) ? 0.0 : faceDirection * inversesqrt( det );
+    return normalize( T * ( mapN.x * scale ) + B * ( mapN.y * scale ) + N * mapN.z );
+  }
+#endif
+
 float flipNumber(float num, float min, float max){
   return (max + min) - num;
 }
@@ -359,8 +375,8 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, fl
 
       normalTextureColor = normalTextureColor * 2.0 - 1.0;
       normalTextureColor.xy *= normalScale;
-      mat3 TBN = mat3(normalize(vTangent), normalize(vBitangent), normalize(vNormal));
-      computedNormal = normalize(TBN * normalTextureColor);
+      float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
+      computedNormal = perturbNormal2Arb( -vViewPosition, normalize(vNormal), normalTextureColor, faceDirection );
     }else{
       computedNormal = normalize(vNormal);
     }

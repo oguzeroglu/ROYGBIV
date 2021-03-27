@@ -47,10 +47,8 @@ uniform vec3 cameraPosition;
 
 #ifdef HAS_NORMAL_MAP
   attribute vec4 normalUV;
-  attribute vec4 tangent;
-  varying vec3 vTangent;
-  varying vec3 vBitangent;
   varying vec4 vNormalUV;
+  varying vec3 vViewPosition;
   #ifdef HAS_ENVIRONMENT_MAP
     varying mat4 vSelectedWorldMatrix;
   #endif
@@ -186,8 +184,6 @@ void main(){
   vNormal = normalize(mat3(selectedWorldInverseTranspose) * normal);
   #ifdef HAS_NORMAL_MAP
     vNormalUV = normalUV;
-    vTangent = (selectedMVMatrix * vec4(tangent.xyz, 0.0)).xyz;
-    vBitangent = normalize(cross(vNormal, vTangent) * tangent.w);
   #endif
 
   #ifdef HAS_TEXTURE
@@ -245,5 +241,11 @@ void main(){
     }
   #endif
 
-  gl_Position = projectionMatrix * selectedMVMatrix * vec4(position, 1.0);
+  vec4 mvPosition = selectedMVMatrix * vec4(position, 1.0);
+
+  #ifdef HAS_NORMAL_MAP
+    vViewPosition = -mvPosition.xyz;
+  #endif
+
+  gl_Position = projectionMatrix * mvPosition;
 }

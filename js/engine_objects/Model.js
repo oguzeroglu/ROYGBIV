@@ -365,10 +365,6 @@ var Model = function(modelInfo, texturesObj, positions, normals, uvs, colors, di
   this.info = modelInfo;
   this.texturesObj = texturesObj;
 
-  if (hasNormalMap){
-    THREE.BufferGeometryUtils.computeTangents(this.geometry);
-  }
-
   this.group = new THREE.Group();
   for (var i = 0; i < modelInfo.childInfos.length; i ++){
     this.group.add(new THREE.Object3D());
