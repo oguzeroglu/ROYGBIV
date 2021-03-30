@@ -652,7 +652,7 @@ ModelCreatorGUIHandler.prototype.splitGeometry = function(geometry, start, count
 
   var pos = geometry.attributes.position.array;
   var norm = geometry.attributes.normal.array;
-  var uv = geometry.attributes.uv.array;
+  var uv = geometry.attributes.uv? geometry.attributes.uv.array: null;
 
   var x = 0;
   var y = 0;
@@ -669,8 +669,8 @@ ModelCreatorGUIHandler.prototype.splitGeometry = function(geometry, start, count
     normalAry[y ++] = norm[cs + 1];
     normalAry[y ++] = norm[cs + 2];
 
-    uvAry[z ++] = uv[cs2];
-    uvAry[z ++] = uv[cs2 + 1];
+    uvAry[z ++] = uv? uv[cs2]: 0;
+    uvAry[z ++] = uv? uv[cs2 + 1]: 0;
   }
 
   var geom = new THREE.BufferGeometry();
