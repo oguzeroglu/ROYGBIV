@@ -416,8 +416,11 @@ ModelInstance.prototype.setPhongLight = function(){
   macroHandler.injectMacro("HAS_PHONG_LIGHTING", this.mesh.material, true, true);
   this.lightingType = lightHandler.lightTypes.PHONG;
 
-  if (this.model.info.hasNormalMap && !this.mesh.material.uniforms.normalScale){
+  if (this.model.info.hasNormalMap){
     macroHandler.injectMacro("HAS_NORMAL_MAP", this.mesh.material, true, true);
+  }
+
+  if (this.model.info.hasNormalMap && !this.mesh.material.uniforms.normalScale){
     this.mesh.material.uniforms.normalScale = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
 
