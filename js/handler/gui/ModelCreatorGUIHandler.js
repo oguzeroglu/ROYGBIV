@@ -70,7 +70,7 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
   terminal.printInfo(Text.LOADING_MODEL);
 
   var modelToLoad = allModels[index];
-  modelLoader.loadModel(modelToLoad.folder, modelToLoad.obj, modelToLoad.mtl, function(model){
+  modelLoader.loadModel(modelToLoad.folder, modelToLoad.obj, modelToLoad.mtl, function(model, mtlMaterialNames){
     var allFolders = [];
     for (var i = 0; i < allModels.length; i ++){
       allFolders.push(allModels[i].folder);
@@ -110,7 +110,7 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
       }
     };
 
-    modelCreatorGUIHandler.renderModel(model, modelName, allFolders[index], allModels[index].arModelNames, function(){
+    modelCreatorGUIHandler.renderModel(model, mtlMaterialNames, modelName, allFolders[index], allModels[index].arModelNames, function(){
       terminal.clear();
       terminal.printInfo(Text.MODEL_LOADED);
 
@@ -163,7 +163,7 @@ ModelCreatorGUIHandler.prototype.renderControls = function(allModels, index, mod
   });
 }
 
-ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName, arModelNames, onReady, centerGeometry){
+ModelCreatorGUIHandler.prototype.renderModel = function(model, mtlMaterialNames, name, folderName, arModelNames, onReady, centerGeometry){
   if (this.modelMesh){
     scene.remove(this.modelMesh);
   }
@@ -195,14 +195,16 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
         var start = curGroupInfo.start;
         var count = curGroupInfo.count;
         var curMat = mat[curGroupInfo.materialIndex];
-        flatInfo.push({
-          geometry: this.splitGeometry(geometry, start, count),
-          material: curMat,
-          name: mesh.name + "_" + i2,
-          mesh: mesh
-        });
+        if (mtlMaterialNames.indexOf(curMat.name) >= 0){
+          flatInfo.push({
+            geometry: this.splitGeometry(geometry, start, count),
+            material: curMat,
+            name: mesh.name + "_" + i2,
+            mesh: mesh
+          });
+        }
       }
-    }else{
+    }else if (mtlMaterialNames.indexOf(mat.name) >= 0){
       flatInfo.push({geometry: geometry, material: mat, name: mesh.name, mesh: mesh});
     }
   }
@@ -212,8 +214,6 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     var childMat = flatInfo[i].material;
     var childName = flatInfo[i].name;
     var childMesh = flatInfo[i].mesh;
-
-    var childBB = childGeom.computeBoundingBox();
 
     var childInfo = {
       name: childName,
@@ -239,7 +239,6 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
     for (var i2 = 0; i2 < normalGeometry.faces.length; i2++){
       normalGeometry.faces[i2].materialIndex = i;
     }
-
     childMesh.updateMatrix(true);
     pseudoGeometry.merge(normalGeometry, childMesh.matrix);
 
@@ -406,7 +405,7 @@ ModelCreatorGUIHandler.prototype.renderModel = function(model, name, folderName,
       childInfo.aoTextureURL = childMat.aoMap.image.src;
       var aoTextureID = null;
       for (var i2 = 0; i2 < childInfos.length; i2 ++){
-        if (childInfos[i2].aoTextureURL == childMat.aosMap.image.src){
+        if (childInfos[i2].aoTextureURL == childMat.aoMap.image.src){
           aoTextureID = childInfos[i2].aoTextureID;
           break;
         }

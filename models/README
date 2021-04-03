@@ -4,6 +4,9 @@ an .obj and a .mtl file (and/or textures). Note that if the model contains
 any textures, texture images under the model folder must respect
 ACCEPTED_TEXTURE_SIZE parameter.
 
+Materials may be manually removed inside the MTL file. In that case any vertex
+associated with the removed MTL will be skipped while generating the geometry.
+
 In order to activate augmented reality view for given model, a folder named
 "ar" may be added under the model folder. This folder should contain .usdz and
 .glb files:
