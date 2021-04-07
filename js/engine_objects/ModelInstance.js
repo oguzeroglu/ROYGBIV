@@ -234,7 +234,6 @@ ModelInstance.prototype.generateBoundingBoxes = function(){
   this.vertices = [];
 
   var bbs = this.getBBs();
-  console.log(bbs);
 
   for (var x = 0; x < bbs.length; x ++){
     var center = bbs[x].center;
