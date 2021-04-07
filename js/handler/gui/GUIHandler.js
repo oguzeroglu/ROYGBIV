@@ -2243,8 +2243,10 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
   }).listen();
   generalFolder.add(guiHandler.modelInstanceManipulationParameters, "Use original geom for picking").onChange(function(val){
     terminal.clear();
-    selectionHandler.getSelectedObject().useOriginalGeometryForPicking = val;
-    selectionHandler.getSelectedObject().generateBoundingBoxes();
+    var obj = selectionHandler.getSelectedObject();
+    selectionHandler.resetCurrentSelection();
+    obj.useOriginalGeometryForPicking = val;
+    obj.generateBoundingBoxes();
     refreshRaycaster("Ok");
   }).listen();
 
