@@ -155,6 +155,7 @@ var GUIHandler = function(){
     "Select by child": false,
     "Has mass": false,
     "Intersectable": false,
+    "Use original geom for picking": false,
     "Affected by light": false,
     "Lighting type": lightHandler.lightTypes.GOURAUD,
     "Normal map scale": "1,1",
@@ -422,6 +423,7 @@ GUIHandler.prototype.afterModelInstanceSelection = function(){
     guiHandler.modelInstanceManipulationParameters["Select by child"] = !!curSelection.selectByChild;
     guiHandler.modelInstanceManipulationParameters["Has mass"] = !curSelection.noMass;
     guiHandler.modelInstanceManipulationParameters["Intersectable"] = !!curSelection.isIntersectable;
+    guiHandler.modelInstanceManipulationParameters["Use original geom for picking"] = !!curSelection.useOriginalGeometryForPicking;
     guiHandler.modelInstanceManipulationParameters["Affected by light"] = !!curSelection.affectedByLight;
     guiHandler.modelInstanceManipulationParameters["Has specularity"] = !!curSelection.isSpecularityEnabled;
     guiHandler.modelInstanceManipulationParameters["Alpha"] = "" + curSelection.alpha;
@@ -2238,6 +2240,12 @@ GUIHandler.prototype.initializeModelInstanceManipulationGUI = function(){
     }else{
       terminal.printInfo(Text.OBJECT_UNINTERSECTABLE);
     }
+  }).listen();
+  generalFolder.add(guiHandler.modelInstanceManipulationParameters, "Use original geom for picking").onChange(function(val){
+    terminal.clear();
+    selectionHandler.getSelectedObject().useOriginalGeometryForPicking = val;
+    selectionHandler.getSelectedObject().generateBoundingBoxes();
+    refreshRaycaster("Ok");
   }).listen();
 
   var graphicsFolder = guiHandler.datGuiModelInstance.addFolder("Graphics");

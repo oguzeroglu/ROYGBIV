@@ -93,7 +93,8 @@ ModelInstance.prototype.export = function(){
     depthWrite: this.depthWrite,
     blending: this.blending,
     specularColor: this.specularColor,
-    selectByChild: !!this.selectByChild
+    selectByChild: !!this.selectByChild,
+    useOriginalGeometryForPicking: !!this.useOriginalGeometryForPicking
   };
 
   var destroyedGridsExport = {};
@@ -157,7 +158,7 @@ ModelInstance.prototype.export = function(){
 }
 
 ModelInstance.prototype.exportLightweight = function(){
-  this.mesh.updateMatrixWorld();
+  this.mesh.updateMatrixWorld(true);
 
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
@@ -233,6 +234,7 @@ ModelInstance.prototype.generateBoundingBoxes = function(){
   this.vertices = [];
 
   var bbs = this.getBBs();
+  console.log(bbs);
 
   for (var x = 0; x < bbs.length; x ++){
     var center = bbs[x].center;
@@ -694,6 +696,7 @@ ModelInstance.prototype.getBBs = function(){
   this.model.group.scale.set(this.scale, this.scale, this.scale);
   this.model.group.updateMatrixWorld(true);
   this.model.group.updateMatrix(true);
+
   var bbs = [];
   for (var i = 0; i < this.model.group.children.length; i ++){
     this.model.group.children[i].updateMatrixWorld(true);
@@ -708,7 +711,6 @@ ModelInstance.prototype.getBBs = function(){
   }
 
   var origBB = new THREE.Box3().setFromObject(this.mesh);
-
   var diff = totalBB.getCenter(new THREE.Vector3()).sub(origBB.getCenter(new THREE.Vector3()));
   for (var i = 0; i < bbs.length; i ++){
     var bb = bbs[i];
