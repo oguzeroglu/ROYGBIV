@@ -53,6 +53,7 @@ app.post("/build", function(req, res){
       copyAssets(req.body);
       copyWorkers(req.body);
       copyProtocolDefinitionFile(req.body);
+      cleanup(req.body.projectName);
       res.send(JSON.stringify({"path": __dirname+"/deploy/"+req.body.projectName+"/"}));
       return;
     }).catch(function(err){
@@ -1049,6 +1050,22 @@ function generateRSFChunk(folderName){
 
 function writeRSFFile(projectName, totalShaderContent){
   fs.writeFileSync("./deploy/"+projectName+"/shader/shader.rsf", totalShaderContent);
+}
+
+function cleanup(projectName){
+  var folder = "./deploy/" + projectName + "/";
+  var modelsFolder = folder + "models/";
+  fs.readdirSync(modelsFolder).filter(item => fs.lstatSync(modelsFolder + item).isDirectory()).forEach(item => {
+    fs.readdirSync(modelsFolder + item + "/").forEach(childItem => {
+      if (childItem.toLowerCase().endsWith(".obj") || childItem.toLowerCase().endsWith(".mtl")){
+        fs.unlinkSync(modelsFolder + item + "/" + childItem);
+        console.log("Removed a model file:", childItem)
+      }else if (childItem.toLowerCase().endsWith(".jpg") || childItem.toLowerCase().endsWith(".jpeg") || childItem.toLowerCase().endsWith(".png")){
+        fs.unlinkSync(modelsFolder + item + "/" + childItem);
+        console.log("Removed an image file:", childItem)
+      }
+    });
+  });
 }
 
 app.use(express.static('./'));
