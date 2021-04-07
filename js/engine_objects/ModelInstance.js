@@ -240,6 +240,10 @@ ModelInstance.prototype.generateBoundingBoxes = function(){
 
     this.boundingBoxes.push(new THREE.Box3().setFromCenterAndSize(center, size));
 
+    if (this.useOriginalGeometryForPicking){
+      continue;
+    }
+
     var pseudoGeometry = new THREE.BoxGeometry(size.x, size.y, size.z);
     var pseudoObj = new THREE.Object3D();
     pseudoObj.position.copy(center);
@@ -255,6 +259,34 @@ ModelInstance.prototype.generateBoundingBoxes = function(){
 
     for (var i = 0; i < pseudoGeometry.faces.length; i ++){
       var face = pseudoGeometry.faces[i];
+      var a = face.a;
+      var b = face.b;
+      var c = face.c;
+      var triangle = new THREE.Triangle(
+        transformedVertices[a], transformedVertices[b], transformedVertices[c]
+      );
+      this.triangles.push(triangle);
+      var plane = new THREE.Plane();
+      triangle.getPlane(plane);
+      this.trianglePlanes.push(plane);
+      this.pseudoFaces.push(face);
+    }
+  }
+
+  if (this.useOriginalGeometryForPicking){
+    this.mesh.updateMatrixWorld(true);
+    var geom = (new THREE.Geometry()).fromBufferGeometry(this.mesh.geometry);
+    var transformedVertices =[];
+    for (var i = 0; i < geom.vertices.length; i ++){
+      this.vertices.push(geom.vertices[i]);
+      var vertex = geom.vertices[i].clone();
+      vertex.applyMatrix4(this.mesh.matrixWorld);
+      this.transformedVertices.push(vertex);
+      transformedVertices.push(vertex);
+    }
+
+    for (var i = 0; i < geom.faces.length; i ++){
+      var face = geom.faces[i];
       var a = face.a;
       var b = face.b;
       var c = face.c;
