@@ -659,6 +659,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     }
 
     modelInstance.resetTextureTransform();
+
+    modelInstance.lastClickTime = null;
+    modelInstance.doubleClickListeners = {};
   }
 
   for (var sceneName in sceneHandler.scenes){

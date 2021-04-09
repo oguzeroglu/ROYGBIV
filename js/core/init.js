@@ -737,6 +737,8 @@ function onRaycasterIntersection(){
            guiHandler.afterObjectSelection();
          }
 
+         object.onClicked(point.x, point.y, point.z);
+
          if (object.clickCallbackFunction){
            object.clickCallbackFunction(point.x, point.y, point.z);
          }
