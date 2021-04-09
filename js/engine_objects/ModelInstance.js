@@ -93,7 +93,8 @@ ModelInstance.prototype.export = function(){
     depthWrite: this.depthWrite,
     blending: this.blending,
     specularColor: this.specularColor,
-    selectByChild: !!this.selectByChild
+    selectByChild: !!this.selectByChild,
+    useOriginalGeometryForPicking: !!this.useOriginalGeometryForPicking
   };
 
   var destroyedGridsExport = {};
@@ -157,7 +158,7 @@ ModelInstance.prototype.export = function(){
 }
 
 ModelInstance.prototype.exportLightweight = function(){
-  this.mesh.updateMatrixWorld();
+  this.mesh.updateMatrixWorld(true);
 
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
@@ -240,6 +241,10 @@ ModelInstance.prototype.generateBoundingBoxes = function(){
 
     this.boundingBoxes.push(new THREE.Box3().setFromCenterAndSize(center, size));
 
+    if (this.useOriginalGeometryForPicking){
+      continue;
+    }
+
     var pseudoGeometry = new THREE.BoxGeometry(size.x, size.y, size.z);
     var pseudoObj = new THREE.Object3D();
     pseudoObj.position.copy(center);
@@ -255,6 +260,34 @@ ModelInstance.prototype.generateBoundingBoxes = function(){
 
     for (var i = 0; i < pseudoGeometry.faces.length; i ++){
       var face = pseudoGeometry.faces[i];
+      var a = face.a;
+      var b = face.b;
+      var c = face.c;
+      var triangle = new THREE.Triangle(
+        transformedVertices[a], transformedVertices[b], transformedVertices[c]
+      );
+      this.triangles.push(triangle);
+      var plane = new THREE.Plane();
+      triangle.getPlane(plane);
+      this.trianglePlanes.push(plane);
+      this.pseudoFaces.push(face);
+    }
+  }
+
+  if (this.useOriginalGeometryForPicking){
+    this.mesh.updateMatrixWorld(true);
+    var geom = (new THREE.Geometry()).fromBufferGeometry(this.mesh.geometry);
+    var transformedVertices =[];
+    for (var i = 0; i < geom.vertices.length; i ++){
+      this.vertices.push(geom.vertices[i]);
+      var vertex = geom.vertices[i].clone();
+      vertex.applyMatrix4(this.mesh.matrixWorld);
+      this.transformedVertices.push(vertex);
+      transformedVertices.push(vertex);
+    }
+
+    for (var i = 0; i < geom.faces.length; i ++){
+      var face = geom.faces[i];
       var a = face.a;
       var b = face.b;
       var c = face.c;
@@ -662,6 +695,7 @@ ModelInstance.prototype.getBBs = function(){
   this.model.group.scale.set(this.scale, this.scale, this.scale);
   this.model.group.updateMatrixWorld(true);
   this.model.group.updateMatrix(true);
+
   var bbs = [];
   for (var i = 0; i < this.model.group.children.length; i ++){
     this.model.group.children[i].updateMatrixWorld(true);
@@ -676,7 +710,6 @@ ModelInstance.prototype.getBBs = function(){
   }
 
   var origBB = new THREE.Box3().setFromObject(this.mesh);
-
   var diff = totalBB.getCenter(new THREE.Vector3()).sub(origBB.getCenter(new THREE.Vector3()));
   for (var i = 0; i < bbs.length; i ++){
     var bb = bbs[i];

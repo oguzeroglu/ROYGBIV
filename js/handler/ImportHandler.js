@@ -64,6 +64,8 @@ ImportHandler.prototype.importModelInstances = function(obj){
       modelInstance.enableSpecularity();
     }
 
+    modelInstance.useOriginalGeometryForPicking = curModelInstanceExport.useOriginalGeometryForPicking;
+
     modelInstance.generateBoundingBoxes();
 
     if (curModelInstanceExport.animationGroup1){
