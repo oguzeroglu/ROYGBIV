@@ -662,6 +662,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
     modelInstance.lastClickTime = null;
     modelInstance.doubleClickListeners = {};
+    delete modelInstance.clickCallbackFunction;
   }
 
   for (var sceneName in sceneHandler.scenes){
