@@ -383,6 +383,12 @@ Preconditions.prototype.checkIfCustomTexturesEnabled = function(callerFunc, mode
   }
 }
 
+Preconditions.prototype.checkIfModelInstanceOnlyIfExists = function(callerFunc, modelInstance){
+  if (modelInstance && !modelInstance.isModelInstance){
+    this.throw(callerFunc, "Object is not a model instance.");
+  }
+}
+
 Preconditions.prototype.checkIfModelInstance = function(callerFunc, modelInstance){
   if (!modelInstance.isModelInstance){
     this.throw(callerFunc, "Object is not a model instance.");
@@ -435,6 +441,12 @@ Preconditions.prototype.checkIfStateMachineHasState = function(callerFunc, state
   }
 
   this.throw(callerFunc, "State machine does not have such state.");
+}
+
+Preconditions.prototype.checkIfModelInstanceInActiveSceneOnlyIfExists = function(callerFunc, modelInstance){
+  if (modelInstance && modelInstance.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Model instance is not inside the active scene.");
+  }
 }
 
 Preconditions.prototype.checkIfModelInstanceInActiveScene = function(callerFunc, modelInstance){
