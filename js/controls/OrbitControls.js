@@ -14,6 +14,8 @@ var OrbitControls = function(params){
   this.initialPhi = (!(typeof params.initialPhi == UNDEFINED))? params.initialPhi: Math.PI/4;
   this.initialTheta = (!(typeof params.initialTheta == UNDEFINED))? params.initialTheta: Math.PI/4;
 
+  this.multiPivotModelInstance = params.multiPivotModelInstance;
+
   this.onUpdateCallback = params.onUpdate;
 
   if (this.initialRadius > this.maxRadius){
@@ -42,13 +44,18 @@ OrbitControls.prototype.onMouseDown = noop;
 OrbitControls.prototype.onMouseUp = noop;
 OrbitControls.prototype.onTap = noop;
 OrbitControls.prototype.onClick = noop;
-OrbitControls.prototype.onDeactivated = noop;
 OrbitControls.prototype.onTouchStart = noop;
 OrbitControls.prototype.onTouchMove = noop;
 OrbitControls.prototype.onTouchEnd = noop;
 OrbitControls.prototype.onKeyDown = noop;
 OrbitControls.prototype.onKeyUp = noop;
 OrbitControls.prototype.onResize = noop;
+
+OrbitControls.prototype.onDeactivated = function(){
+  if (this.doubleClickCallbackID){
+    this.multiPivotModelInstance.unlistenDoubleClick(this.doubleClickCallbackID);
+  }
+}
 
 OrbitControls.prototype.onFullScreenChange = function(isFullScreen){
   if (!isFullScreen && activeControl.requestFullScreen){
@@ -173,9 +180,27 @@ OrbitControls.prototype.onActivated = function(){
   if (this.requestFullScreen){
     fullScreenRequested = true;
   }
+
+  if (this.multiPivotModelInstance){
+    this.animationTargetVector = new THREE.Vector3();
+    this.animationTargetVector2 = new THREE.Vector3();
+    this.lerpAlpha = null;
+    this.doubleClickCallbackID = this.multiPivotModelInstance.listenForDoubleClick(function(x, y, z){
+      this.animationTargetVector.set(x, y, z);
+      this.animationTargetVector2.set(this.minRadius, 0, 0);
+      this.lerpAlpha = 0.05;
+    }.bind(this));
+  }
 }
 
 OrbitControls.prototype.update = function(){
+  if (this.lerpAlpha && this.lerpAlpha < 1){
+    this.lookPosition.lerp(this.animationTargetVector, this.lerpAlpha);
+    REUSABLE_VECTOR.set(this.spherical.radius, 0, 0);
+    REUSABLE_VECTOR.lerp(this.animationTargetVector2, this.lerpAlpha);
+    this.spherical.radius = REUSABLE_VECTOR.x;
+    this.lerpAlpha += 0.05;
+  }
   if (this.spherical.phi > 2.66){
     this.spherical.phi = 2.66;
   }

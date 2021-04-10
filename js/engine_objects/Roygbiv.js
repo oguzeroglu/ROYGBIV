@@ -3525,6 +3525,7 @@ Roygbiv.prototype.createFPSControl = function(parameters){
 // API also automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value
 // is false.
 // onUpdate (optional): A function that is executed on each frame (optional).
+// multiPivotModelInstance (optional): A ModelInstance, allowing users to change the pivot point on double click.
 Roygbiv.prototype.createOrbitControl = function(parameters){
   if (mode == 0){
     return;
@@ -3544,6 +3545,9 @@ Roygbiv.prototype.createOrbitControl = function(parameters){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.initialPhi, parameters.initialPhi);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.initialTheta, parameters.initialTheta);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.onUpdate, parameters.onUpdate);
+  preConditions.checkIfModelInstanceOnlyIfExists(ROYGBIV.createOrbitControl, parameters.multiPivotModelInstance);
+  preConditions.checkIfModelInstanceInActiveSceneOnlyIfExists(ROYGBIV.createOrbitControl, parameters.multiPivotModelInstance);
+  preConditions.checkIfTrue(ROYGBIV.createOrbitControl, "multiPivotModelInstance marked as unintersectable, cannot be clicked on.", (parameters.multiPivotModelInstance && !parameters.multiPivotModelInstance.isIntersectable));
   return new OrbitControls(parameters);
 }
 

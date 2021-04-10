@@ -46,6 +46,8 @@ var ModelInstance = function(name, model, mesh, physicsBody, destroyedGrids, gsN
 
   this.textureTransformsByMaterialIndex = {};
 
+  this.doubleClickListeners = {};
+
   webglCallbackHandler.registerEngineObject(this);
 }
 
@@ -1679,4 +1681,47 @@ ModelInstance.prototype.resetTextureTransform = function(){
   }
 
   this.textureTransformsByMaterialIndex = {};
+}
+
+ModelInstance.prototype.unlistenDoubleClick = function(listenerID){
+  if (mode == 0){
+    return;
+  }
+
+  delete this.doubleClickListeners[listenerID];
+}
+
+ModelInstance.prototype.listenForDoubleClick = function(callback){
+  if (mode == 0){
+    return;
+  }
+  var id = generateUUID();
+  this.doubleClickListeners[id] = callback;
+
+  if (!this.clickCallbackFunction){
+    this.clickCallbackFunction = noop;
+    modelInstancesWithClickListeners.set(this.name, this);
+  }
+
+  return id;
+}
+
+ModelInstance.prototype.onDoubleClicked = function(x, y, z){
+  for (var id in this.doubleClickListeners){
+    this.doubleClickListeners[id](x, y, z);
+  }
+}
+
+ModelInstance.prototype.onClicked = function(x, y, z){
+  if (mode == 0){
+    return;
+  }
+
+  var now = performance.now();
+
+  if (this.lastClickTime && now - this.lastClickTime <= 300){
+    this.onDoubleClicked(x, y, z);
+  }
+
+  this.lastClickTime = now;
 }
