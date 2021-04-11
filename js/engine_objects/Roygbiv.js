@@ -372,7 +372,8 @@ var Roygbiv = function(){
     "unalign3DPosition",
     "setModelInstanceTextureTransform",
     "setModelInstanceClickListener",
-    "removeModelInstanceClickListener"
+    "removeModelInstanceClickListener",
+    "forEachChild"
   ];
 
   this.globals = new Object();
@@ -3270,6 +3271,23 @@ Roygbiv.prototype.setModelInstanceTextureTransform = function(modelInstance, chi
   var childIndex = modelInstance.getIndexByChildName(childName);
   modelInstance.setTextureTransformForChild(childIndex, offsetX, offsetY, repeatX, repeatY);
   smartRenderingHandler.invalidate();
+}
+
+// Executes callbackFunction with childName parameter for each child of model instance.
+Roygbiv.prototype.forEachChild = function(modelInstance, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.forEachChild, preConditions.modelInstance, modelInstance);
+  preConditions.checkIfDefined(ROYGBIV.forEachChild, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfModelInstance(ROYGBIV.forEachChild, modelInstance);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.forEachChild, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfModelInstanceInActiveScene(ROYGBIV.forEachChild, modelInstance);
+
+  for (var i = 0; i < modelInstance.model.info.childInfos.length; i ++){
+    callbackFunction(modelInstance.model.info.childInfos[i].name);
+  }
 }
 
 // CONTROL FUNCTIONS ***********************************************************

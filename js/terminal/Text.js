@@ -1550,4 +1550,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETMODELINSTANCETEXTURETRANSFORM = "Sets texture transformation (offsetX, offsetY, repeatX and repeatY) properties for specified child of given model instance.\nNote that these values are used only if the model instance has a custom texture mapped.";
   this.ROYGBIV_SCRIPTING_API_SETMODELINSTANCECLICKLISTENER = "Sets a click listener for a model instance.\nThe callbackFunction is executed with x, y, z coordinates of the clicked point. The callbackFunction is bound to object\n(this = object inside the function).";
   this.ROYGBIV_SCRIPTING_API_REMOVEMODELINSTANCECLICKLISTENER = "Removes the click listener of a model instance.";
+  this.ROYGBIV_SCRIPTING_API_FOREACHCHILD = "Executes callbackFunction with childName parameter for each child of model instance.";
 }
