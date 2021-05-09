@@ -207,6 +207,7 @@ var Text = function(){
   this.BUILD_WARN_CONSIDER_USING_RESPONSIVE_PS = "[!] Consider using makeParticleSystemsResponsive CLI command.";
   this.BUILD_WARN_IOS_TEXTURE_BLEEDING = "[!] Some of the objects contain custom texture offset, repeat properties or a texture offset animation.\nThis may cause rendering problems in iOS devices.";
   this.BUILD_WARN_UNSUED_TEXTURE_PACK = "[!] There are unused texture packs. Run \"destroyTexturePack *\" command to get rid of them.";
+  this.BUILD_WARN_UNUSED_SKYBOX = "[!] There are unused skyboxes. Run \"destroySkybox\" command to get rid of them.";
   this.BUILD_WARN_WS_SERVER_URL = "[!] Development WS Server URL set however production WS Server URL not set.";
   this.REFRESHING_SHADOW_MAPS = "Refreshing shadow maps.";
   this.TEXTURE_MARGIN_UPDATED = "Texture margin updated.";

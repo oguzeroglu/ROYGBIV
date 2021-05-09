@@ -1039,6 +1039,29 @@ function checkForTextureBleedingInIOS(){
   return false;
 }
 
+function checkForUnusedSkyboxes(){
+  for (var skyboxName in skyBoxes){
+    var used = false;
+    for (var sceneName in sceneHandler.scenes){
+      if (sceneHandler.scenes[sceneName].mappedSkyboxName == skyboxName){
+        used = true;
+      }
+    }
+
+    for (var miName in modelInstances){
+      if (modelInstances[miName].environmentMapInfo && modelInstances[miName].environmentMapInfo.skyboxName == skyboxName){
+        used = true;
+      }
+    }
+
+    if (!used){
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function checkForUnusedTexturePacks(){
   for (var tpName in texturePacks){
     var isUsed = false;

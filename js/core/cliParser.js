@@ -3280,6 +3280,9 @@ function parse(input){
           if (checkForUnusedTexturePacks()){
             terminal.printError(Text.BUILD_WARN_UNSUED_TEXTURE_PACK);
           }
+          if (checkForUnusedSkyboxes()){
+            terminal.printError(Text.BUILD_WARN_UNUSED_SKYBOX);
+          }
           if (checkWSServerURLs()){
             terminal.printError(Text.BUILD_WARN_WS_SERVER_URL);
           }
