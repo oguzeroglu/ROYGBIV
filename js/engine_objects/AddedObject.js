@@ -197,6 +197,13 @@ AddedObject.prototype.updateWorldInverseTranspose = function(overrideMatrix){
 }
 
 AddedObject.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = this.hasSelectiveBloom? 1000: -1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
   if (!this.affectedByLight){
     return;
   }
@@ -1056,6 +1063,8 @@ AddedObject.prototype.export = function(){
   exportObject.rotationMode = this.rotationMode;
   exportObject.hiddenInDesignMode = !!this.hiddenInDesignMode;
   exportObject.skipShadowsInNonWebGLFriendlyDevices = !!this.skipShadowsInNonWebGLFriendlyDevices;
+
+  exportObject.hasSelectiveBloom = !!this.hasSelectiveBloom;
 
   return exportObject;
 }
@@ -3493,4 +3502,8 @@ AddedObject.prototype.removeFog = function(){
   }
   delete this.mesh.material.uniforms.cameraPosition;
   this.mesh.material.needsUpdate = true;
+}
+
+AddedObject.prototype.setSelectiveBloom = function(val){
+  this.hasSelectiveBloom = val;
 }

@@ -1173,6 +1173,8 @@ ImportHandler.prototype.importAddedObjects = function(obj){
 
      addedObjectInstance.skipShadowsInNonWebGLFriendlyDevices = curAddedObjectExport.skipShadowsInNonWebGLFriendlyDevices;
 
+     addedObjectInstance.setSelectiveBloom(!!curAddedObjectExport.hasSelectiveBloom);
+
      if (curAddedObjectExport.hiddenInDesignMode){
        addedObjectInstance.hideInDesignMode(true);
      }

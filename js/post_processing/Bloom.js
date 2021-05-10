@@ -7,13 +7,16 @@ var Bloom = function(){
     gamma: 1,
     tapTypes: [13, 13, 13, 13, 13],
     bloomFactors: [1, 1, 1, 1, 1],
-    bloomTintColors: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)]
+    bloomTintColors: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)],
+    isSelective: false
   }
   this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
 
   if (isDeployment && !ShaderContent.bloomBlurPassVertexShader){
     return;
   }
+
+  this.selectiveRenderingActive = false;
 
   this.generateDirectPass();
   this.generateBrightPass();
@@ -232,8 +235,8 @@ Bloom.prototype.brightPass = function(){
   renderer.webglRenderer.render(this.brightPassScene, orthographicCamera, this.brightTarget);
 }
 
-Bloom.prototype.directPass = function(){
-  renderer.webglRenderer.render(scene, camera, this.sceneTarget);
+Bloom.prototype.directPass = function(overrideTarget){
+  renderer.webglRenderer.render(scene, camera, overrideTarget || this.sceneTarget);
 }
 
 Bloom.prototype.generateCombinerPass = function(){
@@ -325,6 +328,9 @@ Bloom.prototype.setSize = function(width, height){
   }
   this.sceneTarget.setSize(width, height);
   this.brightTarget.setSize(width / 2, height / 2);
+  if (this.selectiveTarget){
+    this.selectiveTarget.setSize(width, height);
+  }
   var coef = 2;
   for (var i = 0; i<this.configurations.blurStepCount; i++){
     this.horizontalBlurTargets[i].setSize(width/coef, height/coef);
@@ -349,7 +355,28 @@ Bloom.prototype.setPixelRatio = function(ratio){
 
 Bloom.prototype.render = function(){
   this.directPass();
+  if (this.configurations.isSelective){
+    this.selectiveRenderingActive = true;
+    this.directPass(this.selectiveTarget);
+    this.selectiveRenderingActive = false;
+  }
   this.brightPass();
   this.blurPass();
   this.combinerPass();
+}
+
+Bloom.prototype.makeSelective = function(){
+  this.configurations.isSelective = true;
+  for (var objName in sceneHandler.getAddedObjects()){
+    var obj = addedObjects[objName];
+    obj.mesh.material.uniforms.selectiveBloomFlag = new THREE.Uniform(0);
+    obj.mesh.material.uniformsNeedUpdate = true;
+    macroHandler.injectMacro("HAS_SELECTIVE_BLOOM", obj.mesh.material, false, true);
+  }
+
+  this.selectiveTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
+  this.selectiveTarget.texture.generateMipmaps = false;
+  this.brightPassMaterial.uniforms.selectiveTexture = new THREE.Uniform(this.selectiveTarget.texture);
+  macroHandler.injectMacro("IS_SELECTIVE", this.brightPassMaterial, false, true);
+  this.brightPassMaterial.uniformsNeedUpdate = true;
 }
