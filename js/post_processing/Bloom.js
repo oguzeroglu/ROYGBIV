@@ -50,6 +50,8 @@ Bloom.prototype.reset = function(){
     this.setBloomFactor(i, 1);
     this.setBloomTintColor(i, 1, 1, 1);
   }
+
+  this.unmakeSelective();
 }
 
 Bloom.prototype.load = function(configs){
@@ -64,6 +66,14 @@ Bloom.prototype.load = function(configs){
     var curBloomTintColor = configs.bloomTintColors[i];
     this.setBloomTintColor(i, curBloomTintColor.x, curBloomTintColor.y, curBloomTintColor.z);
   }
+
+  console.log(configs.isSelective);
+  if (configs.isSelective){
+    this.makeSelective();
+  }else{
+    this.unmakeSelective();
+  }
+
   renderer.bloomOn = configs.isOn;
 }
 
@@ -367,7 +377,7 @@ Bloom.prototype.render = function(){
 
 Bloom.prototype.makeSelective = function(){
   this.configurations.isSelective = true;
-  for (var objName in sceneHandler.getAddedObjects()){
+  for (var objName in addedObjects){
     var obj = addedObjects[objName];
     obj.mesh.material.uniforms.selectiveBloomFlag = new THREE.Uniform(0);
     obj.mesh.material.uniformsNeedUpdate = true;
@@ -378,5 +388,19 @@ Bloom.prototype.makeSelective = function(){
   this.selectiveTarget.texture.generateMipmaps = false;
   this.brightPassMaterial.uniforms.selectiveTexture = new THREE.Uniform(this.selectiveTarget.texture);
   macroHandler.injectMacro("IS_SELECTIVE", this.brightPassMaterial, false, true);
+  this.brightPassMaterial.uniformsNeedUpdate = true;
+}
+
+Bloom.prototype.unmakeSelective = function(){
+  this.configurations.isSelective = false;
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+    delete obj.mesh.material.uniforms.selectiveBloomFlag;
+    obj.mesh.material.uniformsNeedUpdate = true;
+    macroHandler.removeMacro("HAS_SELECTIVE_BLOOM", obj.mesh.material, false, true);
+  }
+
+  delete this.brightPassMaterial.uniforms.selectiveTexture;
+  macroHandler.removeMacro("IS_SELECTIVE", this.brightPassMaterial, false, true);
   this.brightPassMaterial.uniformsNeedUpdate = true;
 }
