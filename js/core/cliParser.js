@@ -5022,6 +5022,8 @@ function parse(input){
                   terminal.clear();
                   terminal.disable();
                   objectExportImportHandler.importObject(objName, json, function(){
+                    var obj = addedObjects[objName] || objectGroups[objName];
+                    afterCLIObjectCreation(obj);
                     terminal.clear();
                     refreshRaycaster(Text.OBJECT_IMPORTED);
                   });
