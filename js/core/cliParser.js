@@ -2066,6 +2066,11 @@ function parse(input){
               }
             }
             selectionHandler.resetCurrentSelection();
+            if (bloom.configurations.isSelective){
+              for (var childName in group){
+                bloom.unmakeObjectSelective(group[childName]);
+              }
+            }
             var objectGroup = new ObjectGroup(groupName, group);
             if (!objectGroup.areGeometriesIdentical()){
               var ctr = 0;
@@ -2109,6 +2114,7 @@ function parse(input){
               objectGroup.isBasicMaterial = true;
             }
             objectGroup.glue(simplifiedChildrenPhysicsBodies);
+            afterCLIObjectCreation(objectGroup);
             objectGroup.simplifiedChildrenPhysicsBodyDescriptions = simplifiedChildrenPhysicsBodyDescriptions;
             sceneHandler.onObjectGroupCreation(objectGroup);
             objectGroups[groupName] = objectGroup;
@@ -2160,6 +2166,7 @@ function parse(input){
           }
           for (var childObjName in objectGroup.group){
             sceneHandler.onAddedObjectCreation(objectGroup.group[childObjName]);
+            afterCLIObjectCreation(objectGroup.group[childObjName]);
           }
           objectGroup.detach();
           sceneHandler.onObjectGroupDeletion(objectGroup);

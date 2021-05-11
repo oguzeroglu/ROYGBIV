@@ -67,7 +67,6 @@ Bloom.prototype.load = function(configs){
     this.setBloomTintColor(i, curBloomTintColor.x, curBloomTintColor.y, curBloomTintColor.z);
   }
 
-  console.log(configs.isSelective);
   if (configs.isSelective){
     this.makeSelective();
   }else{
