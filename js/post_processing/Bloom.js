@@ -384,6 +384,13 @@ Bloom.prototype.makeSelective = function(){
     macroHandler.injectMacro("HAS_SELECTIVE_BLOOM", obj.mesh.material, false, true);
   }
 
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+    obj.mesh.material.uniforms.selectiveBloomFlag = new THREE.Uniform(0);
+    obj.mesh.material.uniformsNeedUpdate = true;
+    macroHandler.injectMacro("HAS_SELECTIVE_BLOOM", obj.mesh.material, false, true);
+  }
+
   this.selectiveTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
   this.selectiveTarget.texture.generateMipmaps = false;
   this.brightPassMaterial.uniforms.selectiveTexture = new THREE.Uniform(this.selectiveTarget.texture);
@@ -395,6 +402,13 @@ Bloom.prototype.unmakeSelective = function(){
   this.configurations.isSelective = false;
   for (var objName in addedObjects){
     var obj = addedObjects[objName];
+    delete obj.mesh.material.uniforms.selectiveBloomFlag;
+    obj.mesh.material.uniformsNeedUpdate = true;
+    macroHandler.removeMacro("HAS_SELECTIVE_BLOOM", obj.mesh.material, false, true);
+  }
+
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
     delete obj.mesh.material.uniforms.selectiveBloomFlag;
     obj.mesh.material.uniformsNeedUpdate = true;
     macroHandler.removeMacro("HAS_SELECTIVE_BLOOM", obj.mesh.material, false, true);

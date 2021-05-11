@@ -247,6 +247,13 @@ ObjectGroup.prototype.updateWorldInverseTranspose = function(overrideMatrix){
 }
 
 ObjectGroup.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = this.hasSelectiveBloom? 1000: -1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
   if (!this.affectedByLight){
     return;
   }
