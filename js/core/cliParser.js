@@ -456,6 +456,7 @@ function parse(input){
             return true;
           }
           gridSystems[selectedGridSystemName].newSurface(objectName, selectedGrid1, selectedGrid2, selectedMaterial);
+          afterCLIObjectCreation(addedObjects[objectName]);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
@@ -845,6 +846,7 @@ function parse(input){
             return true;
           }
           gridSystem.newRamp(anchorGrid, otherGrid, axis, parseInt(height), material, name);
+          afterCLIObjectCreation(addedObjects[name]);
           anchorGrid = 0;
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
@@ -1006,6 +1008,7 @@ function parse(input){
           var gridSystem = gridSystems[gridSystemName];
 
           gridSystem.newBox(selections, height, material, name);
+          afterCLIObjectCreation(addedObjects[name]);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
@@ -2606,6 +2609,7 @@ function parse(input){
           var gridSystem = gridSystems[gridSystemName];
 
           gridSystem.newSphere(sphereName, material, radius, selections);
+          afterCLIObjectCreation(addedObjects[sphereName]);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
@@ -2962,6 +2966,7 @@ function parse(input){
             cylinderName, material, topRadius, bottomRadius,
             cylinderHeight, isOpenEnded, selections
           );
+          afterCLIObjectCreation(addedObjects[cylinderName]);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
@@ -3202,6 +3207,7 @@ function parse(input){
             return true;
           }
           var copiedObj = sourceObj.copy(targetName, isHardCopyBoolean, copyPosition, gs, false);
+          afterCLIObjectCreation(copiedObj);
           scene.add(copiedObj.mesh);
           if (!copiedObj.noMass && (copiedObj instanceof AddedObject)){
             physicsWorld.addBody(copiedObj.physicsBody);
@@ -7128,4 +7134,10 @@ function save(customState, customName){
     anchor.click();
   }
   terminal.printInfo(Text.DOWNLOAD_PROCESS_INITIATED);
+}
+
+function afterCLIObjectCreation(obj){
+  if (bloom.configurations.isSelective){
+    bloom.makeObjectSelective(obj);
+  }
 }
