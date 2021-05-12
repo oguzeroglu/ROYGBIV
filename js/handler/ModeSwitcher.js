@@ -300,6 +300,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   renderer.setPixelRatio(screenResolution);
 
   autoInstancingHandler.handleSelectiveBloom();
+  for (var trailName in objectTrails){
+    objectTrails[trailName].handleSelectiveBloom();
+  }
 
   if (isDeployment){
     loadTime.modeSwitchTime = performance.now() - loadTime.modeSwitchTime;
