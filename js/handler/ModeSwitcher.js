@@ -299,6 +299,8 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   handleViewport();
   renderer.setPixelRatio(screenResolution);
 
+  autoInstancingHandler.handleSelectiveBloom();
+
   if (isDeployment){
     loadTime.modeSwitchTime = performance.now() - loadTime.modeSwitchTime;
   }

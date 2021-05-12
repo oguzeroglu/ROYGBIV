@@ -2,6 +2,18 @@ var AutoInstancingHandler = function(){
   this.maxBatchObjectSize = parseInt((MAX_VERTEX_UNIFORM_VECTORS - 50) / 3);
 }
 
+AutoInstancingHandler.prototype.handleSelectiveBloom = function(){
+  for (var autoInstancedObjectName in autoInstancedObjects){
+    var autoInstancedObject = autoInstancedObjects[autoInstancedObjectName];
+    autoInstancedObject.setSelectiveBloom();
+    var bloomConfs = sceneHandler.scenes[autoInstancedObject.getRegisteredSceneName()].postProcessing.bloom;
+    var shouldInject = bloomConfs.isOn && bloomConfs.isSelective;
+    if (shouldInject){
+      bloom.makeObjectSelective(autoInstancedObject);
+    }
+  }
+}
+
 AutoInstancingHandler.prototype.getObjectKey = function(obj){
   var geomKey = obj.mesh.geometry.uuid;
   var blendingKey = obj.blendingMode;
@@ -12,7 +24,10 @@ AutoInstancingHandler.prototype.getObjectKey = function(obj){
   if (obj.hasCustomPrecision){
     shaderPrecisionKey = obj.customPrecision;
   }
-  return geomKey + PIPE + obj.registeredSceneName + PIPE + blendingKey + PIPE + shaderPrecisionKey;
+
+  var selectiveBloomKey = obj.hasSelectiveBloom? "HAS_SELECTIVE_BLOOM": "HAS_NOT_SELECTIVE_BLOOM";
+
+  return geomKey + PIPE + obj.registeredSceneName + PIPE + blendingKey + PIPE + shaderPrecisionKey + PIPE + selectiveBloomKey;
 }
 
 AutoInstancingHandler.prototype.handle = function(){
