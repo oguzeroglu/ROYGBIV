@@ -5,6 +5,10 @@ precision lowp int;
 
 #define INSERTION
 
+#ifdef HAS_SELECTIVE_BLOOM
+  uniform float selectiveBloomFlag;
+#endif
+
 #ifdef HAS_TEXTURE
   varying vec3 vRgbThreshold;
   varying float vTextureFlag;
@@ -61,6 +65,17 @@ void main(){
   #else
     gl_FragColor = vCalculatedColor;
   #endif
+
+  #ifdef HAS_SELECTIVE_BLOOM
+    if (selectiveBloomFlag <= -100.0){
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+      return;
+    }else if (selectiveBloomFlag >= 100.0){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      return;
+    }
+  #endif
+
   #ifdef HAS_FOG
     #ifdef HAS_SKYBOX_FOG
       vec3 coord = normalize(vWorldPosition - cameraPosition);

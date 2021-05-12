@@ -38,6 +38,23 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   webglCallbackHandler.registerEngineObject(this);
 }
 
+ParticleSystem.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
+}
+
+ParticleSystem.prototype.handleSelectiveBloom = function(){
+  var confs = sceneHandler.scenes[this.registeredSceneName].postProcessing.bloom;
+  if (confs.isOn && confs.isSelective){
+    bloom.makeObjectSelective(this);
+  }
+}
+
 ParticleSystem.prototype.compressGeometry = function(){
   macroHandler.compressAttributes(this.mesh, [
     "position", "velocity", "acceleration", "flags1", "flags3", "flags4", "angularQuaternion",
