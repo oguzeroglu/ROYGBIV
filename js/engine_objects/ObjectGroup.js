@@ -3733,6 +3733,8 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.bakeLights(bakedColors);
   }
 
+  newObjGroup.hasSelectiveBloom = this.hasSelectiveBloom;
+
   return newObjGroup;
 }
 

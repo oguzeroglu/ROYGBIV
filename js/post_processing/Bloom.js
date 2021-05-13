@@ -376,12 +376,18 @@ Bloom.prototype.render = function(){
 }
 
 Bloom.prototype.makeObjectSelective = function(obj){
+  if (!!obj.softCopyParentName){
+    return;
+  }
   obj.mesh.material.uniforms.selectiveBloomFlag = new THREE.Uniform(0);
   obj.mesh.material.uniformsNeedUpdate = true;
   macroHandler.injectMacro("HAS_SELECTIVE_BLOOM", obj.mesh.material, false, true);
 }
 
 Bloom.prototype.unmakeObjectSelective = function(obj){
+  if (!!obj.softCopyParentName){
+    return;
+  }
   delete obj.mesh.material.uniforms.selectiveBloomFlag;
   obj.mesh.material.uniformsNeedUpdate = true;
   macroHandler.removeMacro("HAS_SELECTIVE_BLOOM", obj.mesh.material, false, true);

@@ -1879,6 +1879,16 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.clear();
       selectionHandler.getSelectedObject().hasSelectiveBloom = val;
       terminal.printInfo(val? Text.AFFECTED_BY_SELECTIVE_BLOOM: Text.NOT_AFFECTED_BY_SELECTIVE_BLOOM);
+      for (var objName in addedObjects){
+        if (addedObjects[objName].softCopyParentName == selectionHandler.getSelectedObject().name){
+          addedObjects[objName].hasSelectiveBloom = val;
+        }
+      }
+      for (var objName in objectGroups){
+        if (objectGroups[objName].softCopyParentName == selectionHandler.getSelectedObject().name){
+          objectGroups[objName].hasSelectiveBloom = val;
+        }
+      }
     }).listen();
 
     // SHADOW

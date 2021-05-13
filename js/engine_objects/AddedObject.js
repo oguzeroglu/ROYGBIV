@@ -3419,6 +3419,8 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
 
   copyInstance.setRotationMode(this.rotationMode);
 
+  copyInstance.hasSelectiveBloom = this.hasSelectiveBloom;
+
   return copyInstance;
 }
 
