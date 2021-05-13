@@ -176,6 +176,7 @@ var GUIHandler = function(){
     "Exposure": 0.0,
     "Gamma": 0.0,
     "BlurStepAmount": 0,
+    "Is selective": false,
     "BlurPass1": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass2": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass3": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
@@ -3378,13 +3379,13 @@ GUIHandler.prototype.initializeBloomGUI = function(){
   guiHandler.bloomThresholdController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Threshold").min(0).max(1).step(0.01).onChange(function(val){
     bloom.setThreshold(val);
   }).listen();
-  guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Strength").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Strength").min(0).max(1).step(0.001).onChange(function(val){
     bloom.setBloomStrength(val);
   }).listen();
-  guiHandler.bloomExposureController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Exposure").min(0).max(100).step(0.01).onChange(function(val){
+  guiHandler.bloomExposureController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Exposure").min(0).max(3).step(0.0001).onChange(function(val){
     bloom.setExposure(val);
   }).listen();
-  guiHandler.bloomGammaController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Gamma").min(0).max(100).step(0.01).onChange(function(val){
+  guiHandler.bloomGammaController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Gamma").min(0).max(3).step(0.0001).onChange(function(val){
     bloom.setGamma(val);
   }).listen();
   guiHandler.bloomBlurStepAmountController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "BlurStepAmount").min(1).max(5).step(1).onChange(function(val){
@@ -3400,7 +3401,27 @@ GUIHandler.prototype.initializeBloomGUI = function(){
       guiHandler.disableController(guiHandler["blurPassTapController"+(i+1)]);
     }
   }).listen();
+  guiHandler.bloomIsSelectiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Is selective").onChange(function(val){
+    terminal.clear();
+    if (renderer.bloomOn){
+      if (val){
+        bloom.makeSelective();
+      }else{
+        bloom.unmakeSelective();
+      }
+      terminal.printInfo(val? Text.BLOOM_IS_MARKED_AS_SELECTIVE: Text.BLOOM_IS_MARKED_AS_NON_SELECTIVE);
+    }else{
+      if (val){
+        terminal.printInfo(Text.BLOOM_IS_NOT_ACTIVE_CANNOT_MAKE_SELECTIVE);
+        guiHandler.bloomParameters["Is selective"] = false;
+      }
+    }
+  }).listen();
   guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Active").onChange(function(val){
+    if (!val && guiHandler.bloomParameters["Is selective"]){
+      guiHandler.bloomParameters["Is selective"] = false;
+      bloom.unmakeSelective();
+    }
     renderer.bloomOn = val;
   }).listen();
   for (var i = 0; i<5; i++){

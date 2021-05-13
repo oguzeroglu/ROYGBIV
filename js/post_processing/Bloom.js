@@ -96,6 +96,7 @@ Bloom.prototype.showConfigurations = function(){
   guiHandler.bloomParameters["Exposure"] = this.configurations.exposure;
   guiHandler.bloomParameters["Gamma"] = this.configurations.gamma;
   guiHandler.bloomParameters["BlurStepAmount"] = this.configurations.blurStepCount;
+  guiHandler.bloomParameters["Is selective"] = this.configurations.isSelective;
   for (var i=0; i<5; i++){
     guiHandler.bloomParameters["BlurPass"+(i+1)]["Factor"] = this.configurations.bloomFactors[i];
     guiHandler.bloomParameters["BlurPass"+(i+1)]["Color"] = "#" + (REUSABLE_COLOR.setRGB(this.configurations.bloomTintColors[i].x, this.configurations.bloomTintColors[i].y, this.configurations.bloomTintColors[i].z).getHexString());
