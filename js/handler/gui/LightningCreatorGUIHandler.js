@@ -57,6 +57,7 @@ LightningCreatorGUIHandler.prototype.handleMesh = function(lightningName){
     this.lightning.setCorrectionProperties(prevCorrectionRefDistance, prevCorrectionRefLength);
   }
   this.lightning.start();
+  afterCLIObjectCreation(this.lightning);
 }
 
 LightningCreatorGUIHandler.prototype.commonStartFunctions = function(){
