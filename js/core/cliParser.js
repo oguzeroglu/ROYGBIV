@@ -3503,6 +3503,9 @@ function parse(input){
             addedText.gsName = jobHandlerSelectedGrid.parentName;
             jobHandlerSelectedGrid.createdAddedTextName = addedText.name;
           }
+
+          afterCLIObjectCreation(addedText);
+
           if (!jobHandlerWorking){
             refreshRaycaster(Text.TEXT_ALLOCATED);
           }else{

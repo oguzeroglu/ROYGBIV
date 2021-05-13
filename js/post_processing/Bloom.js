@@ -405,6 +405,11 @@ Bloom.prototype.makeSelective = function(){
     this.makeObjectSelective(obj);
   }
 
+  for (var textName in addedTexts){
+    var text = addedTexts[textName];
+    this.makeObjectSelective(text);
+  }
+
   this.selectiveTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
   this.selectiveTarget.texture.generateMipmaps = false;
   this.brightPassMaterial.uniforms.selectiveTexture = new THREE.Uniform(this.selectiveTarget.texture);
@@ -422,6 +427,11 @@ Bloom.prototype.unmakeSelective = function(){
   for (var objName in objectGroups){
     var obj = objectGroups[objName];
     this.unmakeObjectSelective(obj);
+  }
+
+  for (var textName in addedTexts){
+    var text = addedTexts[textName];
+    this.unmakeObjectSelective(text);
   }
 
   delete this.brightPassMaterial.uniforms.selectiveTexture;

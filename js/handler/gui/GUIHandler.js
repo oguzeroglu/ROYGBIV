@@ -97,7 +97,8 @@ var GUIHandler = function(){
     "Margin Y": 50.0,
     "Max width%": 100,
     "Max height%": 100,
-    "Hidden": false
+    "Hidden": false,
+    "Has selective bloom": false
   };
   this.spriteManipulationParameters = {
     "Sprite": "spriteName",
@@ -643,6 +644,8 @@ GUIHandler.prototype.afterTextSelection = function(){
     }
 
     guiHandler.textManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
+
+    guiHandler.textManipulationParameters["Has selective bloom"] = !!curSelection.hasSelectiveBloom;
   }else{
     guiHandler.hide(guiHandler.guiTypes.TEXT);
   }
@@ -1059,6 +1062,7 @@ GUIHandler.prototype.enableAllTMControllers = function(){
   guiHandler.enableController(guiHandler.textManipulationMaxWidthPercentController);
   guiHandler.enableController(guiHandler.textManipulationMaxHeightPercentController);
   guiHandler.enableController(guiHandler.textManipulationShaderPrecisionController);
+  guiHandler.enableController(guiHandler.textManipulationHasSelectiveBloomController);
 }
 
 GUIHandler.prototype.enableAllSMControllers = function(){
@@ -3245,6 +3249,11 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     }
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  guiHandler.textManipulationHasSelectiveBloomController = graphicsFolder.add(guiHandler.textManipulationParameters, "Has selective bloom").onChange(function(val){
+    terminal.clear();
+    selectionHandler.getSelectedObject().hasSelectiveBloom = val;
+    terminal.printInfo(val? Text.AFFECTED_BY_SELECTIVE_BLOOM: Text.NOT_AFFECTED_BY_SELECTIVE_BLOOM);
   }).listen();
 
   // BACKGROUND

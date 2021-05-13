@@ -1392,6 +1392,8 @@ ImportHandler.prototype.importAddedTexts = function(obj){
     }
 
     addedTextInstance.areaVisibilityConfigurations = curTextExport.areaVisibilityConfigurations;
+
+    addedTextInstance.hasSelectiveBloom = curTextExport.hasSelectiveBloom;
   }
 }
 

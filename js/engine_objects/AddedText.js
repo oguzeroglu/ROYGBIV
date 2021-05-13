@@ -99,6 +99,16 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedText.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = this.hasSelectiveBloom? 1000: -1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
+}
+
 AddedText.prototype.getVisibilityInArea = function(areaName){
   if (this.areaVisibilityConfigurations){
     if (!(typeof this.areaVisibilityConfigurations[areaName] == UNDEFINED)){
@@ -471,6 +481,8 @@ AddedText.prototype.export = function(){
   if (this.areaVisibilityConfigurations){
     exportObj.areaVisibilityConfigurations = this.areaVisibilityConfigurations;
   }
+
+  exportObj.hasSelectiveBloom = this.hasSelectiveBloom;
 
   return exportObj;
 }
