@@ -71,6 +71,7 @@ var GUIHandler = function(){
       parseCommand("unbakeShadow " + selectionHandler.getSelectedObject().name);
     },
     "Active in non WebGL friendly devices": false,
+    "Has selective bloom": false,
     "Export": function(){
       terminal.clear();
       parseCommand("exportObject " + selectionHandler.getSelectedObject().name);
@@ -974,6 +975,9 @@ GUIHandler.prototype.afterObjectSelection = function(){
     }else{
       guiHandler.objectManipulationParameters["Shader precision"] = "default";
     }
+
+    guiHandler.objectManipulationParameters["Has selective bloom"] = !!obj.hasSelectiveBloom;
+
   }else{
     guiHandler.hide(guiHandler.guiTypes.OBJECT);
   }
@@ -1122,6 +1126,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omLookSpeedController);
   guiHandler.enableController(guiHandler.omRotationModeController);
   guiHandler.enableController(guiHandler.omLightingTypeController);
+  guiHandler.enableController(guiHandler.omSelectiveBloomController);
 }
 
 GUIHandler.prototype.show = function(guiType){
@@ -1868,6 +1873,11 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       }else{
         selectionHandler.getSelectedObject().unsetPhongLight();
       }
+    }).listen();
+    guiHandler.omSelectiveBloomController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Has selective bloom").onChange(function(val){
+      terminal.clear();
+      selectionHandler.getSelectedObject().hasSelectiveBloom = val;
+      terminal.printInfo(val? Text.AFFECTED_BY_SELECTIVE_BLOOM: Text.NOT_AFFECTED_BY_SELECTIVE_BLOOM);
     }).listen();
 
     // SHADOW
