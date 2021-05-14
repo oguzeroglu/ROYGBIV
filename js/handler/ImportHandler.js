@@ -1815,6 +1815,8 @@ ImportHandler.prototype.importSprites = function(obj){
     if ((typeof curExport.customRenderOrder) != UNDEFINED){
       sprite.setCustomRenderOrder(curExport.customRenderOrder);
     }
+
+    sprite.hasSelectiveBloom = curExport.hasSelectiveBloom;
   }
 }
 

@@ -415,6 +415,11 @@ Bloom.prototype.makeSelective = function(){
     this.makeObjectSelective(lightning);
   }
 
+  for (var spriteName in sprites){
+    var sprite = sprites[spriteName];
+    this.makeObjectSelective(sprite);
+  }
+
   this.selectiveTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
   this.selectiveTarget.texture.generateMipmaps = false;
   this.brightPassMaterial.uniforms.selectiveTexture = new THREE.Uniform(this.selectiveTarget.texture);
@@ -442,6 +447,11 @@ Bloom.prototype.unmakeSelective = function(){
   for (var lightningName in lightnings){
     var lightning = lightnings[lightningName];
     this.unmakeObjectSelective(lightning);
+  }
+
+  for (var spriteName in sprites){
+    var sprite = sprites[spriteName];
+    this.unmakeObjectSelective(sprite);
   }
 
   delete this.brightPassMaterial.uniforms.selectiveTexture;

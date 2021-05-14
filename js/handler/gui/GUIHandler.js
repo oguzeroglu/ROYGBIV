@@ -121,7 +121,8 @@ var GUIHandler = function(){
     "Crop X": 0.01,
     "Crop Y": 0.01,
     "Hidden": false,
-    "Render order": "" + renderOrders.SPRITE
+    "Render order": "" + renderOrders.SPRITE,
+    "Has selective bloom": false
   };
   this.containerManipulationParameters = {
     "Container": "containerName",
@@ -522,6 +523,7 @@ GUIHandler.prototype.afterSpriteSelection = function(){
     guiHandler.spriteManipulationParameters["Height fixed"] = !(typeof curSelection.fixedHeight == UNDEFINED);
     guiHandler.spriteManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
     guiHandler.spriteManipulationParameters["Render order"] = "" + ((typeof curSelection.customRenderOrder == UNDEFINED)? renderOrders.SPRITE: curSelection.customRenderOrder);
+    guiHandler.spriteManipulationParameters["Has selective bloom"] = !!curSelection.hasSelectiveBloom;
     if (!curSelection.isTextured){
       guiHandler.disableController(guiHandler.spriteManipulationTextureController);
     }
@@ -3041,6 +3043,11 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
     }
     selectionHandler.getSelectedObject().setCustomRenderOrder(parsed);
     terminal.printInfo(Text.RENDER_ORDER_SET);
+  }).listen();
+  graphicsFolder.add(guiHandler.spriteManipulationParameters, "Has selective bloom").onChange(function(val){
+    terminal.clear();
+    selectionHandler.getSelectedObject().hasSelectiveBloom = val;
+    terminal.printInfo(val? Text.AFFECTED_BY_SELECTIVE_BLOOM: Text.NOT_AFFECTED_BY_SELECTIVE_BLOOM);
   }).listen();
 
   // MARGIN

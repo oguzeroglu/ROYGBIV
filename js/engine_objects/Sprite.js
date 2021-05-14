@@ -26,6 +26,16 @@ var Sprite = function(name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+Sprite.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = this.hasSelectiveBloom? 1000: -1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
+}
+
 Sprite.prototype.setCustomRenderOrder = function(customRenderOrder){
   this.customRenderOrder = customRenderOrder;
   this.mesh.renderOrder = customRenderOrder;
@@ -279,7 +289,8 @@ Sprite.prototype.export = function(){
     originalHeightReference: this.originalHeightReference,
     originalScreenResolution: this.originalScreenResolution,
     hiddenInDesignMode: !!this.hiddenInDesignMode,
-    customRenderOrder: this.customRenderOrder
+    customRenderOrder: this.customRenderOrder,
+    hasSelectiveBloom: !!this.hasSelectiveBloom
   };
 }
 
