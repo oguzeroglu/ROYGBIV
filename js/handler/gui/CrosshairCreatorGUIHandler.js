@@ -18,8 +18,10 @@ CrosshairCreatorGUIHandler.prototype.handleTestCrosshair = function(crosshairNam
     alpha: this.configurations["Alpha"],
     size: this.configurations["Size"],
     maxWidthPercent: this.configurations["maxWidthPercent"],
-    maxHeightPercent: this.configurations["maxHeightPercent"]
+    maxHeightPercent: this.configurations["maxHeightPercent"],
+    hasSelectiveBloom: this.configurations["Has selective bloom"]
   });
+  afterCLIObjectCreation(this.crosshair);
   this.crosshair.mesh.visible = true;
 }
 
@@ -31,6 +33,7 @@ CrosshairCreatorGUIHandler.prototype.init = function(crosshairName, isEdit){
     "Size": 5,
     "maxWidthPercent": 100,
     "maxHeightPercent": 100,
+    "Has selective bloom": false,
     "Cancel": function(){
       if (crosshairCreatorGUIHandler.isEdit){
         scene.add(crosshairs[crosshairName].mesh);
@@ -102,6 +105,9 @@ CrosshairCreatorGUIHandler.prototype.createGUI = function(crosshairName, texture
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "maxHeightPercent").min(0.01).max(100).step(0.01).onChange(function(val){
     crosshairCreatorGUIHandler.handleTestCrosshair(crosshairName);
   }).listen();
+  guiHandler.datGuiCrosshairCreation.add(this.configurations, "Has selective bloom").onChange(function(val){
+    crosshairCreatorGUIHandler.handleTestCrosshair(crosshairName);
+  }).listen();
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "Cancel");
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "Done");
 }
@@ -124,6 +130,7 @@ CrosshairCreatorGUIHandler.prototype.edit = function(crosshair, texturePackNames
   this.configurations["Size"] = crosshair.configurations.size;
   this.configurations["maxWidthPercent"] = crosshair.configurations.maxWidthPercent;
   this.configurations["maxHeightPercent"] = crosshair.configurations.maxHeightPercent;
+  this.configurations["Has selective bloom"] = !!crosshair.hasSelectiveBloom;
   this.createGUI(crosshair.name, texturePackNames);
   scene.remove(crosshair.mesh);
   this.handleTestCrosshair(crosshair.name);

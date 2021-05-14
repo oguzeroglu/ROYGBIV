@@ -420,6 +420,11 @@ Bloom.prototype.makeSelective = function(){
     this.makeObjectSelective(sprite);
   }
 
+  for (var crosshairName in crosshairs){
+    var crosshair = crosshairs[crosshairName];
+    this.makeObjectSelective(crosshair);
+  }
+
   this.selectiveTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
   this.selectiveTarget.texture.generateMipmaps = false;
   this.brightPassMaterial.uniforms.selectiveTexture = new THREE.Uniform(this.selectiveTarget.texture);
@@ -452,6 +457,11 @@ Bloom.prototype.unmakeSelective = function(){
   for (var spriteName in sprites){
     var sprite = sprites[spriteName];
     this.unmakeObjectSelective(sprite);
+  }
+
+  for (var crosshairName in crosshairs){
+    var crosshair = crosshairs[crosshairName];
+    this.unmakeObjectSelective(crosshair);
   }
 
   delete this.brightPassMaterial.uniforms.selectiveTexture;
