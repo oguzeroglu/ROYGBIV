@@ -6776,6 +6776,7 @@ function parse(input){
           var gridSystem = gridSystems[gridSystemName];
 
           gridSystem.newModelInstance(selections, height, models[modelName], instanceName);
+          afterCLIObjectCreation(modelInstances[instanceName]);
           if (!jobHandlerWorking){
             refreshRaycaster(Text.MODEL_INSTANCE_CREATED);
           }else{

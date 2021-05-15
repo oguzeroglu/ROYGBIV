@@ -21,6 +21,10 @@ uniform mat4 dynamicLightsMatrix;
 
 #define LIGHT_ATTENUATION_COEF 500000
 
+#ifdef HAS_SELECTIVE_BLOOM
+  uniform float selectiveBloomFlag;
+#endif
+
 #ifdef HAS_ENVIRONMENT_MAP
   #if !defined(HAS_NORMAL_MAP)
     varying vec3 vWorldNormal;
@@ -812,6 +816,17 @@ vec3 handleLighting(vec3 worldPositionComputed, vec3 V, vec3 F0, vec3 albedo, fl
 #endif
 
 void main(){
+
+  #ifdef HAS_SELECTIVE_BLOOM
+    if (selectiveBloomFlag <= -100.0){
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+      return;
+    }else if (selectiveBloomFlag >= 100.0){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      return;
+    }
+  #endif
+
   #ifdef CHILDREN_HIDEABLE
     if (vHiddenFlag > 0.0){
       discard;
