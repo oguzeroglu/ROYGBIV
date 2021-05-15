@@ -71,6 +71,9 @@ MuzzleFlashCreatorGUIHandler.prototype.createMuzzleFlash = function(muzzleflashN
   }
   this.muzzleFlash = new MuzzleFlash(muzzleflashName, refPreconfiguredPS, psCount, psTime);
   this.muzzleFlash.init();
+  if (bloom.configurations.isSelective){
+    this.muzzleFlash.handleSelectiveBloom(true);
+  }
 }
 
 MuzzleFlashCreatorGUIHandler.prototype.show = function(muzzleflashName, refPreconfiguredPS){
