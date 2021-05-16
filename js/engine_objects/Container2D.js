@@ -21,6 +21,24 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.animations = new Object();
 }
 
+Container2D.prototype.handleSelectiveBloom = function(isOn){
+  if (this.hasBackground){
+    if (isOn){
+      bloom.makeObjectSelective(this.backgroundSprite);
+    }else{
+      bloom.unmakeObjectSelective(this.backgroundSprite);
+    }
+  }
+
+  if (this.hasBorder){
+    if (isOn){
+      bloom.makeObjectSelective(this.rectangle);
+    }else{
+      bloom.unmakeObjectSelective(this.rectangle);
+    }
+  }
+}
+
 Container2D.prototype.copyAnimationsFromObject = function(object){
   this.animations = new Object();
 
@@ -55,6 +73,18 @@ Container2D.prototype.setBackground = function(backgroundColor, backgroundAlpha,
     bgSprite.mesh.renderOrder = renderOrders.CONTAINER_BACKGROUND;
     bgSprite.isBackgroundObject = true;
     this.backgroundSprite = bgSprite;
+    if (bloom.configurations.isSelective){
+      bloom.makeObjectSelective(bgSprite);
+    }
+    bgSprite.mesh.onBeforeRender = function(){
+      if (renderer.bloomOn && bloom.configurations.isSelective){
+        if (bloom.selectiveRenderingActive){
+          this.mesh.material.uniforms.selectiveBloomFlag.value = -1000;
+        }else{
+          this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+        }
+      }
+    }.bind({mesh: bgSprite.mesh});
   }
   this.backgroundSprite.setWidthPercent(this.scaleWidth * this.widthPercent);
   this.backgroundSprite.setHeightPercent(this.scaleHeight * this.heightPercent);
@@ -89,6 +119,18 @@ Container2D.prototype.setBorder = function(borderColor, thickness){
   this.borderThickness = thickness;
   this.rectangle.updateMesh(thickness, true);
   this.rectangle.mesh.material.uniforms.color.value.set(borderColor);
+  if (bloom.configurations.isSelective){
+    bloom.makeObjectSelective(this.rectangle);
+  }
+  this.rectangle.mesh.onBeforeRender = function(){
+    if (renderer.bloomOn && bloom.configurations.isSelective){
+      if (bloom.selectiveRenderingActive){
+        this.mesh.material.uniforms.selectiveBloomFlag.value = -1000;
+      }else{
+        this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+      }
+    }
+  }.bind({mesh: this.rectangle.mesh});
 }
 
 Container2D.prototype.exportLightweight = function(){

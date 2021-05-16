@@ -379,6 +379,7 @@ Bloom.prototype.makeObjectSelective = function(obj){
   if (!!obj.softCopyParentName){
     return;
   }
+
   obj.mesh.material.uniforms.selectiveBloomFlag = new THREE.Uniform(0);
   obj.mesh.material.uniformsNeedUpdate = true;
   macroHandler.injectMacro("HAS_SELECTIVE_BLOOM", obj.mesh.material, false, true);
@@ -435,6 +436,11 @@ Bloom.prototype.makeSelective = function(){
     this.makeObjectSelective(modelInstance);
   }
 
+  for (var containerName in containers){
+    var container = containers[containerName];
+    container.handleSelectiveBloom(true);
+  }
+
   this.selectiveTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
   this.selectiveTarget.texture.generateMipmaps = false;
   this.brightPassMaterial.uniforms.selectiveTexture = new THREE.Uniform(this.selectiveTarget.texture);
@@ -482,6 +488,11 @@ Bloom.prototype.unmakeSelective = function(){
   for (var miName in modelInstances){
     var modelInstance = modelInstances[miName];
     this.unmakeObjectSelective(modelInstance);
+  }
+
+  for (var containerName in containers){
+    var container = containers[containerName];
+    container.handleSelectiveBloom(false);
   }
 
   delete this.brightPassMaterial.uniforms.selectiveTexture;

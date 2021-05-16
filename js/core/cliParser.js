@@ -4563,6 +4563,9 @@ function parse(input){
           containers[containerName] = container;
           selectionHandler.select(container);
           guiHandler.afterObjectSelection();
+          if (bloom.configurations.isSelective){
+            container.handleSelectiveBloom(true);
+          }
           sceneHandler.onContainerCreation(container);
           refreshRaycaster(Text.CONTAINER_CREATED);
           return true;
