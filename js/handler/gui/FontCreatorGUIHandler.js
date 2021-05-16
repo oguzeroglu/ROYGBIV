@@ -58,6 +58,9 @@ FontCreatorGUIHandler.prototype.handleTestMesh = function(){
   this.text.refInnerHeight = 569;
   this.text.refCharSize = 50;
   this.text.handleResize();
+  if (bloom.configurations.isSelective){
+    bloom.makeObjectSelective(this.text);
+  }
 }
 
 FontCreatorGUIHandler.prototype.loadFont = function(fontName, typeface){

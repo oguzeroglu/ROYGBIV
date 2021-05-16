@@ -441,6 +441,11 @@ Bloom.prototype.makeSelective = function(){
     container.handleSelectiveBloom(true);
   }
 
+  for (var vkName in virtualKeyboards){
+    var virtualKeyboard = virtualKeyboards[vkName];
+    virtualKeyboard.handleSelectiveBloom(true);
+  }
+
   this.selectiveTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
   this.selectiveTarget.texture.generateMipmaps = false;
   this.brightPassMaterial.uniforms.selectiveTexture = new THREE.Uniform(this.selectiveTarget.texture);
@@ -493,6 +498,11 @@ Bloom.prototype.unmakeSelective = function(){
   for (var containerName in containers){
     var container = containers[containerName];
     container.handleSelectiveBloom(false);
+  }
+
+  for (var vkName in virtualKeyboards){
+    var virtualKeyboard = virtualKeyboards[vkName];
+    virtualKeyboard.handleSelectiveBloom(false);
   }
 
   delete this.brightPassMaterial.uniforms.selectiveTexture;
