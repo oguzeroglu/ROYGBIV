@@ -456,6 +456,7 @@ function parse(input){
             return true;
           }
           gridSystems[selectedGridSystemName].newSurface(objectName, selectedGrid1, selectedGrid2, selectedMaterial);
+          afterCLIObjectCreation(addedObjects[objectName]);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
@@ -845,6 +846,7 @@ function parse(input){
             return true;
           }
           gridSystem.newRamp(anchorGrid, otherGrid, axis, parseInt(height), material, name);
+          afterCLIObjectCreation(addedObjects[name]);
           anchorGrid = 0;
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
@@ -1006,6 +1008,7 @@ function parse(input){
           var gridSystem = gridSystems[gridSystemName];
 
           gridSystem.newBox(selections, height, material, name);
+          afterCLIObjectCreation(addedObjects[name]);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
@@ -2063,6 +2066,11 @@ function parse(input){
               }
             }
             selectionHandler.resetCurrentSelection();
+            if (bloom.configurations.isSelective){
+              for (var childName in group){
+                bloom.unmakeObjectSelective(group[childName]);
+              }
+            }
             var objectGroup = new ObjectGroup(groupName, group);
             if (!objectGroup.areGeometriesIdentical()){
               var ctr = 0;
@@ -2106,6 +2114,7 @@ function parse(input){
               objectGroup.isBasicMaterial = true;
             }
             objectGroup.glue(simplifiedChildrenPhysicsBodies);
+            afterCLIObjectCreation(objectGroup);
             objectGroup.simplifiedChildrenPhysicsBodyDescriptions = simplifiedChildrenPhysicsBodyDescriptions;
             sceneHandler.onObjectGroupCreation(objectGroup);
             objectGroups[groupName] = objectGroup;
@@ -2157,6 +2166,7 @@ function parse(input){
           }
           for (var childObjName in objectGroup.group){
             sceneHandler.onAddedObjectCreation(objectGroup.group[childObjName]);
+            afterCLIObjectCreation(objectGroup.group[childObjName]);
           }
           objectGroup.detach();
           sceneHandler.onObjectGroupDeletion(objectGroup);
@@ -2606,6 +2616,7 @@ function parse(input){
           var gridSystem = gridSystems[gridSystemName];
 
           gridSystem.newSphere(sphereName, material, radius, selections);
+          afterCLIObjectCreation(addedObjects[sphereName]);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
@@ -2962,6 +2973,7 @@ function parse(input){
             cylinderName, material, topRadius, bottomRadius,
             cylinderHeight, isOpenEnded, selections
           );
+          afterCLIObjectCreation(addedObjects[cylinderName]);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
@@ -3202,6 +3214,9 @@ function parse(input){
             return true;
           }
           var copiedObj = sourceObj.copy(targetName, isHardCopyBoolean, copyPosition, gs, false);
+          if (isHardCopyBoolean){
+            afterCLIObjectCreation(copiedObj);
+          }
           scene.add(copiedObj.mesh);
           if (!copiedObj.noMass && (copiedObj instanceof AddedObject)){
             physicsWorld.addBody(copiedObj.physicsBody);
@@ -3488,6 +3503,9 @@ function parse(input){
             addedText.gsName = jobHandlerSelectedGrid.parentName;
             jobHandlerSelectedGrid.createdAddedTextName = addedText.name;
           }
+
+          afterCLIObjectCreation(addedText);
+
           if (!jobHandlerWorking){
             refreshRaycaster(Text.TEXT_ALLOCATED);
           }else{
@@ -4460,6 +4478,7 @@ function parse(input){
           sprites[spriteName].originalWidthReference = renderer.getCurrentViewport().z;
           sprites[spriteName].originalHeightReference = renderer.getCurrentViewport().w;
           sprites[spriteName].originalScreenResolution = screenResolution;
+          afterCLIObjectCreation(sprites[spriteName]);
           sceneHandler.onSpriteCreation(sprites[spriteName]);
           selectionHandler.select(sprites[spriteName]);
           refreshRaycaster(Text.SPRITE_CREATED);
@@ -4544,6 +4563,9 @@ function parse(input){
           containers[containerName] = container;
           selectionHandler.select(container);
           guiHandler.afterObjectSelection();
+          if (bloom.configurations.isSelective){
+            container.handleSelectiveBloom(true);
+          }
           sceneHandler.onContainerCreation(container);
           refreshRaycaster(Text.CONTAINER_CREATED);
           return true;
@@ -5009,6 +5031,8 @@ function parse(input){
                   terminal.clear();
                   terminal.disable();
                   objectExportImportHandler.importObject(objName, json, function(){
+                    var obj = addedObjects[objName] || objectGroups[objName];
+                    afterCLIObjectCreation(obj);
                     terminal.clear();
                     refreshRaycaster(Text.OBJECT_IMPORTED);
                   });
@@ -6755,6 +6779,7 @@ function parse(input){
           var gridSystem = gridSystems[gridSystemName];
 
           gridSystem.newModelInstance(selections, height, models[modelName], instanceName);
+          afterCLIObjectCreation(modelInstances[instanceName]);
           if (!jobHandlerWorking){
             refreshRaycaster(Text.MODEL_INSTANCE_CREATED);
           }else{
@@ -7128,4 +7153,10 @@ function save(customState, customName){
     anchor.click();
   }
   terminal.printInfo(Text.DOWNLOAD_PROCESS_INITIATED);
+}
+
+function afterCLIObjectCreation(obj){
+  if (bloom.configurations.isSelective){
+    bloom.makeObjectSelective(obj);
+  }
 }

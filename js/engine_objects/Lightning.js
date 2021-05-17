@@ -278,6 +278,16 @@ Lightning.prototype.init = function(startPoint, endPoint){
   }
 }
 
+Lightning.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
+}
+
 Lightning.prototype.update = function(){
   if (!IS_WORKER_CONTEXT){
     if (mode == 1 && this.attachedToFPSWeapon){

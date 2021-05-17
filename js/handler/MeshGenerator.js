@@ -286,7 +286,8 @@ MeshGenerator.prototype.generateSkybox = function(skybox, isMock){
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
       cubeTexture: cubeTextureUniform,
-      color: new THREE.Uniform(new THREE.Color(skybox.color))
+      color: new THREE.Uniform(new THREE.Color(skybox.color)),
+      selectiveBloomFlag: new THREE.Uniform(0)
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);

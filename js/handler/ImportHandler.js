@@ -1173,6 +1173,8 @@ ImportHandler.prototype.importAddedObjects = function(obj){
 
      addedObjectInstance.skipShadowsInNonWebGLFriendlyDevices = curAddedObjectExport.skipShadowsInNonWebGLFriendlyDevices;
 
+     addedObjectInstance.setSelectiveBloom(!!curAddedObjectExport.hasSelectiveBloom);
+
      if (curAddedObjectExport.hiddenInDesignMode){
        addedObjectInstance.hideInDesignMode(true);
      }
@@ -1390,6 +1392,8 @@ ImportHandler.prototype.importAddedTexts = function(obj){
     }
 
     addedTextInstance.areaVisibilityConfigurations = curTextExport.areaVisibilityConfigurations;
+
+    addedTextInstance.hasSelectiveBloom = curTextExport.hasSelectiveBloom;
   }
 }
 
@@ -1811,6 +1815,8 @@ ImportHandler.prototype.importSprites = function(obj){
     if ((typeof curExport.customRenderOrder) != UNDEFINED){
       sprite.setCustomRenderOrder(curExport.customRenderOrder);
     }
+
+    sprite.hasSelectiveBloom = curExport.hasSelectiveBloom;
   }
 }
 

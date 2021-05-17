@@ -6,6 +6,15 @@ precision lowp int;
 
 uniform vec3 color;
 
+#ifdef HAS_SELECTIVE_BLOOM
+  uniform float selectiveBloomFlag;
+#endif
+
+#ifdef HAS_SHADOW_MAP
+  varying vec2 vShadowMapUV;
+  uniform sampler2D shadowMap;
+#endif
+
 #ifdef HAS_SKYBOX_FOG
   uniform samplerCube cubeTexture;
   uniform vec3 cameraPosition;
@@ -16,6 +25,17 @@ uniform vec3 color;
 #endif
 
 void main(){
+
+  #ifdef HAS_SELECTIVE_BLOOM
+    if (selectiveBloomFlag <= -100.0){
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+      return;
+    }else if (selectiveBloomFlag >= 100.0){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      return;
+    }
+  #endif
+
   gl_FragColor = vec4(color, 1.0);
 
   #ifdef HAS_FOG

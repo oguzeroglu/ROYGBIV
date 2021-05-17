@@ -41,7 +41,19 @@ SkyboxHandler.prototype.generateMesh = function(skybox){
     skyboxBufferGeometry = new THREE.BoxBufferGeometry(skyboxDistance, skyboxDistance, skyboxDistance);
     geometryCache[geomKey] = skyboxBufferGeometry;
   }
-  this.skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox, false);
+  var mesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox, false);
+  this.skyboxMesh = mesh;
+  mesh.onBeforeRender = function(){
+    if (renderer.bloomOn && bloom.configurations.isSelective){
+      if (bloom.selectiveRenderingActive){
+        mesh.material.uniforms.selectiveBloomFlag.value = -1000;
+      }else{
+        mesh.material.uniforms.selectiveBloomFlag.value = 0;
+      }
+    }else{
+      mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  };
 }
 
 SkyboxHandler.prototype.getMappedSkyboxName = function(){

@@ -479,6 +479,13 @@ ModelInstance.prototype.unsetPhongLight = function(){
 }
 
 ModelInstance.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = -1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
   if (this.animationGroup1){
     this.mesh.material.uniforms.animMatrix1.value.copy(this.animationGroup1.getWorldMatrix());
     this.mesh.material.uniforms.animModelViewMatrix1.value.multiplyMatrices(camera.matrixWorldInverse, this.mesh.material.uniforms.animMatrix1.value);
@@ -1309,6 +1316,10 @@ ModelInstance.prototype.makePBR = function(){
   var alpha = this.alpha;
   this.alpha = 1;
   this.setAlpha(alpha);
+
+  if (bloom.configurations.isSelective){
+    bloom.makeObjectSelective(this);
+  }
 }
 
 ModelInstance.prototype.unmakePBR = function(){
@@ -1371,6 +1382,10 @@ ModelInstance.prototype.unmakePBR = function(){
   var alpha = this.alpha;
   this.alpha = 1;
   this.setAlpha(alpha);
+
+  if (bloom.configurations.isSelective){
+    bloom.makeObjectSelective(this);
+  }
 }
 
 ModelInstance.prototype.setPBRLightAttenuationCoef = function(lightAttenuationCoef){

@@ -15,6 +15,10 @@ varying vec3 vColor;
   uniform sampler2D shadowMap;
 #endif
 
+#ifdef HAS_SELECTIVE_BLOOM
+  uniform float selectiveBloomFlag;
+#endif
+
 #ifdef HAS_TEXTURE
   uniform sampler2D texture;
   varying vec2 vUV;
@@ -796,6 +800,16 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 #endif
 
 void main(){
+
+  #ifdef HAS_SELECTIVE_BLOOM
+    if (selectiveBloomFlag <= -100.0){
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+      return;
+    }else if (selectiveBloomFlag >= 100.0){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      return;
+    }
+  #endif
 
   vec3 colorHandled = vColor;
   #ifdef HAS_PHONG_LIGHTING

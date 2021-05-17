@@ -9,13 +9,13 @@ varying vec3 vNormal;
 #define INSERTION
 
 uniform vec3 color;
+uniform float selectiveBloomFlag;
 
 #ifdef IS_HDR
 	uniform sampler2D cubeTexture;
 #else
 	uniform samplerCube cubeTexture;
 #endif
-
 
 #ifdef IS_HDR
   #define cubeUV_textureSize (1024.0)
@@ -157,6 +157,16 @@ uniform vec3 color;
 #endif
 
 void main(){
+
+
+	if (selectiveBloomFlag <= -100.0){
+		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+		return;
+	}else if (selectiveBloomFlag >= 100.0){
+		gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+		return;
+	}
+
   vec4 skyboxColor = vec4(color, 1.0);
 
   #ifdef IS_HDR

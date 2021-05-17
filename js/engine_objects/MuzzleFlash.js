@@ -10,6 +10,25 @@ var MuzzleFlash = function(name, refPreconfiguredPS, psCount, psTime){
     this.particleSystems[i].maxPSTime = psTime;
     this.particleSystems[i].mesh.position.set(0, 0, 0);
     this.particleSystems[i].muzzleFlashName = this.name;
+    this.particleSystems[i].mesh.onBeforeRender = function(){
+      if (renderer.bloomOn && bloom.configurations.isSelective){
+        if (bloom.selectiveRenderingActive){
+          this.mesh.material.uniforms.selectiveBloomFlag.value = 1000;
+        }else{
+          this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+        }
+      }
+    }.bind({mesh: this.particleSystems[i].mesh});
+  }
+}
+
+MuzzleFlash.prototype.handleSelectiveBloom = function(isOn){
+  for (var i = 0; i<this.particleSystems.length; i++){
+    if (isOn){
+      bloom.makeObjectSelective(this.particleSystems[i]);
+    }else{
+      bloom.unmakeObjectSelective(this.particleSystems[i]);
+    }
   }
 }
 

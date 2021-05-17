@@ -514,7 +514,26 @@ var ObjectTrail = function(configurations){
   this.objectCoordinateCounter = 0;
   this.objectQuaternionCounter = 0;
 
+  this.hasSelectiveBloom = this.object.hasSelectiveBloom;
+
   webglCallbackHandler.registerEngineObject(this);
+}
+
+ObjectTrail.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = this.hasSelectiveBloom? 1000: -1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
+}
+
+ObjectTrail.prototype.handleSelectiveBloom = function(){
+  var bloomConfs = sceneHandler.scenes[this.object.registeredSceneName].postProcessing.bloom;
+  if (bloomConfs.isOn && bloomConfs.isSelective){
+    bloom.makeObjectSelective(this);
+  }
 }
 
 ObjectTrail.prototype.hasTexture = function(){

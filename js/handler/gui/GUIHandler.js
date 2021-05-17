@@ -71,6 +71,7 @@ var GUIHandler = function(){
       parseCommand("unbakeShadow " + selectionHandler.getSelectedObject().name);
     },
     "Active in non WebGL friendly devices": false,
+    "Has selective bloom": false,
     "Export": function(){
       terminal.clear();
       parseCommand("exportObject " + selectionHandler.getSelectedObject().name);
@@ -96,7 +97,8 @@ var GUIHandler = function(){
     "Margin Y": 50.0,
     "Max width%": 100,
     "Max height%": 100,
-    "Hidden": false
+    "Hidden": false,
+    "Has selective bloom": false
   };
   this.spriteManipulationParameters = {
     "Sprite": "spriteName",
@@ -119,7 +121,8 @@ var GUIHandler = function(){
     "Crop X": 0.01,
     "Crop Y": 0.01,
     "Hidden": false,
-    "Render order": "" + renderOrders.SPRITE
+    "Render order": "" + renderOrders.SPRITE,
+    "Has selective bloom": false
   };
   this.containerManipulationParameters = {
     "Container": "containerName",
@@ -175,6 +178,7 @@ var GUIHandler = function(){
     "Exposure": 0.0,
     "Gamma": 0.0,
     "BlurStepAmount": 0,
+    "Is selective": false,
     "BlurPass1": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass2": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass3": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
@@ -519,6 +523,7 @@ GUIHandler.prototype.afterSpriteSelection = function(){
     guiHandler.spriteManipulationParameters["Height fixed"] = !(typeof curSelection.fixedHeight == UNDEFINED);
     guiHandler.spriteManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
     guiHandler.spriteManipulationParameters["Render order"] = "" + ((typeof curSelection.customRenderOrder == UNDEFINED)? renderOrders.SPRITE: curSelection.customRenderOrder);
+    guiHandler.spriteManipulationParameters["Has selective bloom"] = !!curSelection.hasSelectiveBloom;
     if (!curSelection.isTextured){
       guiHandler.disableController(guiHandler.spriteManipulationTextureController);
     }
@@ -641,6 +646,8 @@ GUIHandler.prototype.afterTextSelection = function(){
     }
 
     guiHandler.textManipulationParameters["Hidden"] = !!curSelection.hiddenInDesignMode;
+
+    guiHandler.textManipulationParameters["Has selective bloom"] = !!curSelection.hasSelectiveBloom;
   }else{
     guiHandler.hide(guiHandler.guiTypes.TEXT);
   }
@@ -974,6 +981,9 @@ GUIHandler.prototype.afterObjectSelection = function(){
     }else{
       guiHandler.objectManipulationParameters["Shader precision"] = "default";
     }
+
+    guiHandler.objectManipulationParameters["Has selective bloom"] = !!obj.hasSelectiveBloom;
+
   }else{
     guiHandler.hide(guiHandler.guiTypes.OBJECT);
   }
@@ -1054,6 +1064,7 @@ GUIHandler.prototype.enableAllTMControllers = function(){
   guiHandler.enableController(guiHandler.textManipulationMaxWidthPercentController);
   guiHandler.enableController(guiHandler.textManipulationMaxHeightPercentController);
   guiHandler.enableController(guiHandler.textManipulationShaderPrecisionController);
+  guiHandler.enableController(guiHandler.textManipulationHasSelectiveBloomController);
 }
 
 GUIHandler.prototype.enableAllSMControllers = function(){
@@ -1122,6 +1133,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omLookSpeedController);
   guiHandler.enableController(guiHandler.omRotationModeController);
   guiHandler.enableController(guiHandler.omLightingTypeController);
+  guiHandler.enableController(guiHandler.omSelectiveBloomController);
 }
 
 GUIHandler.prototype.show = function(guiType){
@@ -1867,6 +1879,21 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
         selectionHandler.getSelectedObject().setPhongLight();
       }else{
         selectionHandler.getSelectedObject().unsetPhongLight();
+      }
+    }).listen();
+    guiHandler.omSelectiveBloomController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Has selective bloom").onChange(function(val){
+      terminal.clear();
+      selectionHandler.getSelectedObject().hasSelectiveBloom = val;
+      terminal.printInfo(val? Text.AFFECTED_BY_SELECTIVE_BLOOM: Text.NOT_AFFECTED_BY_SELECTIVE_BLOOM);
+      for (var objName in addedObjects){
+        if (addedObjects[objName].softCopyParentName == selectionHandler.getSelectedObject().name){
+          addedObjects[objName].hasSelectiveBloom = val;
+        }
+      }
+      for (var objName in objectGroups){
+        if (objectGroups[objName].softCopyParentName == selectionHandler.getSelectedObject().name){
+          objectGroups[objName].hasSelectiveBloom = val;
+        }
       }
     }).listen();
 
@@ -3017,6 +3044,11 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
     selectionHandler.getSelectedObject().setCustomRenderOrder(parsed);
     terminal.printInfo(Text.RENDER_ORDER_SET);
   }).listen();
+  graphicsFolder.add(guiHandler.spriteManipulationParameters, "Has selective bloom").onChange(function(val){
+    terminal.clear();
+    selectionHandler.getSelectedObject().hasSelectiveBloom = val;
+    terminal.printInfo(val? Text.AFFECTED_BY_SELECTIVE_BLOOM: Text.NOT_AFFECTED_BY_SELECTIVE_BLOOM);
+  }).listen();
 
   // MARGIN
   guiHandler.spriteManipulationMarginModeController = marginFolder.add(guiHandler.spriteManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right", "Center"]).onChange(function(val){
@@ -3225,6 +3257,11 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
   }).listen();
+  guiHandler.textManipulationHasSelectiveBloomController = graphicsFolder.add(guiHandler.textManipulationParameters, "Has selective bloom").onChange(function(val){
+    terminal.clear();
+    selectionHandler.getSelectedObject().hasSelectiveBloom = val;
+    terminal.printInfo(val? Text.AFFECTED_BY_SELECTIVE_BLOOM: Text.NOT_AFFECTED_BY_SELECTIVE_BLOOM);
+  }).listen();
 
   // BACKGROUND
   guiHandler.textManipulationHasBackgroundController = backgroundFolder.add(guiHandler.textManipulationParameters, "Has bg").onChange(function(val){
@@ -3368,13 +3405,13 @@ GUIHandler.prototype.initializeBloomGUI = function(){
   guiHandler.bloomThresholdController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Threshold").min(0).max(1).step(0.01).onChange(function(val){
     bloom.setThreshold(val);
   }).listen();
-  guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Strength").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Strength").min(0).max(1).step(0.001).onChange(function(val){
     bloom.setBloomStrength(val);
   }).listen();
-  guiHandler.bloomExposureController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Exposure").min(0).max(100).step(0.01).onChange(function(val){
+  guiHandler.bloomExposureController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Exposure").min(0).max(3).step(0.0001).onChange(function(val){
     bloom.setExposure(val);
   }).listen();
-  guiHandler.bloomGammaController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Gamma").min(0).max(100).step(0.01).onChange(function(val){
+  guiHandler.bloomGammaController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Gamma").min(0).max(3).step(0.0001).onChange(function(val){
     bloom.setGamma(val);
   }).listen();
   guiHandler.bloomBlurStepAmountController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "BlurStepAmount").min(1).max(5).step(1).onChange(function(val){
@@ -3390,7 +3427,27 @@ GUIHandler.prototype.initializeBloomGUI = function(){
       guiHandler.disableController(guiHandler["blurPassTapController"+(i+1)]);
     }
   }).listen();
+  guiHandler.bloomIsSelectiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Is selective").onChange(function(val){
+    terminal.clear();
+    if (renderer.bloomOn){
+      if (val){
+        bloom.makeSelective();
+      }else{
+        bloom.unmakeSelective();
+      }
+      terminal.printInfo(val? Text.BLOOM_IS_MARKED_AS_SELECTIVE: Text.BLOOM_IS_MARKED_AS_NON_SELECTIVE);
+    }else{
+      if (val){
+        terminal.printInfo(Text.BLOOM_IS_NOT_ACTIVE_CANNOT_MAKE_SELECTIVE);
+        guiHandler.bloomParameters["Is selective"] = false;
+      }
+    }
+  }).listen();
   guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Active").onChange(function(val){
+    if (!val && guiHandler.bloomParameters["Is selective"]){
+      guiHandler.bloomParameters["Is selective"] = false;
+      bloom.unmakeSelective();
+    }
     renderer.bloomOn = val;
   }).listen();
   for (var i = 0; i<5; i++){

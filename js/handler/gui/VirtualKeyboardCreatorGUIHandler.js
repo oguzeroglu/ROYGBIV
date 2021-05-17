@@ -124,6 +124,9 @@ VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
         virtualKeyboards[name].destroy();
       }
       virtualKeyboards[name] = new VirtualKeyboard(params);
+      if (bloom.configurations.isSelective){
+        virtualKeyboards[name].handleSelectiveBloom(true);
+      }
       sceneHandler.onVirtualKeyboardCreation(virtualKeyboards[name]);
       refreshRaycaster(text, false, function(){
         virtualKeyboardCreatorGUIHandler.onClose(text);
@@ -205,6 +208,9 @@ VirtualKeyboardCreatorGUIHandler.prototype.handleVirtualKeyboardInstance = funct
   this.virtualKeyboard = new VirtualKeyboard(this.configurations);
   this.objectPicker2D = new ObjectPicker2D();
   this.objectPicker2D.binHandler.insertVirtualKeyboard(this.virtualKeyboard);
+  if (bloom.configurations.isSelective){
+    this.virtualKeyboard.handleSelectiveBloom(true);
+  }
 }
 
 VirtualKeyboardCreatorGUIHandler.prototype.onClose = function(text){

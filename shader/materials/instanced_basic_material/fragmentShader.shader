@@ -9,6 +9,10 @@ varying vec3 vColor;
 
 #define INSERTION
 
+#ifdef HAS_SELECTIVE_BLOOM
+  uniform float selectiveBloomFlag;
+#endif
+
 #ifdef IS_AUTO_INSTANCED
   float totalAlpha = 1.0;
 #else
@@ -840,6 +844,16 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 #endif
 
 void main(){
+
+  #ifdef HAS_SELECTIVE_BLOOM
+    if (selectiveBloomFlag <= -100.0){
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+      return;
+    }else if (selectiveBloomFlag >= 100.0){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      return;
+    }
+  #endif
 
   vec3 colorHandled = vColor;
   #ifdef HAS_PHONG_LIGHTING

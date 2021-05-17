@@ -299,6 +299,17 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   handleViewport();
   renderer.setPixelRatio(screenResolution);
 
+  autoInstancingHandler.handleSelectiveBloom();
+  for (var trailName in objectTrails){
+    objectTrails[trailName].handleSelectiveBloom();
+  }
+  for (var psName in particleSystemPool){
+    particleSystemPool[psName].handleSelectiveBloom();
+  }
+  for (var mergedPSName in mergedParticleSystems){
+    mergedParticleSystems[mergedPSName].handleSelectiveBloom();
+  }
+
   if (isDeployment){
     loadTime.modeSwitchTime = performance.now() - loadTime.modeSwitchTime;
   }

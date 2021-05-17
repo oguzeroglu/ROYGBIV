@@ -30,6 +30,8 @@ var Crosshair = function(configurations){
 
   this.material = this.mesh.material;
 
+  this.hasSelectiveBloom = configurations.hasSelectiveBloom;
+
   this.texture.center.set(0.5, 0.5);
   this.angularSpeed = 0;
   this.rotationTime = 0;
@@ -39,6 +41,16 @@ var Crosshair = function(configurations){
   this.shrinkStartSize = this.sizeAmount;
   this.handleResize();
   webglCallbackHandler.registerEngineObject(this);
+}
+
+Crosshair.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = this.hasSelectiveBloom? 1000: -1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
 }
 
 Crosshair.prototype.onTextureAtlasRefreshed = function(){

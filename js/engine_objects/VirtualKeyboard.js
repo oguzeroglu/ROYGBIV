@@ -1,33 +1,3 @@
-// parameters:
-//  name
-//  maxLength
-//  positionXPercent
-//  positionYPercent
-//  fontName
-//  totalWidthPercent
-//  totalHeightPercent
-//  hasBackground
-//  backgroundColor
-//  backgroundAlpha
-//  backgroundTextureName
-//  hasBorder
-//  borderThickness
-//  borderColor
-//  keyWidthPercent
-//  keyHeightPercent
-//  keyHasBorder
-//  keyBorderColor
-//  keyBorderThickness
-//  keyHasBackground
-//  keyBackgroundColor
-//  keyBackgroundAlpha
-//  keyBackgroundTextureName
-//  keyColor
-//  keyCharMargin
-//  keyInteractionColor
-//  keyCharSize
-//  refCharSize
-//  refCharInnerHeight
 var VirtualKeyboard = function(parameters){
   this.isVirtualKeyboard = true;
   this.name = parameters.name;
@@ -122,6 +92,20 @@ var VirtualKeyboard = function(parameters){
   }
 
   this.text = "";
+}
+
+VirtualKeyboard.prototype.handleSelectiveBloom = function(isOn){
+  this.backgroundContainer.handleSelectiveBloom(isOn);
+
+  for (var key in this.containersByKey){
+    var container = this.containersByKey[key];
+    container.handleSelectiveBloom(isOn);
+    if (isOn){
+      bloom.makeObjectSelective(container.addedText);
+    }else{
+      bloom.unmakeObjectSelective(container.addedText);
+    }
+  }
 }
 
 VirtualKeyboard.prototype.resetColors = function(){

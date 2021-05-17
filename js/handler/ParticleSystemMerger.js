@@ -227,6 +227,20 @@ var ParticleSystemMerger = function(psObj, name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+ParticleSystemMerger.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
+}
+
+ParticleSystemMerger.prototype.handleSelectiveBloom = function(){
+  bloom.makeObjectSelective(this);
+}
+
 ParticleSystemMerger.prototype.compressGeometry = function(){
   macroHandler.compressAttributes(this.mesh, [
     "position", "velocity", "acceleration", "flags1", "flags3", "flags4", "angularQuaternion",

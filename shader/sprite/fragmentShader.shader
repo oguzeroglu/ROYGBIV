@@ -6,6 +6,10 @@ precision lowp int;
 uniform vec3 color;
 uniform float alpha;
 
+#ifdef HAS_SELECTIVE_BLOOM
+  uniform float selectiveBloomFlag;
+#endif
+
 #ifdef HAS_TEXTURE
   uniform sampler2D texture;
   uniform vec4 uvRanges;
@@ -38,6 +42,17 @@ uniform float alpha;
 #endif
 
 void main(){
+
+  #ifdef HAS_SELECTIVE_BLOOM
+    if (selectiveBloomFlag <= -100.0){
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+      return;
+    }else if (selectiveBloomFlag >= 100.0){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      return;
+    }
+  #endif
+
   gl_FragColor = vec4(color.r, color.g, color.b, alpha);
   #ifdef HAS_TEXTURE
     vec4 textureColor = texture2D(texture, uvAffineTransformation(vUV, uvRanges.x, uvRanges.y, uvRanges.z, uvRanges.w));

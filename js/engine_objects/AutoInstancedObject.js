@@ -5,6 +5,16 @@ var AutoInstancedObject = function(name, objects){
   this.pseudoObjectGroup = new ObjectGroup(null, objects);
 }
 
+AutoInstancedObject.prototype.onBeforeRender = function(){
+  if (renderer.bloomOn && bloom.configurations.isSelective){
+    if (bloom.selectiveRenderingActive){
+      this.mesh.material.uniforms.selectiveBloomFlag.value = this.hasSelectiveBloom? 1000: -1000;
+    }else{
+      this.mesh.material.uniforms.selectiveBloomFlag.value = 0;
+    }
+  }
+}
+
 AutoInstancedObject.prototype.setAffectedByLight = function(isAffectedByLight){
 
   macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
@@ -387,5 +397,12 @@ AutoInstancedObject.prototype.removeFog = function(){
 AutoInstancedObject.prototype.getRegisteredSceneName = function(){
   for (var objName in this.objects){
     return this.objects[objName].registeredSceneName;
+  }
+}
+
+AutoInstancedObject.prototype.setSelectiveBloom = function(){
+  for (var objName in this.objects){
+    this.hasSelectiveBloom = this.objects[objName].hasSelectiveBloom;
+    return;
   }
 }

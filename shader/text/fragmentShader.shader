@@ -11,6 +11,10 @@ uniform sampler2D glyphTexture;
 
 #define INSERTION
 
+#ifdef HAS_SELECTIVE_BLOOM
+  uniform float selectiveBloomFlag;
+#endif
+
 #ifdef HAS_BACKGROUND
   uniform float backgroundAlpha;
   uniform vec3 backgroundColor;
@@ -38,6 +42,16 @@ void main(){
     discard;
     return;
   }
+
+  #ifdef HAS_SELECTIVE_BLOOM
+    if (selectiveBloomFlag <= -100.0){
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+      return;
+    }else if (selectiveBloomFlag >= 100.0){
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      return;
+    }
+  #endif
 
   #ifdef IS_TWO_DIMENSIONAL
     if (isInputLine > 50.0) {
