@@ -3186,6 +3186,7 @@ ObjectGroup.prototype.export = function(isBuildingForDeploymentMode){
   }
 
   exportObj.skipShadowsInNonWebGLFriendlyDevices = !!this.skipShadowsInNonWebGLFriendlyDevices;
+  exportObj.hasSelectiveBloom = !!this.hasSelectiveBloom;
 
   return exportObj;
 }
@@ -3894,4 +3895,8 @@ ObjectGroup.prototype.hasDisplacementAnimation = function(){
     }
   }
   return false;
+}
+
+ObjectGroup.prototype.setSelectiveBloom = function(val){
+  this.hasSelectiveBloom = val;
 }

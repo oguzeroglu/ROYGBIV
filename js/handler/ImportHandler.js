@@ -1641,6 +1641,8 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (curObjectGroupExport.bakedColors){
       objectGroupInstance.bakeLights(curObjectGroupExport.bakedColors);
     }
+
+    objectGroupInstance.setSelectiveBloom(!!curObjectGroupExport.hasSelectiveBloom);
   }
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){
