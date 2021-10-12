@@ -364,7 +364,7 @@ LightHandler.prototype.findBakeableObjects = function(){
 
   for (var objName in objectGroups){
     var obj = objectGroups[objName];
-    if (!obj.isChangeable && !obj.isDynamicObject && obj.affectedByLight && !obj.isInstanced && obj.lightingType == lightHandler.lightTypes.GOURAUD){
+    if (!obj.bakedColors && !obj.isChangeable && !obj.isDynamicObject && obj.affectedByLight && !obj.isInstanced && obj.lightingType == lightHandler.lightTypes.GOURAUD){
       bakeableObjects.push(obj);
     }
   }
