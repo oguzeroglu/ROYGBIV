@@ -1627,7 +1627,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (curObjectGroupExport.manualPositionInfo){
       objectGroupInstance.setPosition(curObjectGroupExport.manualPositionInfo.x, curObjectGroupExport.manualPositionInfo.y, curObjectGroupExport.manualPositionInfo.z, true);
     }
-    objectGroupInstance.setAffectedByLight(curObjectGroupExport.affectedByLight);
+
     if (objectGroupInstance.affectedByLight && curObjectGroupExport.lightingType == lightHandler.lightTypes.PHONG){
       objectGroupInstance.setPhongLight();
     }
@@ -1643,6 +1643,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     }
 
     objectGroupInstance.setSelectiveBloom(!!curObjectGroupExport.hasSelectiveBloom);
+    objectGroupInstance.setAffectedByLight(curObjectGroupExport.affectedByLight);
   }
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){
