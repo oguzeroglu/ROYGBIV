@@ -219,7 +219,7 @@ function parse(input){
             terminal.printError(Text.GRID_SYSTEM_NOT_IN_SCENE);
             return true;
           }
-          if (Object.keys(gs.grids).length > 100){
+          if (Object.keys(gs.grids).length > 100 * 100 * 100){
             terminal.printError(Text.TOO_MANY_GRIDS);
             return true;
           }
