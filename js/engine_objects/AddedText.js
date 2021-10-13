@@ -100,7 +100,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
 }
 
 AddedText.prototype.onBeforeRender = function(){
-  if (renderer.bloomOn && bloom.configurations.isSelective){
+  if (renderer.bloomOn && bloom.configurations.isSelective && this.mesh.material.uniforms.selectiveBloomFlag){
     if (bloom.selectiveRenderingActive){
       this.mesh.material.uniforms.selectiveBloomFlag.value = this.hasSelectiveBloom? 1000: -1000;
     }else{
