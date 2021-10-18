@@ -4542,8 +4542,10 @@ Roygbiv.prototype.setSteerableLookTarget = function(object, targetVector){
 // the behavior is constructed with given AStar object. So use this API together
 // with the PathFollowingBehavior. If there's no nearby graph vertex of given
 // vectors, this API does not calculate any path. In that case increasing the world
-// bin size might help.
-Roygbiv.prototype.findShortestPath = function(aStar, fromVector, toVector){
+// bin size might help. Optional preventObjects parameter containing an array of
+// added objects/object groups may be passed in order to try to compute a path
+// that is not blocked by these entities.
+Roygbiv.prototype.findShortestPath = function(aStar, fromVector, toVector, preventObjects){
   if (mode == 0){
     return;
   }
@@ -4554,8 +4556,9 @@ Roygbiv.prototype.findShortestPath = function(aStar, fromVector, toVector){
   preConditions.checkIfAStar(ROYGBIV.findShortestPath, aStar);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.findShortestPath, preConditions.fromVector, fromVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.findShortestPath, preConditions.toVector, toVector);
+  preConditions.checkIfPreventObjectsOnlyIfExists(ROYGBIV.findShortestPath, preConditions.preventObjects, preventObjects);
 
-  steeringHandler.calculateShortestPath(aStar, fromVector, toVector);
+  steeringHandler.calculateShortestPath(aStar, fromVector, toVector, preventObjects);
 }
 
 // Makes a steerable represented as hidingObject hide from another steerable

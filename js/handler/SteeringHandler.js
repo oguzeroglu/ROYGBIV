@@ -1079,7 +1079,7 @@ SteeringHandler.prototype.setLookTarget = function(object, targetVector){
   object.steerable.setLookTarget(komputeVector);
 }
 
-SteeringHandler.prototype.calculateShortestPath = function(aStar, fromVector, toVector){
+SteeringHandler.prototype.calculateShortestPath = function(aStar, fromVector, toVector, preventObjects){
   var graph = aStar.graph;
 
   var komputeFromVector = this.vectorPool.get().set(fromVector.x, fromVector.y, fromVector.z);
@@ -1096,7 +1096,28 @@ SteeringHandler.prototype.calculateShortestPath = function(aStar, fromVector, to
     komputeToVector = this.vectorPool.get().set(closestTo.x, closestTo.y, closestTo.z);
   }
 
-  aStar.findShortestPath(komputeFromVector, komputeToVector);
+  aStar.findShortestPath(komputeFromVector, komputeToVector, function(p1x, p1y, p1z, p2x, p2y, p2z){
+    if (!preventObjects){
+      return 0;
+    }
+
+    REUSABLE_LINE.set(REUSABLE_VECTOR.set(p1x, p1y, p1z), REUSABLE_VECTOR_2.set(p2x, p2y, p2z));
+
+    for (var i = 0; i < preventObjects.length; i ++){
+      var obj = preventObjects[i];
+      obj.updateBoundingBoxes();
+      if (obj.isAddedObject && obj.intersectsLine(REUSABLE_LINE)){
+        return Infinity;
+      }
+      for (var childName in obj.group){
+        if (obj.group.intersectsLine(REUSABLE_LINE)){
+          return Infinity;
+        }
+      }
+    }
+
+    return 0;
+  });
 }
 
 SteeringHandler.prototype.makeSteerableHideFromSteerable = function(hidingObject, targetObject){

@@ -323,6 +323,7 @@ var Preconditions = function(){
   this.colorR = "colorR";
   this.colorG = "colorG";
   this.colorB = "colorB";
+  this.preventObjects = "preventObjects";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -331,6 +332,26 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfPreventObjectsOnlyIfExists = function(callerFunc, paramName, preventObjects){
+  if (!preventObjects){
+    return;
+  }
+  this.checkIfArrayOnlyIfExists(callerFunc, paramName, preventObjects);
+  this.checkIfArrayLengthGreaterThan(callerFunc, paramName, preventObjects, 0);
+  for (var i = 0; i < preventObjects.length; i ++){
+    var obj = preventObjects[i];
+    if (!(obj.isAddedObject || obj.isObjectGroup)){
+      this.throw(callerFunc, "preventObjects must only contain added objects or object groups.");
+    }
+    if (!obj.isIntersectable){
+      this.throw(callerFunc, "preventObjects must only contain intersectable objects.");
+    }
+    if (!(obj.isChangeable || obj.isDynamicObject)){
+      this.throw(callerFunc, "preventObjects must only contain changeable or dynamic objects.");
+    }
+  }
 }
 
 Preconditions.prototype.checkIfModelInstanceHasChild = function(callerFunc, modelInstance, childName){
