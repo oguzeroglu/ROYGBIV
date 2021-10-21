@@ -39,7 +39,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
 }
 
 ParticleSystem.prototype.onBeforeRender = function(){
-  if (renderer.bloomOn && bloom.configurations.isSelective){
+  if (renderer.bloomOn && bloom.configurations.isSelective && this.mesh.material.uniforms.selectiveBloomFlag){
     if (bloom.selectiveRenderingActive){
       this.mesh.material.uniforms.selectiveBloomFlag.value = 1000;
     }else{
