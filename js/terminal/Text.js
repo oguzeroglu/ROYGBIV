@@ -1558,4 +1558,10 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETMODELINSTANCECLICKLISTENER = "Sets a click listener for a model instance.\nThe callbackFunction is executed with x, y, z coordinates of the clicked point. The callbackFunction is bound to object\n(this = object inside the function).";
   this.ROYGBIV_SCRIPTING_API_REMOVEMODELINSTANCECLICKLISTENER = "Removes the click listener of a model instance.";
   this.ROYGBIV_SCRIPTING_API_FOREACHCHILD = "Executes callbackFunction with childName parameter for each child of model instance.";
+  this.ROYGBIV_SCRIPTING_API_CREATEEVENTEMITTER = "Creates and returns a new EventEmitter containing following methods:\n" +
+                                                  "on(eventKey, callbackFunction): Listens for an event and executes the\n" +
+                                                  "callback function with the emitted data when the event is emitted. This\n" +
+                                                  "method returns an id which is used in off method.\n" +
+                                                  "off(id): Stops listening for an event. Id is obtained when on is called\n" +
+                                                  "emit(event, data): Emits an event with given data.";
 }

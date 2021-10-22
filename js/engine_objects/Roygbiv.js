@@ -373,7 +373,8 @@ var Roygbiv = function(){
     "setModelInstanceTextureTransform",
     "setModelInstanceClickListener",
     "removeModelInstanceClickListener",
-    "forEachChild"
+    "forEachChild",
+    "createEventEmitter"
   ];
 
   this.globals = new Object();
@@ -5684,4 +5685,14 @@ Roygbiv.prototype.setPixelRatio = function(pixelRatio){
   previewModeScreenResolution = pixelRatio;
   renderer.setPixelRatio(previewModeScreenResolution);
   smartRenderingHandler.invalidate();
+}
+
+// Creates and returns a new EventEmitter containing following methods:
+// on(eventKey, callbackFunction): Listens for an event and executes the
+// callback function with the emitted data when the event is emitted. This
+// method returns an id which is used in off method.
+// off(id): Stops listening for an event. Id is obtained when on is called
+// emit(event, data): Emits an event with given data
+Roygbiv.prototype.createEventEmitter = function(){
+  return new EventEmitter();
 }
