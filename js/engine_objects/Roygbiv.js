@@ -913,6 +913,7 @@ Roygbiv.prototype.getCurrentArea = function(){
     return;
   }
 
+  areaConfigurationsHandler.handle();
   return areaConfigurationsHandler.currentArea;
 }
 
