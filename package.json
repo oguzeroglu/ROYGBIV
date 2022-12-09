@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/oguzeroglu/ROYGBIV#readme",
   "dependencies": {
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "image-size": "^0.8.3",
     "minify": "^6.0.1",
     "pg": "^8.5.1",
